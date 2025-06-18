@@ -5,7 +5,7 @@ Just download https://github.com/shimane-dev/sae/
 
 If you have "aaa.cfg",
 ````
-$ python ./sae/StructureAnalysisEnvironment/bin/Rcfg2vasp_nonLIB.pyRcfg2vasp_nonLIB.py aaa
+$ python ./sae/StructureAnalysisEnvironment/bin/Rcfg2vasp_nonLIB.py aaa
 ````
 to get "aaa.vasp".
 
