@@ -1,18 +1,18 @@
 # rmc_vasp
 
 
-Just download https://github.com/shimane-dev/sae/blob/main/StructureAnalysisEnvironment/bin/Rcfg2vasp_nonLIB.py
+Just download https://github.com/shimane-dev/sae/
 
 If you have "aaa.cfg",
 ````
-$ python Rcfg2vasp_nonLIB.py aaa
+$ python ./sae/StructureAnalysisEnvironment/bin/Rcfg2vasp_nonLIB.pyRcfg2vasp_nonLIB.py aaa
 ````
 to get "aaa.vasp".
 
 ````
-$ cd library
+$ cd sae
 $ python
-$ import StructureAnalysisEnvironment as SAE
-$ cell = SAE.io.Read(filename='POSCAR', code='VASP')
+$ import StructureAnalysisEnvironment as SAEnv
+$ cell = SAEnv.io.Read(filename='POSCAR', code='VASP')
 $ cell.write(code='FDMNES')
 ````
