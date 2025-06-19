@@ -10,9 +10,6 @@ $ python ./sae/StructureAnalysisEnvironment/bin/Rcfg2vasp_nonLIB.py aaa
 to get "aaa.vasp".
 
 ````
-$ cd sae
-$ python
-$ import StructureAnalysisEnvironment as SAEnv
-$ cell = SAEnv.io.Read(filename='POSCAR', code='VASP')
-$ cell.write(code='FDMNES')
+$ python ./Rvasp2cfg_nonLIB.py aaa
 ````
+to regain "aaa.cfg"
