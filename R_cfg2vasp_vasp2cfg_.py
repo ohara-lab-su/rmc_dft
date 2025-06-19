@@ -11,5 +11,5 @@ for i in range(0,1000):
     subprocess.run(["rmcp_v2023.1_lin.exe", "aaa"], check=True)
     # aaa.vasp -> aaa.cfg
     subprocess.run(["python3","Rcfg2vasp_nonLIB.py","aaa"], check=True)
-    shutil.copyfile("aaa.cfg", "POSCAR")
+    shutil.copyfile("aaa.vasp", "POSCAR")
 

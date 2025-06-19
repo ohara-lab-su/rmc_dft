@@ -16,5 +16,5 @@ do
   # aaa.cfg -> aaa.vasp
   python3 Rcfg2vasp_nonLIB.py aaa
 
-  cat aaa.cfg > POSCAR
+  cat aaa.vasp > POSCAR
 done
