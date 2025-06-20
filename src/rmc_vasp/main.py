@@ -6,7 +6,6 @@ from vasp.conv_vasp2cfg import conv_vasp2cfg
 from Rcfg2vasp_nonLIB import conv_cfg2vasp
 
 
-
 def get_main():
     ###############################################
     ## optparse
