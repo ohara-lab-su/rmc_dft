@@ -29,7 +29,7 @@ import optparse
 # from numpy import *
 import numpy as np
 
-def conv(cname: str):
+def conv_vasp2cfg(cname: str):
     ###############################################
     ## default name
     ##
@@ -232,4 +232,4 @@ if __name__ == "__main__":
         # print "script name:",argvs[0]
         cname = args[0]
 
-    conv(cname)
+    conv_vasp2cfg(cname)
