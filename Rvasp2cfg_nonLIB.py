@@ -81,7 +81,7 @@ def conv_vasp2cfg(cname: str):
     ##
     tmp = open(cname + ".vasp")
     datfile = tmp.read()
-    tmp.close
+    tmp.close()
     datlines = datfile.split("\n")
 
 
@@ -214,7 +214,7 @@ def conv_vasp2cfg(cname: str):
 if __name__ == "__main__":
     ###############################################
     ## optparse
-    arser = optparse.OptionParser()
+    parser = optparse.OptionParser()
 
     parser.add_option(
         "-i",
