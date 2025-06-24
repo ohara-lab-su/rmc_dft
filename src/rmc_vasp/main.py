@@ -27,6 +27,7 @@ def get_main():
     #    return cname
     #else:
     #    return 1000
+    return 2
 
 
 def run(max: int = 1000):
