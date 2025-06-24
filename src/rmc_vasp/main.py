@@ -1,3 +1,4 @@
+import optparse
 import shutil
 
 from vasp.vasp import UtilVasp
