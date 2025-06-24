@@ -1,23 +1,25 @@
 # rmc_vasp
-第一原理分子動力学と逆モンテカルロ法(RMC)を交互に行うのを支援するpythonモジュール。
-構造変換パッケージを基盤にしています。( StructureAnalysisEnvironment: 
-https://github.com/shimane-dev/sae.git )
+"rmc_vasp" iteratively performs the ab initio molecular dynamics (MD) and the reverse monte carlo modeling (RMC).
+It is based on the Structure Analysis Environment package ( 
+https://github.com/shimane-dev/sae.git ).
 
 
-## 準備
+## Requirements
 ### VASP
-VASPをインストールします。
+VASP need to be installed.
 (https://www.vasp.at/)
-#### 必要ファイル
-VASPのインプットファイル
+#### Input files
+VASP input files.
 
 ### RMC
-RMC POTをインストールします。
+RMC POT need to be installed.
 (https://www.szfki.hu/~nphys/rmc++/opening.html)
-#### 必要ファイル
-RMC POTのインプットファイル（実験データ）
+#### Input files
+RMC POT input files especially experimental data.
+(Xray diffraction, Neutron diffraction and so on. )
 
-### 初期構造
+### Initial structure
+Density, number of atoms (system size).
 
 
 ## Install
@@ -25,10 +27,10 @@ RMC POTのインプットファイル（実験データ）
 Just download https://github.com/shimane-dev/rmc_vasp/
 Install using pip:
 ````
-pip install rmc_vasp
+$ pip install rmc_vasp
 ````
 
-## 実行
+## Execution
 
 Put input files in a folder and open python:
 ````
