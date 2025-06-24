@@ -1,5 +1,10 @@
 # rmc_vasp
 
+## 準備
+### VASP
+### RMC
+
+## install
 
 Just download https://github.com/shimane-dev/sae/
 
@@ -14,4 +19,5 @@ $ python ./Rvasp2cfg_nonLIB.py aaa
 ````
 to regain "aaa.cfg"
 
+## 実行
 markdonw
