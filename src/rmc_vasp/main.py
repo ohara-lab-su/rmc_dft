@@ -33,7 +33,7 @@ def get_main():
 
 def run(max: int = 1000):
     vasp = UtilVasp()
-    rmc = UtilR
+    rmc = UtilRmc()
 
     # for i in range(0, max):
     vasp.run()
@@ -51,16 +51,16 @@ if __name__ == "__main__":
     ## optparse
     parser = optparse.OptionParser()
 
-    parser.add_option(
-        "-i",
-        "--input",
-        dest="INPUT",
-        default=cname,
-    )
+    #parser.add_option(
+    #    "-i",
+    #    "--input",
+    #    dest="INPUT",
+    #    default=cname,
+    #)
     options, args = parser.parse_args()
 
-    if options.INPUT:
-        cname = options.INPUT
+   # if options.INPUT:
+   #     cname = options.INPUT
 
     # print args,options
     if len(args) > 0:
