@@ -18,7 +18,7 @@ class UtilRmc:
 
     def run_local(mystr: str, blocking: bool = True):
         """
-        Call a local RMC command.
+        It calls a local RMC command.
 
         :param mystr: RMC input file name without extension (project name).
         :type mystr: str
