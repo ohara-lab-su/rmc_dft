@@ -1,17 +1,21 @@
 import subprocess
 from config import Config
 from vasp.conv_vasp2cfg import conv_vasp2cfg
+from x_logger.x_logger import XLogger
 
 
 class UtilVasp:
 
-    def __init__(self):
-        self.a = "b"
+    def __init__(self, logger: XLogger = None):
+        self._logger = logger
+        if logger:
+            self._logger.debug("== create UtilVasp()")
 
     def run(self, blocking: bool = True):
+        self._logger.debug("=== run()")
         subprocess.run(f"{Config.vasp_bin}", check=True)
-        print(self.a)
 
+    @staticmethod
     def conv_vasp2cfg(self, cname: str = "POSCAR"):
         conv_vasp2cfg(cname)
 
