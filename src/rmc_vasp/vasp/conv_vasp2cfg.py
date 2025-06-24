@@ -29,32 +29,32 @@ import optparse
 # from numpy import *
 import numpy as np
 
+
 def conv_vasp2cfg(cname: str):
     ###############################################
     ## default name
     ##
     # cname = "igzo"  # INPUT BASE filename
 
-
     ###############################################
     ## optparse
     # parser = optparse.OptionParser()
 
-   #  parser.add_option(
-   #      "-i",
-   #      "--input",
-   #      dest="INPUT",
-   #      default=cname,
-   #  )
-   #  options, args = parser.parse_args()
-   #
-   #  if options.INPUT:
-   #      cname = options.INPUT
-   #
-   #  # print args,options
-   #  if len(args) > 0:
-   #      # print "script name:",argvs[0]
-   #      cname = args[0]
+    #  parser.add_option(
+    #      "-i",
+    #      "--input",
+    #      dest="INPUT",
+    #      default=cname,
+    #  )
+    #  options, args = parser.parse_args()
+    #
+    #  if options.INPUT:
+    #      cname = options.INPUT
+    #
+    #  # print args,options
+    #  if len(args) > 0:
+    #      # print "script name:",argvs[0]
+    #      cname = args[0]
 
     if cname:
         print("INPUT file name :", cname + ".vasp")
@@ -62,7 +62,6 @@ def conv_vasp2cfg(cname: str):
 
     if not os.path.exists(cname + ".vasp"):
         sys.exit(cname + ".vasp file not found")
-
 
     # def readcfg():
     ###############################################
@@ -75,7 +74,6 @@ def conv_vasp2cfg(cname: str):
     # t3_x,t3_y,t3_z
     # position
 
-
     ###############################################
     ## Open vasp file
     ##
@@ -84,23 +82,21 @@ def conv_vasp2cfg(cname: str):
     tmp.close()
     datlines = datfile.split("\n")
 
-
     ###############################################
     ## Read Header
     ##
 
-    #t = datlines[7].split()
-    #natom = t[0]
-    natom = sum(list(map(int,datlines[6].split())))
+    # t = datlines[7].split()
+    # natom = t[0]
+    natom = sum(list(map(int, datlines[6].split())))
 
-    #t = datlines[8].split()
-    #ntype = t[0]
-    ntype = len(list(map(int,datlines[6].split())))
+    # t = datlines[8].split()
+    # ntype = t[0]
+    ntype = len(list(map(int, datlines[6].split())))
 
     ## We don't construct fixed molecule.
-    #nmoles = datlines[9]
-    #angles = datlines[10]
-
+    # nmoles = datlines[9]
+    # angles = datlines[10]
 
     ###############################################
     ## Read Lattice Vector
@@ -120,14 +116,12 @@ def conv_vasp2cfg(cname: str):
     t3_y = float(v[1])
     t3_z = float(v[2])
 
-
-
     ###############################################
     ## Read Atoms
     ##
-    #lines = 17
-    #type = np.zeros((int(ntype) + 1))
-    #for i in range(int(ntype)):
+    # lines = 17
+    # type = np.zeros((int(ntype) + 1))
+    # for i in range(int(ntype)):
     #    lines += 1
     #    n = datlines[lines].split()
     #    type[i] = n[0]
@@ -137,12 +131,14 @@ def conv_vasp2cfg(cname: str):
     #    tmp = datlines[lines]
     #    lines += 1
     #    tmp = datlines[lines]
-    type = list(map(int,datlines[6].split()))  # length is different from original deffinition
+    type = list(
+        map(int, datlines[6].split())
+    )  # length is different from original deffinition
     ###############################################
     ## Read Internal Coordinate
     ##
-    position = np.zeros((int(natom) + 1, 3)) # final row is dummy
-    lines=7
+    position = np.zeros((int(natom) + 1, 3))  # final row is dummy
+    lines = 7
     for i in range(int(natom)):
         lines += 1
         xyz = datlines[lines].split()
@@ -150,7 +146,6 @@ def conv_vasp2cfg(cname: str):
         position[i, 1] = xyz[1]
         position[i, 2] = xyz[2]
     # print position[i,0], position[i,1], position[i,2]
-
 
     ###############################################
     ## DATA convert
@@ -176,15 +171,21 @@ def conv_vasp2cfg(cname: str):
     ## OUTPUT for cfg
     cfg = open(cname + ".cfg", "w")
 
-    print(" (Version 3 format configuration file) !file created by SimpleCfg::save !", file=cfg)
+    print(
+        " (Version 3 format configuration file) !file created by SimpleCfg::save !",
+        file=cfg,
+    )
     print("comment", file=cfg)
     print("", file=cfg)
     print("", file=cfg)
-    print("                0               0               0 moves generated, tried, accepted", file=cfg)
+    print(
+        "                0               0               0 moves generated, tried, accepted",
+        file=cfg,
+    )
     print("          0              configurations saved", file=cfg)
     print("", file=cfg)
-    print("      %d molecules of all types"%natom, file=cfg)
-    print("          %d types of molecules "%ntype, file=cfg)
+    print("      %d molecules of all types" % natom, file=cfg)
+    print("          %d types of molecules " % ntype, file=cfg)
     print("          1 is the largest number of atoms in a molecule ", file=cfg)
     print("          0 Euler angles are provided ", file=cfg)
     print(" ", file=cfg)
@@ -196,11 +197,10 @@ def conv_vasp2cfg(cname: str):
     print("", file=cfg)
 
     for i in range(ntype):
-        print("       %d molecules of type  %d"%(type[i],(i+1)), file=cfg)
+        print("       %d molecules of type  %d" % (type[i], (i + 1)), file=cfg)
         print("          1 atomic sites ", file=cfg)
         print("              0.000000   0.000000   0.000000", file=cfg)
         print("", file=cfg)
-
 
     for i in range(int(natom)):
         print(

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rmc_vasp"
+version = "0.1.0"
+description = "cobotta ctrl server2 (using ORiN2)"
+# authors = [
+#   { name="Kengo NAKADA", email="kengo.nakada@email.com" }
+# ]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = []
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+# ここでpytestのiniと同じようにオプションが書ける
+# 例えばテストマーク、フィルタ、カバレッジなども追記可能
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
