@@ -1,0 +1,64 @@
+
+! MD
+IBRION = 0        ! MD (treat ionic degrees of freedom)
+NSW    = 4        ! no of ionic steps
+POTIM  = 1.0      ! MD time step in fs
+
+MDALGO = 2        ! Nose-Hoover thermostat
+SMASS  = 1.0      ! Nose mass
+
+TEBEG  = 293.15     ! temperature at beginning
+TEEND  = 293.15  ! temperature at end
+ISIF   = 2        ! update positions; cell shape and volume fixed
+
+################/home/hpc/vasp9_sample/glass_LiPS_g7030_208/INCAR
+general:
+ SYSTEM = glass_LiPS
+ GGA    = PE
+ ISTART = 0
+#ICHARG = 2
+
+#ISTART = 1
+#ICHARG = 1
+#ICHARG = 11
+
+ ENCUT  = 260
+ PREC   = High
+ ALOG   = Fast
+#ALOG   = Normal
+
+#ISMEAR = -5
+ ISMEAR = 0
+ SIGMA  = 0.05
+
+ LORBIT = 11
+ NEDOS  = 1500
+#NEML   = 100
+#NBANDS = 32
+
+dynamic:
+ EDIFF  = 1E-05
+ EDIFFG = 1E-04
+#EDIFF  = 1E-07
+#EDIFFG = 1E-06
+ NSW    = 300
+#NSW    = 0
+ POTIM  = 0.1
+ IBRION = 2
+#ISIF   = 3
+
+ LREAL  = auto
+ NSIM   = 4
+
+#ISPIN = 2
+#MAGMOM = 50*0.0 3*1.0
+
+ NPAR = 4
+
+#cohp:
+# ISYM  = -1
+# NSW   = 0
+# LWAVE = .TRUE.
+# NBANDS = 1000
+
+
