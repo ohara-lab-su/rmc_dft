@@ -10,7 +10,7 @@ def get_main():
     ###############################################
     ## optparse
     # parser = optparse.OptionParser()
-
+    #
     # parser.add_option(
     #     "-n",
     #     "--num",
@@ -18,15 +18,15 @@ def get_main():
     #     default=cname,
     # )
     # options, args = parser.parse_args()
-
+    #
     # if options.INPUT:
     #     cname = options.INPUT
-
-    if len(args) > 0:
-        cname = int(args[0])
-        return cname
-    else:
-        return 1000
+    #
+    #if len(args) > 0:
+    #    cname = int(args[0])
+    #    return cname
+    #else:
+    #    return 1000
 
 
 def run(max: int = 1000):
@@ -45,5 +45,25 @@ def run(max: int = 1000):
 
 
 if __name__ == "__main__":
+    ###############################################
+    ## optparse
+    parser = optparse.OptionParser()
+
+    parser.add_option(
+        "-i",
+        "--input",
+        dest="INPUT",
+        default=cname,
+    )
+    options, args = parser.parse_args()
+
+    if options.INPUT:
+        cname = options.INPUT
+
+    # print args,options
+    if len(args) > 0:
+        # print "script name:",argvs[0]
+        cname = args[0]
+
     num = get_main()
     run(num)
