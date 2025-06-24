@@ -5,3 +5,4 @@ class Config:
     #num_procs = 16
     #vasp_bin = f"mpirun -np {num_procs} {os.path.expanduser('/home/hpc/vasp/bin/vasp')}"
     vasp_bin = "/home/hpc/vasp/bin/vasp"
+
