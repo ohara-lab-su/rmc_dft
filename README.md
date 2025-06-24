@@ -13,3 +13,5 @@ to get "aaa.vasp".
 $ python ./Rvasp2cfg_nonLIB.py aaa
 ````
 to regain "aaa.cfg"
+
+markdonw
