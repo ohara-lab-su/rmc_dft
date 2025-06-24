@@ -5,10 +5,8 @@ from config import Config
 
 class UtilRmc:
     """
-    Utility class for managing and running RMC commands.
-
-    This class provides methods to execute local RMC commands, parse
-    configuration files. It provides RMC-related tools and configurations.
+    Utility class for managing and running local RMC commands.
+    And parsing configuration files.
     """
 
     def run(self, name: str = "local"):
@@ -20,9 +18,9 @@ class UtilRmc:
 
     def run_local(mystr: str, blocking: bool = True):
         """
-        It calls a local RMC command.
+        Call a local RMC command.
 
-        :param mystr: RMC input file name without extension.
+        :param mystr: RMC input file name without extension (project name).
         :type mystr: str
         :param blocking: Blocking mode. Default is True.
         :type blocking: bool
