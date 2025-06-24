@@ -30,7 +30,7 @@ Install using pip:
 $ pip install rmc_vasp
 ````
 
-## Execution
+## How to run
 
 Put input files in a folder and open python:
 ````
