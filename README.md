@@ -1,6 +1,6 @@
 # rmc_vasp
 "rmc_vasp" iteratively performs the ab initio molecular dynamics (MD) and the reverse monte carlo modeling (RMC).
-It is based on the Structure Analysis Environment package ( 
+It is based on Structure Analysis Environment package ( 
 https://github.com/shimane-dev/sae.git ).
 
 
