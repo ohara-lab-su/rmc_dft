@@ -1,4 +1,7 @@
 # rmc_vasp
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_vasp/blob/main/README.md)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_vasp/blob/main/README.ja.md)
+
 "rmc_vasp" iteratively performs the ab initio molecular dynamics (MD) and the reverse monte carlo modeling (RMC).
 It is based on Structure Analysis Environment package ( 
 https://github.com/shimane-dev/sae.git ).
