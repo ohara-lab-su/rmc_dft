@@ -25,7 +25,7 @@ RMC POT のインプットファイルを準備します。特に、実験によ
 密度, 原子数 (セルサイズ)。
 
 
-## Install
+## インストール
 
 Just download https://github.com/shimane-dev/rmc_vasp/
 Install using pip:
