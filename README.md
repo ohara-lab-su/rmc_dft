@@ -1,23 +1,49 @@
 # rmc_vasp
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_vasp/blob/main/README.md)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_vasp/blob/main/README.ja.md)
 
-## 準備
+"rmc_vasp" iteratively performs the ab initio molecular dynamics (MD) and the reverse monte carlo modeling (RMC).
+It is based on Structure Analysis Environment package ( 
+https://github.com/shimane-dev/sae.git ).
+
+
+## Requirements
 ### VASP
+VASP need to be installed.
+(https://www.vasp.at/)
+#### Input files
+VASP input files.
+
 ### RMC
+RMC POT need to be installed.
+(https://www.szfki.hu/~nphys/rmc++/opening.html)
+#### Input files
+RMC POT input files especially experimental data.
+(Xray diffraction, Neutron diffraction and so on. )
 
-## install
+### Initial structure
+Density, number of atoms (system size).
 
-Just download https://github.com/shimane-dev/sae/
 
-If you have "aaa.cfg",
+## Install
+
+Just download https://github.com/shimane-dev/rmc_vasp/
+Install using pip:
 ````
-$ python ./sae/StructureAnalysisEnvironment/bin/Rcfg2vasp_nonLIB.py aaa
+$ pip install rmc_vasp
 ````
-to get "aaa.vasp".
 
-````
-$ python ./Rvasp2cfg_nonLIB.py aaa
-````
-to regain "aaa.cfg"
+## How to run
 
-## 実行
-markdonw
+Put input files in a folder and open python:
+````
+$ python3
+````
+then,
+````
+>>> import rmc_vasp
+````
+and,
+````
+>>> run()
+````
