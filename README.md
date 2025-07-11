@@ -35,7 +35,7 @@ $ pip install rmc_vasp
 
 ## How to run
 
-Put input files in a folder and open python:
+Put input files in a folder (work??) and open python:
 ````
 $ python3
 ````
