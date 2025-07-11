@@ -27,23 +27,24 @@ RMC POT のインプットファイルを準備します。特に、実験によ
 
 ## インストール
 
-Just download https://github.com/shimane-dev/rmc_vasp/
-Install using pip:
+"rmc_vasp"をダウンロードします。 https://github.com/shimane-dev/rmc_vasp/
+pipでインストールします:
 ````
 $ pip install rmc_vasp
 ````
 
-## How to run
+## 実行
 
-Put input files in a folder and open python:
+インプットファイルをファルダーに配置し、そこで？pythonを開きます。
 ````
 $ python3
 ````
-then,
+次に、
 ````
 >>> import rmc_vasp
 ````
-and,
+と打ちます。そして、
 ````
 >>> run()
 ````
+で、実行します。
