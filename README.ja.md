@@ -28,8 +28,10 @@ RMC POT のインプットファイルを準備します。特に、実験によ
 ## インストール
 
 "rmc_vasp"をダウンロードします。 https://github.com/shimane-dev/rmc_vasp/
+"x_logger"もダウンロードします。 https://github.com/shimane-dev/x_logger
 pipでインストールします:
 ````
+$ pip install x_logger
 $ pip install rmc_vasp
 ````
 

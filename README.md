@@ -27,9 +27,11 @@ Density, number of atoms (system size).
 
 ## Install
 
-Just download https://github.com/shimane-dev/rmc_vasp/
+Download https://github.com/shimane-dev/rmc_vasp/ .
+Also, https://github.com/shimane-dev/x_logger .
 Install using pip:
 ````
+$ pip install x_logger
 $ pip install rmc_vasp
 ````
 
