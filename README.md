@@ -34,6 +34,11 @@ Install using pip:
 $ pip install x_logger
 $ pip install rmc_vasp
 ````
+## Using without installation
+
+Download https://github.com/shimane-dev/rmc_vasp/ .
+Also, https://github.com/shimane-dev/x_logger .
+Put "x_logger/" under "rmc_vasp/src/rmc_vasp/"
 
 ## How to run
 
