@@ -6,5 +6,4 @@ sys.path.append(rrr)
 
 #  or use python with ubuntu on windows
 
-export
-PYTHONPATH = "/mnt/c/Users/me/Desktop/src/rmc_vasp:$PYTHONPATH"
+export PYTHONPATH = "/mnt/c/Users/me/Desktop/src/rmc_vasp:$PYTHONPATH"
