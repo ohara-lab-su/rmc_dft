@@ -27,23 +27,33 @@ RMC POT のインプットファイルを準備します。特に、実験によ
 
 ## インストール
 
-Just download https://github.com/shimane-dev/rmc_vasp/
-Install using pip:
+"rmc_vasp"をダウンロードします。 https://github.com/shimane-dev/rmc_vasp/
+"x_logger"もダウンロードします。 https://github.com/shimane-dev/x_logger
+pipでインストールします:
 ````
+$ pip install x_logger
 $ pip install rmc_vasp
 ````
+## インストールなしで使うとき
 
-## How to run
+"rmc_vasp"をダウンロードします。 https://github.com/shimane-dev/rmc_vasp/
+"x_logger"もダウンロードします。 https://github.com/shimane-dev/x_logger
 
-Put input files in a folder and open python:
+ "x_logger/" を "rmc_vasp/src/rmc_vasp/"　の下に置きます。
+
+
+## 実行
+
+インプットファイルをファルダー（work??）に配置し、そこで？pythonを開きます。
 ````
 $ python3
 ````
-then,
+次に、
 ````
 >>> import rmc_vasp
 ````
-and,
+と打ちます。そして、
 ````
 >>> run()
 ````
+で、実行します。
