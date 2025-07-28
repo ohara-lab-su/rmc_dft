@@ -14,11 +14,11 @@ def run(vasp, rmc, max, logger: XLogger = None):
     _rmc = rmc
 
     # for i in range(0, max):
-    _vasp.run()
-    _vasp.conv_vasp2cfg("aaa")
     _rmc.rmc_run("aaa")
     _vasp.conv_POSCAR2vasp("aaa.vasp")
-    conv_cfg2vasp("aaa")
+    # _vasp.run()
+    _vasp.conv_vasp2cfg("aaa")
+    # conv_cfg2vasp("aaa")
 
     # if reach_threshold():
     #     return
