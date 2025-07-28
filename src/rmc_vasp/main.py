@@ -14,7 +14,7 @@ def run(vasp, rmc, max, logger: XLogger = None):
     _rmc = rmc
 
     # for i in range(0, max):
-    _rmc.rmc_run("aaa")
+    _rmc.run("aaa")
     _vasp.conv_POSCAR2vasp("aaa.vasp")
     # _vasp.run()
     _vasp.conv_vasp2cfg("aaa")
