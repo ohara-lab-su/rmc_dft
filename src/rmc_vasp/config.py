@@ -2,7 +2,7 @@ import os
 
 
 class Config:
-    rmc_bin = "/home/hpc/rmcpot/Source_RMC_POT_lin_2023.1/rmcp.exe aaa"
+    rmc_bin = "/home/k/Downloads/Source_RMC_POT_lin_2023.1/rmcp.exe aaa"
     """
     RMCPOT path
     """
