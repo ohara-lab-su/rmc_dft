@@ -8,7 +8,8 @@ class Config:
     """
     # vasp_bin = "mpirun -np 4 vasp"
     num_procs = 4
-    vasp_bin = f"mpirun -np {num_procs} /home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
+    #vasp_bin = f"mpirun -np 4 /home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
+    vasp_bin = f"/home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
     # mpi = f"mpirun -np {num_procs} {os.path.expanduser('/home/hpc/vasp/bin/vasp')}"
     # mpi_opt =
     # vasp_bin = "/home/hpc/vasp/bin/vasp"

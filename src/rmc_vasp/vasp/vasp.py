@@ -28,7 +28,8 @@ class UtilVasp:
 
         """
         self._logger.debug("=== run()")
-        subprocess.run(f"{Config.vasp_bin}", check=True)
+        #subprocess.run(f"{Config.vasp_bin}", check=True, shell=True)
+        subprocess.run(["mpirun", "-np", f"{Config.num_procs}" , f"{Config.vasp_bin}"], check=True)
         return True
 
     @staticmethod
