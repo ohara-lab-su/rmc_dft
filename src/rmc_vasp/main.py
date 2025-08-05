@@ -19,9 +19,9 @@ def run(vasp, rmc, max, logger: XLogger = None):
     print("cfg2vasp"+ str(i))
     _rmc.u_conv_cfg2vasp("aaa")
     print("vasp"+ str(i))
-#    _vasp.run()
+    _vasp.run()
     print("vasp2cfg"+ str(i))
-#    _vasp.u_conv_vasp2cfg("aaa")
+    _vasp.u_conv_vasp2cfg("aaa")
     print("loop end "+ str(i))
 
     # if reach_threshold():
