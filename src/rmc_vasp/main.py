@@ -3,7 +3,7 @@ from rmc.rmc_pot import UtilRmc
 from x_logger.x_logger import XLogger
 
 
-def run(vasp, rmc, max, logger: XLogger = None):
+def run(vasp, rmc, max=2, logger: XLogger = None):
 
     _vasp = vasp
     _rmc = rmc
@@ -13,19 +13,19 @@ def run(vasp, rmc, max, logger: XLogger = None):
     print("print ",_rmc.run)
 
     i=0
-    # for i in range(0, max):
-    print("rmc"+ str(i))
-    _rmc.run("aaa")
-    print("cfg2vasp"+ str(i))
-    _rmc.u_conv_cfg2vasp("aaa")
-    print("vasp"+ str(i))
-    _vasp.run()
-    print("vasp2cfg"+ str(i))
-    _vasp.u_conv_vasp2cfg("aaa")
-    print("loop end "+ str(i))
+    for i in range(0, max):
+#        print("rmc"+ str(i))
+#        _rmc.run("aaa")
+#        print("cfg2vasp"+ str(i))
+#        _rmc.u_conv_cfg2vasp("aaa")
+#        print("vasp"+ str(i))
+#        _vasp.run()
+        print("vasp2cfg"+ str(i))
+        _vasp.u_conv_vasp2cfg("aaa")
+        print("loop end "+ str(i))
 
-    # if reach_threshold():
-    #     return
+        # if reach_threshold():
+        #     return
 
 
 if __name__ == "__main__":
