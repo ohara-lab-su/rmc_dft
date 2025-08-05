@@ -2,7 +2,7 @@ import subprocess
 from config import Config
 from vasp.conv_vasp2cfg import conv_vasp2cfg
 from x_logger.x_logger import XLogger
-
+from ase.io import read, write
 
 class UtilVasp:
 
@@ -33,7 +33,10 @@ class UtilVasp:
         return True
 
     @staticmethod
-    def conv_vasp2cfg(self, cname: str = "POSCAR"):
+    def conv_vasp2cfg(self, cname: str = "aaa.vasp"):
+        xfile = 'XDATCAR'
+        atoms = read(xfile, index=-1)
+        write( 'POSCAR', atoms)
         conv_vasp2cfg(cname)
 
     def get_poscar(self):

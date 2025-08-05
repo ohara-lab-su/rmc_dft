@@ -18,12 +18,12 @@ def run(vasp, rmc, max, logger: XLogger = None):
     print("print ",_rmc.run)
 
     # for i in range(0, max):
-    print("print o")
-    _rmc.run("aaa")
-    print("print a")
-    conv_cfg2vasp("aaa")
-    print("print b")
-    _vasp.run()
+#    print("print o")
+#    _rmc.run("aaa")
+#    print("print a")
+#    conv_cfg2vasp("aaa")
+#    print("print b")
+#    _vasp.run()
     print("print c")
     _vasp.conv_vasp2cfg("aaa")
     print("print d")

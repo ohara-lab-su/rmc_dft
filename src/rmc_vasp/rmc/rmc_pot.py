@@ -26,7 +26,7 @@ class UtilRmc:
         :type blocking: bool
         :return: None
         """
-        subprocess.run([f"{Config.rmc_bin}", mystr], check=True)
+        subprocess.run([f"{Config.rmc_bin}", f"{mystr}"], check=True)
 
     def get_norm(self):
         pass
