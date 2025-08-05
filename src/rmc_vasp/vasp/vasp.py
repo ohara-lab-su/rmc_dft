@@ -33,10 +33,10 @@ class UtilVasp:
         return True
 
     @staticmethod
-    def conv_vasp2cfg(self, cname: str = "aaa.vasp"):
+    def conv_vasp2cfg(self, cname: str = "aaa"):
         xfile = 'XDATCAR'
         atoms = read(xfile, index=-1)
-        write( 'POSCAR', atoms)
+        write( (cname + ".vasp"), atoms, format='vasp', direct=True)
         conv_vasp2cfg(cname)
 
     def get_poscar(self):
