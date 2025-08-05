@@ -1,27 +1,31 @@
-import optparse
-import shutil
-
 from vasp.vasp import UtilVasp
 from rmc.rmc_pot import UtilRmc
-from vasp.conv_vasp2cfg import conv_vasp2cfg
-from Rcfg2vasp_nonLIB import conv_cfg2vasp
 from x_logger.x_logger import XLogger
 
 
-def run(vasp, rmc, max, logger: XLogger = None):
+def run(vasp, rmc, max=2, logger: XLogger = None):
 
     _vasp = vasp
     _rmc = rmc
+    print("print ",_vasp)
+    print("print ",_rmc)
+    print("print ",_vasp.run)
+    print("print ",_rmc.run)
 
-    # for i in range(0, max):
-    _vasp.run()
-    _vasp.conv_vasp2cfg("aaa")
-    _rmc.rmc_run("aaa")
-    _vasp.conv_POSCAR2vasp("aaa.vasp")
-    conv_cfg2vasp("aaa")
+    i=0
+    for i in range(0, max):
+#        print("rmc"+ str(i))
+#        _rmc.run("aaa")
+#        print("cfg2vasp"+ str(i))
+#        _rmc.u_conv_cfg2vasp("aaa")
+#        print("vasp"+ str(i))
+#        _vasp.run()
+        print("vasp2cfg"+ str(i))
+        _vasp.u_conv_vasp2cfg("aaa")
+        print("loop end "+ str(i))
 
-    # if reach_threshold():
-    #     return
+        # if reach_threshold():
+        #     return
 
 
 if __name__ == "__main__":
