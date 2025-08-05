@@ -33,7 +33,7 @@ class UtilVasp:
         return True
 
     @staticmethod
-    def conv_vasp2cfg(self, cname: str = "aaa"):
+    def u_conv_vasp2cfg(self, cname: str = "aaa"):
         xfile = 'XDATCAR'
         atoms = read(xfile, index=-1)
         write( (cname + ".vasp"), atoms, format='vasp', direct=True)

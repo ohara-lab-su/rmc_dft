@@ -25,7 +25,7 @@ def run(vasp, rmc, max, logger: XLogger = None):
 #    print("print b")
 #    _vasp.run()
     print("print c")
-    _vasp.conv_vasp2cfg("aaa")
+    _vasp.u_conv_vasp2cfg("aaa")
     print("print d")
 
     # if reach_threshold():
