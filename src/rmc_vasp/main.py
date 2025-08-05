@@ -12,16 +12,17 @@ def run(vasp, rmc, max, logger: XLogger = None):
     print("print ",_vasp.run)
     print("print ",_rmc.run)
 
+    i=0
     # for i in range(0, max):
-#    print("print o")
-#    _rmc.run("aaa")
-#    print("print a")
+    print("rmc"+ str(i))
+    _rmc.run("aaa")
+    print("cfg2vasp"+ str(i))
     _rmc.u_conv_cfg2vasp("aaa")
-#    print("print b")
+    print("vasp"+ str(i))
 #    _vasp.run()
-#    print("print c")
+    print("vasp2cfg"+ str(i))
 #    _vasp.u_conv_vasp2cfg("aaa")
-#    print("print d")
+    print("loop end "+ str(i))
 
     # if reach_threshold():
     #     return
