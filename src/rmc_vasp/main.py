@@ -1,10 +1,5 @@
-import optparse
-import shutil
-
 from vasp.vasp import UtilVasp
 from rmc.rmc_pot import UtilRmc
-from vasp.conv_vasp2cfg import conv_vasp2cfg
-from Rcfg2vasp_nonLIB import conv_cfg2vasp
 from x_logger.x_logger import XLogger
 
 
