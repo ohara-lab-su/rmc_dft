@@ -1,6 +1,7 @@
 import subprocess
 
 from config import Config
+from rmc.Rcfg2vasp_nonLIB import conv_cfg2vasp
 
 
 class UtilRmc:
@@ -40,6 +41,10 @@ class UtilRmc:
         :return: None
         """
         subprocess.run([f"{Config.rmc_bin}", f"{mystr}"], check=True)
+
+    @staticmethod
+    def u_conv_cfg2vasp(self, cname: str = "aaa"):
+        conv_cfg2vasp(cname)
 
     def get_norm(self):
         pass
