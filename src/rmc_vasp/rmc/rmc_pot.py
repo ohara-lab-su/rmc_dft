@@ -9,9 +9,22 @@ class UtilRmc:
     And parsing configuration files.
     """
 
-    def run(self, name: str = "local"):
+    def run(self, name: str = "local", blocking: bool = True) -> bool:
+        """
+        RMC を実行する
+
+        Args:
+            blocking (bool)_:  subprocessをブロッキングで起動(default: True)
+
+        Returns:
+            bool: 正しく終わったデー
+        """
         if name == "local":
             self.run_local()
+
+        subprocess.run([f"{Config.rmc_bin}", f"{name}"], check=True)
+
+        return True
 
     def run_asc(self):
         pass
