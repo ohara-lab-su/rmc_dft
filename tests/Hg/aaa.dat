@@ -1,0 +1,27 @@
+#003
+[ GENERAL ]
+ TITLE = comment	! --Title of the run (default: blank)
+ CUT-OFF =  2.000000		! --Distance of closest approach for each partials in A (in 11,12,...,22,23.. order);
+			! Give as many values as the number of partials, or MIN for automatic cutoff determination
+ MOVEOUT = 0		! --Whether to use moveout option (default: 1)
+ PRINT-STEP = 1000	! --Generated number of steps for printing (default: 10000)
+ RUN-TIME = 0.1	! --Time limit of the simulation in minutes (default: 300.000000)
+			! alternatives: LAST-GEN = 10000, or LAST-ACC = 10000, (default RUN-TIME = 300.000000)
+ HST-BUFFSIZE = 1		! --Size of the history buffer in lines (default: 0, no history)
+ HST-STEP-FACTOR = 0	! --Number of savings between each history buffering for the .hst file (default: 1 -- means history saved at every 1. saving).
+			! alternative: HST-SAVE-TIME = 2.000000 ! --History save time to *.hst file in minutes
+			! this value is adjusted internally to be an integer multiple of SAVE-TIME.
+ XMAX-FACTOR = 1.414000	! --Xmax= FACTOR*halbox used in the run (default: 1.000000)
+ THREADS = 4		! --Total number of threads to use (default: 1)
+
+[ EXP ]
+ TYPE = ND		! --Type of the experiment, **MANDATORY ITEM** (it should be EXAFS, GR, EDIFF, ND, XRD
+ DATAFILE = Hg.sq	! --File name containing the experimental data, **MANDATORY ITEM**
+ PARTIAL-COEFFS =   1.0000000000000000		! --Weight of each partials (in 11,12,...,22,23.. order);
+			! **MANDATORY ITEM**: you should provide as many values as each partial of your system have
+ SIGMA-MASTER = 0.00100000	! --Standard deviation and leading series for scalable sigma (this or any alternative is) **MANDATORY ITEM**
+			! alternatives: (..._)SIGMA (standard deviation) or
+			! (..._)SIGMA-SCALABLE (sets starting chi2 of this set or constraint to the proportion given by this scalable sigma of the leading series' starting chi2
+
+
+[ END ]
