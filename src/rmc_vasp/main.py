@@ -13,8 +13,11 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
     print("print ",_vasp.run)
     print("print ",_rmc.run)
 
+    _vasp.u_conv_vasp2cfg("aaa")
+
     i=0
     for i in range(0, max):
+
         log_dir= "log" + str(i)
         os.mkdir(log_dir)
 
@@ -30,8 +33,9 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
         _vasp.run()
         _vasp.u_vasp_log()
         _vasp.u_vasp_copy(log_dir)
-
+        
         print("vasp2cfg"+ str(i))
+        _vasp.cp_XDATCAR("aaa")
         _vasp.u_conv_vasp2cfg("aaa")
         print("loop end "+ str(i))
 

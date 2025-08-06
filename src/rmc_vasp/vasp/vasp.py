@@ -57,3 +57,13 @@ class UtilVasp:
     def u_vasp_copy(self, log_dir: str = "log"):
         from vasp.vasp_log import vasp_copy
         vasp_copy(log_dir)
+
+    def cp_XDATCAR(self, cname: str = "aaa"):
+        """
+        Copy XDATCAR to a new file with the specified name.
+
+        Args:
+            cname (str): Name of the new file to create.
+        """
+        write( (cname + ".vasp"), read('XDATCAR', index=-1), format='vasp', direct=True)
+        self._logger.debug(f"Copied XDATCAR to {cname}.vasp")

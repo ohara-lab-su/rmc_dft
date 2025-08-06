@@ -40,3 +40,4 @@ def vasp_copy(log_dir: str = "log"):
             print(f"Copied {file_name} to {log_dir}")
         else:
             print(f"{file_name} does not exist, skipping.")
+
