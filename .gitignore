@@ -1,5 +1,5 @@
 /work
-!/work/*/KPOINTS
-!/work/*/POTCAR
-!/work/*/POSCAR
-!/work/*/INCAR
+!KPOINTS
+!POTCAR
+!POSCAR
+!INCAR
