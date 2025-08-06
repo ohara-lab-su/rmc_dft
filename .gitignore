@@ -1,5 +1,4 @@
-/work/Hg/
-/work/FeSi/
+/work
 !/work/*/KPOINTS
 !/work/*/POTCAR
 !/work/*/POSCAR
