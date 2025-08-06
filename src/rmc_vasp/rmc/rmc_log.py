@@ -1,4 +1,5 @@
 def rmc_log():
+    print("rmc_log")
 
 def rmc_copy(log_dir: str = "log"):
     """
