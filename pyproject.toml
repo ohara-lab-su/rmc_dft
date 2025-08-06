@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rmc_vasp"
-version = "0.1.0"
+version = "0.1.1"
 description = "cobotta ctrl server2 (using ORiN2)"
 authors = [
     { name="Kengo NAKADA", email="kengo.nakada@email.com" },
