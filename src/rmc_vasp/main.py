@@ -14,12 +14,12 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
 
     i=0
     for i in range(0, max):
-#        print("rmc"+ str(i))
-#        _rmc.run("aaa")
-#        print("cfg2vasp"+ str(i))
-#        _rmc.u_conv_cfg2vasp("aaa")
-#        print("vasp"+ str(i))
-#        _vasp.run()
+        print("rmc"+ str(i))
+        _rmc.run("aaa")
+        print("cfg2vasp"+ str(i))
+        _rmc.u_conv_cfg2vasp("aaa")
+        print("vasp"+ str(i))
+        _vasp.run()
         print("vasp2cfg"+ str(i))
         _vasp.u_conv_vasp2cfg("aaa")
         print("loop end "+ str(i))
