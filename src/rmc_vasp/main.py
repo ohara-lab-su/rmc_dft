@@ -6,6 +6,11 @@ import os
 
 def run(vasp, rmc, max=2, logger: XLogger = None):
 
+    # require
+    # INCAR, KPOINTS, POTCAR,
+    # aaa.vasp, XDATCAR (same data). (As of 2025-08-07, it should be created by hand using Packmol.)
+    # aaa.dat, ???.??? (e.g. Hg.sq specified in aaa.dat)
+
     _vasp = vasp
     _rmc = rmc
     print("print ",_vasp)
@@ -15,6 +20,8 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
 
     _vasp.u_conv_vasp2cfg("aaa")
     # This doesn't work because the vasp module is not imported correctly ???
+    # put both aaa.vasp and XDATCAR (same data).
+    # (aaa.vasp and XDATCAR) -> aaa.cfg
 
     i=0
     for i in range(0, max):
