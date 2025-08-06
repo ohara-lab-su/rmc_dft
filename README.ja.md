@@ -2,7 +2,7 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_vasp/blob/main/README.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_vasp/blob/main/README.ja.md)
 
-"rmc_vasp" は第一原理分子動力学と逆モンテカルロ法(RMC)交互実行をサポートするソフトです。
+"rmc_vasp" は第一原理分子動力学/構造最適化と逆モンテカルロ法(RMC)交互実行をサポートするソフトです。
 Structure Analysis Environment package ( 
 https://github.com/shimane-dev/sae.git )をベースにしています。
 
