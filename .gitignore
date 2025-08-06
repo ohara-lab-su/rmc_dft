@@ -1,4 +1,4 @@
-/work/*/
+/work/*/*
 !/work/*/KPOINTS
 !/work/*/POTCAR
 !/work/*/POSCAR
