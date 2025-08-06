@@ -32,7 +32,7 @@ def vasp_copy(log_dir: str = "log"):
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-    files_to_copy = ['OUTCAR', 'OSZICAR', 'vasprun.xml', 'XDATCAR', 'CONTCAR', 'POSCAR', 'KPOINTS']
+    files_to_copy = ['grep_E0_OSZICAR.txt', 'OUTCAR', 'OSZICAR', 'vasprun.xml', 'XDATCAR', 'CONTCAR', 'POSCAR', 'KPOINTS']
 
     for file_name in files_to_copy:
         if os.path.exists(file_name):

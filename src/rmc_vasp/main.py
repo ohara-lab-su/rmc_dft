@@ -21,12 +21,17 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
 
         print("rmc"+ str(i))
         _rmc.run("aaa")
+        _rmc.u_rmc_log()
+        _rmc.u_rmc_copy(log_dir)
+
         print("cfg2vasp"+ str(i))
         _rmc.u_conv_cfg2vasp("aaa")
+
         print("vasp"+ str(i))
         _vasp.run()
-        _vasp.vasp_log()
-        _vasp.vasp_copy(log_dir)
+        _vasp.u_vasp_log()
+        _vasp.u_vasp_copy(log_dir)
+
         print("vasp2cfg"+ str(i))
         _vasp.u_conv_vasp2cfg("aaa")
         print("loop end "+ str(i))
