@@ -56,3 +56,20 @@ class UtilRmc:
 
     def get_norm(self):
         pass
+
+    def u_rmc_log(self):
+        """
+        RMCのログを保存する
+        """
+        from rmc.rmc_log import rmc_log
+        rmc_log()
+
+    def u_rmc_copy(self, log_dir: str = "log"):
+        """
+        Copy RMC log files to the specified directory.
+
+        Args:
+            log_dir (str): Directory to copy the log files to.
+        """
+        from rmc.rmc_log import rmc_copy
+        rmc_copy(log_dir)
