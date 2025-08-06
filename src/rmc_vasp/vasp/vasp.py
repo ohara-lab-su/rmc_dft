@@ -65,5 +65,7 @@ class UtilVasp:
         Args:
             cname (str): Name of the new file to create.
         """
-        write( (cname + ".vasp"), read('XDATCAR', index=-1), format='vasp', direct=True)
-        self._logger.debug(f"Copied XDATCAR to {cname}.vasp")
+        if os.path.exists(cname + ".vasp"):
+            write( (cname + ".vasp"), read('XDATCAR', index=-1), format='vasp', direct=True)
+        else:
+            print(f"skipping cp_XDATCAR")

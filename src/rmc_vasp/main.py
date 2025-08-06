@@ -14,18 +14,19 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
     print("print ",_rmc.run)
 
     _vasp.u_conv_vasp2cfg("aaa")
+    # This doesn't work because the vasp module is not imported correctly ???
 
     i=0
     for i in range(0, max):
-
+        '''
         log_dir= "log" + str(i)
         os.mkdir(log_dir)
-
+        
         print("rmc"+ str(i))
         _rmc.run("aaa")
         _rmc.u_rmc_log()
         _rmc.u_rmc_copy(log_dir)
-
+        
         print("cfg2vasp"+ str(i))
         _rmc.u_conv_cfg2vasp("aaa")
 
@@ -38,7 +39,7 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
         _vasp.cp_XDATCAR("aaa")
         _vasp.u_conv_vasp2cfg("aaa")
         print("loop end "+ str(i))
-
+        '''
         # if reach_threshold():
         #     return
 
