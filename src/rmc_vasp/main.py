@@ -2,7 +2,6 @@ from vasp.vasp import UtilVasp
 from rmc.rmc_pot import UtilRmc
 from x_logger.x_logger import XLogger
 import os
-import shutil
 
 
 def run(vasp, rmc, max=2, logger: XLogger = None):
