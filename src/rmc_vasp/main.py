@@ -1,6 +1,8 @@
 from vasp.vasp import UtilVasp
 from rmc.rmc_pot import UtilRmc
 from x_logger.x_logger import XLogger
+import os
+import shutil
 
 
 def run(vasp, rmc, max=2, logger: XLogger = None):
@@ -14,12 +16,17 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
 
     i=0
     for i in range(0, max):
+        log_dir= "log" + str(i)
+        os.mkdir(log_dir)
+
         print("rmc"+ str(i))
         _rmc.run("aaa")
         print("cfg2vasp"+ str(i))
         _rmc.u_conv_cfg2vasp("aaa")
         print("vasp"+ str(i))
         _vasp.run()
+        _vasp.vasp_log()
+        _vasp.vasp_copy(log_dir)
         print("vasp2cfg"+ str(i))
         _vasp.u_conv_vasp2cfg("aaa")
         print("loop end "+ str(i))

@@ -46,3 +46,14 @@ class UtilVasp:
         pass
         # VASP (self.poscar))
         return None
+
+    def u_vasp_log(self):
+        """
+        VASPのログを保存する
+        """
+        from vasp.vasp_log import vasp_log
+        vasp_log()
+
+    def u_vasp_copy(self, log_dir: str = "log"):
+        from vasp.vasp_log import vasp_copy
+        vasp_copy(log_dir)
