@@ -48,6 +48,10 @@ class UtilVasp:
         # VASP (self.poscar))
         return None
 
+    def get_label(self, cname: str = "aaa.vasp"):
+        #self.label =
+        return True
+
     def u_vasp_log(self):
         """
         VASPのログを保存する

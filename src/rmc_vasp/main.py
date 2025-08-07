@@ -24,6 +24,9 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
     # put both aaa.vasp and XDATCAR (same data).
     # (aaa.vasp and XDATCAR) -> aaa.cfg
 
+    # At this stage, maybe it is possible to create label.txt from aaa.vasp. Or store it  in a class.
+    _vasp.get_label("aaa.vasp")
+
     i=0
     for i in range(0, max):
 
