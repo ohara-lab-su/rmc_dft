@@ -46,3 +46,26 @@ class UtilVasp:
         pass
         # VASP (self.poscar))
         return None
+
+    def u_vasp_log(self):
+        """
+        VASPのログを保存する
+        """
+        from vasp.vasp_log import vasp_log
+        vasp_log()
+
+    def u_vasp_copy(self, log_dir: str = "log"):
+        from vasp.vasp_log import vasp_copy
+        vasp_copy(log_dir)
+
+    def cp_XDATCAR(self, cname: str = "aaa"):
+        """
+        Copy XDATCAR to a new file with the specified name.
+
+        Args:
+            cname (str): Name of the new file to create.
+        """
+        if os.path.exists(cname + ".vasp"):
+            write( (cname + ".vasp"), read('XDATCAR', index=-1), format='vasp', direct=True)
+        else:
+            print(f"skipping cp_XDATCAR")

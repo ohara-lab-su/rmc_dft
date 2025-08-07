@@ -1,14 +1,15 @@
 [build-system]
-requires = ["setuptools>=71.0","coloredlogs"]
+requires = ["setuptools>=71.0","coloredlogs","ase"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "rmc_vasp"
-version = "0.1.0"
-description = "cobotta ctrl server2 (using ORiN2)"
-# authors = [
-#   { name="Kengo NAKADA", email="kengo.nakada@email.com" }
-# ]
+version = "0.1.1"
+description = "rmc_vasp is a Python package for performing Reverse Monte Carlo modeling and ab initio molecular dynamics / relaxation using VASP code."
+authors = [
+    { name="Kengo NAKADA", email="kengo.nakada@email.com" },
+    { name="Kentaro Kobayashi", email=""}
+]
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = []

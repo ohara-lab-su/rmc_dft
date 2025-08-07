@@ -1,9 +1,16 @@
 from vasp.vasp import UtilVasp
 from rmc.rmc_pot import UtilRmc
 from x_logger.x_logger import XLogger
+import os
 
 
 def run(vasp, rmc, max=2, logger: XLogger = None):
+
+    # require
+    # INCAR, KPOINTS, POTCAR,
+    # aaa.vasp, XDATCAR (same data). (As of 2025-08-07, it should be created by hand using Packmol.)
+    # Also, high precision cell length need to be set (manually) from "number density".
+    # aaa.dat, ???.??? (e.g. Hg.sq specified in aaa.dat)
 
     _vasp = vasp
     _rmc = rmc
@@ -12,15 +19,32 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
     print("print ",_vasp.run)
     print("print ",_rmc.run)
 
+    _vasp.u_conv_vasp2cfg("aaa")
+    # This doesn't work because the vasp module is not imported correctly ???
+    # put both aaa.vasp and XDATCAR (same data).
+    # (aaa.vasp and XDATCAR) -> aaa.cfg
+
     i=0
     for i in range(0, max):
-#        print("rmc"+ str(i))
-#        _rmc.run("aaa")
-#        print("cfg2vasp"+ str(i))
-#        _rmc.u_conv_cfg2vasp("aaa")
-#        print("vasp"+ str(i))
-#        _vasp.run()
+
+        log_dir= "log" + str(i)
+        os.mkdir(log_dir)
+        
+        print("rmc"+ str(i))
+        _rmc.run("aaa")
+        _rmc.u_rmc_log()
+        _rmc.u_rmc_copy(log_dir)
+        
+        print("cfg2vasp"+ str(i))
+        _rmc.u_conv_cfg2vasp("aaa")
+
+        print("vasp"+ str(i))
+        _vasp.run()
+        _vasp.u_vasp_log()
+        _vasp.u_vasp_copy(log_dir)
+        
         print("vasp2cfg"+ str(i))
+        _vasp.cp_XDATCAR("aaa")
         _vasp.u_conv_vasp2cfg("aaa")
         print("loop end "+ str(i))
 
