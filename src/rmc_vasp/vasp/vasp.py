@@ -3,6 +3,7 @@ from config import Config
 from vasp.conv_vasp2cfg import conv_vasp2cfg
 from x_logger.x_logger import XLogger
 from ase.io import read, write
+import os
 
 class UtilVasp:
 
