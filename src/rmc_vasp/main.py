@@ -20,6 +20,8 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
     print("print ",_rmc.run)
 
     _vasp.u_conv_vasp2cfg("aaa")
+    _vasp.u_label_back("aaa.vasp")
+    _vasp.u_label_back("XDATCAR")
     # This doesn't work because the vasp module is not imported correctly ???
     # put both aaa.vasp and XDATCAR (same data).
     # (aaa.vasp and XDATCAR) -> aaa.cfg
@@ -28,7 +30,8 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
     for i in range(0, max):
 
         log_dir= "log" + str(i)
-        os.mkdir(log_dir)
+        if not os.path.exists(log_dir):
+            os.mkdir(log_dir)
         
         print("rmc"+ str(i))
         _rmc.run("aaa")
@@ -37,11 +40,15 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
         
         print("cfg2vasp"+ str(i))
         _rmc.u_conv_cfg2vasp("aaa")
+        _vasp.u_label_back("aaa.vasp")
 
         print("vasp"+ str(i))
         _vasp.run()
         _vasp.u_vasp_log()
         _vasp.u_vasp_copy(log_dir)
+        _vasp.u_label_back("aaa.vasp")
+        _vasp.u_label_back("XDATCAR")
+
         
         print("vasp2cfg"+ str(i))
         _vasp.cp_XDATCAR("aaa")
@@ -76,7 +83,7 @@ if __name__ == "__main__":
     #     cname = args[0]
 
     logger = XLogger(log_level="debug", logger_name="kobayashi")
-    max = 1
+    max = 2
     vasp = UtilVasp(logger=logger)
     rmc = UtilRmc()
     run(vasp, rmc, max, logger)

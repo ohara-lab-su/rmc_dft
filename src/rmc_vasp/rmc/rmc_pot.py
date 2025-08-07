@@ -2,6 +2,7 @@ import subprocess
 import shutil
 from config import Config
 from rmc.Rcfg2vasp_nonLIB import conv_cfg2vasp
+import os
 
 
 class UtilRmc:
@@ -45,7 +46,8 @@ class UtilRmc:
     @staticmethod
     def u_conv_cfg2vasp(self, cname: str = "aaa"):
         conv_cfg2vasp(cname)
-        shutil.copy( "POSCAR", "POSCAR.bak")
+        if os.path.exists("POSCAR"):
+            shutil.copy( "POSCAR", "POSCAR.bak")
         shutil.copy( (cname + ".vasp"), "POSCAR")
 
     def get_norm(self):

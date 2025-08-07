@@ -3,6 +3,8 @@ from config import Config
 from vasp.conv_vasp2cfg import conv_vasp2cfg
 from x_logger.x_logger import XLogger
 from ase.io import read, write
+import os
+
 
 class UtilVasp:
 
@@ -47,6 +49,17 @@ class UtilVasp:
         # VASP (self.poscar))
         return None
 
+
+    def u_label_back(self,cname: str = "aaa.vasp"):
+        """
+        VASPファイルの6行目にラベルを設定する
+
+        Args:
+            cname (str): VASPファイル名
+        """
+        from .label_back import label_back
+        label_back(cname)
+        
     def u_vasp_log(self):
         """
         VASPのログを保存する
