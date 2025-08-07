@@ -45,7 +45,8 @@ class UtilRmc:
     @staticmethod
     def u_conv_cfg2vasp(self, cname: str = "aaa"):
         conv_cfg2vasp(cname)
-        shutil.copy( "POSCAR", "POSCAR.bak")
+        if os.path.exists("POSCAR"):
+            shutil.copy( "POSCAR", "POSCAR.bak")
         shutil.copy( (cname + ".vasp"), "POSCAR")
 
     def get_norm(self):
