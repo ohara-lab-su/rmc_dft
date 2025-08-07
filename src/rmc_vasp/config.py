@@ -8,7 +8,7 @@ class Config:
     RMCPOT path
     """
     # vasp_bin = "mpirun -np 4 vasp"
-    num_procs = 4
+    num_procs = 1
     #vasp_bin = f"/home/hpc/vasp/bin/vasp-gamma"
     vasp_bin = f"/home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
     # mpi = f"mpirun -np {num_procs} {os.path.expanduser('/home/hpc/vasp/bin/vasp')}"
