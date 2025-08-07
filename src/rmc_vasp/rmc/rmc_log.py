@@ -14,7 +14,7 @@ def rmc_copy(log_dir: str = "log"):
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-    files_to_copy = ['grep_khi_RMC.txt', 'RMC.log', 'RMC.cfg']
+    files_to_copy = ['grep_khi_RMC.txt', 'aaa.chi', 'aaa.cfg','aaa.sq','aaa.dat']
 
     for file_name in files_to_copy:
         if os.path.exists(file_name):
