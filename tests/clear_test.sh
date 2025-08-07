@@ -40,3 +40,6 @@ rm ./aaa.dat
 
 rm ./label.txt
 
+rm ./aaa.pfq
+rm ./fesi04_smbt-rmc.txt
+
