@@ -1,4 +1,6 @@
 #bash
+rm -rf ./log*/
+
 rm ./aaa.cfg
 rm ./aaa.vasp
 rm ./INCAR
@@ -35,4 +37,6 @@ rm ./aaa.freer
 rm ./aaa.expt
 rm ./aaastart.grid
 rm ./aaa.dat
+
+rm ./label.txt
 

@@ -12,8 +12,8 @@
  EDIFF  = 1E-02
  EDIFFG = 1E-01
 
- NSW    = 5
- NELM   = 6
+ NSW    = 3
+ NELM   = 3
  IBRION = 2
 
  LREAL  = auto
