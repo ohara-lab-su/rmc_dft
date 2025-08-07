@@ -41,6 +41,7 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
         print("cfg2vasp"+ str(i))
         _rmc.u_conv_cfg2vasp("aaa")
         _vasp.u_label_back("aaa.vasp")
+        _vasp.u_label_back("POSCAR")
 
         print("vasp"+ str(i))
         _vasp.run()
