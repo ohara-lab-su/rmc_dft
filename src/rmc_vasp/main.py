@@ -84,7 +84,7 @@ if __name__ == "__main__":
     #     cname = args[0]
 
     logger = XLogger(log_level="debug", logger_name="kobayashi")
-    max = 2
+    max = 10
     vasp = UtilVasp(logger=logger)
     rmc = UtilRmc()
     run(vasp, rmc, max, logger)

@@ -42,4 +42,10 @@ rm ./label.txt
 
 rm ./aaa.pfq
 rm ./fesi04_smbt-rmc.txt
+rm ./OSZICAR
+rm ./POSCAR.bak
 
+rm ./OUTCAR
+rm ./PCDAT
+rm ./POSCAR
+rm ./REPORT
