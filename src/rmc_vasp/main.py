@@ -9,6 +9,7 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
     # require
     # INCAR, KPOINTS, POTCAR,
     # aaa.vasp, XDATCAR (same data). (As of 2025-08-07, it should be created by hand using Packmol.)
+    # Also, high precision cell length need to be set (manually) from "number density".
     # aaa.dat, ???.??? (e.g. Hg.sq specified in aaa.dat)
 
     _vasp = vasp
@@ -25,7 +26,7 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
 
     i=0
     for i in range(0, max):
-        '''
+
         log_dir= "log" + str(i)
         os.mkdir(log_dir)
         
@@ -46,7 +47,7 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
         _vasp.cp_XDATCAR("aaa")
         _vasp.u_conv_vasp2cfg("aaa")
         print("loop end "+ str(i))
-        '''
+
         # if reach_threshold():
         #     return
 
