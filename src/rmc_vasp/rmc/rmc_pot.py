@@ -2,6 +2,7 @@ import subprocess
 import shutil
 from config import Config
 from rmc.Rcfg2vasp_nonLIB import conv_cfg2vasp
+import os
 
 
 class UtilRmc:

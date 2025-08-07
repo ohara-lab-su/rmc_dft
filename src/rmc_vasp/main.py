@@ -28,7 +28,8 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
     for i in range(0, max):
 
         log_dir= "log" + str(i)
-        os.mkdir(log_dir)
+        if not os.path.exists(log_dir):
+            os.mkdir(log_dir)
         
         print("rmc"+ str(i))
         _rmc.run("aaa")
