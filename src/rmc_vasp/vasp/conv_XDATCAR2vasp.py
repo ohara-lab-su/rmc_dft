@@ -59,7 +59,7 @@ def conv_XDATCAR2vasp(cname: str):
     ###############################################
     ## Read Header
     ##
-    num_header= 7  # Number of header lines in XDATCAR. Not inclede "Direct" line.
+    num_header= 7  # Number of header lines in XDATCAR.
 
     natom = sum(list(map(int, datlines[6].split())))
     header = datlines[:num_header]  # First 6 lines are the header
