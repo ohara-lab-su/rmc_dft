@@ -24,13 +24,10 @@ class UtilVasp:
     def run(self, blocking: bool = True) -> bool:
         """
         VASP を実行する
-
         Args:
             blocking (bool)_:  subprocessをブロッキングで起動(default: True)
-
         Returns:
             bool: 正しく終わったデー
-
         """
         self._logger.debug("=== run()")
         #subprocess.run(f"{Config.vasp_bin}", check=True, shell=True)
@@ -62,7 +59,6 @@ class UtilVasp:
     def u_label_back(self,cname: str = "aaa.vasp"):
         """
         VASPファイルの6行目にラベルを設定する
-
         Args:
             cname (str): VASPファイル名
         """
@@ -84,8 +80,14 @@ class UtilVasp:
 
         Args:
             cname (str): Name of the new file to create. Without extension.
+        Returns:
+            bool: 正しく終わったデー
         """
         if os.path.exists(cname):
             conv_XDATCAR2vasp(cname)
+            return True
         else:
             print(f"skipping cp_XDATCAR")
+            return False
+
+
