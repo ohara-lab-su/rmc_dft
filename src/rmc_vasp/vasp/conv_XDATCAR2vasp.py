@@ -59,22 +59,26 @@ def conv_XDATCAR2vasp(cname: str):
     ###############################################
     ## Read Header
     ##
-    num_header= 7  # Number of header lines in XDATCAR
+    num_header= 6  # Number of header lines in XDATCAR. Not inclede "Direct" line.
 
     natom = sum(list(map(int, datlines[6].split())))
-    header = datlines[:num_header]  # First 7 lines are the header
-    NSW=(len(datlines) - 1 - num_header) // (1 + natom)
+    header = datlines[:num_header]  # First 6 lines are the header
+    NSW=(len(datlines) - 1 - num_header) // (1 + natom)  # NSW >= 1.
     skip_lines = num_header + (NSW-1)* (1 + natom)
     configuration = datlines[skip_lines:(skip_lines+(1+natom))]
 
     # Write to VASP format
     with open(cname + ".vasp", "w") as f:
-        for line in header:
-            f.write(line + "\n")
-        f.write("Direct\n")  # VASP format requires 'Direct' keyword
-        for line in configuration:
-            f.write(line + "\n")
-
+        if NSW > 1:
+            for line in header:
+                f.write(line + "\n")
+                f.write("Direct\n")  # VASP format requires 'Direct' keyword
+            for line in configuration:
+                f.write(line + "\n")
+        else:
+            #NSW == 1
+            for line in datlines:
+                f.write(line + "\n")
     f.close()
     print(f"{cname}.vasp created from XDATCAR.")
     return True
