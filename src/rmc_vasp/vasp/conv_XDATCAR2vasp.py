@@ -64,7 +64,7 @@ def conv_XDATCAR2vasp(cname: str):
     natom = sum(list(map(int, datlines[6].split())))
     header = datlines[:num_header]  # First 6 lines are the header
     NSW=(len(datlines) - 1 - num_header) // (1 + natom)  # NSW >= 1.
-    skip_lines = num_header + (NSW-1)* (1 + natom)
+    skip_lines = num_header+1 + (NSW-1)* (1 + natom)
     configuration = datlines[skip_lines:(skip_lines+(1+natom))]
 
     # Write to VASP format
