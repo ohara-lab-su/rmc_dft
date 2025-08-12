@@ -72,7 +72,6 @@ def conv_XDATCAR2vasp(cname: str):
         if NSW > 1:
             for line in header:
                 f.write(line + "\n")
-                f.write("Direct\n")  # VASP format requires 'Direct' keyword
             for line in configuration:
                 f.write(line + "\n")
         else:
