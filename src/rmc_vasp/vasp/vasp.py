@@ -39,6 +39,14 @@ class UtilVasp:
 
     @staticmethod
     def u_conv_vasp2cfg(self, cname: str = "aaa"):
+        """
+        Convert VASP fortmat to cfg format through XDATCAR.
+        Args:
+            self:
+            cname: str = "aaa": Name of the output file without extension.
+        Returns:
+            None
+        """
         conv_XDATCAR2vasp(cname)
         conv_vasp2cfg(cname)
 
