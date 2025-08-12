@@ -39,7 +39,7 @@ class UtilVasp:
 
     @staticmethod
     def u_conv_vasp2cfg(self, cname: str = "aaa"):
-        conv_XDATCAR2vasp(cname="aaa")
+        conv_XDATCAR2vasp(cname)
         conv_vasp2cfg(cname)
 
     def get_poscar(self):
@@ -65,21 +65,19 @@ class UtilVasp:
         """
         VASPのログを保存する
         """
-        from vasp.vasp_log import vasp_log
         vasp_log()
 
     def u_vasp_copy(self, log_dir: str = "log"):
-        from vasp.vasp_log import vasp_copy
         vasp_copy(log_dir)
 
     def cp_XDATCAR(self, cname: str = "aaa"):
         """
-        Copy XDATCAR to a new file with the specified name.
+        Copy XDATCAR to a new file with the specified name (... .vasp).
 
         Args:
-            cname (str): Name of the new file to create.
+            cname (str): Name of the new file to create. Without extension.
         """
-        if os.path.exists(cname + ".vasp"):
-            write( (cname + ".vasp"), read('XDATCAR', index=-1), format='vasp', direct=True)
+        if os.path.exists(cname):
+            conv_XDATCAR2vasp(cname)
         else:
             print(f"skipping cp_XDATCAR")
