@@ -230,6 +230,6 @@ if __name__ == "__main__":
     # print args,options
     if len(args) > 0:
         # print "script name:",argvs[0]
-        cname = args[0]
+        cname = args[1]
 
     conv_vasp2cfg(cname)
