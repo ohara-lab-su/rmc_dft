@@ -45,7 +45,7 @@ class UtilVasp:
             self:
             cname: str = "aaa": Name of the output file without extension.
         Returns:
-            None
+            bool: 正しく終わったデー
         """
         conv_XDATCAR2vasp(cname)
         conv_vasp2cfg(cname)
