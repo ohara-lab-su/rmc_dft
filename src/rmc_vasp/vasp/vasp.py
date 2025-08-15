@@ -1,8 +1,11 @@
 import subprocess
 from config import Config
 from vasp.conv_vasp2cfg import conv_vasp2cfg
+from vasp.conv_XDATCAR2vasp import conv_XDATCAR2vasp
+from vasp.label_back import label_back
+from vasp.vasp_log import vasp_log, vasp_copy
+
 from x_logger.x_logger import XLogger
-from ase.io import read, write
 import os
 
 
@@ -21,13 +24,10 @@ class UtilVasp:
     def run(self, blocking: bool = True) -> bool:
         """
         VASP を実行する
-
         Args:
             blocking (bool)_:  subprocessをブロッキングで起動(default: True)
-
         Returns:
             bool: 正しく終わったデー
-
         """
         self._logger.debug("=== run()")
         #subprocess.run(f"{Config.vasp_bin}", check=True, shell=True)
@@ -36,9 +36,15 @@ class UtilVasp:
 
     @staticmethod
     def u_conv_vasp2cfg(self, cname: str = "aaa"):
-        xfile = 'XDATCAR'
-        atoms = read(xfile, index=-1)
-        write( (cname + ".vasp"), atoms, format='vasp', direct=True)
+        """
+        Convert VASP fortmat to cfg format through XDATCAR.
+        Args:
+            self:
+            cname: str = "aaa": Name of the output file without extension.
+        Returns:
+            bool: 正しく終わったデー
+        """
+        conv_XDATCAR2vasp(cname)
         conv_vasp2cfg(cname)
 
     def get_poscar(self):
@@ -53,7 +59,6 @@ class UtilVasp:
     def u_label_back(self,cname: str = "aaa.vasp"):
         """
         VASPファイルの6行目にラベルを設定する
-
         Args:
             cname (str): VASPファイル名
         """
@@ -64,21 +69,25 @@ class UtilVasp:
         """
         VASPのログを保存する
         """
-        from vasp.vasp_log import vasp_log
         vasp_log()
 
     def u_vasp_copy(self, log_dir: str = "log"):
-        from vasp.vasp_log import vasp_copy
         vasp_copy(log_dir)
 
     def cp_XDATCAR(self, cname: str = "aaa"):
         """
-        Copy XDATCAR to a new file with the specified name.
+        Copy XDATCAR to a new file with the specified name (... .vasp).
 
         Args:
-            cname (str): Name of the new file to create.
+            cname (str): Name of the new file to create. Without extension.
+        Returns:
+            bool: 正しく終わったデー
         """
-        if os.path.exists(cname + ".vasp"):
-            write( (cname + ".vasp"), read('XDATCAR', index=-1), format='vasp', direct=True)
+        if os.path.exists(cname):
+            conv_XDATCAR2vasp(cname)
+            return True
         else:
             print(f"skipping cp_XDATCAR")
+            return False
+
+
