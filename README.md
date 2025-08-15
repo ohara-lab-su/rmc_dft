@@ -60,7 +60,7 @@ and,
 >>> run()
 ````
 
-### Beta version (2025, middle of August)
+### Beta version (Middle of August, 2025)
 We put input files at "rmc_vasp/src/rmc_vasp/" and run the code as follows:
 ````
 $ python ./main.py
