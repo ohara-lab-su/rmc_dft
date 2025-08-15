@@ -10,13 +10,17 @@ https://github.com/shimane-dev/sae.git )をベースにしています。
 ## 準備
 ### VASP
 VASPをインストールします。
-(https://www.vasp.at/)
+(https://www.vasp.at/)。
+動作確認済バージョン: 6.4.2, 5.3.5。
+
 #### インプットファイル
 VASPのインプットファイルを準備します。
 
 ### RMC
 RMC POTをインストールします。
-(https://www.szfki.hu/~nphys/rmc++/opening.html)
+(https://www.szfki.hu/~nphys/rmc++/opening.html)。
+動作確認済バージョン: 2023.1。
+
 #### インプットファイル
 RMC POT のインプットファイルを準備します。特に、実験による測定データが重要です。
 (X線回折, 中性子回折 などなど )
