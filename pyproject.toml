@@ -8,7 +8,7 @@ version = "0.1.3"
 description = "rmc_vasp is a Python package for performing Reverse Monte Carlo modeling and ab initio molecular dynamics / relaxation using VASP code."
 authors = [
     { name="Kengo NAKADA", email="kengo.nakada@email.com" },
-    { name="Kentaro Kobayashi", email=""}
+    { name="Kentaro Kobayashi", email="kobayashi@email.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.8"
