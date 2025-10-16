@@ -6,6 +6,19 @@
 It is based on Structure Analysis Environment package ( 
 https://github.com/shimane-dev/sae.git ).
 
+## Table of Contents
+
+- [Requirements](#requirements)
+    - [VASP](#vasp)
+        - [Input files](#input-files)
+    - [RMC](#rmc)
+        - [Input files](#input-files-1)
+    - [Initial structure](#initial-structure)
+- [Install](#install)
+- [Using without installation](#using-without-installation)
+- [How to run](#how-to-run)
+    - [Beta version](#beta-version-middle-of-august-2025)
+- [Output](#output)
 
 ## Requirements
 ### VASP
@@ -39,11 +52,19 @@ Install using pip:
 $ pip install x_logger
 $ pip install rmc_vasp
 ````
-## Using without installation
+
+<details>
+
+<summary> Using without installation </summary>
 
 Download https://github.com/shimane-dev/rmc_vasp/ .
+
 Also, https://github.com/shimane-dev/x_logger .
+
 Put "x_logger/" under "rmc_vasp/src/rmc_vasp/"
+
+</details>
+
 
 ## How to run
 
