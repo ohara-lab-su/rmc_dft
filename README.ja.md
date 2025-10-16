@@ -13,9 +13,9 @@ https://github.com/shimane-dev/sae.git )をベースにしています。
 
 [インストール](#インストール)
 
-[インストールなしで使うとき](#インストールなしで使うとき)
-
 [実行](#実行)
+
+[アウトプット](#アウトプット)
 
 ## 準備
 ### VASP
@@ -49,13 +49,18 @@ pipでインストールします:
 $ pip install x_logger
 $ pip install rmc_vasp
 ````
-## インストールなしで使うとき
+
+<details>
+
+<summary> インストールなしで使うとき </summary>
 
 "rmc_vasp"をダウンロードします。 https://github.com/shimane-dev/rmc_vasp/
+
 "x_logger"もダウンロードします。 https://github.com/shimane-dev/x_logger
 
  "x_logger/" を "rmc_vasp/src/rmc_vasp/"　の下に置きます。
 
+</details>
 
 ## 実行
 インプットファイルをファルダー（work??）に配置し、そこで？pythonを開きます。
