@@ -1,0 +1,20 @@
+ SYSTEM = system
+ GGA    = PE
+
+ ISTART = 0
+
+ PREC   = Normal
+ ALGO   = Normal
+
+ ISMEAR = 0
+ SIGMA  = 0.1
+
+ EDIFF  = 1E-04
+ EDIFFG = 1E-03
+
+ NSW    = 5
+ NELM   = 30
+ IBRION = 2
+
+ LREAL  = auto
+
