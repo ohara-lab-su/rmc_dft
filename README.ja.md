@@ -52,11 +52,9 @@ $ pip install x_logger
 $ pip install rmc_vasp
 ````
 
-<details>
+<details><summary> インストールなしで使うとき </summary>
 
-<summary> インストールなしで使うとき </summary>
-
-"rmc_vasp"をダウンロードします。 https://github.com/shimane-dev/rmc_vasp/
+ダウンロードします。 https://github.com/shimane-dev/rmc_vasp/
 
 "x_logger"もダウンロードします。 https://github.com/shimane-dev/x_logger
 
@@ -94,4 +92,3 @@ grep_E0_OSZICAR.txt（エネルギー）
 を出力します。
 
 
-Link to the sample section: [Link Text](#sample-section)
