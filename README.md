@@ -15,7 +15,6 @@ https://github.com/shimane-dev/sae.git ).
         - [Input files](#input-files-1)
     - [Initial structure](#initial-structure)
 - [Install](#install)
-- [Using without installation](#using-without-installation)
 - [How to run](#how-to-run)
     - [Beta version](#beta-version-middle-of-august-2025)
 - [Output](#output)
