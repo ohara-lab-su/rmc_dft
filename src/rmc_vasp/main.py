@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from vasp.vasp import UtilVasp
 from rmc.rmc_pot import UtilRmc
 from x_logger.x_logger import XLogger
@@ -19,6 +20,7 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
     print("print ",_vasp.run)
     print("print ",_rmc.run)
 
+    # rmc用のCFG変換
     _vasp.u_conv_vasp2cfg("aaa")
     _vasp.u_label_back("aaa.vasp")
     _vasp.u_label_back("XDATCAR")
