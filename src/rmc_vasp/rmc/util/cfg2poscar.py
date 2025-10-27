@@ -27,32 +27,42 @@ import optparse
 # from numpy import *
 import numpy as np
 
-def conv_cfg2vasp(cname: str):
+
+def cfg2poscar(cname: str):
+    """
+    RMCPOT cfg 形式を poscar 形式にする
+    SAE を使わない独立版(noLIB)
+
+    Args:
+        cname:
+
+    Returns:
+
+    """
     ###############################################
     ## default name
     ##
-    #cname = "igzo"  # INPUT BASE filename
-
+    # poscar_name = "igzo"  # INPUT BASE filename
 
     ###############################################
     ## optparse
-    #parser = optparse.OptionParser()
+    # parser = optparse.OptionParser()
     #
-    #parser.add_option(
+    # parser.add_option(
     #    "-i",
-    #    "--input",
+    #    "--input_poscar",
     #    dest="INPUT",
-    #    default=cname,
-    #)
-    #options, args = parser.parse_args()
+    #    default=poscar_name,
+    # )
+    # options, args = parser.parse_args()
     #
-    #if options.INPUT:
-    #    cname = options.INPUT
+    # if options.INPUT:
+    #    poscar_name = options.INPUT
     #
     ## print args,options
-    #if len(args) > 0:
+    # if len(args) > 0:
     #    # print "script name:",argvs[0]
-    #    cname = args[0]
+    #    poscar_name = args[0]
 
     if cname:
         print("INPUT file name :", cname + ".cfg")
@@ -60,7 +70,6 @@ def conv_cfg2vasp(cname: str):
 
     if not os.path.exists(cname + ".cfg"):
         sys.exit(cname + ".cfg file not found")
-
 
     # def readcfg():
     ###############################################
@@ -73,7 +82,6 @@ def conv_cfg2vasp(cname: str):
     # t3_x,t3_y,t3_z
     # position
 
-
     ###############################################
     ## Open RMC_POT cfg file
     ##
@@ -81,7 +89,6 @@ def conv_cfg2vasp(cname: str):
     datfile = tmp.read()
     tmp.close()
     datlines = datfile.split("\n")
-
 
     ###############################################
     ## Read Header
@@ -108,7 +115,6 @@ def conv_cfg2vasp(cname: str):
     tmp = datlines[12]
     tmp = datlines[13]
 
-
     ###############################################
     ## Read Lattice Vector
     ##
@@ -128,7 +134,6 @@ def conv_cfg2vasp(cname: str):
     t3_z = float(v[2])
 
     tmp = datlines[17]
-
 
     ###############################################
     ## Read Atoms
@@ -158,7 +163,6 @@ def conv_cfg2vasp(cname: str):
         position[i, 2] = xyz[2]
     # print position[i,0], position[i,1], position[i,2]
 
-
     ###############################################
     ## DATA convert
     ##
@@ -181,7 +185,6 @@ def conv_cfg2vasp(cname: str):
         position[i, 0] = position[i, 0] / 2 + x_offset
         position[i, 1] = position[i, 1] / 2 + y_offset
         position[i, 2] = position[i, 2] / 2 + z_offset
-
 
     ###############################################
     ## OUTPUT for VASP
@@ -211,6 +214,7 @@ def conv_cfg2vasp(cname: str):
 
     vasp.close()
 
+
 if __name__ == "__main__":
 
     ###############################################
@@ -219,7 +223,7 @@ if __name__ == "__main__":
 
     parser.add_option(
         "-i",
-        "--input",
+        "--input_poscar",
         dest="INPUT",
         default=cname,
     )
@@ -233,4 +237,4 @@ if __name__ == "__main__":
         # print "script name:",argvs[0]
         cname = args[0]
 
-    conv_cfg2vasp(cname)
+    cfg2poscar(cname)

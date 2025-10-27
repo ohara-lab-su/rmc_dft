@@ -28,13 +28,25 @@ import optparse
 
 # from numpy import *
 import numpy as np
+from x_logger import XLogger
 
 
-def conv_vasp2cfg(cname: str):
+def poscar2cfg(cfg_name: str, logger: XLogger = None):
+    """
+
+    Args:
+        cfg_name:
+        logger:
+
+    Returns:
+
+    """
+    if logger:
+        logger = XLogger()
     ###############################################
     ## default name
     ##
-    # cname = "igzo"  # INPUT BASE filename
+    # poscar_name = "igzo"  # INPUT BASE filename
 
     ###############################################
     ## optparse
@@ -42,26 +54,27 @@ def conv_vasp2cfg(cname: str):
 
     #  parser.add_option(
     #      "-i",
-    #      "--input",
+    #      "--input_poscar",
     #      dest="INPUT",
-    #      default=cname,
+    #      default=poscar_name,
     #  )
     #  options, args = parser.parse_args()
     #
     #  if options.INPUT:
-    #      cname = options.INPUT
+    #      poscar_name = options.INPUT
     #
     #  # print args,options
     #  if len(args) > 0:
-    #      # print "script name:",argvs[0]
-    #      cname = args[0]
+    #      # print "script name1G:",argvs[0]
+    #      poscar_name = args[0]
 
-    if cname:
-        print("INPUT file name :", cname + ".vasp")
-        print("OUTPUT file name:", cname + ".cfg")
+    if cfg_name:
+        logger.info(f"INPUT file name : {cfg_name}.vasp")
+        logger.info(f"OUTPUT file name: {cfg_name}.cfg")
 
-    if not os.path.exists(cname + ".vasp"):
-        sys.exit(cname + ".vasp file not found")
+    if not os.path.exists(cfg_name + ".vasp"):
+        logger.error(cfg_name + ".vasp file not found")
+        return False
 
     # def readcfg():
     ###############################################
@@ -77,7 +90,7 @@ def conv_vasp2cfg(cname: str):
     ###############################################
     ## Open vasp file
     ##
-    tmp = open(cname + ".vasp")
+    tmp = open(cfg_name + ".vasp")
     datfile = tmp.read()
     tmp.close()
     datlines = datfile.split("\n")
@@ -169,7 +182,7 @@ def conv_vasp2cfg(cname: str):
 
     ###############################################
     ## OUTPUT for cfg
-    cfg = open(cname + ".cfg", "w")
+    cfg = open(cfg_name + ".cfg", "w")
 
     print(
         " (Version 3 format configuration file) !file created by SimpleCfg::save !",
@@ -218,7 +231,7 @@ if __name__ == "__main__":
 
     parser.add_option(
         "-i",
-        "--input",
+        "--input_poscar",
         dest="INPUT",
         default=cname,
     )
@@ -232,4 +245,4 @@ if __name__ == "__main__":
         # print "script name:",argvs[0]
         cname = args[0]
 
-    conv_vasp2cfg(cname)
+    poscar2cfg(cname)
