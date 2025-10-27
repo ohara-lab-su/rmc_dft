@@ -31,9 +31,9 @@ import os
 
 
 
-def conv_XDATCAR2vasp(cname: str):
+def xdatcat2poscar(cname: str):
     """
-    Convert XDATCAR to VASP format.
+    VASP の XDATCAR ファイルを POSCAR 形式にする
 
     Args:
         cname (str): Base name for output files.
@@ -84,8 +84,8 @@ def conv_XDATCAR2vasp(cname: str):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python conv_XDATCAR2vasp.py <base_name>")
+        print("Usage: python xdatcat2poscar.py <base_name>")
         sys.exit(1)
 
     base_name = sys.argv[1]
-    conv_XDATCAR2vasp(base_name)
+    xdatcat2poscar(base_name)

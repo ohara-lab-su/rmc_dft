@@ -27,11 +27,21 @@ import optparse
 # from numpy import *
 import numpy as np
 
-def conv_cfg2vasp(cname: str):
+def cfg2poscar(cname: str):
+    """
+    RMCPOT cfg 形式を poscar 形式にする
+    SAE を使わない独立版(noLIB)
+
+    Args:
+        cname:
+
+    Returns:
+
+    """
     ###############################################
     ## default name
     ##
-    #cname = "igzo"  # INPUT BASE filename
+    #cfg_name = "igzo"  # INPUT BASE filename
 
 
     ###############################################
@@ -42,17 +52,17 @@ def conv_cfg2vasp(cname: str):
     #    "-i",
     #    "--input",
     #    dest="INPUT",
-    #    default=cname,
+    #    default=cfg_name,
     #)
     #options, args = parser.parse_args()
     #
     #if options.INPUT:
-    #    cname = options.INPUT
+    #    cfg_name = options.INPUT
     #
     ## print args,options
     #if len(args) > 0:
     #    # print "script name:",argvs[0]
-    #    cname = args[0]
+    #    cfg_name = args[0]
 
     if cname:
         print("INPUT file name :", cname + ".cfg")
@@ -233,4 +243,4 @@ if __name__ == "__main__":
         # print "script name:",argvs[0]
         cname = args[0]
 
-    conv_cfg2vasp(cname)
+    cfg2poscar(cname)

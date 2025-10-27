@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from vasp.vasp import UtilVasp
+from vasp.vasp import Vasp
 from rmc.rmc_pot import UtilRmc
 from x_logger.x_logger import XLogger
 import os
@@ -21,7 +21,8 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
     print("print ",_rmc.run)
 
     # rmc用のCFG変換
-    _vasp.u_conv_vasp2cfg("aaa")
+    cfg_name = "aaa"
+    _vasp.poscar2cfg(cfg_name)
     _vasp.u_label_back("aaa.vasp")
     _vasp.u_label_back("XDATCAR")
     # This doesn't work because the vasp module is not imported correctly ???
@@ -55,7 +56,7 @@ def run(vasp, rmc, max=2, logger: XLogger = None):
         
         print("vasp2cfg"+ str(i))
         _vasp.cp_XDATCAR("aaa")
-        _vasp.u_conv_vasp2cfg("aaa")
+        _vasp.poscar2cfg("aaa")
         print("loop end "+ str(i))
 
         # if reach_threshold():
@@ -73,20 +74,20 @@ if __name__ == "__main__":
     #    "-i",
     #    "--input",
     #    dest="INPUT",
-    #    default=cname,
+    #    default=cfg_name,
     # )
     # options, args = parser.parse_args()
 
     # if options.INPUT:
-    #     cname = options.INPUT
+    #     cfg_name = options.INPUT
 
     # print args,options
     # if len(args) > 0:
     #     # print "script name:",argvs[0]
-    #     cname = args[0]
+    #     cfg_name = args[0]
 
     logger = XLogger(log_level="debug", logger_name="kobayashi")
     max = 10
-    vasp = UtilVasp(logger=logger)
+    vasp = Vasp(logger=logger)
     rmc = UtilRmc()
     run(vasp, rmc, max, logger)

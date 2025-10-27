@@ -30,11 +30,11 @@ import optparse
 import numpy as np
 
 
-def conv_vasp2cfg(cname: str):
+def poscar2cfg(cfg_name: str):
     ###############################################
     ## default name
     ##
-    # cname = "igzo"  # INPUT BASE filename
+    # cfg_name = "igzo"  # INPUT BASE filename
 
     ###############################################
     ## optparse
@@ -44,24 +44,24 @@ def conv_vasp2cfg(cname: str):
     #      "-i",
     #      "--input",
     #      dest="INPUT",
-    #      default=cname,
+    #      default=cfg_name,
     #  )
     #  options, args = parser.parse_args()
     #
     #  if options.INPUT:
-    #      cname = options.INPUT
+    #      cfg_name = options.INPUT
     #
     #  # print args,options
     #  if len(args) > 0:
-    #      # print "script name:",argvs[0]
-    #      cname = args[0]
+    #      # print "script name1G:",argvs[0]
+    #      cfg_name = args[0]
 
-    if cname:
-        print("INPUT file name :", cname + ".vasp")
-        print("OUTPUT file name:", cname + ".cfg")
+    if cfg_name:
+        print("INPUT file name :", cfg_name + ".vasp")
+        print("OUTPUT file name:", cfg_name + ".cfg")
 
-    if not os.path.exists(cname + ".vasp"):
-        sys.exit(cname + ".vasp file not found")
+    if not os.path.exists(cfg_name + ".vasp"):
+        sys.exit(cfg_name + ".vasp file not found")
 
     # def readcfg():
     ###############################################
@@ -77,7 +77,7 @@ def conv_vasp2cfg(cname: str):
     ###############################################
     ## Open vasp file
     ##
-    tmp = open(cname + ".vasp")
+    tmp = open(cfg_name + ".vasp")
     datfile = tmp.read()
     tmp.close()
     datlines = datfile.split("\n")
@@ -169,7 +169,7 @@ def conv_vasp2cfg(cname: str):
 
     ###############################################
     ## OUTPUT for cfg
-    cfg = open(cname + ".cfg", "w")
+    cfg = open(cfg_name + ".cfg", "w")
 
     print(
         " (Version 3 format configuration file) !file created by SimpleCfg::save !",
@@ -232,4 +232,4 @@ if __name__ == "__main__":
         # print "script name:",argvs[0]
         cname = args[0]
 
-    conv_vasp2cfg(cname)
+    poscar2cfg(cname)
