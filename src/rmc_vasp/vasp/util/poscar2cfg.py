@@ -28,13 +28,25 @@ import optparse
 
 # from numpy import *
 import numpy as np
+from x_logger import XLogger
 
 
-def poscar2cfg(cfg_name: str):
+def poscar2cfg(cfg_name: str, logger: XLogger = None):
+    """
+
+    Args:
+        cfg_name:
+        logger:
+
+    Returns:
+
+    """
+    if logger:
+        logger = XLogger()
     ###############################################
     ## default name
     ##
-    # cfg_name = "igzo"  # INPUT BASE filename
+    # poscar_name = "igzo"  # INPUT BASE filename
 
     ###############################################
     ## optparse
@@ -42,26 +54,27 @@ def poscar2cfg(cfg_name: str):
 
     #  parser.add_option(
     #      "-i",
-    #      "--input",
+    #      "--input_poscar",
     #      dest="INPUT",
-    #      default=cfg_name,
+    #      default=poscar_name,
     #  )
     #  options, args = parser.parse_args()
     #
     #  if options.INPUT:
-    #      cfg_name = options.INPUT
+    #      poscar_name = options.INPUT
     #
     #  # print args,options
     #  if len(args) > 0:
     #      # print "script name1G:",argvs[0]
-    #      cfg_name = args[0]
+    #      poscar_name = args[0]
 
     if cfg_name:
-        print("INPUT file name :", cfg_name + ".vasp")
-        print("OUTPUT file name:", cfg_name + ".cfg")
+        logger.info(f"INPUT file name : {cfg_name}.vasp")
+        logger.info(f"OUTPUT file name: {cfg_name}.cfg")
 
     if not os.path.exists(cfg_name + ".vasp"):
-        sys.exit(cfg_name + ".vasp file not found")
+        logger.error(cfg_name + ".vasp file not found")
+        return False
 
     # def readcfg():
     ###############################################
@@ -218,7 +231,7 @@ if __name__ == "__main__":
 
     parser.add_option(
         "-i",
-        "--input",
+        "--input_poscar",
         dest="INPUT",
         default=cname,
     )

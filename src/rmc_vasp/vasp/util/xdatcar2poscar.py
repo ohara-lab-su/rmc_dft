@@ -29,21 +29,27 @@ from __future__ import print_function
 import sys
 import os
 
+from x_logger import XLogger
 
 
-def xdatcat2poscar(cname: str):
+def xdatcat2poscar(input_poscar: str, logger: XLogger = None):
     """
     VASP の XDATCAR ファイルを POSCAR 形式にする
 
     Args:
-        cname (str): Base name for output files.
+        input_poscar (str): Base name for output files.
+        logger (Xlogger):
     """
-    if cname:
-        print("INPUT file name :", "XDATCAR")
-        print("OUTPUT file name:", cname + ".vasp")
+    if logger:
+        logger = XLogger()
+
+    if input_poscar:
+        logger.info("INPUT file name : XDATCAR")
+        logger.info(f"OUTPUT file name: {input_poscar}.vasp")
 
     if not os.path.exists("XDATCAR"):
-        sys.exit("XDATCAR file not found")
+        # sys.exit("XDATCAR file not found")
+        return False
 
     # Conversion logic goes here
     # Copy the header and last configuration.
@@ -59,32 +65,34 @@ def xdatcat2poscar(cname: str):
     ###############################################
     ## Read Header
     ##
-    num_header= 7  # Number of header lines in XDATCAR.
+    num_header = 7  # Number of header lines in XDATCAR.
 
     natom = sum(list(map(int, datlines[6].split())))
     header = datlines[:num_header]  # First 6 lines are the header
-    NSW=(len(datlines)  - num_header) // (1 + natom)  # NSW >= 1.
-    skip_lines = num_header + (NSW-1)* (1 + natom)
-    configuration = datlines[skip_lines:(skip_lines+(1+natom))]
+    NSW = (len(datlines) - num_header) // (1 + natom)  # NSW >= 1.
+    skip_lines = num_header + (NSW - 1) * (1 + natom)
+    configuration = datlines[skip_lines : (skip_lines + (1 + natom))]
 
     # Write to VASP format
-    with open(cname + ".vasp", "w") as f:
+    with open(input_poscar + ".vasp", "w") as f:
         if NSW > 1:
             for line in header:
                 f.write(line + "\n")
             for line in configuration:
                 f.write(line + "\n")
         else:
-            #NSW == 1
+            # NSW == 1
             for line in datlines:
                 f.write(line + "\n")
     f.close()
-    print(f"{cname}.vasp created from XDATCAR.")
+
+    logger.info(f"{input_poscar}.vasp created from XDATCAR.")
     return True
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python xdatcat2poscar.py <base_name>")
+        logger.info("Usage: python xdatcat2poscar.py <base_name>")
         sys.exit(1)
 
     base_name = sys.argv[1]
