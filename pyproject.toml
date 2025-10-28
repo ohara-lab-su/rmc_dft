@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rmc_vasp"
-version = "0.2.0"
+version = "0.2.1"
 
 description = "rmc_vasp is a Python package for performing Reverse Monte Carlo modeling and ab initio molecular dynamics / relaxation using VASP code."
 authors = [

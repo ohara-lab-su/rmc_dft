@@ -16,10 +16,16 @@ class RmcPot:
     And parsing configuration files.
     """
 
-    def __init__(self, logger: XLogger = None):
+    def __init__(self, rmc_log, logger: XLogger = None):
         if not logger:
             logger = XLogger()
         self._logger = logger
+
+    def preprocess(self):
+        pass
+
+    def postprocess(self):
+        pass
 
     @staticmethod
     def run(

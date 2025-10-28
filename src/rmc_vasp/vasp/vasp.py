@@ -25,10 +25,18 @@ class Vasp:
 
     def __init__(
         self,
+        mpi_cmd: str = None,
+        mpi_flag: str = None,
+        num_procs: int = Config.num_procs,
+        vasp_bin: str = Config.vasp_bin,
+        job_cmd: str = None,
         logger: XLogger = None,
     ):
         """
         Args:
+            mpi_cmd (str):
+            num_procs (int):
+            vasp_bin (str):
             logger (XLogger):  ろがー
         """
         if not logger:
@@ -36,17 +44,69 @@ class Vasp:
         self._logger = logger
         self._logger.debug("== create Vasp()")
 
+        self.mpi_cmd = mpi_cmd or "mpirun"  # 規定のMPIコマンド
+        self.mpi_flag = mpi_flag or "-np"
+        self.num_procs = num_procs or Config.num_procs
+        self.vasp_bin = vasp_bin or Config.vasp_bin
+        self.job_cmd = job_cmd or ""
+
+    def preprocess(self):
+        pass
+
+    def postprocess(self):
+        pass
+
+    def set_mpi(
+        self,
+        mpi_cmd: str = None,
+        mpi_flag: str = None,
+        num_procs: int = None,
+    ):
+        """MPI設定書き換え"""
+        if mpi_cmd:
+            self.mpi_cmd = mpi_cmd
+        if num_procs:
+            self.num_procs = num_procs
+        if mpi_flag:
+            self.mpi_flag = mpi_flag
+
     def run(
         self,
+        mode: str = "local",
         blocking: bool = True,
     ) -> bool:
         """
         VASP を実行する
         Args:
+            mode (str): "local" vasp_bin
+                        "mpi" mpi_cmd + mpi_flag + num_procs + vasp_bin
+                        "job" job_cmd + vasp_bin
             blocking (bool)_:  subprocessをブロッキングで起動(default: True)
         Returns:
             bool: 正しく終わったデー
         """
+        self._logger.info(f"=== run(mode={mode}) ===")
+
+        if mode == "local":
+            cmd = [self.vasp_bin]
+
+        elif mode == "mpi":
+            # 最初の仕様通り: mpi_cmd + num_procs + vasp_bin
+            cmd = [self.mpi_cmd, self.mpi_flag, str(self.num_procs), self.vasp_bin]
+
+        elif mode == "job":
+            if not self.job_cmd:
+                raise RuntimeError("job_cmd が設定されていません。")
+            # job_cmd は launcher として vas_bin の前に置くのみ
+            cmd = shlex.split(self.job_cmd) + [self.vasp_bin]
+
+        else:
+            raise ValueError(f"未知の mode: {mode}")
+
+        self._logger.info("Executing: " + " ".join(cmd))
+        subprocess.run(cmd, check=True)
+        return True
+
         self._logger.info("=== run()")
         # subprocess.run(f"{Config.vasp_bin}", check=True, shell=True)
         subprocess.run(
