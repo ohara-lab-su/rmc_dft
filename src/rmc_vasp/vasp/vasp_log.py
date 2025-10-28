@@ -16,6 +16,18 @@ class VaspLog:
         output_filename: str = "grep_E0_OSZICAR.txt",
         key: str = "E0",
     ):
+        """
+        OSZICAR から E0 を取り出して、ファイル保存する
+        (廃止予定)
+
+        Args:
+            input_filename:
+            output_filename:
+            key:
+
+        Returns:
+
+        """
         input_file = "OSZICAR"
         output_file = "grep_E0_OSZICAR.txt"
         key = "E0"
@@ -27,29 +39,29 @@ class VaspLog:
                         print(line)
                         outfile.writelines(line)
 
-    def vasp_log(self):
+    def collect_result(self):
         """
-        VASPのログを保存する
+        VASPのログからひつようなじょうほうをとりだして、保存する
         This function is used to grep energy from OUTCAR file.
         """
         self.grep_energy()
         print("grep energy from OUTCAR file finished.")
 
-    def vasp_copy(
+    def backup_result(
         self,
-        log_dir: str = "log",
+        dst_log_dir: str = "log",
     ):
         """
         Copy VASP log files to the specified directory.
 
         Args:
-            log_dir (str): Directory to copy the log files to.
+            dst_log_dir (str): Directory to copy the log files to.
         """
         import shutil
         import os
 
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
+        if not os.path.exists(dst_log_dir):
+            os.makedirs(dst_log_dir)
 
         files_to_copy = [
             "grep_E0_OSZICAR.txt",
@@ -64,7 +76,7 @@ class VaspLog:
 
         for file_name in files_to_copy:
             if os.path.exists(file_name):
-                shutil.copy(file_name, log_dir)
-                self._logger.info(f"Copied {file_name} to {log_dir}")
+                shutil.copy(file_name, dst_log_dir)
+                self._logger.info(f"Copied {file_name} to {dst_log_dir}")
             else:
                 self._logger.info(f"{file_name} does not exist, skipping.")

@@ -5,6 +5,6 @@ from rmc_vasp.rmc.rmc_log import RmcLog
 
 
 # from .vasp.vasp import Vasp
-# from .vasp.vasp_log import VaspLog
+# from .vasp.collect_result import VaspLog
 # from .rmc.rmc_pot import RmcPot
-# from .rmc.rmc_log import RmcLog
+# from .rmc.collect_result import RmcLog

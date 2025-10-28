@@ -9,12 +9,13 @@ from ase.io import read, write
 
 from config import Config
 
+from rmc_vasp import VaspLog
 from rmc_vasp.vasp.util.poscar2cfg import poscar2cfg
 from rmc_vasp.vasp.util.xdatcar2poscar import xdatcar2poscar
 
 # from vasp.util.poscar2cfg import poscar2cfg
 # from vasp.util.xdatcar2poscar import xdatcar2poscar
-# from vasp.vasp_log import vasp_log, vasp_copy
+# from vasp.collect_result import collect_result, backup_result
 # from .util.poscar2cfg import poscar2cfg
 # from .util.xdatcar2poscar import xdatcar2poscar
 
@@ -25,6 +26,8 @@ class Vasp:
 
     def __init__(
         self,
+        vasp_log,
+        input_name,
         mpi_cmd: str = None,
         mpi_flag: str = None,
         num_procs: int = Config.num_procs,
@@ -34,11 +37,16 @@ class Vasp:
     ):
         """
         Args:
+            vasp_log:
+            input_name (str): input_name.vasp
             mpi_cmd (str):
             num_procs (int):
             vasp_bin (str):
             logger (XLogger):  ろがー
         """
+        self._vasp_log = vasp_log
+        self._input_name = input_name
+
         if not logger:
             logger = XLogger()
         self._logger = logger
@@ -50,29 +58,48 @@ class Vasp:
         self.vasp_bin = vasp_bin or Config.vasp_bin
         self.job_cmd = job_cmd or ""
 
-    def preprocess(self):
-        pass
+    def preprocess(self, input_name):
+        # RMC_POT で 結果の CFG から変換した **.vasp に対して
+        # element 情報を加える
+        self._logger.info("== preprocess()")
+        self._logger.info(f"   add_element_name({input_name}.vasp)")
+        self.ensure_vasp5_format(f"{input_name}.vasp")
 
-    def postprocess(self):
-        pass
+        # POSCAR についても同様の処理を行う
+        self._logger.info(f"   add_element_name(POSCAR)")
+        self.ensure_vasp5_format("POSCAR")
 
-    def set_mpi(
+    def postprocess(
         self,
-        mpi_cmd: str = None,
-        mpi_flag: str = None,
-        num_procs: int = None,
+        log_dir,
+        input_name: str | None = None,
     ):
-        """MPI設定書き換え"""
-        if mpi_cmd:
-            self.mpi_cmd = mpi_cmd
-        if num_procs:
-            self.num_procs = num_procs
-        if mpi_flag:
-            self.mpi_flag = mpi_flag
+        self._logger.info("== postprocess()")
+
+        if not input_name:
+            input_name = self._input_name
+
+        # VASP のログから必要な結果を取得する
+        self._vasp_log.collect_result()
+
+        # VASP のログを指定ディレクトリに保存する
+        self._vasp_log.backup_result(log_dir)
+
+        # もし、VASP4 形式ならば VASP5 形式に変換する(重複作業OK)
+        self.ensure_vasp5_format(f"{input_name}.vasp")
+        self.ensure_vasp5_format("XDATCAR")
+
+        self._logger.info(f"== xdatcar2poscar({input_name})")
+        self.xdatcar2poscar(input_name)
+
+        self._logger.info("== poscar2cfg()")
+        self.poscar2cfg(input_name)
 
     def run(
         self,
         mode: str = "local",
+        postprocess: bool = True,
+        preprocess: bool = True,
         blocking: bool = True,
     ) -> bool:
         """
@@ -81,11 +108,17 @@ class Vasp:
             mode (str): "local" vasp_bin
                         "mpi" mpi_cmd + mpi_flag + num_procs + vasp_bin
                         "job" job_cmd + vasp_bin
+            postprocess (bool): RMC-VASP 用の postprocess を run 中に行う
+            preprocess (bool): RMC-VASP 用の postprocess を run 中に行う
             blocking (bool)_:  subprocessをブロッキングで起動(default: True)
         Returns:
             bool: 正しく終わったデー
         """
         self._logger.info(f"=== run(mode={mode}) ===")
+
+        # preprocess
+        if preprocess:
+            self.preprocess(self._input_name)
 
         if mode == "local":
             cmd = [self.vasp_bin]
@@ -105,6 +138,10 @@ class Vasp:
 
         self._logger.info("Executing: " + " ".join(cmd))
         subprocess.run(cmd, check=True)
+
+        # postprocess
+        if postprocess:
+            self.postprocess(self._input_name)
         return True
 
         self._logger.info("=== run()")
@@ -113,6 +150,20 @@ class Vasp:
             ["mpirun", "-np", f"{Config.num_procs}", f"{Config.vasp_bin}"], check=True
         )
         return True
+
+    def set_mpi(
+        self,
+        mpi_cmd: str = None,
+        mpi_flag: str = None,
+        num_procs: int = None,
+    ):
+        """MPI設定書き換え"""
+        if mpi_cmd:
+            self.mpi_cmd = mpi_cmd
+        if num_procs:
+            self.num_procs = num_procs
+        if mpi_flag:
+            self.mpi_flag = mpi_flag
 
     @staticmethod
     def poscar2cfg(
@@ -131,13 +182,15 @@ class Vasp:
         poscar2cfg(cfg_name)
         return True
 
-    @staticmethod
-    def add_element_name(
+    def ensure_vasp5_format(
+        self,
         poscar_name: str = "aaa.vasp",
         element_info: str | None = None,
     ) -> bool:
         """
         VASPファイルの6行目にラベルを設定する
+        VASP4 type POSCAR to VASP5 type POSCAR
+        繰り返し実行しても副作用はない
 
         RMC pot の cfg 形式は元素名がないために、POSCAR 形式に変換したときに困る場合があるので
         VASP5 形式にする( cfg2poscar は element 情報がない VASP4 形式)
@@ -168,22 +221,30 @@ class Vasp:
             # ファイルに上書き保存
             with open(poscar_name, "w") as file:
                 file.writelines(lines)
-            print(f"{poscar_name} label back.")
+            self._logger.info(f"{poscar_name} label back.")
         else:
-            printf("error: line number out of range.")
+            self._logger.info("error: line number out of range.")
 
         return True
 
-    @staticmethod
-    def xdatcar2poscar(cfg_name: str = "aaa"):
+    #
+    # Utilities
+    #
+
+    def xdatcar2poscar(
+        self,
+        input_name: str | None = None,
+    ):
         """
         Copy XDATCAR to a new file with the specified name (... .vasp).
 
         Args:
-            cfg_name (str): Name of the new file to create. Without extension.
+            input_name (str): Name of the new file to create. Without extension.
         Returns:
             bool: 正しく終わったデー
         """
+        self._logger.info(f"== xdatcar2poscar({input_name})")
+        xdatcar2poscar(input_name)
 
     @staticmethod
     def pdb2poscar(pdb_name: str = "aaa"):
