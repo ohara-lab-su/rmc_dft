@@ -41,7 +41,7 @@ def poscar2cfg(cfg_name: str, logger: XLogger = None):
     Returns:
 
     """
-    if logger:
+    if not logger:
         logger = XLogger()
     ###############################################
     ## default name
@@ -222,6 +222,7 @@ def poscar2cfg(cfg_name: str, logger: XLogger = None):
         )
 
     cfg.close()
+    return True
 
 
 if __name__ == "__main__":

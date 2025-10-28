@@ -5,7 +5,7 @@ from x_logger import XLogger
 class VaspLog:
 
     def __init__(self, logger: XLogger = None):
-        if logger:
+        if not logger:
             logger = XLogger()
         self._logger = logger
 

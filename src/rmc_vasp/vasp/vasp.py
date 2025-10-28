@@ -9,9 +9,14 @@ from ase.io import read, write
 
 from config import Config
 
-from vasp.util.poscar2cfg import poscar2cfg
-from vasp.util.xdatcar2poscar import xdatcar2poscar
-from vasp.vasp_log import vasp_log, vasp_copy
+from rmc_vasp.vasp.util.poscar2cfg import poscar2cfg
+from rmc_vasp.vasp.util.xdatcar2poscar import xdatcar2poscar
+
+# from vasp.util.poscar2cfg import poscar2cfg
+# from vasp.util.xdatcar2poscar import xdatcar2poscar
+# from vasp.vasp_log import vasp_log, vasp_copy
+# from .util.poscar2cfg import poscar2cfg
+# from .util.xdatcar2poscar import xdatcar2poscar
 
 from x_logger.x_logger import XLogger
 
@@ -26,9 +31,10 @@ class Vasp:
         Args:
             logger (XLogger):  ろがー
         """
+        if not logger:
+            logger = XLogger()
         self._logger = logger
-        if logger:
-            self._logger.debug("== create Vasp()")
+        self._logger.debug("== create Vasp()")
 
     def run(
         self,
@@ -63,6 +69,7 @@ class Vasp:
         """
         xdatcar2poscar(cfg_name)
         poscar2cfg(cfg_name)
+        return True
 
     @staticmethod
     def add_element_name(
