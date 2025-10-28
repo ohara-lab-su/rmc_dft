@@ -7,11 +7,12 @@ from x_logger import XLogger
 
 if __name__ == "__main__":
     logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
-    vasp = Vasp(logger=logger)
-    vasp_log = VaspLog(logger=logger)
 
-    rmc = RmcPot(logger=logger)
+    vasp_log = VaspLog(logger=logger)
+    vasp = Vasp(vasp_log, logger=logger)
+
     rmc_log = RmcLog(logger=logger)
+    rmc = RmcPot(rmc_log, logger=logger)
 
     # require
     # INCAR, KPOINTS, POTCAR,
@@ -24,6 +25,8 @@ if __name__ == "__main__":
 
     # POSCAR to CFG (rmc用のCFG変換)
     cfg_name = "aaa"
+
+    # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
     vasp.poscar2cfg(cfg_name)
 
     i = 0
@@ -33,24 +36,10 @@ if __name__ == "__main__":
         if not os.path.exists(log_dir):
             os.mkdir(log_dir)
 
-        logger.info("rmc" + str(i))
+        logger.info("== rmc" + str(i))
         rmc.run(cfg_name)
-        rmc_log.rmc_log()
-        rmc_log.rmc_copy(log_dir)
 
-        logger.info("cfg2poscar" + str(i))
-        rmc.cfg2poscar(cfg_name)
-        vasp.add_element_name("aaa.vasp")
-        vasp.add_element_name("POSCAR")
-
-        logger.info("vasp" + str(i))
+        logger.info("== vasp" + str(i))
         vasp.run()
-        vasp_log.vasp_log()
-        vasp_log.vasp_copy(log_dir)
-        vasp.add_element_name("aaa.vasp")
-        vasp.add_element_name("XDATCAR")
 
-        logger.info("vasp2cfg" + str(i))
-        vasp.xdatcar2poscar(cfg_name)
-        vasp.poscar2cfg(cfg_name)
         logger.info("loop end " + str(i))
