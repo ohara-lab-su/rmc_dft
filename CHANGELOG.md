@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## v0.2.0, 2019-01-14 nakada
+## v0.2.1 nakada
+
+- bugfix & test
+
+## v0.2.0, nakada
 
 - rmc_vasp 大整理
   - クラスと関数構造を全面的に変更
