@@ -4,7 +4,10 @@ import subprocess
 import shutil
 from config import Config
 
-from rmc.Rcfg2vasp_nonLIB import conv_cfg2vasp
+from rmc_vasp.rmc.util.cfg2poscar import cfg2poscar
+from x_logger import XLogger
+
+# from .util import cfg2poscar
 
 
 class RmcPot:
@@ -14,7 +17,7 @@ class RmcPot:
     """
 
     def __init__(self, logger: XLogger = None):
-        if logger:
+        if not logger:
             logger = XLogger()
         self._logger = logger
 

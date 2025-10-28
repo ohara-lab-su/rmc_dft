@@ -32,7 +32,7 @@ import os
 from x_logger import XLogger
 
 
-def xdatcat2poscar(input_poscar: str, logger: XLogger = None):
+def xdatcar2poscar(input_poscar: str, logger: XLogger = None):
     """
     VASP の XDATCAR ファイルを POSCAR 形式にする
 
@@ -40,7 +40,7 @@ def xdatcat2poscar(input_poscar: str, logger: XLogger = None):
         input_poscar (str): Base name for output files.
         logger (Xlogger):
     """
-    if logger:
+    if not logger:
         logger = XLogger()
 
     if input_poscar:
@@ -92,8 +92,8 @@ def xdatcat2poscar(input_poscar: str, logger: XLogger = None):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        logger.info("Usage: python xdatcat2poscar.py <base_name>")
+        logger.info("Usage: python xdatcar2poscar.py <base_name>")
         sys.exit(1)
 
     base_name = sys.argv[1]
-    xdatcat2poscar(base_name)
+    xdatcar2poscar(base_name)
