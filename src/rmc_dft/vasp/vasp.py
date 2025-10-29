@@ -11,6 +11,7 @@ from rmc_dft.config import Config
 from rmc_dft.vasp.vasp_log import VaspLog
 from rmc_dft.vasp.util.poscar2cfg import poscar2cfg
 from rmc_dft.vasp.util.xdatcar2poscar import xdatcar2poscar
+from rmc_dft.vasp.util.make_poscar import PotcarBuilder
 
 from x_logger import XLogger
 
@@ -54,23 +55,40 @@ class Vasp:
         self.vasp_bin = vasp_bin or Config.vasp_bin
         self.job_cmd = job_cmd or Config.job_cmd
 
-    def preprocess(self, input_name: str, element_info: str = "label.txt"):
+    def init(self, input_name: str = None):
+        """POSCAR から cfg を作る"""
+        if input_namei is None:
+            input_name = self._input_name
+
+        self._logger.info("== init()")
+
+        # POSCAR から CFG を作成
+        self._logger.info(f"== poscar2cfg({input_name})")
+        self.poscar2cfg(_input_name)
+
+    def preprocess(
+        self,
+        input_name: str,
+        element_info: str = "label.txt",
+    ) -> bool:
         """
         RMC-DFT において、RMCの結果を持っている状態で、VASP を動かすための前処理
 
         CFG -> POSCAR (VASP5形式)
+        すでに POSCAR ファイルが存在する時に動かしても問題ない
 
         Args:
             input_name (str): xxx.vasp 名前における xxxに相当する名前
             element_info (str):
 
         Returns:
-
+            bool:
         """
+        self._logger.info("== preprocess()")
+
         # RMC_POT で 結果の CFG から変換した **.vasp に対して
         # element 情報を加える
         # VASP5 形式にする (cfg変換はVASP4形式を吐き出す、RMC_POT は cfg には元素記号を含まないために VASP4 形式のみになる
-        self._logger.info("== preprocess()")
         self._logger.info(f"   add_element_name({input_name}.vasp)")
         self.ensure_vasp5_format(
             poscar_name=f"{input_name}.vasp", element_info=element_info
@@ -79,17 +97,19 @@ class Vasp:
         # POSCAR についても同様の処理を行う
         self._logger.info(f"   add_element_name(POSCAR)")
         self.ensure_vasp5_format(poscar_name="POSCAR", element_info=element_info)
+        return True
 
     def postprocess(
         self,
         log_dir: str,
         input_name: str | None = None,
-    ):
+    ) -> bool:
         """
+        前処理
 
         Args:
-            log_dir:
-            input_name:
+            log_dir (str):
+            input_name (str):
 
         Returns:
 
@@ -114,6 +134,7 @@ class Vasp:
 
         self._logger.info(f"== poscar2cfg({input_name})")
         self.poscar2cfg(input_name)
+        return True
 
     def run(
         self,
@@ -145,9 +166,10 @@ class Vasp:
         # すべてのモードで共通の環境変数を定義
         env = os.environ.copy()
 
-        # preprocess
+        ########################
         if preprocess:
             self.preprocess(self._input_name)
+        ########################
 
         if mode == "local":
             # MPI build された vasp を local で動かすためのもの (infinibandを使わない)
@@ -171,9 +193,11 @@ class Vasp:
         self._logger.info("Executing: " + " ".join(cmd))
         subprocess.run(cmd, check=True, env=env)
 
-        # postprocess
+        ########################
         if postprocess:
             self.postprocess(self._input_name)
+        ########################
+
         return True
 
         self._logger.info("=== run()")
@@ -204,22 +228,9 @@ class Vasp:
         if job_cmd:
             self.job_cmd = job_cmd
 
-    @staticmethod
-    def poscar2cfg(
-        cfg_name: str = "aaa",
-    ):
-        """
-        Convert VASP XDATCAR/POSCAR を RMC CFG 形式に変換する
-
-        Args:
-            cfg_name: str = "aaa": Name of the output file without extension.
-
-        Returns:
-            bool: 正しく終わったデー
-        """
-        xdatcar2poscar(cfg_name)
-        poscar2cfg(cfg_name)
-        return True
+    #
+    # for VASP
+    #
 
     def ensure_vasp5_format(
         self,
@@ -266,9 +277,53 @@ class Vasp:
 
         return True
 
+    @staticmethod
+    def make_potential(
+        elements: list[str],
+        output: str = "POTCAR",
+    ) -> bool:
+        """
+        PotcarBuilder クラスを使って POTCAR を生成
+
+        Args:
+            elements (list):  Li Mn O など
+            output (str): ディクトリ付きならば bb/POTCAR などと書けばいい
+
+        Returns:
+
+        """
+        # builder = PotcarBuilder("~/potpaw_PBE.64")
+        # path = Path(output).expanduser()
+        # if path.is_dir():
+        #     path = path / "POTCAR"
+        builder = PotcarBuilder("~/potpaw_PBE.64")
+        builder.build(elements, output=output)
+        # builder.build(elements, output=str(path))
+        return True
+
+    def convert_to_rmc(self):
+        pass
+
     #
-    # Utilities
+    # Utilities for vasp
     #
+
+    @staticmethod
+    def poscar2cfg(
+        cfg_name: str = "aaa",
+    ) -> bool:
+        """
+        Convert VASP XDATCAR/POSCAR を RMC CFG 形式に変換する
+
+        Args:
+            cfg_name: str = "aaa": Name of the output file without extension.
+
+        Returns:
+            bool: 正しく終わったデー
+        """
+        # xdatcar2poscar(cfg_name)
+        poscar2cfg(cfg_name)
+        return True
 
     def xdatcar2poscar(
         self,
@@ -276,6 +331,7 @@ class Vasp:
     ):
         """
         Copy XDATCAR to a new file with the specified name (... .vasp).
+        最終結果だけならば CONTCAR で十分
 
         Args:
             input_name (str): Name of the new file to create. Without extension.

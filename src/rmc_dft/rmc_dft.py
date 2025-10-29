@@ -65,8 +65,11 @@ class RmcDft:
     def set_max_loop(self, max_loop: int):
         self._max_loop: int = max_loop
 
-    def poscar2cfg(self, cfg_name: str):
-        self._dft.poscar2cfg(cfg_name)
+    def preprocess(self, cfg_name: str):
+        self._dft.preprocess(cfg_name)
+
+    def postprocess(self, cfg_name: str):
+        self._dft.postprocess(cfg_name)
 
     def run(
         self,
@@ -82,7 +85,7 @@ class RmcDft:
             cfg_name: str = self._cfg_name
 
         # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
-        # self._dft.poscar2cfg(cfg_name)
+        self._dft.initprocess(cfg_name)
 
         digits: int = len(str(max_loop - 1))
 
@@ -104,7 +107,6 @@ class RmcDft:
             self._logger.info("loop end " + str(i))
 
 
-# register dynamically imported classes into module globals
 globals().update(
     {
         "RmcPot": RmcPot,
@@ -126,6 +128,6 @@ if __name__ == "__main__":
         logger=_logger,
     )
 
-    # RMCの初期構造をPOSCAR から作る
-    rmc_dft.poscar2cfg(cfg_name)
+    # RMCの初期構造を POSCAR から作る
+    rmc_dft.init(cfg_name)
     rmc_dft.run()
