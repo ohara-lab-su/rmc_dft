@@ -2,12 +2,11 @@
 import os
 import subprocess
 import shutil
-from config import Config
 
-from rmc_vasp.rmc.util.cfg2poscar import cfg2poscar
+from rmc_dft.config import Config
+from rmc_dft.rmc.util.cfg2poscar import cfg2poscar
+
 from x_logger import XLogger
-
-# from .util import cfg2poscar
 
 
 class RmcPot:
