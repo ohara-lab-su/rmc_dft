@@ -22,7 +22,7 @@ Dataset measured at BL04B2
 3列目以降は重み因子を示しています。
 
 ```math
-coeff_ii = \frac{c_i^2 bar{b_i}^2}{\sum_{i} \sum_{j} c_i c_j bar{b_i b_j}} \qquad , \
+coeff_ii = \frac{c_i^2 bar{b_i}^2}{\sum_{i} \sum_{j} c_i c_j bar{b_i b_j}} \qquad , \qquad 
 coeff_ij = \frac{c_i c_j bar{b_i b_j}}{\sum_{i} \sum_{j} c_i c_j bar{b_i b_j}}
 ```
 公式マニュアル　https://www.szfki.hu/~nphys/rmc++/RMC_POT_user_guide.pdf
