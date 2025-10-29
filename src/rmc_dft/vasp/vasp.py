@@ -7,19 +7,11 @@ import os
 import subprocess
 from ase.io import read, write
 
-from config import Config
+from rmc_dft.config import Config
+from rmc_dft.vasp.util.poscar2cfg import poscar2cfg
+from rmc_dft.vasp.util.xdatcar2poscar import xdatcar2poscar
 
-from rmc_vasp import VaspLog
-from rmc_vasp.vasp.util.poscar2cfg import poscar2cfg
-from rmc_vasp.vasp.util.xdatcar2poscar import xdatcar2poscar
-
-# from vasp.util.poscar2cfg import poscar2cfg
-# from vasp.util.xdatcar2poscar import xdatcar2poscar
-# from vasp.collect_result import collect_result, backup_result
-# from .util.poscar2cfg import poscar2cfg
-# from .util.xdatcar2poscar import xdatcar2poscar
-
-from x_logger.x_logger import XLogger
+from x_logger import XLogger
 
 
 class Vasp:
@@ -56,7 +48,7 @@ class Vasp:
         self.mpi_flag = mpi_flag or "-np"
         self.num_procs = num_procs or Config.num_procs
         self.vasp_bin = vasp_bin or Config.vasp_bin
-        self.job_cmd = job_cmd or ""
+        self.job_cmd = job_cmd or Config.job_cmd
 
     def preprocess(self, input_name):
         # RMC_POT で 結果の CFG から変換した **.vasp に対して
@@ -98,6 +90,7 @@ class Vasp:
     def run(
         self,
         mode: str = "local",
+        job_cmd: str = None,
         postprocess: bool = True,
         preprocess: bool = True,
         blocking: bool = True,
@@ -108,36 +101,45 @@ class Vasp:
             mode (str): "local" vasp_bin
                         "mpi" mpi_cmd + mpi_flag + num_procs + vasp_bin
                         "job" job_cmd + vasp_bin
+            job_cmd (str): ジョブコマンド(mode=job時に使う)
+                        　　優先順番
+                           instance(job_cmd=xxx)< set_job_cmd(xxx) < run(job_cmd=xxx)
             postprocess (bool): RMC-VASP 用の postprocess を run 中に行う
             preprocess (bool): RMC-VASP 用の postprocess を run 中に行う
-            blocking (bool)_:  subprocessをブロッキングで起動(default: True)
+            blocking (bool):  subprocessをブロッキングで起動(default: True)
         Returns:
             bool: 正しく終わったデー
         """
         self._logger.info(f"=== run(mode={mode}) ===")
+
+        # すべてのモードで共通の環境変数を定義
+        env = os.environ.copy()
 
         # preprocess
         if preprocess:
             self.preprocess(self._input_name)
 
         if mode == "local":
-            cmd = [self.vasp_bin]
+            # MPI build された vasp を local で動かすためのもの (infinibandを使わない)
+            env["FI_PROVIDER"] = "tcp"
+            env["I_MPI_FABRICS"] = "shm:tcp"
+            env["I_MPI_DEBUG"] = "5"
+            cmd = ["mpirun", "-np", "1", f"{self.vasp_bin}"]
+            # cmd = [self.vasp_bin]
 
         elif mode == "mpi":
-            # 最初の仕様通り: mpi_cmd + num_procs + vasp_bin
             cmd = [self.mpi_cmd, self.mpi_flag, str(self.num_procs), self.vasp_bin]
 
         elif mode == "job":
-            if not self.job_cmd:
-                raise RuntimeError("job_cmd が設定されていません。")
-            # job_cmd は launcher として vas_bin の前に置くのみ
-            cmd = shlex.split(self.job_cmd) + [self.vasp_bin]
+            if not job_cmd:
+                job_cmd = self.job_cmd
+            cmd = [job_cmd]
 
         else:
             raise ValueError(f"未知の mode: {mode}")
 
         self._logger.info("Executing: " + " ".join(cmd))
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, env=env)
 
         # postprocess
         if postprocess:
@@ -164,6 +166,13 @@ class Vasp:
             self.num_procs = num_procs
         if mpi_flag:
             self.mpi_flag = mpi_flag
+
+    def set_job_cmd(
+        self,
+        job_cmd: str = None,
+    ):
+        if job_cmd:
+            self.job_cmd = job_cmd
 
     @staticmethod
     def poscar2cfg(

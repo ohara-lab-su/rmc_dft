@@ -1,18 +1,25 @@
 #!/usr/bin/env python
+"""
+RMC-DFT のUIクラスを使わずに直接 rmc_pot, vasp 関係のクラスを起動して
+RMC-VASP を構成する sample script
+"""
 import os
 
-from rmc_vasp import Vasp, VaspLog, RmcPot, RmcLog
+from rmc_dft import Vasp, VaspLog, RmcPot, RmcLog
 from x_logger import XLogger
 
 
 if __name__ == "__main__":
     logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
 
+    # POSCAR to CFG (rmc用のCFG変換)
+    cfg_name = "aaa"
+
     vasp_log = VaspLog(logger=logger)
-    vasp = Vasp(vasp_log, logger=logger)
+    vasp = Vasp(vasp_log, cfg_name, logger=logger)
 
     rmc_log = RmcLog(logger=logger)
-    rmc = RmcPot(rmc_log, logger=logger)
+    rmc = RmcPot(rmc_log, cfg_name, logger=logger)
 
     # require
     # INCAR, KPOINTS, POTCAR,
@@ -21,18 +28,18 @@ if __name__ == "__main__":
     # Also, high precision cell length need to be set (manually) from "number density".
     # aaa.dat, ???.??? (e.g. Hg.sq specified in aaa.dat)
 
-    max = 10
-
-    # POSCAR to CFG (rmc用のCFG変換)
-    cfg_name = "aaa"
+    max_loop = 10
 
     # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
     vasp.poscar2cfg(cfg_name)
 
-    i = 0
-    for i in range(0, max):
+    digits = len(str(max_loop - 1))
 
-        log_dir = "log" + str(i)
+    i = 0
+    for i in range(0, max_loop):
+
+        log_dir = f"log{str(i).zfill(digits)}"
+
         if not os.path.exists(log_dir):
             os.mkdir(log_dir)
 
@@ -41,5 +48,6 @@ if __name__ == "__main__":
 
         logger.info("== vasp" + str(i))
         vasp.run()
-
+        # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
+        # vasp.run(mode="test")
         logger.info("loop end " + str(i))
