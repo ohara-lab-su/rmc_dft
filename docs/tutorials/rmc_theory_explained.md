@@ -25,7 +25,7 @@ RMCPOT では
 ```math
 \frac{E}{\sigma^2} = \chi_{new}^2 - \chi_{old}^2  \quad , \quad
 
-\chi^2 =  \frac{(S(Q)_{calculation} - S(Q)_{ecperiment})^2 }{\sigma^2}
+\chi^2 =  \frac{(S(Q)_{calculation} - S(Q)_{experiment})^2 }{\sigma^2}
 ```
 になっており、アニーリングのエネルギーに相当するのは実験との一致度　直接ではなく、現状の一致度の更新の度合い、になっているように思われる。
 これは、探索がより局所的になるのかどうか・・・よくわからない。いずれにしても、アニーリングの温度パラメーター
