@@ -23,7 +23,7 @@ reverse Monte Carlo法
 RMCPOT では
 
 ```math
-\frac{E}{/sigma^2} = \chi_{new}^2 - \chi_{old}^2  \quad , \quad
+\frac{E}{\sigma^2} = \chi_{new}^2 - \chi_{old}^2  \quad , \quad
 
 \chi^2 =  \frac{(S(Q)_{calculation} - S(Q)_{ecperiment})^2 }{\sigma^2}
 ```
