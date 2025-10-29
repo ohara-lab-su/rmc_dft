@@ -82,7 +82,7 @@ class Vasp:
 
     def postprocess(
         self,
-        log_dir,
+        log_dir: str,
         input_name: str | None = None,
     ):
         """
@@ -112,7 +112,7 @@ class Vasp:
         self._logger.info(f"== xdatcar2poscar({input_name})")
         self.xdatcar2poscar(input_name)
 
-        self._logger.info("== poscar2cfg()")
+        self._logger.info(f"== poscar2cfg({input_name})")
         self.poscar2cfg(input_name)
 
     def run(
@@ -125,6 +125,7 @@ class Vasp:
     ) -> bool:
         """
         VASP を実行する
+
         Args:
             mode (str): "local" vasp_bin
                         "mpi" mpi_cmd + mpi_flag + num_procs + vasp_bin
@@ -135,6 +136,7 @@ class Vasp:
             postprocess (bool): RMC-VASP 用の postprocess を run 中に行う
             preprocess (bool): RMC-VASP 用の postprocess を run 中に行う
             blocking (bool):  subprocessをブロッキングで起動(default: True)
+
         Returns:
             bool: 正しく終わったデー
         """
