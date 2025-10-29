@@ -2,7 +2,7 @@
 from x_logger import XLogger
 
 
-class RmcLog:
+class RmcPotLog:
 
     def __init__(self, logger: XLogger = None):
         if not logger:

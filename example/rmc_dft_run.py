@@ -4,7 +4,7 @@ import os
 # local の config
 from config import Config
 
-from rmc_dft import Vasp, VaspLog, RmcPot, RmcLog
+from rmc_dft import Vasp, VaspLog, RmcPot, RmcPotLog, RmcDft
 from x_logger import XLogger
 
 

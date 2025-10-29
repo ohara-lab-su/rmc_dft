@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 import os
 
-from rmc_dft.vasp import Vasp, VaspLog
-from rmc_dft.rmc import RmcPot, RmcLog
+from rmc_dft.vasp.vasp import Vasp
+from rmc_dft.vasp.vasp_log import VaspLog
+from rmc_dft.rmc_pot.rmc_pot import RmcPot
+from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
 from rmc_dft.config import Config
 from x_logger import XLogger
 
@@ -58,27 +60,31 @@ class RmcDft:
         self._rmc = rmc_class(self._rmc_log, cfg_name, logger=logger)
 
     def set_cfg_name(self, cfg_name: str):
-        self._cfg_name = cfg_name
+        self._cfg_name: str = cfg_name
 
     def set_max_loop(self, max_loop: int):
-        self._max_loop = max_loop
+        self._max_loop: int = max_loop
 
     def poscar2cfg(self, cfg_name: str):
-        self._vasp.poscar2cfg(cfg_name)
+        self._dft.poscar2cfg(cfg_name)
 
     def run(
         self,
         max_loop: int | None = None,
         mode: str = "local",
+        cfg_name: str = None,
         logger: XLogger = None,
     ):
-        if max_loop:
-            max_loop = self._max_loop
+        if not max_loop:
+            max_loop: int = self._max_loop
+
+        if not cfg_name:
+            cfg_name: str = self._cfg_name
 
         # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
-        # self._vasp.poscar2cfg(cfg_name)
+        # self._dft.poscar2cfg(cfg_name)
 
-        digits = len(str(max_loop - 1))
+        digits: int = len(str(max_loop - 1))
 
         i = 0
         for i in range(0, max_loop):
@@ -92,10 +98,21 @@ class RmcDft:
             self._rmc.run(cfg_name)
 
             self._logger.info("== vasp" + str(i))
-            self._vasp.run(mode=mode)
-            # self._vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
-            # self._vasp.run(mode="test")
+            self._dft.run(mode=mode)
+            # self._dft.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
+            # self._dft.run(mode="test")
             self._logger.info("loop end " + str(i))
+
+
+# register dynamically imported classes into module globals
+globals().update(
+    {
+        "RmcPot": RmcPot,
+        "RmcPotLog": RmcPotLog,
+        "Vasp": Vasp,
+        "VaspLog": VaspLog,
+    }
+)
 
 
 if __name__ == "__main__":

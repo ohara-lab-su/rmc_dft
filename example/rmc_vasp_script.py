@@ -5,7 +5,7 @@ RMC-VASP を構成する sample script
 """
 import os
 
-from rmc_vasp import Vasp, VaspLog, RmcPot, RmcLog
+from rmc_dft import Vasp, VaspLog, RmcPot, RmcLog
 from x_logger import XLogger
 
 
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # Also, high precision cell length need to be set (manually) from "number density".
     # aaa.dat, ???.??? (e.g. Hg.sq specified in aaa.dat)
 
-    max = 10
+    max_loop = 10
 
     # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
     vasp.poscar2cfg(cfg_name)
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     digits = len(str(max_loop - 1))
 
     i = 0
-    for i in range(0, max):
+    for i in range(0, max_loop):
 
         log_dir = f"log{str(i).zfill(digits)}"
 

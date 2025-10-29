@@ -13,6 +13,7 @@ class Config:
     #
     # VASP  path
     #
+
     # vasp_bin = "mpirun -np 4 vasp"
     num_procs = 1
     # vasp_bin = f"/home/hpc/vasp/bin/vasp-gamma"
@@ -21,3 +22,8 @@ class Config:
     # mpi = f"mpirun -np {num_procs} {os.path.expanduser('/home/hpc/vasp/bin/vasp')}"
     # mpi_opt =
     # vasp_bin = "/home/hpc/vasp/bin/vasp"
+
+    #
+    # default job_name
+    #
+    job_cmd = "qsub job_hpcs2024_node2.sh"

@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.2.2 nakada
+
+- dft_rmc により、vasp, rmc_pot などのクラスを読んで使うように一般化した
+  - example (モジュールを読んで実際に rmc_dft を動かすprogram) と module を分離を明確に
+- bugfix
+- さまざまな調整
+ 
 ## v0.2.1 nakada
 
 - bugfix & test

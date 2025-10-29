@@ -4,7 +4,7 @@ import subprocess
 import shutil
 
 from rmc_dft.config import Config
-from rmc_dft.rmc.util.cfg2poscar import cfg2poscar
+from rmc_dft.rmc_pot.util.cfg2poscar import cfg2poscar
 
 from x_logger import XLogger
 
