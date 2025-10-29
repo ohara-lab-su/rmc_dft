@@ -3,6 +3,9 @@ from x_logger import XLogger
 
 
 class VaspLog:
+    """
+    VASP の出力ファイルを計算後に整理・解析するクラス
+    """
 
     def __init__(self, logger: XLogger = None):
         if not logger:
@@ -11,7 +14,7 @@ class VaspLog:
 
     # grep on python
     @staticmethod
-    def grep_energy(
+    def get_E0(
         input_filename: str = "OSZICAR",
         output_filename: str = "grep_E0_OSZICAR.txt",
         key: str = "E0",
@@ -44,8 +47,8 @@ class VaspLog:
         VASPのログからひつようなじょうほうをとりだして、保存する
         This function is used to grep energy from OUTCAR file.
         """
-        self.grep_energy()
-        print("grep energy from OUTCAR file finished.")
+        self.get_E0()
+        self._logger.info("grep energy from OUTCAR file finished.")
 
     def backup_result(
         self,
@@ -80,3 +83,8 @@ class VaspLog:
                 self._logger.info(f"Copied {file_name} to {dst_log_dir}")
             else:
                 self._logger.info(f"{file_name} does not exist, skipping.")
+
+
+if __name__ == "__main__":
+    vasp_log = VaspLog()
+    vasp_log.collect_result()
