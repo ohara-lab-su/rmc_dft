@@ -31,11 +31,45 @@ import numpy as np
 from x_logger import XLogger
 
 
-def poscar2cfg(cfg_name: str, logger: XLogger = None):
+def contcar2cfg(
+    cfg_name: str,
+    logger: XLogger = None,
+):
     """
+    2025.10.29 update CONTCAR タイプ対応
+    コア部分を分離
 
     Args:
-        cfg_name:
+        cfg_name (str):  CFG 保存用の名前
+        logger (str):
+
+    Returns:
+
+    """
+    if not logger:
+        logger = XLogger()
+
+    logger.info(f"INPUT file name : CONTCAR")
+    logger.info(f"OUTPUT file name: {cfg_name}.cfg")
+
+    return convert_to_cfg("CONTCAR", cfg_name)
+
+
+def vasp2cfg(
+    cfg_name: str,
+    logger: XLogger = None,
+):
+    """
+    2025.10.29 update CONTCAR タイプ対応
+
+    *) poscar2cfg ではなく vasp2cfg にしているのは
+       poscar --> xxx.cfg ではなく
+       xxx.vasp --> xxx.cfg を意図しているから
+
+    Args:
+        cfg_name (str): cfg_name.vasp ファイルを読み込む(POSCAR相当)
+                        もし、cfg_name.vasp ファイルが存在しなければ
+                        CONTCAR を読み込む
         logger:
 
     Returns:
@@ -43,37 +77,32 @@ def poscar2cfg(cfg_name: str, logger: XLogger = None):
     """
     if not logger:
         logger = XLogger()
-    ###############################################
-    ## default name
-    ##
-    # poscar_name = "igzo"  # INPUT BASE filename
 
-    ###############################################
-    ## optparse
-    # parser = optparse.OptionParser()
+    logger.info(f"INPUT file name : {cfg_name}.vasp")
+    logger.info(f"OUTPUT file name: {cfg_name}.cfg")
+    poscar_name = cfg_name + ".vasp"
 
-    #  parser.add_option(
-    #      "-i",
-    #      "--input_poscar",
-    #      dest="INPUT",
-    #      default=poscar_name,
-    #  )
-    #  options, args = parser.parse_args()
-    #
-    #  if options.INPUT:
-    #      poscar_name = options.INPUT
-    #
-    #  # print args,options
-    #  if len(args) > 0:
-    #      # print "script name1G:",argvs[0]
-    #      poscar_name = args[0]
+    return convert_to_cfg(poscar_name, cfg_name)
 
-    if cfg_name:
-        logger.info(f"INPUT file name : {cfg_name}.vasp")
-        logger.info(f"OUTPUT file name: {cfg_name}.cfg")
 
-    if not os.path.exists(cfg_name + ".vasp"):
-        logger.error(cfg_name + ".vasp file not found")
+def convert_to_cfg(
+    poscar_name: str = "POSCAR",
+    cfg_name: str = "aaa",
+    logger: XLogger = None,
+):
+    """
+    name ファイルを中身 POSCAR/CONTCAR とみなして、そのファイルを cfg 形式にする
+
+    Args:
+        poscar_name (str): この名前のファイルをそのまま読み込む
+        cfg_name (str): cfg_name.cfg として書き出す
+        logger (XLogger):
+
+    Returns:
+
+    """
+    if not os.path.exists(name):
+        logger.error(f"{name} file not found")
         return False
 
     # def readcfg():
@@ -90,10 +119,15 @@ def poscar2cfg(cfg_name: str, logger: XLogger = None):
     ###############################################
     ## Open vasp file
     ##
-    tmp = open(cfg_name + ".vasp")
-    datfile = tmp.read()
-    tmp.close()
-    datlines = datfile.split("\n")
+    # tmp = open(cfg_name + ".vasp")
+    try:
+        with open(poscar_name, "r") as tmp:
+            datfile = tmp.read()
+            datlines = datfile.split("\n")
+
+    except Exception:
+        logger.error(f"Error: {poscar_name} file open failed")
+        return False
 
     ###############################################
     ## Read Header
@@ -223,27 +257,3 @@ def poscar2cfg(cfg_name: str, logger: XLogger = None):
 
     cfg.close()
     return True
-
-
-if __name__ == "__main__":
-    ###############################################
-    ## optparse
-    parser = optparse.OptionParser()
-
-    parser.add_option(
-        "-i",
-        "--input_poscar",
-        dest="INPUT",
-        default=cname,
-    )
-    options, args = parser.parse_args()
-
-    if options.INPUT:
-        cname = options.INPUT
-
-    # print args,options
-    if len(args) > 0:
-        # print "script name:",argvs[0]
-        cname = args[0]
-
-    poscar2cfg(cname)

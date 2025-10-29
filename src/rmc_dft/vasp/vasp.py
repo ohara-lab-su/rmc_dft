@@ -10,6 +10,10 @@ from ase.io import read, write
 from rmc_dft.config import Config
 from rmc_dft.vasp.vasp_log import VaspLog
 from rmc_dft.vasp.util.poscar2cfg import poscar2cfg
+from rmc_dft.vasp.util.poscar2cfg import contcar2cfg
+from rmc_dft.vasp.util.poscar2cfg import convert_to_cfg
+from rmc_dft.vasp.util.poscar2cfg import copy_contcar_to_vasp
+from rmc_dft.vasp.util.poscar2cfg import copy_vasp_to_poscar
 from rmc_dft.vasp.util.xdatcar2poscar import xdatcar2poscar
 from rmc_dft.vasp.util.make_poscar import PotcarBuilder
 
@@ -72,10 +76,9 @@ class Vasp:
         element_info: str = "label.txt",
     ) -> bool:
         """
-        RMC-DFT において、RMCの結果を持っている状態で、VASP を動かすための前処理
+        vasp 前処理
 
-        CFG -> POSCAR (VASP5形式)
-        すでに POSCAR ファイルが存在する時に動かしても問題ない
+        xxx.vasp (VASP4) --> xxx.vasp (VASP5)
 
         Args:
             input_name (str): xxx.vasp 名前における xxxに相当する名前
@@ -87,16 +90,26 @@ class Vasp:
         self._logger.info("== preprocess()")
 
         # RMC_POT で 結果の CFG から変換した **.vasp に対して
-        # element 情報を加える
-        # VASP5 形式にする (cfg変換はVASP4形式を吐き出す、RMC_POT は cfg には元素記号を含まないために VASP4 形式のみになる
+        # element 情報を加える(VASP5 形式にする)
+        # cfg変換はVASP4形式を吐き出す
+        # RMC_POT は cfg には元素記号を含まないために VASP4 形式のみになる
+
         self._logger.info(f"   add_element_name({input_name}.vasp)")
         self.ensure_vasp5_format(
-            poscar_name=f"{input_name}.vasp", element_info=element_info
+            poscar_name=f"{input_name}.vasp",
+            element_info=element_info,
         )
 
-        # POSCAR についても同様の処理を行う
-        self._logger.info(f"   add_element_name(POSCAR)")
-        self.ensure_vasp5_format(poscar_name="POSCAR", element_info=element_info)
+        # input_name.vasp --> POSCAR
+        copy_vasp_to_poscar(input_name)
+
+        # # POSCAR についても同様の処理を行う
+        # self._logger.info(f"   add_element_name(POSCAR)")
+        # self.ensure_vasp5_format(
+        #     poscar_name="POSCAR",
+        #     element_info=element_info,
+        # )
+
         return True
 
     def postprocess(
@@ -105,7 +118,7 @@ class Vasp:
         input_name: str | None = None,
     ) -> bool:
         """
-        前処理
+        後処理
 
         Args:
             log_dir (str):
@@ -126,14 +139,17 @@ class Vasp:
         self._vasp_log.backup_result(log_dir)
 
         # もし、VASP4 形式ならば VASP5 形式に変換する(重複作業OK)
-        self.ensure_vasp5_format(f"{input_name}.vasp")
-        self.ensure_vasp5_format("XDATCAR")
+        # self.ensure_vasp5_format(f"{input_name}.vasp")
+        # self.ensure_vasp5_format("XDATCAR")
 
-        self._logger.info(f"== xdatcar2poscar({input_name})")
-        self.xdatcar2poscar(input_name)
+        # self._logger.info(f"== xdatcar2poscar({input_name})")
+        # self.xdatcar2poscar(input_name)
 
-        self._logger.info(f"== poscar2cfg({input_name})")
-        self.poscar2cfg(input_name)
+        # self._logger.info(f"== poscar2cfg({input_name})")
+        # self.poscar2cfg(input_name)
+
+        # CONTCAR -> CFG
+        self.contcar2cfg(input_name)
         return True
 
     def run(
@@ -301,19 +317,41 @@ class Vasp:
         # builder.build(elements, output=str(path))
         return True
 
-    def convert_to_rmc(self):
-        pass
+    @staticmethod
+    def convert_to_cfg(
+        self,
+        name: str = "aaa",
+    ) -> bool:
+        convert_to_cfg(name)
+        return True
 
     #
     # Utilities for vasp
     #
 
-    @staticmethod
-    def poscar2cfg(
+    def contcar2cfg(
+        self,
         cfg_name: str = "aaa",
     ) -> bool:
         """
-        Convert VASP XDATCAR/POSCAR を RMC CFG 形式に変換する
+        convert CONTCAR to CFG
+
+        Args:
+            cfg_name (str):
+
+        Returns:
+            bool:
+        """
+        self._logger.info(f"== poscar2cfg({cfg_name})")
+        contcar2cfg(cfg_name)
+        return True
+
+    def poscar2cfg(
+        self,
+        cfg_name: str = "aaa",
+    ) -> bool:
+        """
+        Convert VASP POSCAR を RMC CFG 形式に変換する
 
         Args:
             cfg_name: str = "aaa": Name of the output file without extension.
@@ -321,6 +359,7 @@ class Vasp:
         Returns:
             bool: 正しく終わったデー
         """
+        self._logger.info(f"== poscar2cfg({cfg_name})")
         # xdatcar2poscar(cfg_name)
         poscar2cfg(cfg_name)
         return True
@@ -328,7 +367,7 @@ class Vasp:
     def xdatcar2poscar(
         self,
         input_name: str | None = None,
-    ):
+    ) -> bool:
         """
         Copy XDATCAR to a new file with the specified name (... .vasp).
         最終結果だけならば CONTCAR で十分
@@ -340,6 +379,7 @@ class Vasp:
         """
         self._logger.info(f"== xdatcar2poscar({input_name})")
         xdatcar2poscar(input_name)
+        return True
 
     @staticmethod
     def pdb2poscar(pdb_name: str = "aaa"):

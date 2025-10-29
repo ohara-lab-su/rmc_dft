@@ -38,6 +38,20 @@ class RmcPot:
     def set_cfg_name(self, cfg_name: str):
         self._cfg_name = cfg_name
 
+    def init(self, cfg_name: str):
+        """
+        RMC-DFT は RMC から始める。しかし構造ファイルは VASP ベースから
+        スタートするので、rmc_pot 側での初期化はこのルーチンでは明示的にしない
+        互換のフェイクI/F
+
+        Args:
+            cfg_name:
+
+        Returns:
+
+        """
+        pass
+
     def preprocess(self):
         pass
 
@@ -47,6 +61,12 @@ class RmcPot:
         cfg_name: str | None = None,
     ):
         """
+        RMC 後に DFT を動かすにあたっての
+        cfg --> poscar 変換
+
+        他のコードを使っても基本は poscar 経由を念頭におくので
+        postprocess は poscar にしておけば他のライブラリを使っても
+        齟齬は出ない
 
         Args:
             log_dir:

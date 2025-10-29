@@ -7,6 +7,8 @@ POTCAR 自動生成クラス
 
 import os
 import sys
+from csv import excel_tab
+
 from x_logger import XLogger
 
 
@@ -152,7 +154,11 @@ class PotcarBuilder:
                 return path
         raise FileNotFoundError(f"{element} に対応する POTCAR が見つかりません。")
 
-    def build(self, elements: list[str], output: str = "POTCAR") -> None:
+    def build(
+        self,
+        elements: list[str],
+        output: str = "POTCAR",
+    ) -> bool:
         """
         指定元素リストから POTCAR を構築して出力する。
 
@@ -165,6 +171,7 @@ class PotcarBuilder:
             output:
 
         Returns:
+            bool:
 
         """
         # 親ディレクトリを作成
@@ -172,19 +179,24 @@ class PotcarBuilder:
         if output_dir and not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
 
-        # POTCAR ファイル生成
-        with open(output, "wb") as fout:
-            for elem in elements:
-                pot_src_path: str = os.path.join(self.base_dir, elem, "POTCAR")
-                if not os.path.isfile(pot_src_path):
-                    raise FileNotFoundError(
-                        f"ポテンシャルが見つかりません: {pot_src_path}"
-                    )
-                self._logger.info(f"{elem:>3} <- {pot_src_path}")
-                with open(pot_src_path, "rb") as fin:
-                    fout.write(fin.read())
+        try:
+            # POTCAR ファイル生成
+            with open(output, "wb") as fout:
+                for elem in elements:
+                    pot_src_path: str = os.path.join(self.base_dir, elem, "POTCAR")
+                    if not os.path.isfile(pot_src_path):
+                        raise FileNotFoundError(
+                            f"ポテンシャルが見つかりません: {pot_src_path}"
+                        )
+                    self._logger.info(f"{elem:>3} <- {pot_src_path}")
+                    with open(pot_src_path, "rb") as fin:
+                        fout.write(fin.read())
+        except Exception as e:
+            self._logger.error(f"Error: {e}")
+            return False
 
         self._logger.info(f"POTCAR を出力しました: {output}")
+        return True
 
 
 if __name__ == "__main__":

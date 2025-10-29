@@ -25,5 +25,6 @@ if __name__ == "__main__":
     )
 
     # RMCの初期構造をPOSCAR から作る
-    rmc_dft.poscar2cfg(cfg_name)
+    # rmc_dft.poscar2cfg(cfg_name)
+    rmc_dft.init(cfg_name)
     rmc_dft.run()

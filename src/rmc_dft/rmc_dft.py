@@ -65,6 +65,10 @@ class RmcDft:
     def set_max_loop(self, max_loop: int):
         self._max_loop: int = max_loop
 
+    def init(self, cfg_name: str):
+        self._dft.init(cfg_name)
+        self._rmc.init(cfg_name)
+
     def preprocess(self, cfg_name: str):
         self._dft.preprocess(cfg_name)
 
