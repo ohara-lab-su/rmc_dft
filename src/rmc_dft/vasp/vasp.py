@@ -8,6 +8,7 @@ import subprocess
 from ase.io import read, write
 
 from rmc_dft.config import Config
+from rmc_dft.vasp.vasp_log import VaspLog
 from rmc_dft.vasp.util.poscar2cfg import poscar2cfg
 from rmc_dft.vasp.util.xdatcar2poscar import xdatcar2poscar
 
@@ -15,11 +16,14 @@ from x_logger import XLogger
 
 
 class Vasp:
+    """
+    RMD-DFT  のため VASP構造作成 / VASPパラメータ入力 / 実行 /解析用のクラス
+    """
 
     def __init__(
         self,
-        vasp_log,
-        input_name,
+        vasp_log: VaspLog,
+        input_name: str,
         mpi_cmd: str = None,
         mpi_flag: str = None,
         num_procs: int = Config.num_procs,
@@ -29,14 +33,14 @@ class Vasp:
     ):
         """
         Args:
-            vasp_log:
+            vasp_log (VaspLog):
             input_name (str): input_name.vasp
             mpi_cmd (str):
             num_procs (int):
             vasp_bin (str):
             logger (XLogger):  ろがー
         """
-        self._vasp_log = vasp_log
+        self._vasp_log: VaspLog = vasp_log
         self._input_name = input_name
 
         if not logger:
@@ -50,22 +54,46 @@ class Vasp:
         self.vasp_bin = vasp_bin or Config.vasp_bin
         self.job_cmd = job_cmd or Config.job_cmd
 
-    def preprocess(self, input_name):
+    def preprocess(self, input_name: str, element_info: str = "label.txt"):
+        """
+        RMC-DFT において、RMCの結果を持っている状態で、VASP を動かすための前処理
+
+        CFG -> POSCAR (VASP5形式)
+
+        Args:
+            input_name (str): xxx.vasp 名前における xxxに相当する名前
+            element_info (str):
+
+        Returns:
+
+        """
         # RMC_POT で 結果の CFG から変換した **.vasp に対して
         # element 情報を加える
+        # VASP5 形式にする (cfg変換はVASP4形式を吐き出す、RMC_POT は cfg には元素記号を含まないために VASP4 形式のみになる
         self._logger.info("== preprocess()")
         self._logger.info(f"   add_element_name({input_name}.vasp)")
-        self.ensure_vasp5_format(f"{input_name}.vasp")
+        self.ensure_vasp5_format(
+            poscar_name=f"{input_name}.vasp", element_info=element_info
+        )
 
         # POSCAR についても同様の処理を行う
         self._logger.info(f"   add_element_name(POSCAR)")
-        self.ensure_vasp5_format("POSCAR")
+        self.ensure_vasp5_format(poscar_name="POSCAR", element_info=element_info)
 
     def postprocess(
         self,
         log_dir,
         input_name: str | None = None,
     ):
+        """
+
+        Args:
+            log_dir:
+            input_name:
+
+        Returns:
+
+        """
         self._logger.info("== postprocess()")
 
         if not input_name:
