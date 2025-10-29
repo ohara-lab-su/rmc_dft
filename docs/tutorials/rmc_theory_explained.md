@@ -36,6 +36,7 @@ RMCPOT では
 P=min[exp(-E/\sigma),1]
 ```
 にある量である。
+
 正確な記述は公式
 https://www.szfki.hu/~nphys/rmc++/RMC_POT_user_guide.pdf
 の式4周辺を参照
