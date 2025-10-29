@@ -21,6 +21,7 @@
 
 - RMC/VASP の method を若干追加
 - input_sample の追加・テスト
+- RMC-VASP の基本動作テスト
 
 ## v0.0.x nakada
 
