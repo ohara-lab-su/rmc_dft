@@ -37,5 +37,5 @@ if __name__ == "__main__":
 
     cfg_name = args.cfg_name
     # rmc = RmcPot(None, cfg_name=cfg_name, logger=logger)
-    rmc = RmcPotLog(logger=logger)
+    rmc = RmcPotLog(cfg_name=cfg_name, logger=logger)
     rmc.clear(cfg_name=cfg_name)

@@ -4,14 +4,14 @@ from pathlib import Path
 
 
 def copy_vasp_to_poscar(
-    name: str,
+    vasp_name: str,
     logger: XLogger = None,
 ) -> bool:
     """
-    {name}.vasp ファイルを POSCAR にコピーする
+    {vasp_name}.vasp ファイルを POSCAR にコピーする
 
     Args:
-        name (str): 入力ファイル名（拡張子なし）
+        vasp_name (str): 入力ファイル名（拡張子なし）
         logger (XLogger): ロガー（未指定の場合は新規生成）
 
     Returns:
@@ -20,7 +20,7 @@ def copy_vasp_to_poscar(
     if not logger:
         logger = XLogger()
 
-    src = Path(f"{name}.vasp")
+    src = Path(f"{vasp_name}.vasp")
     dst = Path("POSCAR")
 
     if not src.exists():

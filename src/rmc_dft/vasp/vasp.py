@@ -33,7 +33,7 @@ class Vasp:
     def __init__(
         self,
         vasp_log: VaspLog,
-        input_name: str,
+        vasp_name: str,
         mpi_cmd: str = None,
         mpi_flag: str = None,
         num_procs: int = Config.num_procs,
@@ -44,14 +44,14 @@ class Vasp:
         """
         Args:
             vasp_log (VaspLog):
-            input_name (str): input_name.vasp
+            vasp_name (str): vasp_name.vasp
             mpi_cmd (str):
             num_procs (int):
             vasp_bin (str):
             logger (XLogger):  ろがー
         """
         self._vasp_log: VaspLog = vasp_log
-        self._input_name = input_name
+        self._vasp_name: str = vasp_name
 
         if not logger:
             logger = XLogger()
@@ -119,20 +119,29 @@ class Vasp:
     # RMC-DFT の VASP 側の init/preprocess/postprocess
     #
 
-    def init(self, input_name: str = None):
-        """POSCAR から cfg を作る"""
-        if input_namei is None:
-            input_name = self._input_name
+    def init(self, cfg_name: str = None):
+        """
+        POSCAR から cfg を作る
 
+        Args:
+            cfg_name (str): 出力する cfg_name.cfg
+
+        Returns:
+
+        """
         self._logger.info("== init()")
 
+        if cfg_name is None:
+            cfg_name = self._vasp_name
+        self._logger.info(f"cfg_name={cfg_name})")
+
         # POSCAR から CFG を作成
-        self._logger.info(f"== poscar2cfg({input_name})")
-        self.poscar2cfg(_input_name)
+        self._logger.info(f"== poscar2cfg(cfg_name={cfg_name})")
+        self.poscar2cfg(cfg_name=cfg_name)
 
     def preprocess(
         self,
-        input_name: str,
+        vasp_name: str = "aaa",
         element_info: str = "label.txt",
     ) -> bool:
         """
@@ -141,7 +150,7 @@ class Vasp:
         xxx.vasp (VASP4) --> xxx.vasp (VASP5)
 
         Args:
-            input_name (str): xxx.vasp 名前における xxxに相当する名前
+            vasp_name (str): xxx.vasp 名前における xxxに相当する名前
             element_info (str):
 
         Returns:
@@ -154,14 +163,14 @@ class Vasp:
         # cfg変換はVASP4形式を吐き出す
         # RMC_POT は cfg には元素記号を含まないために VASP4 形式のみになる
 
-        self._logger.info(f"   add_element_name({input_name}.vasp)")
+        self._logger.info(f"add_element_name({vasp_name}.vasp)")
         self.ensure_vasp5_format(
-            poscar_name=f"{input_name}.vasp",
+            poscar_name=f"{vasp_name}.vasp",
             element_info=element_info,
         )
 
         # input_name.vasp --> POSCAR
-        copy_vasp_to_poscar(input_name)
+        copy_vasp_to_poscar(vasp_name)
 
         # # POSCAR についても同様の処理を行う
         # self._logger.info(f"   add_element_name(POSCAR)")
@@ -174,42 +183,43 @@ class Vasp:
 
     def postprocess(
         self,
-        log_dir: str,
-        input_name: str | None = None,
+        log_dir: str = "log",
+        cfg_name: str | None = None,
     ) -> bool:
         """
         後処理
 
         Args:
             log_dir (str):
-            input_name (str):
+            cfg_name (str): POSCAR -> cfg_name.cfg
 
         Returns:
 
         """
         self._logger.info("== postprocess()")
 
-        if not input_name:
-            input_name = self._input_name
+        if not cfg_name:
+            cfg_name = self._cfg_name
+        self._logger.info(f"cfg_name={cfg_name})")
 
         # VASP のログから必要な結果を取得する
         self._vasp_log.collect_result()
 
         # VASP のログを指定ディレクトリに保存する
-        self._vasp_log.backup_result(log_dir)
+        self._vasp_log.backup_result(log_dir=log_dir)
 
         # もし、VASP4 形式ならば VASP5 形式に変換する(重複作業OK)
-        # self.ensure_vasp5_format(f"{input_name}.vasp")
+        # self.ensure_vasp5_format(f"{cfg_name}.vasp")
         # self.ensure_vasp5_format("XDATCAR")
 
-        # self._logger.info(f"== xdatcar2poscar({input_name})")
-        # self.xdatcar2poscar(input_name)
+        # self._logger.info(f"== xdatcar2poscar({cfg_name})")
+        # self.xdatcar2poscar(cfg_name)
 
-        # self._logger.info(f"== poscar2cfg({input_name})")
-        # self.poscar2cfg(input_name)
+        # self._logger.info(f"== poscar2cfg({cfg_name})")
+        # self.poscar2cfg(cfg_name))
 
         # CONTCAR -> CFG
-        self.contcar2cfg(input_name)
+        self.contcar2cfg(cfg_name=cfg_name)
         return True
 
     #
@@ -220,12 +230,17 @@ class Vasp:
         self,
         mode: str = "local",
         job_cmd: str = None,
-        postprocess: bool = True,
-        preprocess: bool = True,
+        postprocess: bool = False,
+        preprocess: bool = False,
         blocking: bool = True,
     ) -> bool:
         """
         VASP を実行する
+
+        local 実行
+        FI_PROVIDER="TCP"
+        I_MPI_FABRICS="shm:tcp"
+        I_MPI_DEBUG="5"
 
         Args:
             mode (str): "local" vasp_bin

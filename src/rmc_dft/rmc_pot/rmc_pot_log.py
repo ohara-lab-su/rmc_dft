@@ -9,19 +9,28 @@ from x_logger import XLogger
 
 class RmcPotLog:
 
-    def __init__(self, logger: XLogger = None):
+    def __init__(
+        self,
+        cfg_name: str,
+        logger: XLogger = None,
+    ):
+        """
+        Args:
+            cfg_name (str):
+            logger (XLogger):
+        """
         if not logger:
             logger = XLogger()
         self._logger = logger
 
         # default name
-        self.cfg_name: str = "aaa"
+        self._cfg_name: str = cfg_name
 
     def set_cfg_name(self, cfg_name: str) -> None:
-        self.cfg_name: str = cfg_name
+        self._cfg_name: str = cfg_name
 
     def get_cfg_name(self) -> str:
-        return self.cfg_name
+        return self._cfg_name
 
     def clear(self, cfg_name: str) -> None:
         """
@@ -89,14 +98,14 @@ class RmcPotLog:
 
     def backup_result(
         self,
-        dst_log_dir: str = "log",
+        log_dir: str = "log",
         cfg_name: str = "aaa",
     ):
         """
         Copy RMC log files to the specified directory.
 
         Args:
-            dst_log_dir (str): Directory to copy the log files to.
+            log_dir (str): Directory to copy the log files to.
             cfg_name (str): Name of the configuration file.
         """
         self._logger.info("== backup_result")
@@ -104,9 +113,9 @@ class RmcPotLog:
         if not cfg_name:
             cfg_name = self.cfg_name
 
-        if not os.path.exists(dst_log_dir):
-            self._logger.info(f"mkdir {dst_log_dir}")
-            os.makedirs(dst_log_dir)
+        if not os.path.exists(log_dir):
+            self._logger.info(f"mkdir {log_dir}")
+            os.makedirs(log_dir)
 
         files_to_copy = [
             "grep_khi_RMC.txt",
@@ -121,9 +130,8 @@ class RmcPotLog:
         ]
 
         for file_name in files_to_copy:
-            print(file_name)
             if os.path.exists(f"{file_name}"):
-                shutil.copy(file_name, dst_log_dir)
-                self._logger.info(f"Copied {file_name} to {dst_log_dir}")
+                shutil.copy(file_name, log_dir)
+                self._logger.info(f"Copied {file_name} to {log_dir}")
             else:
                 self._logger.info(f"{file_name} does not exist, skipping.")

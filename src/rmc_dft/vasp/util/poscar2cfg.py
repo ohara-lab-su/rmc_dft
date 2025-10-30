@@ -80,7 +80,8 @@ def poscar2cfg(
 
 
 def vasp2cfg(
-    cfg_name: str,
+    vasp_name: str,
+    cfg_name: str = None,
     logger: XLogger = None,
 ):
     """
@@ -94,6 +95,7 @@ def vasp2cfg(
         cfg_name (str): cfg_name.vasp ファイルを読み込む(POSCAR相当)
                         もし、cfg_name.vasp ファイルが存在しなければ
                         CONTCAR を読み込む
+        vasp_name (str):
         logger:
 
     Returns:
@@ -102,11 +104,17 @@ def vasp2cfg(
     if not logger:
         logger = XLogger()
 
-    logger.info(f"INPUT file name : {cfg_name}.vasp")
-    logger.info(f"OUTPUT file name: {cfg_name}.cfg")
-    poscar_name = cfg_name + ".vasp"
+    if not cfg_name:
+        cfg_name = vasp_name
 
-    return convert_to_cfg(poscar_name, cfg_name)
+    logger.info(f"INPUT file name : {vasp_name}.vasp")
+    logger.info(f"OUTPUT file name: {cfg_name}.cfg")
+    poscar_name = vasp_name + ".vasp"
+
+    return convert_to_cfg(
+        poscar_name=poscar_name,
+        cfg_name=cfg_name,
+    )
 
 
 def convert_to_cfg(

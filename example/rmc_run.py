@@ -18,9 +18,9 @@ if __name__ == "__main__":
     cfg_name = "aaa"
 
     # POSCAR to CFG
-    poscar2cfg(cfg_name)
+    poscar2cfg(cfg_name=cfg_name)
 
-    rmc_log = RmcPotLog(logger=logger)
+    rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
     rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
     rmc.run(cfg_name=cfg_name)
 

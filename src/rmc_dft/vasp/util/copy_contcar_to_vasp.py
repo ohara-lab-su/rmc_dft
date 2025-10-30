@@ -4,14 +4,14 @@ from pathlib import Path
 
 
 def copy_contcar_to_vasp(
-    name: str,
+    vasp_name: str,
     logger: XLogger = None,
 ) -> bool:
     """
     CONTCAR ファイルを {name}.vasp にコピーする
 
     Args:
-        name (str): 出力ファイル名（拡張子なし）
+        vasp_name (str): 出力ファイル名（拡張子なし）
         logger (XLogger):
 
     Returns:
@@ -22,7 +22,7 @@ def copy_contcar_to_vasp(
         logger = XLogger()
 
     src = Path("CONTCAR")
-    dst = Path(f"{name}.vasp")
+    dst = Path(f"{vasp_name}.vasp")
 
     if not src.exists():
         logger.error("Error: CONTCAR ファイルが見つかりません。")

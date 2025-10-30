@@ -28,48 +28,29 @@ import optparse
 import numpy as np
 
 
-def cfg2poscar(cname: str):
+def cfg2poscar(
+    cfg_name: str,
+    vasp_name: str = None,
+):
     """
     RMCPOT cfg 形式を poscar 形式にする
     SAE を使わない独立版(noLIB)
 
     Args:
-        cname:
+        cfg_name (str)::
+        vasp_name (str):
 
     Returns:
 
     """
-    ###############################################
-    ## default name
-    ##
-    # poscar_name = "igzo"  # INPUT BASE filename
+    if not vasp_name:
+        vasp_name = cfg_name
 
-    ###############################################
-    ## optparse
-    # parser = optparse.OptionParser()
-    #
-    # parser.add_option(
-    #    "-i",
-    #    "--input_poscar",
-    #    dest="INPUT",
-    #    default=poscar_name,
-    # )
-    # options, args = parser.parse_args()
-    #
-    # if options.INPUT:
-    #    poscar_name = options.INPUT
-    #
-    ## print args,options
-    # if len(args) > 0:
-    #    # print "script name:",argvs[0]
-    #    poscar_name = args[0]
+    print("INPUT file name :", cfg_name + ".cfg")
+    print("OUTPUT file name:", vasp_name + ".vasp")
 
-    if cname:
-        print("INPUT file name :", cname + ".cfg")
-        print("OUTPUT file name:", cname + ".vasp")
-
-    if not os.path.exists(cname + ".cfg"):
-        sys.exit(cname + ".cfg file not found")
+    if not os.path.exists(cfg_name + ".cfg"):
+        sys.exit(cfg_name + ".cfg file not found")
 
     # def readcfg():
     ###############################################
@@ -85,7 +66,7 @@ def cfg2poscar(cname: str):
     ###############################################
     ## Open RMC_POT cfg file
     ##
-    tmp = open(cname + ".cfg")
+    tmp = open(cfg_name + ".cfg")
     datfile = tmp.read()
     tmp.close()
     datlines = datfile.split("\n")
@@ -188,7 +169,7 @@ def cfg2poscar(cname: str):
 
     ###############################################
     ## OUTPUT for VASP
-    vasp = open(cname + ".vasp", "w")
+    vasp = open(vasp_name + ".vasp", "w")
 
     print(comment, file=vasp)
     print("1.0", file=vasp)
@@ -213,28 +194,3 @@ def cfg2poscar(cname: str):
         )
 
     vasp.close()
-
-
-if __name__ == "__main__":
-
-    ###############################################
-    ## optparse
-    parser = optparse.OptionParser()
-
-    parser.add_option(
-        "-i",
-        "--input_poscar",
-        dest="INPUT",
-        default=cname,
-    )
-    options, args = parser.parse_args()
-
-    if options.INPUT:
-        cname = options.INPUT
-
-    # print args,options
-    if len(args) > 0:
-        # print "script name:",argvs[0]
-        cname = args[0]
-
-    cfg2poscar(cname)

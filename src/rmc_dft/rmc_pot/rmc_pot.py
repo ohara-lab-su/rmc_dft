@@ -79,19 +79,22 @@ class RmcPot:
         齟齬は出ない
 
         Args:
-            log_dir:
-            cfg_name:
+            log_dir (str):
+            cfg_name (str): cfg_name と vasp_name は等しいとする
 
         Returns:
 
         """
+        self._logger.info(f"== postprocess()")
+
         if not cfg_name:
             cfg_name = self._cfg_name
+        self._logger.info(f"cfg_name = {cfg_name}")
 
         # RMC_POT 結果保存
         self._rmc_log.collect_result()
         self._rmc_log.backup_result(
-            dst_log_dir=log_dir,
+            log_dir=log_dir,
             cfg_name=cfg_name,
         )
 
@@ -117,21 +120,6 @@ class RmcPot:
         """
         subprocess.run([f"{Config.rmc_bin}", f"{cfg_name}"], check=True)
         return True
-
-    def run_asc(self):
-        pass
-
-    #    def run_local(mystr: str, blocking: bool = True):
-    #        """
-    #        It calls a local RMC command.
-    #
-    #        :param mystr: RMC input_poscar file name without extension (project name).
-    #        :type mystr: str
-    #        :param blocking: Blocking mode. Default is True.
-    #        :type blocking: bool
-    #        :return: None
-    #        """
-    #        subprocess.run([f"{Config.rmc_bin}", f"{mystr}"], check=True)
 
     #
     # Utilities

@@ -143,7 +143,10 @@ class PotcarBuilder:
             "Cf": ["Cf"],
         }
 
-    def choose_potential(self, element: str) -> str:
+    def choose_potential(
+        self,
+        element: str,
+    ) -> str:
         """最適な POTCAR のファイルパスを返す"""
         if element not in self.priority:
             raise KeyError(f"{element} は未登録の元素")
@@ -157,31 +160,31 @@ class PotcarBuilder:
     def build(
         self,
         elements: list[str],
-        output: str = "POTCAR",
+        poscar_name: str = "POTCAR",
     ) -> bool:
         """
         指定元素リストから POTCAR を構築して出力する。
 
         判定規則:
-          - output が区切り記号で終わる、または実在するディレクトリ -> ディレクトリ扱い（中に POTCAR）
+          - poscar_name が区切り記号で終わる、または実在するディレクトリ -> ディレクトリ扱い（中に POTCAR）
           - 上記以外 -> ファイル扱い（親ディレクトリを作成）
 
         Args:
-            elements:
-            output:
+            elements (list[str])::
+            poscar_name (str):
 
         Returns:
             bool:
 
         """
         # 親ディレクトリを作成
-        output_dir: str = os.path.dirname(output)
+        output_dir: str = os.path.dirname(poscar_name)
         if output_dir and not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
 
         try:
             # POTCAR ファイル生成
-            with open(output, "wb") as fout:
+            with open(poscar_name, "wb") as fout:
                 for elem in elements:
                     pot_src_path: str = os.path.join(self.base_dir, elem, "POTCAR")
                     if not os.path.isfile(pot_src_path):
@@ -195,7 +198,7 @@ class PotcarBuilder:
             self._logger.error(f"Error: {e}")
             return False
 
-        self._logger.info(f"POTCAR を出力しました: {output}")
+        self._logger.info(f"POTCAR を出力しました: {poscar_name}")
         return True
 
 
@@ -209,11 +212,11 @@ if __name__ == "__main__":
     # make_poscar.py Li Mn O ./bb/POTCAR
     args = sys.argv[1:]
     if len(args) >= 2 and "." in args[-1]:
-        output_file = args[-1]
+        poscar_name = args[-1]
         _elements = args[:-1]
     else:
-        output_file = "POTCAR"
+        poscar_name = "POTCAR"
         _elements = args
 
     builder = PotcarBuilder("~/potpaw_PBE.64")
-    builder.build(_elements, output=output_file)
+    builder.build(_elements, poscar_name=poscar_name)
