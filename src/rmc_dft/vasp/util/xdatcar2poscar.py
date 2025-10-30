@@ -32,20 +32,23 @@ import os
 from x_logger import XLogger
 
 
-def xdatcar2poscar(input_poscar: str, logger: XLogger = None):
+def xdatcar2poscar(
+    vasp_name: str,
+    logger: XLogger = None,
+):
     """
     VASP の XDATCAR ファイルを POSCAR 形式にする
 
     Args:
-        input_poscar (str): Base name for output files.
+        vasp_name (str): Base name for output files.
         logger (Xlogger):
     """
     if not logger:
         logger = XLogger()
 
-    if input_poscar:
+    if vasp_name:
         logger.info("INPUT file name : XDATCAR")
-        logger.info(f"OUTPUT file name: {input_poscar}.vasp")
+        logger.info(f"OUTPUT file name: {vasp_name}.vasp")
 
     if not os.path.exists("XDATCAR"):
         # sys.exit("XDATCAR file not found")
@@ -74,7 +77,7 @@ def xdatcar2poscar(input_poscar: str, logger: XLogger = None):
     configuration = datlines[skip_lines : (skip_lines + (1 + natom))]
 
     # Write to VASP format
-    with open(input_poscar + ".vasp", "w") as f:
+    with open(vasp_name + ".vasp", "w") as f:
         if NSW > 1:
             for line in header:
                 f.write(line + "\n")
@@ -86,7 +89,7 @@ def xdatcar2poscar(input_poscar: str, logger: XLogger = None):
                 f.write(line + "\n")
     f.close()
 
-    logger.info(f"{input_poscar}.vasp created from XDATCAR.")
+    logger.info(f"{vasp_name}.vasp created from XDATCAR.")
     return True
 
 

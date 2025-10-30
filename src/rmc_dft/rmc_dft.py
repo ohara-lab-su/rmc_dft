@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 import os
+from typing import Any, Dict, List, Optional
 
 from rmc_dft.vasp.vasp import Vasp
 from rmc_dft.vasp.vasp_log import VaspLog
 from rmc_dft.rmc_pot.rmc_pot import RmcPot
 from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
 from rmc_dft.config import Config
+
 from x_logger import XLogger
 
 
@@ -64,6 +66,10 @@ class RmcDft:
 
     def set_max_loop(self, max_loop: int):
         self._max_loop: int = max_loop
+
+    def init(self, cfg_name: str):
+        self._dft.init(cfg_name)
+        self._rmc.init(cfg_name)
 
     def preprocess(self, cfg_name: str):
         self._dft.preprocess(cfg_name)

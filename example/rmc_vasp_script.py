@@ -16,10 +16,14 @@ if __name__ == "__main__":
     cfg_name = "aaa"
 
     vasp_log = VaspLog(logger=logger)
-    vasp = Vasp(vasp_log, cfg_name, logger=logger)
+    vasp = Vasp(
+        vasp_log=vasp_log,
+        vasp_name=vasp_name,
+        logger=logger,
+    )
 
-    rmc_log = RmcPotLog(logger=logger)
-    rmc = RmcPot(rmc_log, cfg_name, logger=logger)
+    rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
+    rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
 
     # require
     # INCAR, KPOINTS, POTCAR,
@@ -44,10 +48,13 @@ if __name__ == "__main__":
             os.mkdir(log_dir)
 
         logger.info("== rmc" + str(i))
-        rmc.run(cfg_name)
+        rmc.run(cfg_name=cfg_name)
+        rmc.postprocess(log_dir=log_dir, cfg_name=cfg_name)
 
         logger.info("== vasp" + str(i))
+        vasp.preprocess(vasp_name=vasp_name, element_info="label.txt")
         vasp.run()
+        vasp.postprocess(log_dir="vasp_log", cfg_name=cfg_name)
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
         logger.info("loop end " + str(i))
