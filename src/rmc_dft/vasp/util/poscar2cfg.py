@@ -55,6 +55,30 @@ def contcar2cfg(
     return convert_to_cfg("CONTCAR", cfg_name)
 
 
+def poscar2cfg(
+    cfg_name: str,
+    logger: XLogger = None,
+):
+    """
+    2025.10.29 update CONTCAR タイプ対応
+    コア部分を分離
+
+    Args:
+        cfg_name (str):  CFG 保存用の名前
+        logger (str):
+
+    Returns:
+
+    """
+    if not logger:
+        logger = XLogger()
+
+    logger.info(f"INPUT file name : POSCAR")
+    logger.info(f"OUTPUT file name: {cfg_name}.cfg")
+
+    return convert_to_cfg("POSCAR", cfg_name)
+
+
 def vasp2cfg(
     cfg_name: str,
     logger: XLogger = None,

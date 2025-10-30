@@ -5,15 +5,20 @@ K.KOBAYASHI
 """
 import os
 import subprocess
+from typing import Any
+
 from ase.io import read, write
 
 from rmc_dft.config import Config
 from rmc_dft.vasp.vasp_log import VaspLog
-from rmc_dft.vasp.util.poscar2cfg import poscar2cfg
-from rmc_dft.vasp.util.poscar2cfg import contcar2cfg
-from rmc_dft.vasp.util.poscar2cfg import convert_to_cfg
-from rmc_dft.vasp.util.poscar2cfg import copy_contcar_to_vasp
-from rmc_dft.vasp.util.poscar2cfg import copy_vasp_to_poscar
+from rmc_dft.vasp.util.poscar2cfg import (
+    vasp2cfg,
+    contcar2cfg,
+    poscar2cfg,
+    convert_to_cfg,
+)
+from rmc_dft.vasp.util.copy_contcar_to_vasp import copy_contcar_to_vasp
+from rmc_dft.vasp.util.copy_vasp_to_poscar import copy_vasp_to_poscar
 from rmc_dft.vasp.util.xdatcar2poscar import xdatcar2poscar
 from rmc_dft.vasp.util.make_poscar import PotcarBuilder
 
@@ -58,6 +63,61 @@ class Vasp:
         self.num_procs = num_procs or Config.num_procs
         self.vasp_bin = vasp_bin or Config.vasp_bin
         self.job_cmd = job_cmd or Config.job_cmd
+
+        # for VASP INCAR
+        self._incar_keys: Dict[str, Any] = {
+            "EDIFF": 1e-04,
+            "EDIFFG": 1e-05,
+            "ISTART": 0,
+            "ISMEAR": 0,
+            "SIGMA": 0.1,
+            "NSW": 2,
+            "NELM": 30,
+            "IBRION": 2,
+            "ISIF": 2,
+            "LREAL": "auto",
+        }
+        # 各キーに対応する property / get_xxx, set_xxx をクラスに動的追加
+        for key in list(self._incar_keys.keys()):
+            self._install_property(key)
+
+    #
+    # INTCAR
+    #
+
+    def _install_property(self, key: str) -> None:
+        """
+        属性アクセスを get_{KEY} / set_{KEY} にバインド。
+        それらが存在しなければ辞書を既定動作とする。
+        """
+
+        def fget(inst: Vasp, k: str = key) -> Any:
+            getter = getattr(inst, f"get_{k}", None)
+            if callable(getter):
+                return getter()  # 高度な getter を必ず経由
+            return inst._incar_keys.get(k)  # 既定（辞書）取得
+
+        def fset(inst: Vasp, value: Any, k: str = key) -> None:
+            setter = getattr(inst, f"set_{k}", None)
+            if callable(setter):
+                setter(value)  # 高度な setter を必ず経由
+            else:
+                inst._incar_keys[k] = value  # 既定（辞書）更新
+
+        # クラスに property を貼る（以後 instance.k で fget/fset が必ず呼ばれる）
+        setattr(self.__class__, key, property(fget, fset))
+
+    def set_EDIFF(self, EDIFF: float) -> None:
+        self._incar_keys["EDIFF"] = float(EDIFF)
+        self._incar_keys["EDIFFG"] = float(EDIFF) * 10
+
+    def get_EDIFFG(self) -> float:
+        self._incar_keys["EDIFFG"] = float(self.EDIFF) * 10
+        return self._incar_keys["EDIFFG"]
+
+    #
+    # RMC-DFT の VASP 側の init/preprocess/postprocess
+    #
 
     def init(self, input_name: str = None):
         """POSCAR から cfg を作る"""
@@ -152,6 +212,10 @@ class Vasp:
         self.contcar2cfg(input_name)
         return True
 
+    #
+    # VASP run
+    #
+
     def run(
         self,
         mode: str = "local",
@@ -222,6 +286,10 @@ class Vasp:
             ["mpirun", "-np", f"{Config.num_procs}", f"{Config.vasp_bin}"], check=True
         )
         return True
+
+    #
+    # VASP 側の設定
+    #
 
     def set_mpi(
         self,
@@ -385,3 +453,70 @@ class Vasp:
     def pdb2poscar(pdb_name: str = "aaa"):
         atoms = read((str + ".pdb"), format="pdb")
         write((str + ".vasp"), atoms, format="vasp", direct=True)
+
+    def to_incar(self) -> str:
+        """
+        設定してある VASP の INCAR タグを表示
+
+        Returns:
+            str:
+
+        """
+        lines = []
+        for k, v in self._incar_keys.items():
+            if v is None:
+                continue
+            if isinstance(v, bool):
+                s = ".TRUE." if v else ".FALSE."
+            elif isinstance(v, (list, tuple)):
+                s = " ".join(str(x) for x in v)
+            else:
+                s = str(v)
+            lines.append(f"{k} = {s}")
+        return "\n".join(lines)
+
+    def write_incar(self, filepath: Optional[str] = None) -> str:
+        """
+        既存の to_incar() を用いて INCAR テキストを生成し、指定パスに書き出し
+        相対 / 絶対どちらのパスでも可。
+
+        Args:
+            filepath (str, optional): 出力ファイルのパス。
+                None の場合はカレントディレクトリに 'INCAR' として出力。
+
+        Returns:
+            str: 書き出したファイルの絶対パス
+        """
+        if filepath is None:
+            filepath = "INCAR"
+
+        incar_text: str = self.to_incar()
+
+        dirpath = os.path.dirname(filepath)
+        if dirpath:
+            os.makedirs(dirpath, exist_ok=True)
+
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(incar_text if incar_text.endswith("\n") else incar_text + "\n")
+
+        return os.path.abspath(filepath)
+
+
+if __name__ == "__main__":
+    logger = XLogger()
+    vasp_log = VaspLog(logger=logger)
+    vasp = Vasp(
+        vasp_log,
+        input_name="INCAR",
+        mpi_cmd="mpirun",
+        mpi_flag="-np",
+        num_procs=1,
+        vasp_bin="vasp_std",
+        job_cmd=None,
+        logger=logger,
+    )
+    print(vasp.NSW)
+    print(vasp.EDIFF)
+    print(vasp.EDIFFG)
+    print(vasp.get_EDIFFG())
+    print(vasp.to_incar())

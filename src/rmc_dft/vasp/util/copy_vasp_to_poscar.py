@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from x_logger import XLogger
 
 
 def copy_vasp_to_poscar(
