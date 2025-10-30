@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from x_logger import XLogger
+from pathlib import Path
 
 
 def copy_contcar_to_vasp(
