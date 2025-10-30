@@ -36,5 +36,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     cfg_name = args.cfg_name
-    rmc = RmcPot(None, cfg_name=cfg_name, logger=logger)
+    # rmc = RmcPot(None, cfg_name=cfg_name, logger=logger)
+    rmc = RmcPotLog(logger=logger)
     rmc.clear(cfg_name=cfg_name)

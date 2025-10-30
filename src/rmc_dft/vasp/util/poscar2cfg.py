@@ -125,8 +125,8 @@ def convert_to_cfg(
     Returns:
 
     """
-    if not os.path.exists(name):
-        logger.error(f"{name} file not found")
+    if not os.path.exists(poscar_name):
+        logger.error(f"{poscar_name} file not found")
         return False
 
     # def readcfg():

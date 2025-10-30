@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+RMD-DFT を動かす
+"""
 import os
 
 # local の config
@@ -9,8 +12,8 @@ from x_logger import XLogger
 
 
 if __name__ == "__main__":
-    _logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
-    _config = Config()
+    logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+    config = Config()
 
     # POSCAR to CFG (rmc用のCFG変換)
     cfg_name = "aaa"
@@ -20,8 +23,8 @@ if __name__ == "__main__":
         dft_code="Vasp",
         cfg_name="aaa",
         max_loop=3,
-        config=_config,
-        logger=_logger,
+        config=config,
+        logger=logger,
     )
 
     # RMCの初期構造をPOSCAR から作る

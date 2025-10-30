@@ -503,17 +503,17 @@ class Vasp:
 
 
 if __name__ == "__main__":
-    logger = XLogger()
-    vasp_log = VaspLog(logger=logger)
+    _logger = XLogger()
+    _vasp_log = VaspLog(logger=_logger)
     vasp = Vasp(
-        vasp_log,
+        _vasp_log,
         input_name="INCAR",
         mpi_cmd="mpirun",
         mpi_flag="-np",
         num_procs=1,
         vasp_bin="vasp_std",
         job_cmd=None,
-        logger=logger,
+        logger=_logger,
     )
     print(vasp.NSW)
     print(vasp.EDIFF)

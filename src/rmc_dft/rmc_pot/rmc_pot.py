@@ -5,6 +5,7 @@ import shutil
 from typing import Any, Dict, List, Optional
 
 from rmc_dft.config import Config
+from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
 from rmc_dft.rmc_pot.util.cfg2poscar import cfg2poscar
 
 from x_logger import XLogger
@@ -18,7 +19,7 @@ class RmcPot:
 
     def __init__(
         self,
-        rmc_log=None,
+        rmc_log: RmcPotLog = None,
         cfg_name: str = "aaa",
         logger: XLogger = None,
     ):
@@ -36,8 +37,16 @@ class RmcPot:
             logger = XLogger()
         self._logger = logger
 
+        # rmc_log に cfg_name をセットする
+        if self._rmc_log:
+            self._logger.info(f"== rmc_log.set_cfg_name({cfg_name})")
+            self._rmc_log.set_cfg_name(cfg_name)
+
     def set_cfg_name(self, cfg_name: str):
         self._cfg_name = cfg_name
+        # rmc_log に cfg_name をセットする
+        if self._rmc_log:
+            self._rmc_log.set_cfg_name(cfg_name)
 
     def init(self, cfg_name: str):
         """
@@ -81,11 +90,14 @@ class RmcPot:
 
         # RMC_POT 結果保存
         self._rmc_log.collect_result()
-        self._rmc_log.backup_result(log_dir)
+        self._rmc_log.backup_result(
+            dst_log_dir=log_dir,
+            cfg_name=cfg_name,
+        )
 
         # RMC_POT 結果から、POSCAR 作成
         self._logger.info(f"== cfg2poscar({cfg_name})")
-        self._rmc.cfg2poscar(cfg_name)
+        self.cfg2poscar(cfg_name)
         pass
 
     @staticmethod
@@ -124,65 +136,6 @@ class RmcPot:
     #
     # Utilities
     #
-
-    def clear(self, cfg_name: str) -> None:
-        """
-        rmc_pot の出力ファイルを消す
-
-        Args:
-            cfg_name (str):
-
-        Returns:
-
-        """
-        delete_list = [
-            "bcf",
-            "calcdat",
-            "chi",
-            "dat",
-            "expt",
-            "fit",
-            "free",
-            "freer",
-            "grid",
-            "hgm",
-            "hst",
-            "pfq",
-            "ppcf",
-            "state",
-            "",
-        ]
-
-        for extname in delete_list:
-            if not os.path.isfile(f"{cfg_name}.{extname}"):
-                continue
-            try:
-                self.remove_file(f"{cfg_name}.{extname}")
-                self.remove_file(f"{cfg_name}start.grid")
-                self.remove_file(f"{cfg_name}start.hgm")
-            except FileNotFoundError as e:
-                self._logger.info(f"[SKIP] {e}")
-            except PermissionError:
-                self._logger.error(f"[Error] 権限がありません: {cfg_name}.{extname}")
-
-    def remove_file(self, filename: str) -> bool:
-        """
-        現在の作業ディレクトリ（スクリプト実行フォルダ）にある指定ファイルを削除する。
-
-        Args:
-            filename (str): 削除するファイル名（相対/絶対どちらでも可）
-
-        """
-        # パスを絶対化（カレントディレクトリ基準）
-        path = os.path.abspath(filename)
-
-        if not os.path.isfile(path):
-            self._logger.error(f"指定ファイルが存在しません: {path}")
-            return False
-
-        os.remove(path)
-        self._logger.info(f"delete: {path}")
-        return True
 
     @staticmethod
     def cfg2poscar(cfg_name: str | None = None):
