@@ -29,3 +29,80 @@ coeff_{ij} = \frac{c_i c_j \overline{b_i b_j}}{\sum_{i} \sum_{j} c_i c_j \overli
 のE3を参照してください。
 Faber-Ziman型部分構造因子S_ij(q)を通して、全体のS(q)を構成するときに用いられる形式になります。
 T. E. Faber　& J. M. Ziman, 1964, DOI: https://doi.org/10.1080/14786436508211931
+
+# datファイル
+
+```{code}
+comment sio2 
+0.0842566414       ! number density
+1 1 1 1 1 1 ! cut offs
+0.01 0.01 0.01   ! maximum moves
+0.025        ! r spacing
+.false.      ! whether to use moveout option
+0            ! number of configurration to collect
+5000         ! step for printing
+0 0          ! time limit, step for saving
+0 0 1 0      ! g(r), neutron, x-ray, EXAFS
+S_q_fqd_0.3_0.03_40.sq
+1 991
+1.0
+5E-3
+.false.
+.true.
+.false.
+.false.
+0         ! number of cos. distr of bond angles constraint, dcos_theta (spacing in cos(theta) space
+0  ! no of coord. constr.
+0         ! no of av. coord. contsr.
+0         ! potential
+0         ! FNC switch
+0         ! initial bin shift;
+1         ! xmax used in the run.
+1         ! number of atoms moved in a single move
+200       ! size of the history buffer
+10        ! number of display update beteen each history buffering
+0         ! indicator of custom move
+0         ! whether to load the histgram form file, if posible [0:no 1:yes]
+5        ! maximum number of atoms in a gridcell
+0 0       ! frction of swaps, ntypes*(ntypes-1)/2 0 not allowded or 1 allowed for the possible mixed part
+4         ! total number of threads to use
+```
+
+1行目
+```{code}
+comment sio2
+```
+コメントです。
+
+
+```{code}
+```
+
+
+```{code}
+```
+
+
+```{code}
+```
+
+
+```{code}
+```
+
+
+```{code}
+```
+
+
+```{code}
+```
+
+
+```{code}
+```
+
+
+```{code}
+```
+
