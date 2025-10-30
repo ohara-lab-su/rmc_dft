@@ -2,6 +2,7 @@
 import os
 import subprocess
 import shutil
+from typing import Any, Dict, List, Optional
 
 from rmc_dft.config import Config
 from rmc_dft.rmc_pot.util.cfg2poscar import cfg2poscar
@@ -17,8 +18,8 @@ class RmcPot:
 
     def __init__(
         self,
-        rmc_log,
-        cfg_name: str,
+        rmc_log=None,
+        cfg_name: str = "aaa",
         logger: XLogger = None,
     ):
         """
@@ -123,6 +124,65 @@ class RmcPot:
     #
     # Utilities
     #
+
+    def clear(self, cfg_name: str) -> None:
+        """
+        rmc_pot の出力ファイルを消す
+
+        Args:
+            cfg_name (str):
+
+        Returns:
+
+        """
+        delete_list = [
+            "bcf",
+            "calcdat",
+            "chi",
+            "dat",
+            "expt",
+            "fit",
+            "free",
+            "freer",
+            "grid",
+            "hgm",
+            "hst",
+            "pfq",
+            "ppcf",
+            "state",
+            "",
+        ]
+
+        for extname in delete_list:
+            if not os.path.isfile(f"{cfg_name}.{extname}"):
+                continue
+            try:
+                self.remove_file(f"{cfg_name}.{extname}")
+                self.remove_file(f"{cfg_name}start.grid")
+                self.remove_file(f"{cfg_name}start.hgm")
+            except FileNotFoundError as e:
+                self._logger.info(f"[SKIP] {e}")
+            except PermissionError:
+                self._logger.error(f"[Error] 権限がありません: {cfg_name}.{extname}")
+
+    def remove_file(self, filename: str) -> bool:
+        """
+        現在の作業ディレクトリ（スクリプト実行フォルダ）にある指定ファイルを削除する。
+
+        Args:
+            filename (str): 削除するファイル名（相対/絶対どちらでも可）
+
+        """
+        # パスを絶対化（カレントディレクトリ基準）
+        path = os.path.abspath(filename)
+
+        if not os.path.isfile(path):
+            self._logger.error(f"指定ファイルが存在しません: {path}")
+            return False
+
+        os.remove(path)
+        self._logger.info(f"delete: {path}")
+        return True
 
     @staticmethod
     def cfg2poscar(cfg_name: str | None = None):
