@@ -38,15 +38,15 @@ autosummary_generate = True
 
 # 型ヒント参照で失敗した時の警告を抑制する
 nitpick_ignore = [
-    ("py:class", "fastapi_frame.clients.async_device_client.AsyncDeviceClient"),
-    ("py:class", "fastapi_frame.clients.sync_device_client.SyncDeviceClient"),
-    ("py:class", "fastapi_frame.routers.device_router.DeviceRouter"),
+    # ("py:class", "fastapi_frame.clients.async_device_client.AsyncDeviceClient"),
+    # ("py:class", "fastapi_frame.clients.sync_device_client.SyncDeviceClient"),
+    # ("py:class", "fastapi_frame.routers.device_router.DeviceRouter"),
     ("py:class", "x_logger.x_logger.XLogger"),
     ("py:class", "Path"),
     ("py:class", "pathlib.Path"),
     ("py:class", "direction"),
-    ("py:class", "pydantic.main.BaseModel"),
-    ("py:class", "ConfigDict"),
+    # ("py:class", "pydantic.main.BaseModel"),
+    # ("py:class", "ConfigDict"),
     ("py:class", "enum.Enum"),
     # 必要な型は全てここに追記
 ]
@@ -55,8 +55,8 @@ nitpick_ignore = [
 autodoc_type_aliases = {
     "XLogger": "x_logger.x_logger.XLogger",
     "Path": "pathlib.Path",
-    "BaseModel": "pydantic.main.BaseModel",
-    "ConfigDict": "pydantic.config.ConfigDict",
+    # "BaseModel": "pydantic.main.BaseModel",
+    # "ConfigDict": "pydantic.config.ConfigDict",
     "Enum": "enum.Enum",
 }
 

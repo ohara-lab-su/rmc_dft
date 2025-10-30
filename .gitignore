@@ -1,7 +1,9 @@
-/work
 !KPOINTS
 !POTCAR
 !POSCAR
 !INCAR
 
+build/
+work/
 .idea/
+*.egg-info/
