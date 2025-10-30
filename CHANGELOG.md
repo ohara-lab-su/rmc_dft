@@ -6,6 +6,7 @@
   - example (モジュールを読んで実際に rmc_dft を動かすprogram) と module を分離を明確に
 - bugfix
 - さまざまな調整
+- rm_vasp から rmd_dft の改変での(主にリポジトリ関係)のゴタゴタ解消
  
 ## v0.2.1 nakada
 
