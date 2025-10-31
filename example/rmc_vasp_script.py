@@ -14,6 +14,7 @@ if __name__ == "__main__":
 
     # POSCAR to CFG (rmc用のCFG変換)
     cfg_name = "aaa"
+    vasp_name = "aaa"
 
     vasp_log = VaspLog(logger=logger)
     vasp = Vasp(
@@ -37,24 +38,32 @@ if __name__ == "__main__":
     # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
     vasp.poscar2cfg(cfg_name)
 
+    run_mode = "local"
     digits = len(str(max_loop - 1))
 
     i = 0
     for i in range(0, max_loop):
 
-        log_dir = f"log{str(i).zfill(digits)}"
+        log_rmc_dir = f"log_rmc{str(i).zfill(digits)}"
+        log_vasp_dir = f"log_vasp{str(i).zfill(digits)}"
 
         if not os.path.exists(log_dir):
             os.mkdir(log_dir)
 
         logger.info("== rmc" + str(i))
         rmc.run(cfg_name=cfg_name)
-        rmc.postprocess(log_dir=log_dir, cfg_name=cfg_name)
+        rmc.postprocess(
+            log_dir=log_rmc_dir,
+            cfg_name=cfg_name,
+            element_info="label.txt",
+        )
 
         logger.info("== vasp" + str(i))
-        vasp.preprocess(vasp_name=vasp_name, element_info="label.txt")
-        vasp.run()
-        vasp.postprocess(log_dir="vasp_log", cfg_name=cfg_name)
+        vasp.run(mode=run_mode)
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
+        vasp.postprocess(
+            log_dir=log_vasp_dir,
+            cfg_name=cfg_name,
+        )
         logger.info("loop end " + str(i))

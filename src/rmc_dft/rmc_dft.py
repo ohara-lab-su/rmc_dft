@@ -40,6 +40,8 @@ class RmcDft:
         self._cfg_name = cfg_name
         self._config = config
         self._max_loop = max_loop
+        self._dft_code = dft_code
+        self._rmc_code = rmc_code
 
         # --- DFT部分の動的生成 ---
         dft_log_class = globals().get(f"{dft_code}Log")
@@ -98,18 +100,28 @@ class RmcDft:
         i = 0
         for i in range(0, max_loop):
 
-            log_dir = f"log{str(i).zfill(digits)}"
+            log_rmc_dir = f"log_rmc{str(i).zfill(digits)}"
+            log_dft_dir = f"log_dft{str(i).zfill(digits)}"
 
             if not os.path.exists(log_dir):
                 os.mkdir(log_dir)
 
-            self._logger.info("== rmc" + str(i))
-            self._rmc.run(cfg_name)
+            self._logger.info(f"== {self._rmc_code}" + str(i))
+            self._rmc.run(cfg_name=cfg_name)
+            self._rmc.postprocess(
+                log_dir=log_rmc_dir,
+                cfg_name=cfg_name,
+                element_info="label.txt",
+            )
 
-            self._logger.info("== vasp" + str(i))
+            self._logger.info(f"== {self._dft_code}" + str(i))
             self._dft.run(mode=mode)
             # self._dft.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
             # self._dft.run(mode="test")
+            self._dft.postprocess(
+                log_dir=log_vasp_dir,
+                cfg_name=cfg_name,
+            )
             self._logger.info("loop end " + str(i))
 
 

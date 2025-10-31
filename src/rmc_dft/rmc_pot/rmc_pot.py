@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional
 from rmc_dft.config import Config
 from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
 from rmc_dft.rmc_pot.util.cfg2poscar import cfg2poscar
+from rmc_dft.util import ensure_vasp5_format
 
 from x_logger import XLogger
 
@@ -63,16 +64,24 @@ class RmcPot:
         pass
 
     def preprocess(self):
-        pass
+        """
+        このコードを動かすときは RMC_POT 入力が揃って意前提とする
+        """
+        self._logger.info("== preprocess()")
 
     def postprocess(
         self,
-        log_dir: str = "log",
+        log_dir: str = "log_rmc",
         cfg_name: str | None = None,
-    ):
+        element_info: str | list | None = None,
+    ) -> bool:
         """
+        後処理
+
         RMC 後に DFT を動かすにあたっての
-        cfg --> poscar 変換
+        1) DATA-collect
+        2) BACKUP
+        3) CFG --> POSCAR (VASP4) 変換 --> VASP5 変換
 
         他のコードを使っても基本は poscar 経由を念頭におくので
         postprocess は poscar にしておけば他のライブラリを使っても
@@ -81,8 +90,10 @@ class RmcPot:
         Args:
             log_dir (str):
             cfg_name (str): cfg_name と vasp_name は等しいとする
+            element_info (str | list): 元素情報
 
         Returns:
+            bool:
 
         """
         self._logger.info(f"== postprocess()")
@@ -91,17 +102,34 @@ class RmcPot:
             cfg_name = self._cfg_name
         self._logger.info(f"cfg_name = {cfg_name}")
 
-        # RMC_POT 結果保存
+        if not element_info:
+            element_info = "label.txt"
+
+        # DATA-collect
         self._rmc_log.collect_result()
+
+        # BACKUP-RESULT
         self._rmc_log.backup_result(
             log_dir=log_dir,
             cfg_name=cfg_name,
         )
 
-        # RMC_POT 結果から、POSCAR 作成
-        self._logger.info(f"== cfg2poscar({cfg_name})")
-        self.cfg2poscar(cfg_name)
-        pass
+        # RMC_POT 結果から、POSCAR (VASP4 style) 作成
+        # --> xxx.vasp
+        self._logger.info(f"== cfg2poscar({cfg_name}.vasp)")
+        self.cfg2poscar(cfg_name=cfg_name, vasp_name=cfg_name)
+
+        # VASP4 --> VASP5
+        self._logger.info(f"== encure vasp5 format ({cfg_name}.vasp)")
+        self.ensure_vasp5_format(
+            poscar_name=f"{cfg_name}.vasp",
+            element_info="label.txt",
+        )
+
+        # xxx.vasp --> POSCAR
+        shutil.copy(f"{cfg_name}.vasp", "POSCAR")
+
+        return True
 
     @staticmethod
     def run(
@@ -124,13 +152,45 @@ class RmcPot:
     #
     # Utilities
     #
-
     @staticmethod
-    def cfg2poscar(cfg_name: str | None = None):
+    def ensure_vasp5_format(
+        poscar_name: str,
+        element_info: str | None = None,
+        logger: XLogger = None,
+    ) -> bool:
+        if not logger:
+            logger = XLogger()
+        return ensure_vasp5_format(poscar_name, element_info, logger=logger)
+
+    def cfg2poscar(
+        self,
+        cfg_name: str | None = None,
+        vasp_name: str = None,
+    ) -> bool:
+        """
+
+        Args:
+            cfg_name (str):  xxx.cfg
+            vasp_name (str):  xxx.vasp
+
+        Returns:
+
+        """
         if not cfg_name:
             cfg_name = self._cfg_name
 
-        cfg2poscar(cfg_name)
+        if not vasp_name:
+            vasp_name = cfg_name
+        self._logger.info(f"cfg_name = {cfg_name}")
+        self._logger.info(f"vasp_name = {cfg_name}")
+
+        cfg2poscar(cfg_name=cfg_name, vasp_name=vasp_name)
+
+        # POSCAR を後に上書きしちゃうので保存しておく
         if os.path.exists("POSCAR"):
             shutil.copy("POSCAR", "POSCAR.bak")
+
+        # xxx.vasp を POSCAR の名前でもコピーしておく
         shutil.copy((cfg_name + ".vasp"), "POSCAR")
+
+        return True
