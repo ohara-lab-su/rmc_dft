@@ -5,6 +5,7 @@ from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
 from rmc_dft.rmc_dft import RmcDft
 from rmc_dft.config import Config
 from rmc_dft.util import poscar2cfg
+from rmc_dft.util import ensure_vasp5_format
 
 
 # from .vasp.vasp import Vasp

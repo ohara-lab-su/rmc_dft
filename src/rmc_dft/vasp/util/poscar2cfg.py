@@ -72,6 +72,7 @@ def poscar2cfg(
     """
     if not logger:
         logger = XLogger()
+    logger.info(f"== poscar2cfg(poscar_name=POSCAR, cfg_name={cfg_name})")
 
     logger.info(f"INPUT file name : POSCAR")
     logger.info(f"OUTPUT file name: {cfg_name}.cfg")
