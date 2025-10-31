@@ -4,8 +4,9 @@ K.NAKADA, kengo.nakada@gmail.com
 K.KOBAYASHI
 """
 import os
-import subprocess
 from typing import Any, Dict, List, Optional
+import subprocess
+import shutil
 
 from ase.io import read, write
 
@@ -20,6 +21,7 @@ from rmc_dft.vasp.util.poscar2cfg import (
 from rmc_dft.vasp.util.copy_contcar_to_vasp import copy_contcar_to_vasp
 from rmc_dft.vasp.util.copy_vasp_to_poscar import copy_vasp_to_poscar
 from rmc_dft.vasp.util.xdatcar2poscar import xdatcar2poscar
+from rmc_dft.vasp.util.ensure_vasp5_format import ensure_vasp5_format
 from rmc_dft.vasp.util.make_poscar import PotcarBuilder
 
 from x_logger import XLogger
@@ -129,15 +131,15 @@ class Vasp:
         Returns:
 
         """
-        self._logger.info("== init()")
+        self._logger.info(f"== init()")
 
-        if cfg_name is None:
-            cfg_name = self._vasp_name
-        self._logger.info(f"cfg_name={cfg_name})")
+        # if cfg_name is None:
+        #     cfg_name = self._vasp_name
+        # self._logger.info(f"cfg_name={cfg_name})")
 
-        # POSCAR から CFG を作成
-        self._logger.info(f"== poscar2cfg(cfg_name={cfg_name})")
-        self.poscar2cfg(cfg_name=cfg_name)
+        # # POSCAR から CFG を作成
+        # self._logger.info(f"== poscar2cfg(cfg_name={cfg_name})")
+        # self.poscar2cfg(cfg_name=cfg_name)
 
     def preprocess(
         self,
@@ -146,6 +148,10 @@ class Vasp:
     ) -> bool:
         """
         vasp 前処理
+
+        基本的に Vasp Class は相手がなんであれ動くようにする
+        それは入力が常に VASP であることを仮定していて、
+        相手のプログラム側の postprocess or convert してから動かすことを全手とする
 
         xxx.vasp (VASP4) --> xxx.vasp (VASP5)
 
@@ -157,44 +163,28 @@ class Vasp:
             bool:
         """
         self._logger.info("== preprocess()")
-
-        # RMC_POT で 結果の CFG から変換した **.vasp に対して
-        # element 情報を加える(VASP5 形式にする)
-        # cfg変換はVASP4形式を吐き出す
-        # RMC_POT は cfg には元素記号を含まないために VASP4 形式のみになる
-
-        self._logger.info(f"add_element_name({vasp_name}.vasp)")
-        self.ensure_vasp5_format(
-            poscar_name=f"{vasp_name}.vasp",
-            element_info=element_info,
-        )
-
-        # input_name.vasp --> POSCAR
-        copy_vasp_to_poscar(vasp_name)
-
-        # # POSCAR についても同様の処理を行う
-        # self._logger.info(f"   add_element_name(POSCAR)")
-        # self.ensure_vasp5_format(
-        #     poscar_name="POSCAR",
-        #     element_info=element_info,
-        # )
-
         return True
 
     def postprocess(
         self,
-        log_dir: str = "log",
+        log_dir: str = "log_vasp",
         cfg_name: str | None = None,
     ) -> bool:
         """
         後処理
+
+        1) DATA-collect
+        2) BACKUP
+        3) CONTCAR --> POSCAR
+        4) CONTCAR --> CFG (for RMC_POT)
+
 
         Args:
             log_dir (str):
             cfg_name (str): POSCAR -> cfg_name.cfg
 
         Returns:
-
+            bool:
         """
         self._logger.info("== postprocess()")
 
@@ -202,24 +192,19 @@ class Vasp:
             cfg_name = self._cfg_name
         self._logger.info(f"cfg_name={cfg_name})")
 
-        # VASP のログから必要な結果を取得する
+        # DATA-collect
         self._vasp_log.collect_result()
 
-        # VASP のログを指定ディレクトリに保存する
+        # BACKUP-DATA
         self._vasp_log.backup_result(log_dir=log_dir)
 
-        # もし、VASP4 形式ならば VASP5 形式に変換する(重複作業OK)
-        # self.ensure_vasp5_format(f"{cfg_name}.vasp")
-        # self.ensure_vasp5_format("XDATCAR")
-
-        # self._logger.info(f"== xdatcar2poscar({cfg_name})")
-        # self.xdatcar2poscar(cfg_name)
-
-        # self._logger.info(f"== poscar2cfg({cfg_name})")
-        # self.poscar2cfg(cfg_name))
+        # CONTCAR -> POSCAR
+        shutil.copyfile("CONTCAR", "POSCAR")
 
         # CONTCAR -> CFG
+        self._logger.info(f"== contcar2cfg(cfg_name={cfg_name}.cfg)")
         self.contcar2cfg(cfg_name=cfg_name)
+
         return True
 
     #
@@ -331,50 +316,13 @@ class Vasp:
     # for VASP
     #
 
+    @staticmethod
     def ensure_vasp5_format(
-        self,
-        poscar_name: str = "aaa.vasp",
+        poscar_name: str,
         element_info: str | None = None,
+        logger: XLogger = None,
     ) -> bool:
-        """
-        VASPファイルの6行目にラベルを設定する
-        VASP4 type POSCAR to VASP5 type POSCAR
-        繰り返し実行しても副作用はない
-
-        RMC pot の cfg 形式は元素名がないために、POSCAR 形式に変換したときに困る場合があるので
-        VASP5 形式にする( cfg2poscar は element 情報がない VASP4 形式)
-
-        Args:
-            poscar_name (str): POSCARファイル名
-            element_info (str): element 情報があるファイル名
-
-        Returns:
-            bool: True/False
-        """
-        if element_info is None:
-            element_info = "label.txt"
-
-        # element 情報があるファイルを開く
-        try:
-            with open(element_info, "r") as file:
-                label_line = file.readline().strip()
-        except FileNotFoundError:
-            print(f"File not found.")
-
-        with open(poscar_name, "r") as file:
-            lines = file.readlines()
-            label_place = 6
-        if 1 <= label_place <= len(lines):
-            lines[label_place - 1] = label_line + "\n"  # 改行を付けて置換
-
-            # ファイルに上書き保存
-            with open(poscar_name, "w") as file:
-                file.writelines(lines)
-            self._logger.info(f"{poscar_name} label back.")
-        else:
-            self._logger.info("error: line number out of range.")
-
-        return True
+        return ensure_vasp5_format(poscar_name, element_info, logger=logger)
 
     @staticmethod
     def make_potential(

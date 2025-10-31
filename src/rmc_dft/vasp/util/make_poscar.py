@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 POTCAR 自動生成クラス
-他のスクリプト（例: make_poscar.py）からインポートして使用可能。
+ex) make_poscar.py Li Mn O
 """
 
 import os
@@ -26,13 +26,14 @@ class PotcarBuilder:
         """
 
         Args:
-            base_dir:
-            logger:
+            base_dir (str):
+            logger (XLogger):
         """
 
         if not logger:
             logger = XLogger()
         self._logger = logger
+
         self.base_dir = os.path.expanduser(base_dir)
         self.priority = {
             "H": [
@@ -212,11 +213,11 @@ if __name__ == "__main__":
     # make_poscar.py Li Mn O ./bb/POTCAR
     args = sys.argv[1:]
     if len(args) >= 2 and "." in args[-1]:
-        poscar_name = args[-1]
+        _poscar_name = args[-1]
         _elements = args[:-1]
     else:
-        poscar_name = "POTCAR"
+        _poscar_name = "POTCAR"
         _elements = args
 
     builder = PotcarBuilder("~/potpaw_PBE.64")
-    builder.build(_elements, poscar_name=poscar_name)
+    builder.build(_elements, poscar_name=_poscar_name)

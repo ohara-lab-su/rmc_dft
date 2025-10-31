@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.2.3 nakada
+
+- v0.2.2 相当の機能を再構成
+  - RMC/VASP の処理単位の再構築
+    - method 整理
+- それぞれの機能の最低限試験
+- RMC/VASP の個別の class を連携したテスト
+- RMC-DFT からの RMC/VASP 呼び出しテスト
+
 ## v0.2.2 nakada
 
 - dft_rmc により、vasp, rmc_pot などのクラスを読んで使うように一般化した
