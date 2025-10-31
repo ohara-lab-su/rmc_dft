@@ -43,6 +43,23 @@ class RmcDft:
         self._dft_code = dft_code
         self._rmc_code = rmc_code
 
+        # --- RMC部分の動的生成 ---
+        rmc_log_class = globals().get(f"{rmc_code}Log")
+        rmc_class = globals().get(rmc_code)
+
+        if rmc_log_class is None or rmc_class is None:
+            raise ValueError(f"Unknown RMC code: {rmc_code}")
+
+        self._rmc_log = rmc_log_class(
+            cfg_name=cfg_name,
+            logger=logger,
+        )
+        self._rmc = rmc_class(
+            self._rmc_log,
+            cfg_name=cfg_name,
+            logger=logger,
+        )
+
         # --- DFT部分の動的生成 ---
         dft_log_class = globals().get(f"{dft_code}Log")
         dft_class = globals().get(dft_code)
@@ -51,17 +68,11 @@ class RmcDft:
             raise ValueError(f"Unknown DFT code: {dft_code}")
 
         self._dft_log = dft_log_class(logger=logger)
-        self._dft = dft_class(self._dft_log, cfg_name, logger=logger)
-
-        # --- RMC部分の動的生成 ---
-        rmc_log_class = globals().get(f"{rmc_code}Log")
-        rmc_class = globals().get(rmc_code)
-
-        if rmc_log_class is None or rmc_class is None:
-            raise ValueError(f"Unknown RMC code: {rmc_code}")
-
-        self._rmc_log = rmc_log_class(logger=logger)
-        self._rmc = rmc_class(self._rmc_log, cfg_name, logger=logger)
+        self._dft = dft_class(
+            self._dft_log,
+            vasp_name=cfg_name,
+            logger=logger,
+        )
 
     def set_cfg_name(self, cfg_name: str):
         self._cfg_name: str = cfg_name
@@ -70,8 +81,9 @@ class RmcDft:
         self._max_loop: int = max_loop
 
     def init(self, cfg_name: str):
-        self._dft.init(cfg_name)
-        self._rmc.init(cfg_name)
+        # self._dft.init(cfg_name)
+        # self._rmc.init(cfg_name)
+        pass
 
     def preprocess(self, cfg_name: str):
         self._dft.preprocess(cfg_name)
@@ -92,19 +104,16 @@ class RmcDft:
         if not cfg_name:
             cfg_name: str = self._cfg_name
 
-        # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
-        self._dft.initprocess(cfg_name)
-
         digits: int = len(str(max_loop - 1))
 
         i = 0
         for i in range(0, max_loop):
 
-            log_rmc_dir = f"log_rmc{str(i).zfill(digits)}"
-            log_dft_dir = f"log_dft{str(i).zfill(digits)}"
+            log_rmc_dir = f"log{str(i).zfill(digits)}"
+            log_dft_dir = f"log{str(i).zfill(digits)}"
 
-            if not os.path.exists(log_dir):
-                os.mkdir(log_dir)
+            if not os.path.exists(log_dft_dir):
+                os.mkdir(log_dft_dir)
 
             self._logger.info(f"== {self._rmc_code}" + str(i))
             self._rmc.run(cfg_name=cfg_name)
@@ -119,7 +128,7 @@ class RmcDft:
             # self._dft.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
             # self._dft.run(mode="test")
             self._dft.postprocess(
-                log_dir=log_vasp_dir,
+                log_dir=log_dft_dir,
                 cfg_name=cfg_name,
             )
             self._logger.info("loop end " + str(i))

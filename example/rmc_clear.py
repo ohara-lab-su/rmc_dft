@@ -5,6 +5,7 @@ RMC の出力を消す
 import os
 import sys
 import argparse
+import shutil
 
 from rmc_dft import Vasp, VaspLog, RmcPot, RmcPotLog
 from x_logger import XLogger

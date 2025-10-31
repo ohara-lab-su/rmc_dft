@@ -4,8 +4,9 @@ K.NAKADA, kengo.nakada@gmail.com
 K.KOBAYASHI
 """
 import os
-import subprocess
 from typing import Any, Dict, List, Optional
+import subprocess
+import shutil
 
 from ase.io import read, write
 
@@ -130,15 +131,15 @@ class Vasp:
         Returns:
 
         """
-        self._logger.info("== init()")
+        self._logger.info(f"== init()")
 
-        if cfg_name is None:
-            cfg_name = self._vasp_name
-        self._logger.info(f"cfg_name={cfg_name})")
+        # if cfg_name is None:
+        #     cfg_name = self._vasp_name
+        # self._logger.info(f"cfg_name={cfg_name})")
 
-        # POSCAR から CFG を作成
-        self._logger.info(f"== poscar2cfg(cfg_name={cfg_name})")
-        self.poscar2cfg(cfg_name=cfg_name)
+        # # POSCAR から CFG を作成
+        # self._logger.info(f"== poscar2cfg(cfg_name={cfg_name})")
+        # self.poscar2cfg(cfg_name=cfg_name)
 
     def preprocess(
         self,

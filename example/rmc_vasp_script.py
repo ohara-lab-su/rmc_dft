@@ -4,6 +4,7 @@ RMC-DFT のUIクラスを使わずに直接 rmc_pot, vasp 関係のクラスを�
 RMC-VASP を構成する sample script
 """
 import os
+import shutil
 
 from rmc_dft import Vasp, VaspLog, RmcPot, RmcPotLog
 from x_logger import XLogger
@@ -44,11 +45,11 @@ if __name__ == "__main__":
     i = 0
     for i in range(0, max_loop):
 
-        log_rmc_dir = f"log_rmc{str(i).zfill(digits)}"
-        log_vasp_dir = f"log_vasp{str(i).zfill(digits)}"
+        log_rmc_dir = f"log{str(i).zfill(digits)}"
+        log_vasp_dir = f"log{str(i).zfill(digits)}"
 
-        if not os.path.exists(log_dir):
-            os.mkdir(log_dir)
+        if not os.path.exists(log_rmc_dir):
+            os.mkdir(log_rmc_dir)
 
         logger.info("== rmc" + str(i))
         rmc.run(cfg_name=cfg_name)

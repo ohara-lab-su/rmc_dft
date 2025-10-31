@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import os
+from typing import Any, Dict, List, Optional
 import subprocess
 import shutil
-from typing import Any, Dict, List, Optional
 
 from rmc_dft.config import Config
 from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
