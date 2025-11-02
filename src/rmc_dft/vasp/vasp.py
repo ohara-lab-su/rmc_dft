@@ -11,14 +11,19 @@ import shutil
 from ase.io import read, write
 
 from rmc_dft.config import Config
+
 from rmc_dft.vasp.vasp_incar import VaspIncar
+from rmc_dft.vasp.vasp_kpoints import VaspKpoints
 from rmc_dft.vasp.vasp_log import VaspLog
+
 from rmc_dft.vasp.util.poscar2cfg import (
     vasp2cfg,
     contcar2cfg,
     poscar2cfg,
     convert_to_cfg,
 )
+
+# util
 from rmc_dft.vasp.util.copy_contcar_to_vasp import copy_contcar_to_vasp
 from rmc_dft.vasp.util.copy_vasp_to_poscar import copy_vasp_to_poscar
 from rmc_dft.vasp.util.xdatcar2poscar import xdatcar2poscar
@@ -28,18 +33,6 @@ from rmc_dft.vasp.util.make_potcar import VaspPotcarBuilder
 from x_logger import XLogger
 
 # vasp.py 冒頭（class 外）
-DEFAULT_INCAR: dict[str, object] = {
-    "EDIFF": 1e-04,
-    "EDIFFG": 1e-05,
-    "ISTART": 0,
-    "ISMEAR": 0,
-    "SIGMA": 0.1,
-    "NSW": 2,
-    "NELM": 30,
-    "IBRION": 2,
-    "ISIF": 2,
-    "LREAL": "auto",
-}
 
 
 class Vasp:
@@ -51,6 +44,9 @@ class Vasp:
         self,
         vasp_log: VaspLog,
         vasp_name: str,
+        incar_name: str = "INCAR",
+        kpoints_name: str = "KPOINTS",
+        auto_write: bool = True,
         mpi_cmd: str = None,
         mpi_flag: str = None,
         num_procs: int = Config.num_procs,
@@ -62,6 +58,8 @@ class Vasp:
         Args:
             vasp_log (VaspLog): VASP の log 解析管理
             vasp_name (str): POSCAR などに関連する系の識別名（例: "aaa.vasp" or "POSCAR）
+            incar_name (str): INCAR
+            kpoints_name (str): KPOINTS
             mpi_cmd (str): 例 "mpirun"
             mpi_flag (str): 例 "-np"
             num_procs (int): 並列数
@@ -69,31 +67,72 @@ class Vasp:
             job_cmd (str): ジョブ投入コマンド（None ならローカル実行）
             logger (XLogger):  ろがー
         """
-        self._vasp_name: str = vasp_name
-
-        # INCAR ファイルのOUTファイル入出力インスタンスの移譲を受ける
-        self._vasp_log: VaspLog = vasp_log
-
         if not logger:
             logger = XLogger()
         self._logger = logger
         self._logger.debug("== create Vasp()")
 
-        # 実行系設定
+        # INCAR ファイルのOUTファイル入出力インスタンスの移譲を受ける
+        self._vasp_log: VaspLog = vasp_log
+
+        self._vasp_name: str = vasp_name
+        self.incar_name: str = incar_name
+        self.kpoints_name: str = kpoints_name
+
+        # -------------------------------
+        # デフォルト値定義
+        # -------------------------------
+        self._incar_defaults: dict[str, object] = {
+            "EDIFF": 1e-04,
+            "EDIFFG": 1e-05,
+            "ISTART": 0,
+            "ISMEAR": 0,
+            "SIGMA": 0.1,
+            "NSW": 2,
+            "NELM": 30,
+            "IBRION": 2,
+            "ISIF": 2,
+            "LREAL": "auto",
+        }
+
+        # デフォルト KPOINTS ファイル内容
+        self.kpoints_defaults = """K-Points
+0
+Monkhorst-Pack or Gamma
+1 1 1
+0 0 0
+"""
+
+        # VASP 実行系設定
         self.mpi_cmd = mpi_cmd or "mpirun"  # 規定のMPIコマンド
         self.mpi_flag = mpi_flag or "-np"
         self.num_procs: int = num_procs or Config.num_procs
         self.vasp_bin: str = vasp_bin or Config.vasp_bin
         self.job_cmd = job_cmd or Config.job_cmd
 
-        # INCAR (VASP利用のための INCAR 編集なので基本的には名前を変更しない)
-        self.incar_name: str = "INCAR"
+        # --- INCAR ---
+        self._incar = VaspIncar(
+            incar_name=self.incar_name,
+            auto_write=self.auto_write,
+            logger=self._logger,
+        )
+        # INCAR が存在すれば読み込み、なければデフォルトで新規作成
+        if not os.path.exists(self.incar_name):
+            for key, val in self.incar_defaults.items():
+                self._incar.set(key, val)
 
-        # INCAR の値管理
-        self._logger.info(f"== VaspIncar({self.incar_name})")
-        self._incar: VaspIncar = VaspIncar(incar_name=self.incar_name)
+        # --- KPOINTS ---
+        self._kpoints = VaspKpoints(
+            kpoints_name=self.kpoints_name,
+            auto_write=self.auto_write,
+            logger=self._logger,
+        )
+        # KPOINTS が存在すれば読み込み、なければデフォルトで新規作成
+        if not os.path.exists(self.kpoints_name):
+            with open(self.kpoints_name, "w") as f:
+                f.write(self.kpoints_defaults)
 
-    # --- 委譲メソッド群 ---
+    # --- 委譲メソッド群 (INCAR) ---
     def get_tag(self, key: str):
         """INCAR の値を取得"""
         return self._incar.get(key)
@@ -113,6 +152,26 @@ class Vasp:
     def export_incar_dict(self):
         """INCAR を辞書で取得"""
         return self._incar.export_dict()
+
+    # --- 委譲メソッド群 (KPOINTS) ---
+    def get_kpoints(self, key: str):
+        """KPOINTS の値取得（grid/gamma/comment）"""
+        return self._kpoints.get_value(key)
+
+    def set_kpoints(self, key: str, value) -> None:
+        """
+        KPOINTS 値設定。
+        明示設定は既存ファイルより優先して上書き。
+        """
+        self._kpoints.set_value(key, value)
+
+    def reload_kpoints(self) -> None:
+        """KPOINTS 再読込"""
+        self._kpoints.reload_kpoints()
+
+    def export_kpoints_dict(self):
+        """KPOINTS を辞書で取得"""
+        return self._kpoints.export_dict()
 
     #
     # RMC-DFT の VASP 側の init/preprocess/postprocess
