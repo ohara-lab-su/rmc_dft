@@ -95,14 +95,6 @@ class Vasp:
             "LREAL": "auto",
         }
 
-        # デフォルト KPOINTS ファイル内容
-        self.kpoints_defaults = """K-Points
-0
-Monkhorst-Pack or Gamma
-1 1 1
-0 0 0
-"""
-
         # VASP 実行系設定
         self.mpi_cmd = mpi_cmd or "mpirun"  # 規定のMPIコマンド
         self.mpi_flag = mpi_flag or "-np"
@@ -127,10 +119,13 @@ Monkhorst-Pack or Gamma
             auto_write=self.auto_write,
             logger=self._logger,
         )
-        # KPOINTS が存在すれば読み込み、なければデフォルトで新規作成
+        # KPOINTS: 既存があれば読み取り優先。
+        # 無ければデフォルトで生成（Monkhorst-Pack 1 1 1, shift 0 0 0）
         if not os.path.exists(self.kpoints_name):
-            with open(self.kpoints_name, "w") as f:
-                f.write(self.kpoints_defaults)
+            self.kpoints.set_mode("Monkhorst-Pack")
+            self.kpoints.set_grid(1, 1, 1)
+            self.kpoints.set_shift(0, 0, 0)
+            self.kpoints.write()
 
     # --- 委譲メソッド群 (INCAR) ---
     def get_tag(self, key: str):

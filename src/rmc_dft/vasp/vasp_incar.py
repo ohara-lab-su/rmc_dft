@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 
 import os
 from pymatgen.io.vasp.inputs import Incar
