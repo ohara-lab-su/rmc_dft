@@ -1,3 +1,8 @@
+"""
+K.KOBAHASHI
+"""
+
+
 def reach_threshold(inp):
     """
     Threshold that stops calculation.

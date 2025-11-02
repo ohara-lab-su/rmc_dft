@@ -1,3 +1,7 @@
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
+
 from rmc_dft.vasp.vasp import Vasp
 from rmc_dft.vasp.vasp_incar import VaspIncar
 from rmc_dft.vasp.vasp_incar_writer import VaspIncarWriter

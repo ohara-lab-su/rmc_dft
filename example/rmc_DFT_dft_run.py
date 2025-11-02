@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """
+K.NAKADA, kengo.nakada@gmail.com
+
 RMD-DFT を動かす
 """
 import os

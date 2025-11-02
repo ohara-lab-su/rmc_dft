@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 from typing import Any
 from x_logger import XLogger
 
@@ -6,6 +9,12 @@ from x_logger import XLogger
 class VaspIncarWriter:
     """
     INCAR の実ファイルを、コメント・空行を保持したまま編集・書き換えるためのクラス。
+
+    基本的に TAG の 入出力(INCARファイルに対する読み書き)だけならば、
+    VaspIncar() で終わる話なのだが、INCAR 中の既存のコメントや
+    既存のフォーマット形式を維持するために、読み書き関係を強化するクラスが
+    必要で、そのための機能をこのクラスが有する
+
     目的:
         - 既存ファイルの構造を壊さない
         - 特定タグのみ置換・追加・削除ができる
@@ -22,12 +31,18 @@ class VaspIncarWriter:
             incar_name (str):
             logger (XLogger):
         """
+        if not logger:
+            logger = XLogger()
+        self._logger = logger
+
         self.incar_name: str = incar_name
 
         if os.path.exists(self.incar_name):
+            self._logger.info(f"== OPEN INCAR: incar_name = {self.incar_name}")
             with open(self.incar_name, "r", encoding="utf-8") as f:
                 self.lines: list[str] = f.readlines()
         else:
+            self._logger.info(f"== OPEN INCAR (NEW)")
             self.lines: list[str] = []
 
     @staticmethod
@@ -58,7 +73,7 @@ class VaspIncarWriter:
                         continue
             new_lines.append(line)
 
-        # ファイル内にタグがなかった場合 → 末尾に追加
+        # ファイル内にタグがなかった場合 --> 末尾に追加
         if not found:
             if len(new_lines) > 0 and not new_lines[-1].endswith("\n"):
                 new_lines[-1] += "\n"

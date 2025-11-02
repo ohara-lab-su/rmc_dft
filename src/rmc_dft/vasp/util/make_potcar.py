@@ -1,6 +1,9 @@
 #!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 
-from rmc_dft.vasp.vasp_potcar_builder import VaspPotcarBuilder
+from rmc_dft.vasp.vasp_potcar_builder import VaspPotcarBuilde1Gr
 
 
 if __name__ == "__main__":

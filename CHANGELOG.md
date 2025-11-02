@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.3.x nakada
+
+- INPUT 関係を クラスライブラリ上から行う・管理できる仕様に改変
+  - vasp_incar.py
+  - vasp_incar_writer.py
+  - vasp_poscar_builder.py (make_pocar.py から実態をこちらに移動)
+
 ## v0.2.3 nakada
 
 - v0.2.2 相当の機能を再構成
@@ -31,7 +38,7 @@
 
 - RMC/VASP の method を若干追加
 - input_sample の追加・テスト
-- RMC-VASP の基本動作テスト
+- RMC-VASP の基本動作・テスト
 
 ## v0.0.x nakada
 

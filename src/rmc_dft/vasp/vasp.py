@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-K.NAKADA, kengo.nakada@gmail.com
-K.KOBAYASHI
+K.NAKADA, kengo.nakada@gmail.com (1st, 3rd varsion)
+K.KOBAYASHI (2nd version)
 """
 import os
 from typing import Any, Dict, List, Optional
@@ -56,8 +56,10 @@ class Vasp:
             job_cmd (str): ジョブ投入コマンド（None ならローカル実行）
             logger (XLogger):  ろがー
         """
-        self._vasp_log: VaspLog = vasp_log
         self._vasp_name: str = vasp_name
+
+        # INCAR ファイルのOUTファイル入出力インスタンスの移譲を受ける
+        self._vasp_log: VaspLog = vasp_log
 
         if not logger:
             logger = XLogger()
@@ -71,13 +73,14 @@ class Vasp:
         self.vasp_bin: str = vasp_bin or Config.vasp_bin
         self.job_cmd = job_cmd or Config.job_cmd
 
-        # INCAR
+        # INCAR (VASP利用のための INCAR 編集なので基本的には名前を変更しない)
         self.incar_name: str = "INCAR"
 
         # INCAR の値管理
+        self._logger.info(f"== VaspIncar({self.incar_name})")
         self._incar_logic: VaspIncar = VaspIncar(incar_name=self.incar_name)
 
-        # INCAR 書き込み管理
+        # INCAR 書き込み管理 (実態としては INCAR 読み書きの中心となる)
         self._incar_writer: VaspIncarWriter = VaspIncarWriter(
             incar_name=self.incar_name
         )
@@ -256,7 +259,7 @@ class Vasp:
         self._sync_incar_keys_from_file()
 
     #
-    # 既存の to_incar / write_incar 互換
+    # 旧来の to_incar / write_incar 互換
     # INCAR のコメント保持が必要な運用では set_tag()/remove_tag() を使用すること
     #
 

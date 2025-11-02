@@ -1,3 +1,7 @@
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
+
 from rmc_dft.vasp.vasp import Vasp
 from rmc_dft.vasp.vasp_log import VaspLog
 from rmc_dft.rmc_pot.rmc_pot import RmcPot

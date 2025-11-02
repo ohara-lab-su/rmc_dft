@@ -1,20 +1,18 @@
 #!/usr/bin/env python
 """
+K.NAKADA, kengo.nakada@gmail.com
+
 VASP の INCAR 編集機能を担当するクラス群。
 
 本モジュールは、RMC-DFT システムにおける
 「VASP 入力編集部」を独立モジュールとして管理することが目的
 
 主構成:
-    1. VaspIncar
-        - INCAR の読み込み・編集・削除・再読み込みを行う。
-        - pymatgen.io.vasp.inputs.Incar を利用。
-        - 実ファイルが存在しない場合は空の INCAR から開始。
-        - set_value で即座にファイルへ反映（存在しない場合は新規作成）。
-        - get_value は None を返した場合、VASP デフォルト値を意味する。
-    2. VaspMinimal
-        - 上位クラス（Vasp）から VaspIncar を委譲して使うための最小例。
-        - INCAR 操作を get/set/unset/reload の各メソッドで委譲する。
+    - INCAR の読み込み・編集・削除・再読み込みを行う。
+    - pymatgen.io.vasp.inputs.Incar を利用。
+    - 実ファイルが存在しない場合は空の INCAR から開始。
+    - set_value で即座にファイルへ反映（存在しない場合は新規作成）。
+    - get_value は None を返した場合、VASP デフォルト値を意味する。
 
 テスト:
     if __name__ == "__main__" 以下で、INCAR が
@@ -33,6 +31,7 @@ from x_logger import XLogger
 class VaspIncar:
     """
     VASP の INCAR ファイルを編集・管理するクラス。
+    多々たんに pymatgen のうすーいラッパー
 
     責務:
         - INCAR ファイルの読み込みと書き込み。
@@ -68,12 +67,15 @@ class VaspIncar:
             logger = XLogger()
         self._logger = logger
 
-        self.incar_name: str = incar_name  # 編集対象ファイル名
+        self.incar_name: str = incar_name  # INCAR
 
         # Pymatgen Module
         self.incar_data: Incar = self._load_incar()  # Incar オブジェクトをロード
 
-    def _load_incar(self) -> Incar:
+    def _load_incar(
+        self,
+        incar_name: str = None,
+    ) -> Incar:
         """
         INCAR ファイルを読み込み、Incar オブジェクトを生成する。
 
@@ -81,13 +83,21 @@ class VaspIncar:
             Incar: 読み込んだ Incar オブジェクト。
                    ファイルが存在しない場合は空の Incar()。
         """
-        file_exists: bool = os.path.exists(self.incar_name)
+        self._logger.info("== incar reload")
+        if not incar_name:
+            incar_name = self.incar_name
+
+        file_exists: bool = os.path.exists(incar_name)
         if file_exists:
-            return Incar.from_file(self.incar_name)
+            # pymatgen で INCAR のロード
+            return Incar.from_file(incar_name)
         else:
             return Incar()
 
-    def reload_incar(self) -> None:
+    def reload_incar(
+        self,
+        incar_name: str = None,
+    ) -> bool:
         """
         外部で INCAR が編集された場合に再読み込みを行う。
 
@@ -95,13 +105,14 @@ class VaspIncar:
             - ファイルが存在する場合は再度 Incar.from_file() を実行。
             - 存在しない場合は空の Incar() にリセットする。
         """
-        file_exists: bool = os.path.exists(self.incar_name)
-        if file_exists:
-            self.incar_data = Incar.from_file(self.incar_name)
-        else:
-            self.incar_data = Incar()
+        self._logger.info("== reload incar")
+        self.incar_data = self._load_incar(incar_name)
+        return True
 
-    def get_value(self, tag_name: str) -> Optional[Any]:
+    def get_value(
+        self,
+        tag_name: str,
+    ) -> Optional[Any]:
         """
         指定されたタグの値を取得する。
 
@@ -121,31 +132,49 @@ class VaspIncar:
         else:
             return None
 
-    def set_value(self, tag_name: str, value: Any) -> None:
+    def set_value(
+        self,
+        tag_name: str,
+        value: Any,
+        force_write: bool = False,
+    ) -> None:
         """
         指定されたタグの値を設定し、即座にファイルへ反映する。
 
         Args:
             tag_name (str): 設定するタグ名。
             value (Any): 設定する値（数値、文字列、真偽値など）。
+            force_write (bool): ファイル書き出しの有無 (既存のINCAR情報を消すので注意)
         """
         tag_upper: str = tag_name.upper()
         self.incar_data[tag_upper] = value
-        self.incar_data.write_file(self.incar_name)
 
-    def remove_value(self, tag_name: str) -> None:
+        # ここで書き出すのはテスト用(既存のINCAR情報を消すので)
+        if write:
+            self.incar_data.write_file(self.incar_name)
+
+    def remove_value(
+        self,
+        tag_name: str,
+        force_write: bool = False,
+    ) -> None:
         """
         指定されたタグを削除し、ファイルへ反映する。
+        基本的にファイルへ反映するので注意（既存の INCAR のコメント構造が壊れるため）
+
+        デフォルトは force_write = False のために、デフォルトではこのメソッドは何もしない
 
         Args:
             tag_name (str): 削除対象のタグ名。
+            force_write (bool): 強制的にファイルの読みき（デフォルトFalse)
         """
         tag_upper: str = tag_name.upper()
         tag_exists: bool = tag_upper in self.incar_data
 
-        if tag_exists:
-            del self.incar_data[tag_upper]
-            self.incar_data.write_file(self.incar_name)
+        if force_write:
+            if tag_exists:
+                del self.incar_data[tag_upper]
+                self.incar_data.write_file(self.incar_name)
 
     def export_dict(self) -> Dict[str, Any]:
         """
@@ -157,102 +186,56 @@ class VaspIncar:
         return dict(self.incar_data)
 
 
-class VaspMinimal:
-    """
-    VASP 側の最小委譲クラス。
-
-    概要:
-        - 実際の VASP クラスが VaspIncar を内部で保持し、
-          INCAR 操作をこのクラスを通して委譲する想定。
-        - テスト目的で最小限のラッパとして定義。
-
-    提供メソッド:
-        - get_tag(): タグ値の取得。
-        - set_tag(): タグ値の設定。
-        - unset_tag(): タグ値の削除。
-        - reload_incar(): 外部変更の再読み込み。
-    """
-
-    def __init__(self, incar_name: str = "INCAR") -> None:
-        """
-        コンストラクタ。
-
-        Args:
-            incar_name (str): 委譲先の VaspIncar が操作するファイル名。
-        """
-        self.incar = VaspIncar(incar_name=incar_name)
-
-    def get_tag(self, tag_name: str) -> Optional[Any]:
-        """VaspIncar.get_value() の委譲。"""
-        return self.incar.get_value(tag_name)
-
-    def set_tag(self, tag_name: str, value: Any) -> None:
-        """VaspIncar.set_value() の委譲。"""
-        self.incar.set_value(tag_name, value)
-
-    def unset_tag(self, tag_name: str) -> None:
-        """VaspIncar.remove_value() の委譲。"""
-        self.incar.remove_value(tag_name)
-
-    def reload_incar(self) -> None:
-        """VaspIncar.reload_incar() の委譲。"""
-        self.incar.reload_incar()
-
-
-# =====================================================================
-# テストコード
-# =====================================================================
 if __name__ == "__main__":
     """
     機能テスト。
-    以下の 2 ケースを順に検証する:
-        ケースA: 既存 INCAR が存在する場合。
-        ケースB: INCAR が存在しない場合。
+        1) INCAR が存在する場合。
+        2) INCAR が存在しない場合。
     """
 
     # ---------------------------------------------------------------
-    # ケースA: 既存の INCAR がある場合
+    # (1) INCAR がある場合
     # ---------------------------------------------------------------
-    existing_incar_name: str = "INCAR_existing_case"
+    ## existing_incar_name: str = "INCAR_existing_case"
 
-    # テスト準備: 既存ファイルを再生成
-    if os.path.exists(existing_incar_name):
-        os.remove(existing_incar_name)
-    with open(existing_incar_name, "w", encoding="utf-8") as f:
-        f.write("ENCUT = 450\n")
-        f.write("ISPIN = 2\n")
+    ## # テスト準備: 既存ファイルを再生成
+    ## if os.path.exists(existing_incar_name):
+    ##     os.remove(existing_incar_name)
+    ## with open(existing_incar_name, "w", encoding="utf-8") as f:
+    ##     f.write("ENCUT = 450\n")
+    ##     f.write("ISPIN = 2\n")
 
-    print("=== ケースA: 既存 INCAR がある場合 ===")
+    ## print("=== ケースA: 既存 INCAR がある場合 ===")
 
-    # クラス生成と初期読み込み確認
-    incar_a = VaspIncar(incar_name=existing_incar_name)
-    print("初期読み込み:", incar_a.export_dict())
+    ## # クラス生成と初期読み込み確認
+    ## incar_a = VaspIncar(incar_name=existing_incar_name)
+    ## print("初期読み込み:", incar_a.export_dict())
 
-    # タグ値の取得（既存値と未設定タグ）
-    print("get_value('ENCUT') =", incar_a.get_value("ENCUT"))
-    print("get_value('LREAL') =", incar_a.get_value("LREAL"))
+    ## # タグ値の取得（既存値と未設定タグ）
+    ## print("get_value('ENCUT') =", incar_a.get_value("ENCUT"))
+    ## print("get_value('LREAL') =", incar_a.get_value("LREAL"))
 
-    # 値の上書き設定
-    print("\n--- set_value テスト ---")
-    incar_a.set_value("ENCUT", 520)
-    print("ENCUT=520 設定後:", incar_a.export_dict())
+    ## # 値の上書き設定
+    ## print("\n--- set_value テスト ---")
+    ## incar_a.set_value("ENCUT", 520)
+    ## print("ENCUT=520 設定後:", incar_a.export_dict())
 
-    # タグ削除
-    print("\n--- remove_value テスト ---")
-    incar_a.remove_value("ISPIN")
-    print("ISPIN 削除後:", incar_a.export_dict())
+    ## # タグ削除
+    ## print("\n--- remove_value テスト ---")
+    ## incar_a.remove_value("ISPIN")
+    ## print("ISPIN 削除後:", incar_a.export_dict())
 
-    # 外部編集を模擬（手動追記）
-    with open(existing_incar_name, "a", encoding="utf-8") as f:
-        f.write("LREAL = .FALSE.\n")
+    ## # 外部編集を模擬（手動追記）
+    ## with open(existing_incar_name, "a", encoding="utf-8") as f:
+    ##     f.write("LREAL = .FALSE.\n")
 
-    # 再読み込み確認
-    incar_a.reload_incar()
-    print("\n--- reload_incar テスト ---")
-    print("再読み込み後:", incar_a.export_dict())
+    ## # 再読み込み確認
+    ## incar_a.reload_incar()
+    ## print("\n--- reload_incar テスト ---")
+    ## print("再読み込み後:", incar_a.export_dict())
 
     # ---------------------------------------------------------------
-    # ケースB: INCAR が存在しない場合
+    # INCAR が存在しない場合
     # ---------------------------------------------------------------
     missing_incar_name: str = "INCAR_missing_case"
 
@@ -286,12 +269,3 @@ if __name__ == "__main__":
     incar_b.reload_incar()
     print("\n--- 再読み込み確認 ---")
     print("再読み込み後:", incar_b.export_dict())
-
-    # ---------------------------------------------------------------
-    # VaspMinimal の委譲確認
-    # ---------------------------------------------------------------
-    print("\n=== VaspMinimal による委譲確認 ===")
-    vasp_mini = VaspMinimal(incar_name=missing_incar_name)
-    print("get_tag('ENCUT') =", vasp_mini.get_tag("ENCUT"))
-    vasp_mini.set_tag("SIGMA", 0.05)
-    print("SIGMA 設定後:", vasp_mini.incar.export_dict())
