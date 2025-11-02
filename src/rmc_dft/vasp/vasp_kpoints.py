@@ -46,7 +46,7 @@ class VaspKpoints:
     def __init__(
         self,
         kpoints_name: str = "KPOINTS",
-        auto_write: bool = False,
+        auto_write: bool = True,
         logger=None,
     ) -> None:
         self.kpoints_name: str = kpoints_name

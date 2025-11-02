@@ -23,7 +23,7 @@ class VaspIncar:
     def __init__(
         self,
         incar_name: str = "INCAR",
-        auto_write: bool = False,
+        auto_write: bool = True,
         logger: XLogger | None = None,
     ):
         self.incar_name: str = os.path.abspath(incar_name)

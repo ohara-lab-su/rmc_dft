@@ -3,12 +3,12 @@
 K.NAKADA, kengo.nakada@gmail.com
 """
 
-from rmc_dft.vasp.vasp_potcar_builder import VaspPotcarBuilder
+from rmc_dft.vasp.vasp_potcar import VaspPotcarBuilder
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python potcar_builder.py Li Mn O [output_file(optional)]")
+        print("Usage: python make_potcar.py Li Mn O [output_file(optional)]")
         sys.exit(1)
 
     # 最後の引数が出力ファイル名なら分離

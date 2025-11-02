@@ -1,11 +1,13 @@
 # CHANGELOG
 
-## v0.3.x nakada
+## v0.2.4 nakada (pre 0.3.0)
 
 - INPUT 関係を クラスライブラリ上から行う・管理できる仕様に改変
   - vasp_incar.py
-  - vasp_incar_writer.py
-  - vasp_poscar_builder.py (make_pocar.py から実態をこちらに移動)
+  - vasp_incar_incar.py
+  - vasp_potcar.py
+  - vasp_kpoints.py
+  - rmc_pot_dat.py
 
 ## v0.2.3 nakada
 

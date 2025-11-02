@@ -78,6 +78,7 @@ class Vasp:
         self._vasp_name: str = vasp_name
         self.incar_name: str = incar_name
         self.kpoints_name: str = kpoints_name
+        self.auto_write: bool = auto_write
 
         # -------------------------------
         # デフォルト値定義
