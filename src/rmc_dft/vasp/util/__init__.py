@@ -8,4 +8,4 @@ from rmc_dft.vasp.util.copy_contcar_to_vasp import copy_contcar_to_vasp
 from rmc_dft.vasp.util.copy_vasp_to_poscar import copy_vasp_to_poscar
 from rmc_dft.vasp.util.ensure_vasp5_format import ensure_vasp5_format
 from rmc_dft.vasp.util.xdatcar2poscar import xdatcar2poscar
-from rmc_dft.vasp.util.make_poscar import PotcarBuilder
+from rmc_dft.vasp.util.make_potcar import VaspPotcarBuilder

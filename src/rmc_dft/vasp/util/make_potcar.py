@@ -3,7 +3,7 @@
 K.NAKADA, kengo.nakada@gmail.com
 """
 
-from rmc_dft.vasp.vasp_potcar_builder import VaspPotcarBuilde1Gr
+from rmc_dft.vasp.vasp_potcar_builder import VaspPotcarBuilder
 
 
 if __name__ == "__main__":
