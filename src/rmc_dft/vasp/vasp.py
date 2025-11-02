@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-K.NAKADA, kengo.nakada@gmail.com
-K.KOBAYASHI
+K.NAKADA, kengo.nakada@gmail.com (1st, 3rd varsion)
+K.KOBAYASHI (2nd version)
 """
 import os
 from typing import Any, Dict, List, Optional
@@ -11,20 +11,28 @@ import shutil
 from ase.io import read, write
 
 from rmc_dft.config import Config
+
+from rmc_dft.vasp.vasp_incar import VaspIncar
+from rmc_dft.vasp.vasp_kpoints import VaspKpoints
 from rmc_dft.vasp.vasp_log import VaspLog
+
 from rmc_dft.vasp.util.poscar2cfg import (
     vasp2cfg,
     contcar2cfg,
     poscar2cfg,
     convert_to_cfg,
 )
+
+# util
 from rmc_dft.vasp.util.copy_contcar_to_vasp import copy_contcar_to_vasp
 from rmc_dft.vasp.util.copy_vasp_to_poscar import copy_vasp_to_poscar
 from rmc_dft.vasp.util.xdatcar2poscar import xdatcar2poscar
 from rmc_dft.vasp.util.ensure_vasp5_format import ensure_vasp5_format
-from rmc_dft.vasp.util.make_poscar import PotcarBuilder
+from rmc_dft.vasp.util.make_potcar import VaspPotcarBuilder
 
 from x_logger import XLogger
+
+# vasp.py 冒頭（class 外）
 
 
 class Vasp:
@@ -36,6 +44,9 @@ class Vasp:
         self,
         vasp_log: VaspLog,
         vasp_name: str,
+        incar_name: str = "INCAR",
+        kpoints_name: str = "KPOINTS",
+        auto_write: bool = True,
         mpi_cmd: str = None,
         mpi_flag: str = None,
         num_procs: int = Config.num_procs,
@@ -45,29 +56,34 @@ class Vasp:
     ):
         """
         Args:
-            vasp_log (VaspLog):
-            vasp_name (str): vasp_name.vasp
-            mpi_cmd (str):
-            num_procs (int):
-            vasp_bin (str):
+            vasp_log (VaspLog): VASP の log 解析管理
+            vasp_name (str): POSCAR などに関連する系の識別名（例: "aaa.vasp" or "POSCAR）
+            incar_name (str): INCAR
+            kpoints_name (str): KPOINTS
+            mpi_cmd (str): 例 "mpirun"
+            mpi_flag (str): 例 "-np"
+            num_procs (int): 並列数
+            vasp_bin (str): 実行バイナリ（例: "vasp_std"）
+            job_cmd (str): ジョブ投入コマンド（None ならローカル実行）
             logger (XLogger):  ろがー
         """
-        self._vasp_log: VaspLog = vasp_log
-        self._vasp_name: str = vasp_name
-
         if not logger:
             logger = XLogger()
         self._logger = logger
         self._logger.debug("== create Vasp()")
 
-        self.mpi_cmd = mpi_cmd or "mpirun"  # 規定のMPIコマンド
-        self.mpi_flag = mpi_flag or "-np"
-        self.num_procs = num_procs or Config.num_procs
-        self.vasp_bin = vasp_bin or Config.vasp_bin
-        self.job_cmd = job_cmd or Config.job_cmd
+        # INCAR ファイルのOUTファイル入出力インスタンスの移譲を受ける
+        self._vasp_log: VaspLog = vasp_log
 
-        # for VASP INCAR
-        self._incar_keys: Dict[str, Any] = {
+        self._vasp_name: str = vasp_name
+        self.incar_name: str = incar_name
+        self.kpoints_name: str = kpoints_name
+        self.auto_write: bool = auto_write
+
+        # -------------------------------
+        # デフォルト値定義
+        # -------------------------------
+        self._incar_defaults: dict[str, object] = {
             "EDIFF": 1e-04,
             "EDIFFG": 1e-05,
             "ISTART": 0,
@@ -79,43 +95,79 @@ class Vasp:
             "ISIF": 2,
             "LREAL": "auto",
         }
-        # 各キーに対応する property / get_xxx, set_xxx をクラスに動的追加
-        for key in list(self._incar_keys.keys()):
-            self._install_property(key)
 
-    #
-    # INTCAR
-    #
+        # VASP 実行系設定
+        self.mpi_cmd = mpi_cmd or "mpirun"  # 規定のMPIコマンド
+        self.mpi_flag = mpi_flag or "-np"
+        self.num_procs: int = num_procs or Config.num_procs
+        self.vasp_bin: str = vasp_bin or Config.vasp_bin
+        self.job_cmd = job_cmd or Config.job_cmd
 
-    def _install_property(self, key: str) -> None:
+        # --- INCAR ---
+        self._incar = VaspIncar(
+            incar_name=self.incar_name,
+            auto_write=self.auto_write,
+            logger=self._logger,
+        )
+        # INCAR が存在すれば読み込み、なければデフォルトで新規作成
+        if not os.path.exists(self.incar_name):
+            for key, val in self.incar_defaults.items():
+                self._incar.set(key, val)
+
+        # --- KPOINTS ---
+        self._kpoints = VaspKpoints(
+            kpoints_name=self.kpoints_name,
+            auto_write=self.auto_write,
+            logger=self._logger,
+        )
+        # KPOINTS: 既存があれば読み取り優先。
+        # 無ければデフォルトで生成（Monkhorst-Pack 1 1 1, shift 0 0 0）
+        if not os.path.exists(self.kpoints_name):
+            self.kpoints.set_mode("Monkhorst-Pack")
+            self.kpoints.set_grid(1, 1, 1)
+            self.kpoints.set_shift(0, 0, 0)
+            self.kpoints.write()
+
+    # --- 委譲メソッド群 (INCAR) ---
+    def get_tag(self, key: str):
+        """INCAR の値を取得"""
+        return self._incar.get(key)
+
+    def set_tag(self, key: str, value):
+        """INCAR の値を設定"""
+        self._incar.set(key, value)
+
+    def remove_tag(self, key: str):
+        """INCAR の項目を削除"""
+        self._incar.remove(key)
+
+    def reload_incar(self):
+        """INCAR を再読込"""
+        self._incar.reload()
+
+    def export_incar_dict(self):
+        """INCAR を辞書で取得"""
+        return self._incar.export_dict()
+
+    # --- 委譲メソッド群 (KPOINTS) ---
+    def get_kpoints(self, key: str):
+        """KPOINTS の値取得（grid/gamma/comment）"""
+        return self._kpoints.get_value(key)
+
+    def set_kpoints(self, key: str, value) -> None:
         """
-        属性アクセスを get_{KEY} / set_{KEY} にバインド。
-        それらが存在しなければ辞書を既定動作とする。
+        KPOINTS 値設定。
+        明示設定は既存ファイルより優先して上書き。
         """
+        self._kpoints.set_value(key, value)
 
-        def fget(inst: Vasp, k: str = key) -> Any:
-            getter = getattr(inst, f"get_{k}", None)
-            if callable(getter):
-                return getter()  # 高度な getter を必ず経由
-            return inst._incar_keys.get(k)  # 既定（辞書）取得
+    def reload_kpoints(self) -> None:
+        """KPOINTS 再読込"""
+        self._kpoints.reload_kpoints()
 
-        def fset(inst: Vasp, value: Any, k: str = key) -> None:
-            setter = getattr(inst, f"set_{k}", None)
-            if callable(setter):
-                setter(value)  # 高度な setter を必ず経由
-            else:
-                inst._incar_keys[k] = value  # 既定（辞書）更新
-
-        # クラスに property を貼る（以後 instance.k で fget/fset が必ず呼ばれる）
-        setattr(self.__class__, key, property(fget, fset))
-
-    def set_EDIFF(self, EDIFF: float) -> None:
-        self._incar_keys["EDIFF"] = float(EDIFF)
-        self._incar_keys["EDIFFG"] = float(EDIFF) * 10
-
-    def get_EDIFFG(self) -> float:
-        self._incar_keys["EDIFFG"] = float(self.EDIFF) * 10
-        return self._incar_keys["EDIFFG"]
+    def export_kpoints_dict(self):
+        """KPOINTS を辞書で取得"""
+        return self._kpoints.export_dict()
 
     #
     # RMC-DFT の VASP 側の init/preprocess/postprocess
@@ -330,7 +382,7 @@ class Vasp:
         output: str = "POTCAR",
     ) -> bool:
         """
-        PotcarBuilder クラスを使って POTCAR を生成
+        VaspPotcarBuilder クラスを使って POTCAR を生成
 
         Args:
             elements (list):  Li Mn O など
@@ -339,7 +391,7 @@ class Vasp:
         Returns:
 
         """
-        # builder = PotcarBuilder("~/potpaw_PBE.64")
+        # builder = VaspPotcarBuilder("~/potpaw_PBE.64")
         # path = Path(output).expanduser()
         # if path.is_dir():
         #     path = path / "POTCAR"
@@ -417,60 +469,13 @@ class Vasp:
         atoms = read((str + ".pdb"), format="pdb")
         write((str + ".vasp"), atoms, format="vasp", direct=True)
 
-    def to_incar(self) -> str:
-        """
-        設定してある VASP の INCAR タグを表示
-
-        Returns:
-            str:
-
-        """
-        lines = []
-        for k, v in self._incar_keys.items():
-            if v is None:
-                continue
-            if isinstance(v, bool):
-                s = ".TRUE." if v else ".FALSE."
-            elif isinstance(v, (list, tuple)):
-                s = " ".join(str(x) for x in v)
-            else:
-                s = str(v)
-            lines.append(f"{k} = {s}")
-        return "\n".join(lines)
-
-    def write_incar(self, filepath: Optional[str] = None) -> str:
-        """
-        既存の to_incar() を用いて INCAR テキストを生成し、指定パスに書き出し
-        相対 / 絶対どちらのパスでも可。
-
-        Args:
-            filepath (str, optional): 出力ファイルのパス。
-                None の場合はカレントディレクトリに 'INCAR' として出力。
-
-        Returns:
-            str: 書き出したファイルの絶対パス
-        """
-        if filepath is None:
-            filepath = "INCAR"
-
-        incar_text: str = self.to_incar()
-
-        dirpath = os.path.dirname(filepath)
-        if dirpath:
-            os.makedirs(dirpath, exist_ok=True)
-
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write(incar_text if incar_text.endswith("\n") else incar_text + "\n")
-
-        return os.path.abspath(filepath)
-
 
 if __name__ == "__main__":
     _logger = XLogger()
     _vasp_log = VaspLog(logger=_logger)
     vasp = Vasp(
         _vasp_log,
-        input_name="INCAR",
+        vasp_name="INCAR",
         mpi_cmd="mpirun",
         mpi_flag="-np",
         num_procs=1,
@@ -482,4 +487,4 @@ if __name__ == "__main__":
     print(vasp.EDIFF)
     print(vasp.EDIFFG)
     print(vasp.get_EDIFFG())
-    print(vasp.to_incar())
+    # print(vasp.to_incar())

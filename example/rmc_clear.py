@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """
+K.NAKADA, kengo.nakada@gmail.com
+
 RMC の出力を消す
 """
 import os

@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 
 from x_logger import XLogger
 
@@ -17,7 +20,7 @@ def ensure_vasp5_format(
     VASP5 形式にする (cfg2poscar は element 情報がない VASP4 形式)
 
     Args:
-        poscar_name (str): POSCARファイル名
+        poscar_name (str): POSCAR
         element_info (str): element 情報があるファイル名
         logger (XLogger):
 

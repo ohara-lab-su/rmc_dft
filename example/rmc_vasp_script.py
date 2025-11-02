@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """
+K.NAKADA, kengo.nakada@gmail.com
+
 RMC-DFT のUIクラスを使わずに直接 rmc_pot, vasp 関係のクラスを起動して
 RMC-VASP を構成する sample script
 """

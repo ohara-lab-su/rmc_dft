@@ -1,3 +1,7 @@
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
+
 from rmc_dft.vasp.util.poscar2cfg import (
     vasp2cfg,
     poscar2cfg,

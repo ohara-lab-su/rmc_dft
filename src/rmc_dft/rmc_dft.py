@@ -1,12 +1,15 @@
 #!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 import os
 from typing import Any, Dict, List, Optional
 
-from rmc_dft.vasp.vasp import Vasp
-from rmc_dft.vasp.vasp_log import VaspLog
-from rmc_dft.rmc_pot.rmc_pot import RmcPot
-from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
+from rmc_dft.rmc_pot import RmcPot, RmcPotLog
+from rmc_dft.vasp import Vasp, VaspLog
 from rmc_dft.config import Config
+from rmc_dft.util import poscar2cfg
+from rmc_dft.util import ensure_vasp5_format
 
 from x_logger import XLogger
 
@@ -132,6 +135,19 @@ class RmcDft:
                 cfg_name=cfg_name,
             )
             self._logger.info("loop end " + str(i))
+
+    @staticmethod
+    def poscar2cfg(
+        self,
+        cfg_name: str,
+        posscar_name: str = None,
+    ) -> bool:
+        if not posscar_name:
+            posscar_name = f"{cfg_name}.vasp"
+
+        # CFG ファイルを作る
+        poscar2cfg(cfg_name=cfg_name)
+        return True
 
 
 globals().update(

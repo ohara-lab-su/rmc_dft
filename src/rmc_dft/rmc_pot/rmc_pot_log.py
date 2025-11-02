@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com (2nd version)
+K.KOBAYASHI (1st version)
+"""
 import os
 import shutil
 

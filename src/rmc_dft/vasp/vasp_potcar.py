@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+K.NAKADA, kengo.nakada@gmail.com
+
 POTCAR 自動生成クラス
 ex) make_poscar.py Li Mn O
 """
@@ -12,7 +14,7 @@ from csv import excel_tab
 from x_logger import XLogger
 
 
-class PotcarBuilder:
+class VaspPotcarBuilder:
     """
     指定された元素リストから最適なポテンシャルを選び、
     一つの POTCAR に連結して出力するクラス。
@@ -219,5 +221,5 @@ if __name__ == "__main__":
         _poscar_name = "POTCAR"
         _elements = args
 
-    builder = PotcarBuilder("~/potpaw_PBE.64")
+    builder = VaspPotcarBuilder("~/potpaw_PBE.64")
     builder.build(_elements, poscar_name=_poscar_name)

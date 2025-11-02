@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """
+K.NAKADA, kengo.nakada@gmail.com
+
 RMC を動かすだけ
 """
 import os
