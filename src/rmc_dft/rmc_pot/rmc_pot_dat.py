@@ -4,15 +4,15 @@ K.NAKADA, kengo.nakada@gmail.com
 
 RmcPotDat: RMC_POT の .dat 入力ファイル編集クラス
 
-- 本クラスは「タグ名ではなく行番号に意味がある」RMC_POT の .dat 形式を前提とします。
-- 各行は「値 [任意空白] ! コメント」の構造で、コメントは保持したまま値のみ更新します。
+- 本クラスは「タグ名ではなく行番号に意味がある」RMC_POT の .dat 形式を前提
+- 各行は「値 [任意空白] ! コメント」の構造で、コメントは保持したまま値のみ更新
 - 代表的に編集頻度の高い行:
     2行目: number density (float)
     3行目: cut offs (float×3)
     4行目: maximum moves (float×2)
     5行目: r spacing (float)
-- 真偽値は .true. / .false. に正規化して出力します。
-- 任意行の直接取得/更新用に get_line()/set_line() も提供します。
+- 真偽値は .true. / .false. に正規化して出力
+- 任意行の直接取得/更新用に get_line()/set_line() も提供
 """
 
 from dataclasses import dataclass

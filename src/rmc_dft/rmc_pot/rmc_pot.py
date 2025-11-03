@@ -35,6 +35,7 @@ class RmcPot:
 
         Args:
             rmc_log: RMC_POT のログ処理用のインスタンス
+            rmc_dat: RMC_POT のDAT処理用のインスタンス
             cfg_name (str): cfg-filename
             logger (XLogger):
         """
@@ -42,20 +43,25 @@ class RmcPot:
             logger = XLogger()
         self._logger = logger
 
-        if rmc_dat is None:
-            rmc_dat = RmcPotDat(logger=logger, dat_name=cfg_name, auto_write=True)
-        self._rmc_dat = rmc_dat
-
-        self._rmc_log = rmc_log
+        # aaa.dat ファイルなどの CFG ファイル名 prefix
         self._cfg_name = cfg_name
 
-        # rmc_log に cfg_name をセットする
+        # .dat ファイル処理 instance
+        if rmc_dat is None:
+            rmc_dat = RmcPotDat(
+                logger=logger,
+                dat_name=cfg_name,
+                auto_write=True,
+            )
+        self._rmc_dat = rmc_dat
+        if self._rmc_dat:
+            self._logger.info(f"== rmc_pot_dat()")
+
+        # RMC 出力ファイル処理
+        self._rmc_log = rmc_log
         if self._rmc_log:
             self._logger.info(f"== rmc_log.set_cfg_name({cfg_name})")
             self._rmc_log.set_cfg_name(cfg_name)
-
-        if self._rmc_dat:
-            self._logger.info(f"== rmc_pot_dat()")
 
     def set_cfg_name(self, cfg_name: str):
         self._cfg_name = cfg_name
