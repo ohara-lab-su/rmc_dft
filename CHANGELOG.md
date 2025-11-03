@@ -1,10 +1,9 @@
 # CHANGELOG
 
-## v0.2.4 nakada (pre 0.3.0)
+## v0.3.0 nakada
 
 - INPUT 関係を クラスライブラリ上から行う・管理できる仕様に改変
   - vasp_incar.py
-  - vasp_incar_incar.py
   - vasp_potcar.py
   - vasp_kpoints.py
   - rmc_pot_dat.py

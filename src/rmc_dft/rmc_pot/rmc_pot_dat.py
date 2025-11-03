@@ -4,68 +4,22 @@ K.NAKADA, kengo.nakada@gmail.com
 
 RmcPotDat: RMC_POT の .dat 入力ファイル編集クラス
 
-- 本クラスは「タグ名ではなく行番号に意味がある」RMC_POT の .dat 形式を前提とします。
-- 各行は「値 [任意空白] ! コメント」の構造で、コメントは保持したまま値のみ更新します。
+- 本クラスは「タグ名ではなく行番号に意味がある」RMC_POT の .dat 形式を前提
+- 各行は「値 [任意空白] ! コメント」の構造で、コメントは保持したまま値のみ更新
 - 代表的に編集頻度の高い行:
     2行目: number density (float)
     3行目: cut offs (float×3)
     4行目: maximum moves (float×2)
     5行目: r spacing (float)
-- 真偽値は .true. / .false. に正規化して出力します。
-- 任意行の直接取得/更新用に get_line()/set_line() も提供します。
+- 真偽値は .true. / .false. に正規化して出力
+- 任意行の直接取得/更新用に get_line()/set_line() も提供
 """
-
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import Sequence, Union, Tuple  # Optional は使用しない
 
-
-Number = Union[int, float]
-Grid2 = Tuple[Number, Number]
-Grid3 = Tuple[Number, Number, Number]
-
-
-def _to_bool_token(v: Union[bool, str]) -> str:
-    """
-    真偽入力を .true. / .false. に正規化する。
-
-    Args:
-        v: bool もしくは真偽を表す文字列（大文字小文字は不問）
-
-    Returns:
-        ".true." もしくは ".false."
-    """
-    if isinstance(v, bool):
-        return ".true." if v else ".false."
-    s = str(v).strip().lower()
-    if s in (".true.", "true", "t", "1", "yes", "y"):
-        return ".true."
-    if s in (".false.", "false", "f", "0", "no", "n"):
-        return ".false."
-    # 不明値はそのまま返さず、明示的に例外
-    raise ValueError(f"真偽として解釈できません: {v!r}")
-
-
-def _fmt_number(x: Number) -> str:
-    """
-    数値を .dat に過度な科学表記を使わず整形する。
-
-    仕様:
-      - int はそのまま
-      - float は小数点以下の無意味なゼロを取り除く
-      - 非常に大きい/小さい値でない限り指数表記は避ける
-    """
-    if isinstance(x, int) or (isinstance(x, float) and x.is_integer()):
-        return str(int(x))
-    # 通常の小数表現を優先
-    s = f"{float(x):.12g}"  # 12桁で十分に安定
-    return s
-
-
-def _fmt_sequence(seq: Sequence[Number]) -> str:
-    """数値列を空白区切りで整形。"""
-    return " ".join(_fmt_number(v) for v in seq)
+from x_logger import XLogger
 
 
 @dataclass
@@ -98,10 +52,10 @@ class RmcPotDat:
     RMC_POT の .dat ファイルを行番号ベースで編集するためのクラス。
 
     使い方:
-        dat = RmcPotDat("/abs/path/to/aaa.dat")
+        dat = RmcPotDat("/abs/path/to/aaa.dat", auto_write=True)
         rho = dat.get_density()
-        dat.set_cutoffs((2.5, 2.2, 2.0))
-        dat.write()  # 上書き保存
+        dat.set_cutoffs((2.5, 2.2, 2.0))  # auto_write=True なら即時保存
+        dat.write()  # 明示保存も可能
 
     注意:
         - 行番号は 1 始まり。内部処理では 0 始まりのリストに対応付けます。
@@ -109,29 +63,81 @@ class RmcPotDat:
         - 指定の .dat 形式（添付例）を前提に実装しています。
     """
 
-    # 添付例に基づく主要フィールド行番号（1 始まり）
-    LINE_DENSITY: int = 2
-    LINE_CUTOFFS: int = 3
-    LINE_MAX_MOVES: int = 4
-    LINE_R_SPACING: int = 5
-
-    def __init__(self, dat_path: str):
+    def __init__(
+        self,
+        dat_name: str,
+        auto_write: bool = True,
+        logger: XLogger | None = None,
+    ) -> None:
         """
         Args:
-            dat_path: 編集対象 .dat の絶対パス（推奨）
+            dat_name (str): xxxx.dat の絶対パス、基本名前（拡張子は付けない）
+            auto_write (bool): True の場合 set_* / set_line で即時書き出し
+            logger (XLogger):
         """
-        self.dat_path: str = str(Path(dat_path))
-        self._lines: List[_Line] = []
+        self._logger = logger or XLogger()
+        self.dat_name: str = dat_name
+        self._lines: list[_Line] = []
+        self._auto_write: bool = auto_write
         self._load()
+
+    # --------------------
+    # 静的フォーマット関数群（クラス内に集約）
+    # --------------------
+    @staticmethod
+    def _to_bool_token(v: bool | str) -> str:
+        """
+        真偽入力を .true. / .false. に正規化する。
+
+        Args:
+            v: bool もしくは真偽を表す文字列（大文字小文字は不問）
+
+        Returns:
+            ".true." もしくは ".false."
+        """
+        if isinstance(v, bool):
+            return ".true." if v else ".false."
+        s = str(v).strip().lower()
+        if s in (".true.", "true", "t", "1", "yes", "y"):
+            return ".true."
+        if s in (".false.", "false", "f", "0", "no", "n"):
+            return ".false."
+        # 不明値はそのまま返さず、明示的に例外
+        raise ValueError(f"真偽として解釈できません: {v!r}")
+
+    @staticmethod
+    def _fmt_number(x: Union[int, float]) -> str:
+        """
+        数値を .dat に過度な科学表記を使わず整形する。
+
+        仕様:
+          - int はそのまま
+          - float は小数点以下の無意味なゼロを取り除く
+          - 非常に大きい/小さい値でない限り指数表記は避ける
+        """
+        if isinstance(x, int) or (isinstance(x, float) and x.is_integer()):
+            return str(int(x))
+        # 通常の小数表現を優先
+        s = f"{float(x):.12g}"  # 12桁で十分に安定
+        return s
+
+    @classmethod
+    def _fmt_sequence(cls, seq: Sequence[Union[int, float]]) -> str:
+        """数値列を空白区切りで整形。"""
+        return " ".join(cls._fmt_number(v) for v in seq)
 
     # --------------------
     # 基本 I/O
     # --------------------
     def _load(self) -> None:
         """ファイルを読み込んで内部行リストを構築。"""
-        p = Path(self.dat_path)
+        self._logger.info(f"== load({self.dat_name}.dat)")
+
+        p = Path(f"{self.dat_name}.dat")
         if not p.exists():
-            raise FileNotFoundError(f".dat ファイルが見つかりません: {self.dat_path}")
+            raise FileNotFoundError(
+                f".dat ファイルが見つかりません: {p} (.dat は自動付加されます)"
+            )
 
         self._lines.clear()
         with p.open("r", encoding="utf-8") as f:
@@ -147,24 +153,26 @@ class RmcPotDat:
                         _Line(value=raw.strip(), comment="", had_bang=False)
                     )
 
-    def write(self, out_path: Optional[str] = None) -> None:
+    def write(self, out_name: str | None = None) -> None:
         """
-        現在の内容を書き出す。
+        現在の内容を書き出す (.dat は自動付加される)
 
         Args:
-            out_path: 出力先。未指定なら self.dat_path に上書き保存。
+            out_name (str): 出力先。未指定なら self.dat_name に上書き保存。
         """
-        target = self.dat_path if out_path is None else str(Path(out_path))
-        with open(target, "w", encoding="utf-8") as f:
+        target = Path(f"{self.dat_name if out_name is None else out_name}.dat")
+        with target.open("w", encoding="utf-8") as f:
             for ln in self._lines:
                 f.write(ln.render())
+        self._logger.info(f"== write({target})")
 
     # --------------------
     # 任意行の get / set
     # --------------------
     def get_line(self, line_no_1based: int) -> str:
         """
-        任意行の値部分を返す（コメントは含めない）。
+        任意行の値部分を返す（コメントは含めない）
+        本来の RMC_POT を編集するための raw メソッド
 
         Args:
             line_no_1based: 1 始まりの行番号
@@ -176,7 +184,11 @@ class RmcPotDat:
         return self._lines[idx].value
 
     def set_line(
-        self, line_no_1based: int, value: Union[str, Number, Sequence[Number], bool]
+        self,
+        line_no_1based: int,
+        value: Union[str, int, float, Sequence[Union[int, float]], bool],
+        *,
+        auto_write: bool | None = None,
     ) -> None:
         """
         任意行の値部分を更新（コメントは保持）。
@@ -184,6 +196,7 @@ class RmcPotDat:
         Args:
             line_no_1based: 1 始まりの行番号
             value: 置換値（数値/数値列/真偽/文字列）
+            auto_write: True 指定で即時保存。None の場合はインスタンス既定(self._auto_write)に従う。
 
         Raises:
             IndexError: 行番号が範囲外
@@ -191,60 +204,73 @@ class RmcPotDat:
         """
         idx = self._index(line_no_1based)
         self._lines[idx].value = self._coerce_value(value)
+        do_write = self._auto_write if auto_write is None else auto_write
+        if do_write:
+            self.write()
 
     # --------------------
     # 代表フィールド: density / cutoffs / max_moves / r_spacing
     # --------------------
-    # density (2 行目)
     def get_density(self) -> float:
         """2 行目 density を float で返す。"""
-        return float(self.get_line(self.LINE_DENSITY).split()[0])
+        return float(self.get_line(2).split()[0])
 
-    def set_density(self, rho: Number) -> None:
+    def set_density(
+        self, rho: Union[int, float], *, auto_write: bool | None = None
+    ) -> None:
         """2 行目 density を更新。"""
-        self.set_line(self.LINE_DENSITY, rho)
+        self.set_line(2, rho, auto_write=auto_write)
 
-    # cut offs (3 行目; 3 要素)
-    def get_cutoffs(self) -> Grid3:
+    def get_cutoffs(self) -> Tuple[float, float, float]:
         """3 行目 cut offs を (c1, c2, c3) で返す。"""
-        toks = self.get_line(self.LINE_CUTOFFS).split()
+        toks = self.get_line(3).split()
         if len(toks) < 3:
             raise ValueError(f"cut offs 行の要素数が不足: {toks!r}")
         return float(toks[0]), float(toks[1]), float(toks[2])
 
-    def set_cutoffs(self, values: Union[Grid3, Sequence[Number]]) -> None:
+    def set_cutoffs(
+        self,
+        values: Sequence[Union[int, float]],
+        *,
+        auto_write: bool | None = None,
+    ) -> None:
         """3 行目 cut offs を更新。"""
         seq = list(values)
         if len(seq) != 3:
             raise ValueError(f"cut offs は 3 要素が必要です: {values!r}")
-        self.set_line(self.LINE_CUTOFFS, seq)
+        self.set_line(3, seq, auto_write=auto_write)
 
-    # maximum moves (4 行目; 2 要素)
-    def get_max_moves(self) -> Grid2:
+    def get_max_moves(self) -> Tuple[float, float]:
         """4 行目 maximum moves を (m1, m2) で返す。"""
-        toks = self.get_line(self.LINE_MAX_MOVES).split()
+        toks = self.get_line(4).split()
         if len(toks) < 2:
             raise ValueError(f"maximum moves 行の要素数が不足: {toks!r}")
         return float(toks[0]), float(toks[1])
 
-    def set_max_moves(self, values: Union[Grid2, Sequence[Number]]) -> None:
+    def set_max_moves(
+        self,
+        values: Sequence[Union[int, float]],
+        *,
+        auto_write: bool | None = None,
+    ) -> None:
         """4 行目 maximum moves を更新。"""
         seq = list(values)
         if len(seq) != 2:
             raise ValueError(f"maximum moves は 2 要素が必要です: {values!r}")
-        self.set_line(self.LINE_MAX_MOVES, seq)
+        self.set_line(4, seq, auto_write=auto_write)
 
-    # r spacing (5 行目; 1 要素)
     def get_r_spacing(self) -> float:
         """5 行目 r spacing を float で返す。"""
-        toks = self.get_line(self.LINE_R_SPACING).split()
+        toks = self.get_line(5).split()
         if not toks:
             raise ValueError("r spacing 行が空です")
         return float(toks[0])
 
-    def set_r_spacing(self, dr: Number) -> None:
+    def set_r_spacing(
+        self, dr: Union[int, float], *, auto_write: bool | None = None
+    ) -> None:
         """5 行目 r spacing を更新。"""
-        self.set_line(self.LINE_R_SPACING, dr)
+        self.set_line(5, dr, auto_write=auto_write)
 
     # --------------------
     # ヘルパ
@@ -258,26 +284,28 @@ class RmcPotDat:
             )
         return idx
 
-    @staticmethod
-    def _coerce_value(value: Union[str, Number, Sequence[Number], bool]) -> str:
+    @classmethod
+    def _coerce_value(
+        cls,
+        value: Union[str, int, float, Sequence[Union[int, float]], bool],
+    ) -> str:
         """
         入力値を .dat へ書き込むための文字列に正規化。
 
         ルール:
           - str: そのまま（前後空白は適宜呼び出し側で制御）
           - bool: .true. / .false.
-          - Sequence[Number]: 空白区切りで整形
+          - Sequence[Union[int, float]]: 空白区切りで整形
           - Number: 数値フォーマットで整形
         """
         if isinstance(value, str):
             return value.strip()
         if isinstance(value, bool):
-            return _to_bool_token(value)
+            return cls._to_bool_token(value)
         if isinstance(value, (int, float)):
-            return _fmt_number(value)
-        # Sequence[Number] の判定（str はすでに除外）
+            return cls._fmt_number(value)
         try:
             seq = list(value)  # type: ignore[arg-type]
         except TypeError as exc:
             raise TypeError(f"未対応の型です: {type(value)!r}") from exc
-        return _fmt_sequence(seq)
+        return cls._fmt_sequence(seq)

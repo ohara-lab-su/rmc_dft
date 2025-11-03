@@ -24,6 +24,12 @@ if __name__ == "__main__":
 
     rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
     rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
-    rmc.run(cfg_name=cfg_name)
 
-    rmc.postprocess()
+    ret = rmc.get_tag("density")
+    print(ret)
+    rmc.set_tag("density", 0.1)
+    ret = rmc.get_tag("density")
+    print(ret)
+
+    # rmc.run(cfg_name=cfg_name)
+    # rmc.postprocess()
