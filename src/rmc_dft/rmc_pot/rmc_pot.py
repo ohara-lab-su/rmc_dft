@@ -9,7 +9,9 @@ import subprocess
 import shutil
 
 from rmc_dft.config import Config
+from rmc_dft.rmc_pot.rmc_pot_dat import RmcPotDat
 from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
+
 from rmc_dft.rmc_pot.util.cfg2poscar import cfg2poscar
 from rmc_dft.util import ensure_vasp5_format
 
@@ -25,6 +27,7 @@ class RmcPot:
     def __init__(
         self,
         rmc_log: RmcPotLog = None,
+        rmc_dat: RmcPotDat = None,
         cfg_name: str = "aaa",
         logger: XLogger = None,
     ):
@@ -35,23 +38,68 @@ class RmcPot:
             cfg_name (str): cfg-filename
             logger (XLogger):
         """
-        self._rmc_log = rmc_log
-        self._cfg_name = cfg_name
-
         if not logger:
             logger = XLogger()
         self._logger = logger
+
+        if rmc_dat is None:
+            rmc_dat = RmcPotDat(logger=logger, dat_name=cfg_name, auto_write=True)
+        self._rmc_dat = rmc_dat
+
+        self._rmc_log = rmc_log
+        self._cfg_name = cfg_name
 
         # rmc_log に cfg_name をセットする
         if self._rmc_log:
             self._logger.info(f"== rmc_log.set_cfg_name({cfg_name})")
             self._rmc_log.set_cfg_name(cfg_name)
 
+        if self._rmc_dat:
+            self._logger.info(f"== rmc_pot_dat()")
+
     def set_cfg_name(self, cfg_name: str):
         self._cfg_name = cfg_name
         # rmc_log に cfg_name をセットする
         if self._rmc_log:
             self._rmc_log.set_cfg_name(cfg_name)
+
+    # --------------------
+    # 互換 I/F
+    # --------------------
+    def set_tag(self, tag_name: str, *args) -> None:
+        """
+        RmcPotData 側の set_xxx メソッドを呼び出す互換I/F。
+
+        Args:
+            tag_name (str): タグ名（例: 'cutoffs', 'potential'）
+            *args: set_xxx に渡す引数
+        """
+        method_name = f"set_{tag_name.lower()}"
+        method = getattr(self._rmc_dat, method_name, None)
+        if method is None:
+            raise AttributeError(
+                f"RmcPotData に '{method_name}' が定義されていません。"
+            )
+        method(*args)
+
+    def get_tag(self, tag_name: str, *args):
+        """
+        RmcPotData 側の get_xxx メソッドを呼び出す互換I/F。
+
+        Args:
+            tag_name (str): タグ名（例: 'cutoffs', 'potential'）
+            *args: get_xxx に渡す引数（必要な場合）
+
+        Returns:
+            Any: 対応する get_xxx の戻り値
+        """
+        method_name = f"get_{tag_name.lower()}"
+        method = getattr(self._rmc_dat, method_name, None)
+        if method is None:
+            raise AttributeError(
+                f"RmcPotData に '{method_name}' が定義されていません。"
+            )
+        return method(*args)
 
     def init(self, cfg_name: str):
         """

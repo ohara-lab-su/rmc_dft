@@ -71,7 +71,7 @@ class VaspLog:
         pid_suffix = f".{os.getpid()}"
 
         # === copy: INCAR, KPOINTS, POSCAR ===
-        for name in ("INCAR", "KPOINTS", "POSCAR"):
+        for name in ("INCAR", "KPOINTS", "POSCAR", "DOSCAR", "PROCAR", "POTCAR"):
             src = Path(name)
             dst = Path(f"{name.lower()}{suffix}")
             if self._exists_either(dst):
@@ -108,6 +108,7 @@ class VaspLog:
         #   直前で CONTCAR は move 済み（contcar{suffix}[.gz] に退避）。
         contcar = Path(f"contcar{suffix}")
         contcar_gz = contcar.with_suffix(".gz")
+
         if contcar.exists() or contcar_gz.exists():
             src_path = contcar_gz if contcar_gz.exists() else contcar
             self._logger.info(f"cp {src_path.name} --> POSCAR")
@@ -225,11 +226,10 @@ class VaspLog:
             except FileNotFoundError:
                 pass
 
-    @staticmethod
-    def clean(suffixes: list[str]) -> None:
+    def clean(self, suffixes: list[str] = None) -> None:
         """
         Args:
-            suffixes (str:
+            suffixes (str):
 
         Returns:
 
@@ -286,24 +286,24 @@ class VaspLog:
         if not suffixes:
             # 引数なし：通常ファイル削除
             for f in base_files:
-                remove_file(f)
+                self.remove_file(f)
             for p in patterns:
-                remove_pattern(p)
+                self.remove_pattern(p)
 
         else:
             # 引数あり：サフィックス付きファイル削除
             for suf in suffixes:
                 for f in base_files:
-                    remove_file(f.lower() + suf)
-                    remove_file(f.lower() + suf + ".gz")
-                    remove_file(f.upper() + suf)
-                    remove_file(f.upper() + suf + ".gz")
+                    self.remove_file(f.lower() + suf)
+                    self.remove_file(f.lower() + suf + ".gz")
+                    self.remove_file(f.upper() + suf)
+                    self.remove_file(f.upper() + suf + ".gz")
 
                 # 特殊ケース
-                remove_file(f"vasprun{suf}.xml")
-                remove_file(f"vaspout{suf}.h5")
-                remove_file(f"vasprun{suf}.xml.gz")
-                remove_file(f"vaspout{suf}.h5.gz")
+                self.remove_file(f"vasprun{suf}.xml")
+                self.remove_file(f"vaspout{suf}.h5")
+                self.remove_file(f"vasprun{suf}.xml.gz")
+                self.remove_file(f"vaspout{suf}.h5.gz")
 
 
 if __name__ == "__main__":

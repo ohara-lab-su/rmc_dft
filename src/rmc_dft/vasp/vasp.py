@@ -133,8 +133,29 @@ class Vasp:
         """INCAR の値を取得"""
         return self._incar.get(key)
 
-    def set_tag(self, key: str, value):
-        """INCAR の値を設定"""
+    def set_tag(
+        self,
+        key: str,
+        value: Any,
+    ) -> None:
+        """
+        INCAR の値を設定
+
+        Example:
+            set_tag("NSW", 1)
+
+        Args:
+            key (str):
+            value (Any):
+
+        Returns:
+            None:
+        """
+        if isinstance(value, int):
+            valeue = str(value)
+        if isinstance(value, float):
+            valeue = str(value)
+
         self._incar.set(key, value)
 
     def remove_tag(self, key: str):
@@ -192,6 +213,14 @@ class Vasp:
         # # POSCAR から CFG を作成
         # self._logger.info(f"== poscar2cfg(cfg_name={cfg_name})")
         # self.poscar2cfg(cfg_name=cfg_name)
+
+    @staticmethod
+    def cat(filename: str) -> None:
+        if os.path.exists(filename):
+            with open(filename) as f:
+                print(f.read(), end="")
+        else:
+            print(f"[Warning] {filename} not found.")
 
     def preprocess(
         self,
