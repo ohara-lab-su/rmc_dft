@@ -17,7 +17,7 @@ RmcPotDat: RMC_POT の .dat 入力ファイル編集クラス
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Sequence, Union, Tuple  # Optional は使用しない
+from typing import List, Sequence, Union, Tuple
 
 from x_logger import XLogger
 
@@ -209,74 +209,18 @@ class RmcPotDat:
             self.write()
 
     # --------------------
-    # 代表フィールド: density / cutoffs / max_moves / r_spacing
-    # --------------------
-    def get_density(self) -> float:
-        """2 行目 density を float で返す。"""
-        return float(self.get_line(2).split()[0])
-
-    def set_density(
-        self, rho: Union[int, float], *, auto_write: bool | None = None
-    ) -> None:
-        """2 行目 density を更新。"""
-        self.set_line(2, rho, auto_write=auto_write)
-
-    def get_cutoffs(self) -> Tuple[float, float, float]:
-        """3 行目 cut offs を (c1, c2, c3) で返す。"""
-        toks = self.get_line(3).split()
-        if len(toks) < 3:
-            raise ValueError(f"cut offs 行の要素数が不足: {toks!r}")
-        return float(toks[0]), float(toks[1]), float(toks[2])
-
-    def set_cutoffs(
-        self,
-        values: Sequence[Union[int, float]],
-        *,
-        auto_write: bool | None = None,
-    ) -> None:
-        """3 行目 cut offs を更新。"""
-        seq = list(values)
-        if len(seq) != 3:
-            raise ValueError(f"cut offs は 3 要素が必要です: {values!r}")
-        self.set_line(3, seq, auto_write=auto_write)
-
-    def get_max_moves(self) -> Tuple[float, float]:
-        """4 行目 maximum moves を (m1, m2) で返す。"""
-        toks = self.get_line(4).split()
-        if len(toks) < 2:
-            raise ValueError(f"maximum moves 行の要素数が不足: {toks!r}")
-        return float(toks[0]), float(toks[1])
-
-    def set_max_moves(
-        self,
-        values: Sequence[Union[int, float]],
-        *,
-        auto_write: bool | None = None,
-    ) -> None:
-        """4 行目 maximum moves を更新。"""
-        seq = list(values)
-        if len(seq) != 2:
-            raise ValueError(f"maximum moves は 2 要素が必要です: {values!r}")
-        self.set_line(4, seq, auto_write=auto_write)
-
-    def get_r_spacing(self) -> float:
-        """5 行目 r spacing を float で返す。"""
-        toks = self.get_line(5).split()
-        if not toks:
-            raise ValueError("r spacing 行が空です")
-        return float(toks[0])
-
-    def set_r_spacing(
-        self, dr: Union[int, float], *, auto_write: bool | None = None
-    ) -> None:
-        """5 行目 r spacing を更新。"""
-        self.set_line(5, dr, auto_write=auto_write)
-
-    # --------------------
     # ヘルパ
     # --------------------
     def _index(self, line_no_1based: int) -> int:
-        """1 始まり行番号 -> 0 始まりインデックスに変換し、範囲を検証。"""
+        """
+        1 始まり行番号 -> 0 始まりインデックスに変換し、範囲を検証。
+
+        Args:
+            line_no_1based (int): 1 始まり
+
+        Returns:
+
+        """
         idx = line_no_1based - 1
         if idx < 0 or idx >= len(self._lines):
             raise IndexError(
@@ -309,3 +253,128 @@ class RmcPotDat:
         except TypeError as exc:
             raise TypeError(f"未対応の型です: {type(value)!r}") from exc
         return cls._fmt_sequence(seq)
+
+    # --------------------
+    # 代表フィールド: density / cutoffs / max_moves / r_spacing
+    # --------------------
+    def get_comment(self) -> str:
+        """1 行目 comment を str で返す。"""
+        return str(self.get_line(1).split()[0])
+
+    def set_comment(
+        self,
+        comment: str,
+        *,
+        auto_write: bool | None = None,
+    ) -> None:
+        """1 行目 comment を更新。"""
+        self.set_line(1, comment, auto_write=auto_write)
+
+    def get_density(self) -> float:
+        """
+        2 行目 density を float で返す。
+
+        例)
+        0.0842566414       ! number densit
+
+        - 系の数密度（number density） 単位は原子数 / Å^3。
+        - cfg ファイル中の原子数とシミュレーションボックス体積の
+          関係で一致させる必要があります。（二重定義）
+        """
+        return float(self.get_line(2).split()[0])
+
+    def set_density(
+        self, rho: Union[int, float], *, auto_write: bool | None = None
+    ) -> None:
+        """2 行目 density を更新。"""
+        self.set_line(2, rho, auto_write=auto_write)
+
+    def get_cutoffs(self) -> List[Union[int, float]]:
+        """
+        3 行目 cut offs を (c1, c2, c3) で返す。
+
+        例)
+        1 1 1 1 1 1 ! cut offs
+
+        - 説明: 原子種ごとのカットオフ距離（またはカットオフの有無フラグ）を指定するフィールド。
+        - 実務上: 多くの実装では「最低許容距離（min separation）」や「ペアごとの距離カットオフ」を指定。
+                 型の数 (ntypes) に応じた個数を並べる必要がある
+        - 並びは3元型の場合、11,12,13,22,23,33となっている
+        - n元型の場合、11,12,13,14, ... , 1n, 22, 23,...,2n, 33, 34, ..., 3n, ..., nn となる
+        """
+        toks = self.get_line(3).split()
+        try:
+            return [tok for tok in toks]
+        except ValueError as exc:
+            raise ValueError(f"cut offs 行に数値以外の値があります: {toks!r}") from exc
+
+    def set_cutoffs(
+        self,
+        values: Sequence[Union[int, float]],
+        *,
+        auto_write: bool | None = None,
+    ) -> None:
+        """
+        3 行目 cut offs を更新。可変長対応。
+
+        Args:
+            values (Sequence[Union[int, float]]):
+                 原子種ごとのカットオフ距離リストを指定する。
+                 要素数は ntypes に応じて可変（3 要素に限定しない）。
+            auto_write (bool | None, optional):
+        """
+        seq = list(values)
+        for v in seq:
+            if not isinstance(v, (int, float)):
+                raise TypeError(f"cut offs には数値のみを指定してください: {v!r}")
+
+        # set_line はコメントを保持したまま値部を置換する
+        self.set_line(3, seq, auto_write=auto_write)
+
+    def get_max_moves(self) -> Tuple[float, float]:
+        """
+        4 行目 maximum moves を (m1, m2) で返す。
+
+        例)
+        0.01 0.01 0.01   ! maximum moves
+
+        - 説明: 原子移動の最大振幅（1 回の move での最大変位）を指定します。複数値が並んでいる場合はタイプごと、または移動タイプごとの設定になっていることがあります。単位は Å。
+        - 備考: 値が小さいほど受理率が高くなるがサンプリング効率は落ちます。調整して受理率を 20–50% 程度に保つのが一般的です。
+        """
+        toks = self.get_line(4).split()
+        if len(toks) < 2:
+            raise ValueError(f"maximum moves 行の要素数が不足: {toks!r}")
+        return float(toks[0]), float(toks[1])
+
+    def set_max_moves(
+        self,
+        values: Sequence[Union[int, float]],
+        *,
+        auto_write: bool | None = None,
+    ) -> None:
+        """4 行目 maximum moves を更新。"""
+        seq = list(values)
+        if len(seq) != 2:
+            raise ValueError(f"maximum moves は 2 要素が必要です: {values!r}")
+        self.set_line(4, seq, auto_write=auto_write)
+
+    def get_r_spacing(self) -> float:
+        """
+        5 行目 r spacing を float で返す。i
+
+        例)
+        0.025        ! r spacing
+
+        - 説明: 近接分布関数 g(r) のビン幅（r の刻み幅）。単位は Å。
+        - 備考: 小さいほど解像度は上がるが計算負荷が増える
+        """
+        toks = self.get_line(5).split()
+        if not toks:
+            raise ValueError("r spacing 行が空です")
+        return float(toks[0])
+
+    def set_r_spacing(
+        self, dr: Union[int, float], *, auto_write: bool | None = None
+    ) -> None:
+        """5 行目 r spacing を更新。"""
+        self.set_line(5, dr, auto_write=auto_write)
