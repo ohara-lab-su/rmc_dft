@@ -379,6 +379,71 @@ class RmcPotDat:
         """5 行目 r spacing を更新。"""
         self.set_line(5, dr, auto_write=auto_write)
 
+    def get_print_interval(self) -> int:
+        """
+        8 行目（step for printing）を取得する。
+
+        【内容】
+        - RMC_POT の計算進行中、標準出力やログファイルに
+          エネルギー・受理率・コスト関数などの経過情報を
+          どの間隔で出力するかを指定するステップ数。
+
+        【マニュアル定義】
+        - ラベル: “step for printing”
+        - 意味: RMC の実行ループ中で何ステップごとに
+                計算状況（χ²値、受理率、平均変位など）を表示するか。
+        - 値の単位: ステップ数（整数）
+        - 0 または負値: 無効（出力を行わない、もしくは既定間隔を使用）
+
+        【例】
+            5000  ! step for printing
+            → 5000 ステップごとに進行情報を出力。
+            100   ! step for printing
+            → 100 ステップごとに頻繁に出力。
+            0     ! step for printing
+            → 出力を抑止または既定間隔に従う。
+
+        Returns:
+            int: ログ出力間隔（ステップ数単位）
+        """
+        tokens = self.get_line(8).split()
+        if not tokens:
+            raise ValueError("8 行目が空です。")
+        try:
+            return int(float(tokens[0]))
+        except ValueError as exc:
+            raise ValueError(f"8 行目に整数以外の値があります: {tokens!r}") from exc
+
+    def set_print_interval(
+        self,
+        interval_step: int,
+        *,
+        auto_write: bool | None = None,
+    ) -> None:
+        """
+        8 行目（step for printing）を更新する。
+
+        【内容】
+        - 計算経過を標準出力やログに記録する間隔を指定する。
+          値は「ステップ数」で指定し、0 の場合は無効または既定値使用。
+
+        【例】
+            5000 → 5000 ステップごとに出力。
+            100  → 100 ステップごとに出力。
+            0    → 出力を抑止。
+
+        Args:
+            interval_step (int):
+                出力間隔（ステップ数単位）
+            auto_write (bool | None):
+                True の場合は即時保存。None の場合はインスタンス既定値に従う。
+        """
+        if interval_step < 0:
+            raise ValueError(
+                f"interval_step は 0 以上を指定してください: {interval_step}"
+            )
+        self.set_line(8, str(int(interval_step)), auto_write=auto_write)
+
     def get_time_and_save(self) -> tuple[float, int]:
         """
         9 行目（time limit, step for saving）を取得する。
