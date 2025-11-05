@@ -14,10 +14,8 @@ from x_logger import XLogger
 
 
 if __name__ == "__main__":
-
-    logger = XLogger(log_level="debug", logger_name="rmc_run")
-
     cfg_name = "aaa"
+    logger = XLogger(log_level="debug", logger_name="rmc_run")
 
     # POSCAR to CFG
     poscar2cfg(cfg_name=cfg_name)
