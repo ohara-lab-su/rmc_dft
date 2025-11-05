@@ -58,9 +58,8 @@ class RmcPotDat:
         dat.write()  # 明示保存も可能
 
     注意:
-        - 行番号は 1 始まり。内部処理では 0 始まりのリストに対応付けます。
-        - 既存コメントは保持します。コメント無しの行へ値を設定した場合はコメント無しで書き出します。
-        - 指定の .dat 形式（添付例）を前提に実装しています。
+        - 行番号は 1 始まり。内部処理では 0 始まりのリストに対応付け
+        - 既存コメントは保持します。コメント無しの行へ値を設定した場合はコメント無しで書き出し
     """
 
     def __init__(
@@ -108,7 +107,7 @@ class RmcPotDat:
     @staticmethod
     def _fmt_number(x: Union[int, float]) -> str:
         """
-        数値を .dat に過度な科学表記を使わず整形する。
+        数値を .dat に過度な科学表記を使わず整形
 
         仕様:
           - int はそのまま
@@ -194,9 +193,9 @@ class RmcPotDat:
         任意行の値部分を更新（コメントは保持）。
 
         Args:
-            line_no_1based: 1 始まりの行番号
+            line_no_1based (int): 1 始まりの行番号
             value: 置換値（数値/数値列/真偽/文字列）
-            auto_write: True 指定で即時保存。None の場合はインスタンス既定(self._auto_write)に従う。
+            auto_write (bool): True 指定で即時保存。None の場合はインスタンス既定(self._auto_write)に従う。
 
         Raises:
             IndexError: 行番号が範囲外
@@ -279,7 +278,7 @@ class RmcPotDat:
 
         - 系の数密度（number density） 単位は原子数 / Å^3。
         - cfg ファイル中の原子数とシミュレーションボックス体積の
-          関係で一致させる必要があります。（二重定義）
+          関係で一致させる必要がある（二重定義）
         """
         return float(self.get_line(2).split()[0])
 
@@ -320,7 +319,7 @@ class RmcPotDat:
         Args:
             values (Sequence[Union[int, float]]):
                  原子種ごとのカットオフ距離リストを指定する。
-                 要素数は ntypes に応じて可変（3 要素に限定しない）。
+                 要素数は ntypes に応じて可変（3 要素に限定しない）
             auto_write (bool | None, optional):
         """
         seq = list(values)
@@ -338,8 +337,10 @@ class RmcPotDat:
         例)
         0.01 0.01 0.01   ! maximum moves
 
-        - 説明: 原子移動の最大振幅（1 回の move での最大変位）を指定します。複数値が並んでいる場合はタイプごと、または移動タイプごとの設定になっていることがあります。単位は Å。
-        - 備考: 値が小さいほど受理率が高くなるがサンプリング効率は落ちます。調整して受理率を 20–50% 程度に保つのが一般的です。
+        - 説明: 原子移動の最大振幅（1 回の move での最大変位）を指定します。複数値が並んでいる場合はタイプごと、
+               または移動タイプごとの設定になっていることがある。単位は Å。
+        - 備考: 値が小さいほど受理率が高くなるがサンプリング効率は落ちます
+               調整して受理率を 20–50% 程度に保つのが一般的
         """
         toks = self.get_line(4).split()
         if len(toks) < 2:
@@ -386,7 +387,7 @@ class RmcPotDat:
         【内容】
         - RMC 計算において「moveout オプション」を使用するかどうかを指定するブール値。
           moveout オプションは、原子のランダム移動試行時に追加的な処理を行う機能であり、
-          一般的には「移動後の局所最適化」や「過大な変位の制限」を目的とする。
+          一般的には「移動後の局所最適化」や「過大な変位の制限」を目的とする
 
         【マニュアル定義】
         - ラベル: “whether to use moveout option”
@@ -859,3 +860,377 @@ class RmcPotDat:
             raise ValueError(f"範囲が不正です: start={start}, end={end}")
         # 厳密に「2 トークンのみ」を書き込む
         self.set_line(12, f"{int(start)} {int(end)}", auto_write=auto_write)
+
+    def get_scale_factor(self) -> float:
+        """
+        13 行目（scale factor）を取得する。
+
+        【内容】
+        - 実験 S(Q) や F(Q) に対してスケールを合わせるための係数。
+          シミュレーション出力を実験データと正規化するために使用される。
+        - 一般的な初期値は 1.0。
+
+        Returns:
+            float: スケーリング因子。
+        """
+        return float(self.get_line(13).split()[0])
+
+    def set_scale_factor(self, value: float, *, auto_write: bool | None = None) -> None:
+        """
+        13 行目（scale factor）を設定する。
+
+        Args:
+            value (float): スケーリング因子。
+            auto_write (bool | None): True で即時保存。
+        """
+        self.set_line(13, self._fmt_number(value), auto_write=auto_write)
+
+    def get_sigma_factor(self) -> float:
+        """
+        14 行目（standard deviation / temperature factor）を取得する。
+
+        【内容】
+        - メトロポリス法で使用する標準偏差 σ（温度因子）を表す。
+        - マニュアルでは “standard deviation” と記載されており、
+          サンプルでは「5E-3 0」や「5E-3 1」のように 2 つの値を取る場合がある。
+          ここでは先頭値 σ のみを返す。
+
+        Returns:
+            float: 標準偏差（σ）。
+        """
+        toks = self.get_line(14).split()
+        return float(toks[0])
+
+    def set_sigma_factor(self, sigma: float, *, auto_write: bool | None = None) -> None:
+        """
+        14 行目（standard deviation / temperature factor）を設定する。
+
+        Args:
+            sigma (float): 標準偏差（σ）。
+            auto_write (bool | None): True で即時保存。
+        """
+        self.set_line(14, self._fmt_number(sigma), auto_write=auto_write)
+
+    def get_flag_15(self) -> bool:
+        """
+        15 行目（boolean flag 1）を取得する。
+
+        【内容】
+        - ブール値 (.true./.false.)。
+          通常は S(Q) のバックグラウンド補正や平滑化の有無を指定する。
+
+        Returns:
+            bool: True の場合は有効化。
+        """
+        return self.get_line(15).strip().lower().startswith(".t")
+
+    def set_flag_15(self, value: bool, *, auto_write: bool | None = None) -> None:
+        """15 行目（boolean flag 1）を設定する。"""
+        self.set_line(15, self._to_bool_token(value), auto_write=auto_write)
+
+    def get_flag_16(self) -> bool:
+        """
+        16 行目（boolean flag 2）を取得する。
+
+        【内容】
+        - ブール値 (.true./.false.)。
+          データ重み付けを行うかどうかを示すことが多い。
+
+        Returns:
+            bool: True の場合は有効化。
+        """
+        return self.get_line(16).strip().lower().startswith(".t")
+
+    def set_flag_16(self, value: bool, *, auto_write: bool | None = None) -> None:
+        """16 行目（boolean flag 2）を設定する。"""
+        self.set_line(16, self._to_bool_token(value), auto_write=auto_write)
+
+    def get_flag_17(self) -> bool:
+        """
+        17 行目（boolean flag 3）を取得する。
+
+        【内容】
+        - ブール値 (.true./.false.)。
+          追加オプション（誤差正規化・スムージングなど）を制御する場合がある。
+
+        Returns:
+            bool: True の場合は有効化。
+        """
+        return self.get_line(17).strip().lower().startswith(".t")
+
+    def set_flag_17(self, value: bool, *, auto_write: bool | None = None) -> None:
+        """17 行目（boolean flag 3）を設定する。"""
+        self.set_line(17, self._to_bool_token(value), auto_write=auto_write)
+
+    def get_flag_18(self) -> bool:
+        """
+        18 行目（boolean flag 4）を取得する。
+
+        【内容】
+        - ブール値 (.true./.false.)。
+          一般的に、データ処理や誤差解析の補助機能をオン/オフする。
+
+        Returns:
+            bool: True の場合は有効化。
+        """
+        return self.get_line(18).strip().lower().startswith(".t")
+
+    def set_flag_18(self, value: bool, *, auto_write: bool | None = None) -> None:
+        """18 行目（boolean flag 4）を設定する。"""
+        self.set_line(18, self._to_bool_token(value), auto_write=auto_write)
+
+    def get_angle_constraint_count(self) -> int:
+        """
+        19 行目（number of cos. distr of bond angles constraint）を取得する。
+
+        【内容】
+        - ボンド角度分布に基づく制約数。
+          0 の場合、角度分布制約を適用しない。
+
+        Returns:
+            int: 角度制約数。
+        """
+        return int(float(self.get_line(19).split()[0]))
+
+    def set_angle_constraint_count(
+        self, value: int, *, auto_write: bool | None = None
+    ) -> None:
+        """19 行目（角度制約数）を設定する。"""
+        self.set_line(19, str(int(value)), auto_write=auto_write)
+
+    def get_coord_constraint_count(self) -> int:
+        """
+        20 行目（number of coordination constraints）を取得する。
+
+        【内容】
+        - 配位数に基づく制約の数。
+          0 の場合は適用しない。
+
+        Returns:
+            int: 配位数制約の数。
+        """
+        return int(float(self.get_line(20).split()[0]))
+
+    def set_coord_constraint_count(
+        self, value: int, *, auto_write: bool | None = None
+    ) -> None:
+        """20 行目（配位数制約数）を設定する。"""
+        self.set_line(20, str(int(value)), auto_write=auto_write)
+
+    def get_avg_coord_constraint_count(self) -> int:
+        """
+        21 行目（number of average coordination constraints）を取得する。
+
+        【内容】
+        - 平均配位数に関する制約数。
+          0 の場合は制約なし。
+
+        Returns:
+            int: 平均配位数制約の数。
+        """
+        return int(float(self.get_line(21).split()[0]))
+
+    def set_avg_coord_constraint_count(
+        self, value: int, *, auto_write: bool | None = None
+    ) -> None:
+        """21 行目（平均配位数制約数）を設定する。"""
+        self.set_line(21, str(int(value)), auto_write=auto_write)
+
+    def get_potential_flag(self) -> int:
+        """
+        22 行目（potential flag）を取得する。
+
+        【内容】
+        - ポテンシャル使用のフラグまたは選択番号。
+          0 の場合はポテンシャル未使用。
+
+        Returns:
+            int: ポテンシャルフラグ。
+        """
+        return int(float(self.get_line(22).split()[0]))
+
+    def set_potential_flag(self, value: int, *, auto_write: bool | None = None) -> None:
+        """22 行目（ポテンシャルフラグ）を設定する。"""
+        self.set_line(22, str(int(value)), auto_write=auto_write)
+
+    def get_fnc_switch(self) -> int:
+        """
+        23 行目（FNC switch）を取得する。
+
+        【内容】
+        - Fixed Neighbour Constraints (FNC) のオン/オフ。
+          0 の場合は無効、1 の場合は有効。
+
+        Returns:
+            int: FNCスイッチ（0または1）。
+        """
+        return int(float(self.get_line(23).split()[0]))
+
+    def set_fnc_switch(self, value: int, *, auto_write: bool | None = None) -> None:
+        """23 行目（FNCスイッチ）を設定する。"""
+        self.set_line(23, str(int(value)), auto_write=auto_write)
+
+    def get_initial_bin_shift(self) -> int:
+        """
+        24 行目（initial bin shift）を取得する。
+
+        【内容】
+        - g(r) 等のヒストグラム初期シフト値。
+          0 はシフトなし。
+
+        Returns:
+            int: 初期ビンシフト。
+        """
+        return int(float(self.get_line(24).split()[0]))
+
+    def set_initial_bin_shift(
+        self, value: int, *, auto_write: bool | None = None
+    ) -> None:
+        """24 行目（initial bin shift）を設定する。"""
+        self.set_line(24, str(int(value)), auto_write=auto_write)
+
+    def get_xmax_used(self) -> float:
+        """
+        25 行目（xmax used in the run）を取得する。
+
+        【内容】
+        - g(r) 等の計算に用いる最大 r 値。
+          スケール因子的に使われることもある。
+
+        Returns:
+            float: xmax の値。
+        """
+        return float(self.get_line(25).split()[0])
+
+    def set_xmax_used(self, value: float, *, auto_write: bool | None = None) -> None:
+        """25 行目（xmax used in the run）を設定する。"""
+        self.set_line(25, self._fmt_number(value), auto_write=auto_write)
+
+    def get_num_atoms_per_move(self) -> int:
+        """
+        26 行目（number of atoms moved in a single move）を取得する。
+
+        【内容】
+        - 1 回の move 操作で同時に動かす原子の数。
+          通常は 1。
+
+        Returns:
+            int: 移動させる原子数。
+        """
+        return int(float(self.get_line(26).split()[0]))
+
+    def set_num_atoms_per_move(
+        self, value: int, *, auto_write: bool | None = None
+    ) -> None:
+        """26 行目（number of atoms moved）を設定する。"""
+        self.set_line(26, str(int(value)), auto_write=auto_write)
+
+    def get_history_buffer_size(self) -> int:
+        """
+        27 行目（size of the history buffer）を取得する。
+
+        【内容】
+        - 受理率など過去情報を保持する履歴バッファサイズ。
+          統計の平滑化に使用される。
+
+        Returns:
+            int: バッファサイズ。
+        """
+        return int(float(self.get_line(27).split()[0]))
+
+    def set_history_buffer_size(
+        self, value: int, *, auto_write: bool | None = None
+    ) -> None:
+        """27 行目（history buffer size）を設定する。"""
+        self.set_line(27, str(int(value)), auto_write=auto_write)
+
+    def get_display_update_interval(self) -> int:
+        """
+        28 行目（number of display update between each history buffering）を取得する。
+
+        Returns:
+            int: 表示更新の間隔。
+        """
+        return int(float(self.get_line(28).split()[0]))
+
+    def set_display_update_interval(
+        self, value: int, *, auto_write: bool | None = None
+    ) -> None:
+        """28 行目（display update interval）を設定する。"""
+        self.set_line(28, str(int(value)), auto_write=auto_write)
+
+    def get_custom_move_flag(self) -> int:
+        """
+        29 行目（indicator of custom move）を取得する。
+
+        Returns:
+            int: カスタムムーブ使用フラグ（0/1）。
+        """
+        return int(float(self.get_line(29).split()[0]))
+
+    def set_custom_move_flag(
+        self, value: int, *, auto_write: bool | None = None
+    ) -> None:
+        """29 行目（custom move flag）を設定する。"""
+        self.set_line(29, str(int(value)), auto_write=auto_write)
+
+    def get_load_histogram_flag(self) -> int:
+        """
+        30 行目（whether to load the histogram from file）を取得する。
+
+        Returns:
+            int: 0 ならロードしない、1 ならロードする。
+        """
+        return int(float(self.get_line(30).split()[0]))
+
+    def set_load_histogram_flag(
+        self, value: int, *, auto_write: bool | None = None
+    ) -> None:
+        """30 行目（load histogram flag）を設定する。"""
+        self.set_line(30, str(int(value)), auto_write=auto_write)
+
+    def get_max_atoms_per_cell(self) -> int:
+        """
+        31 行目（maximum number of atoms in a gridcell）を取得する。
+
+        Returns:
+            int: グリッドセル内最大原子数。
+        """
+        return int(float(self.get_line(31).split()[0]))
+
+    def set_max_atoms_per_cell(
+        self, value: int, *, auto_write: bool | None = None
+    ) -> None:
+        """31 行目（max atoms per gridcell）を設定する。"""
+        self.set_line(31, str(int(value)), auto_write=auto_write)
+
+    def get_swap_settings(self) -> tuple[int, int]:
+        """
+        32 行目（fraction of swaps, allow flag）を取得する。
+
+        Returns:
+            tuple[int, int]: (swap_fraction, allow_flag)
+        """
+        toks = self.get_line(32).split()
+        if len(toks) < 2:
+            raise ValueError("32 行目は 2 つの整数が必要です。")
+        return int(float(toks[0])), int(float(toks[1]))
+
+    def set_swap_settings(
+        self, fraction: int, allow_flag: int, *, auto_write: bool | None = None
+    ) -> None:
+        """32 行目（swap fraction と許可フラグ）を設定する。"""
+        self.set_line(32, f"{int(fraction)} {int(allow_flag)}", auto_write=auto_write)
+
+    def get_thread_count(self) -> int:
+        """
+        33 行目（total number of threads to use）を取得する。
+
+        Returns:
+            int: 使用スレッド数。
+        """
+        return int(float(self.get_line(33).split()[0]))
+
+    def set_thread_count(self, value: int, *, auto_write: bool | None = None) -> None:
+        """33 行目（スレッド数）を設定する。"""
+        self.set_line(33, str(int(value)), auto_write=auto_write)
