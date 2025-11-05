@@ -16,8 +16,8 @@ RmcPotDat: RMC_POT の .dat 入力ファイル編集クラス
 """
 
 from dataclasses import dataclass
+from typing import List, Sequence, Union, Tuple, Optional
 from pathlib import Path
-from typing import List, Sequence, Union, Tuple
 
 from x_logger import XLogger
 
@@ -378,3 +378,217 @@ class RmcPotDat:
     ) -> None:
         """5 行目 r spacing を更新。"""
         self.set_line(5, dr, auto_write=auto_write)
+
+    def get_time_and_save(self) -> tuple[float, int]:
+        """
+        9 行目（time limit, step for saving）を取得する。
+
+        【内容】
+        - 9 行目は、計算の停止条件と出力間隔を設定する 2 つの値からなる。
+          RMC_POT マニュアルでは「time limit, step for saving」と定義されている。
+
+          (1) time limit:
+              - 計算の最大実行時間（単位: 分）
+              - 経過時間がこの値を超えると自動停止する。
+              - 0 の場合は無効（時間制限なし）
+
+          (2) step for saving:
+              - RMC 計算の進行中、どの間隔で現在構造などをファイルに保存するか。
+              - ステップ数単位で指定（例: 5000 → 5000 ステップごとに保存）
+              - 0 の場合は無効（または既定間隔に従う）
+
+        【例】
+            0.2 0   ! time limit, step for saving
+            → 最大 0.2 分（12 秒）で終了、保存間隔は無効
+            60 500  ! time limit, step for saving
+            → 60 分で停止、500 ステップごとに保存
+
+        Returns:
+            tuple[float, int]:
+                (time_limit_min, save_interval_step)
+        """
+        toks = self.get_line(9).split()
+        if len(toks) < 2:
+            raise ValueError(f"9 行目の要素数が不足しています: {toks!r}")
+        try:
+            return float(toks[0]), int(float(toks[1]))
+        except ValueError as exc:
+            raise ValueError(f"9 行目に数値以外の値があります: {toks!r}") from exc
+
+    def set_time_and_save(
+        self,
+        time_limit_min: float,
+        save_interval_step: int,
+        *,
+        auto_write: bool | None = None,
+    ) -> None:
+        """
+        9 行目（time limit, step for saving）を更新する。
+
+        【内容】
+        - time limit:
+            計算の最大実行時間（分単位, float）。
+            0 の場合は時間制限なし。
+        - step for saving:
+            結果ファイルを出力するステップ間隔（整数ステップ）。
+            0 の場合は自動保存を無効化。
+
+        【例】
+            (60, 1000)
+            → 最大 60 分で停止、1000 ステップごとに結果保存。
+            (0, 0)
+            → 両方無効化（時間制限も保存間隔も設定しない）。
+
+        Args:
+            time_limit_min (float): 最大実行時間（単位: 分）
+            save_interval_step (int): 保存ステップ間隔
+            auto_write (bool | None): True で即時保存。None は既定に従う。
+        """
+        if time_limit_min < 0:
+            raise ValueError(
+                f"time_limit_min は 0 以上を指定してください: {time_limit_min}"
+            )
+        if save_interval_step < 0:
+            raise ValueError(
+                f"save_interval_step は 0 以上を指定してください: {save_interval_step}"
+            )
+
+        values = [self._fmt_number(time_limit_min), str(int(save_interval_step))]
+        self.set_line(9, values, auto_write=auto_write)
+
+    def get_data_flags(self) -> tuple[int, int, int, int]:
+        """
+        10 行目（g(r), neutron, x-ray, EXAFS の出力フラグ）を取得する。
+
+        【内容】
+        - 各整数は、その物理量の計算・出力を行うかどうかを指定する。
+          順序は常に以下で固定される（RMC_POT マニュアル II.E 節より）:
+            (1) g(r) の計算フラグ
+            (2) neutron S(Q) の計算フラグ
+            (3) X-ray F(Q) の計算フラグ
+            (4) EXAFS χ(k) の計算フラグ
+
+        【仕様】
+        - 0: 無効（そのデータ種を出力・比較しない）
+        - 1: 有効（そのデータ種を出力・比較する）
+
+        【例】
+            0 0 1 0  ! g(r), neutron, x-ray, EXAFS
+            → g(r)=0, neutron=0, x-ray=1, EXAFS=0
+              → X線データのみ出力・比較対象とする設定。
+
+        Returns:
+            tuple[int, int, int, int]:
+                (gr_flag, neutron_flag, xray_flag, exafs_flag)
+        """
+        tokens = self.get_line(10).split()
+        if len(tokens) < 4:
+            raise ValueError(f"10 行目の要素数が不足しています: {tokens!r}")
+        try:
+            return tuple(int(v) for v in tokens[:4])  # type: ignore[return-value]
+        except ValueError as exc:
+            raise ValueError(f"10 行目に整数以外の値があります: {tokens!r}") from exc
+
+    def set_data_flags(
+        self,
+        flags: tuple[int, int, int, int],
+        *,
+        auto_write: bool | None = None,
+    ) -> None:
+        """
+        10 行目（g(r), neutron, x-ray, EXAFS の出力フラグ）を更新する。
+
+        【内容】
+        - 10 行目は、4 つの整数値で各データ種の出力可否を指定する。
+          順序は固定:
+            (1) g(r)
+            (2) neutron S(Q)
+            (3) X-ray F(Q)
+            (4) EXAFS χ(k)
+        - 各値の意味:
+            0: 無効（出力・比較を行わない）
+            1: 有効（出力・比較を行う）
+
+        【例】
+            (0, 0, 1, 0)
+            → g(r)=off, neutron=off, X-ray=on, EXAFS=off
+              → X線 F(Q) のみを比較対象に設定。
+
+        Args:
+            flags (tuple[int, int, int, int]):
+                (gr_flag, neutron_flag, xray_flag, exafs_flag)
+            auto_write (bool | None):
+                True なら即時保存。None の場合はインスタンス既定に従う。
+        """
+        if len(flags) != 4:
+            raise ValueError(
+                f"flags は 4 要素 (g(r), neutron, x-ray, EXAFS) が必要です: {flags!r}"
+            )
+        if not all(isinstance(v, int) and v in (0, 1) for v in flags):
+            raise ValueError(f"flags には 0 または 1 のみ指定可能です: {flags!r}")
+
+        self.set_line(10, [str(v) for v in flags], auto_write=auto_write)
+
+    def get_exp_filename(self) -> str:
+        """
+        11 行目（実験データファイル名）を返す（旧来固定フォーマット）。
+
+        【.dat 側の決まり（旧来固定）】
+        - 10 行目は 4 つの整数をこの順で持つ:
+            g(r), neutron S(Q), X-ray F(Q), EXAFS χ(k)
+          これらは各データ種の「ブロック数」を表す（0 ならブロック無し）。
+        - 11 行目以降には、上記順序で「有効なデータ種のブロック」が連続。
+          各ブロックの先頭行が「実験データファイル名」、直後の行が「点範囲（開始・終了の2整数）」。
+        - 本メソッドは「11 行目のファイル名」をそのまま返す（例: 10 行目が `0 0 1 0` なら
+          11 行目は X-ray F(Q) ブロックのファイル名）。
+
+        【実験データファイルの中身（旧来固定フォーマット, あいまいさ無し）】
+        - 1 行目: データ点数 N（整数）
+        - 2 行目: タイトル（任意文字列。数値としては読まれない）
+        - 3 行目以降: 各データ点の行。種別ごとに列は厳密に以下となる。
+          - g(r)        : r, g(r)                                         （2 列）
+          - neutron S(Q): Q, S(Q)                                         （2 列）
+          - X-ray F(Q)  : Q, F(Q), c_αβ を RMC 順で M 本                  （2+M 列）
+                           M = ntypes*(ntypes+1)/2
+                           RMC 順 = 11, 12, 13, …, 22, 23, …, 33
+                           例: 2 元系 → 5 列（Q, F(Q), c11, c12, c22）
+                               3 元系 → 8 列（Q, F(Q), c11, c12, c13, c22, c23, c33）
+          - EXAFS χ(k)  : k, χ(k)                                         （2 列）
+
+        例（あなたの貼付データ）:
+        - 10 行目 `0 0 1 0` → X-ray F(Q) にフィット。
+          5 列ファイルは 2 元系（Q, F(Q), c11, c12, c22）、
+          8 列ファイルは 3 元系（Q, F(Q), c11, c12, c13, c22, c23, c33）。
+        """
+        return self.get_line(11).split()[0]
+
+    def set_exp_filename(
+        self,
+        path: Union[str, Path],
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """
+        11 行目（実験データファイル名）を更新する（旧来固定フォーマット）。
+
+        【.dat 側の決まり（旧来固定）】
+        - 10 行目の順序は常に:
+            g(r), neutron S(Q), X-ray F(Q), EXAFS χ(k)
+        - 11 行目は、上記で有効な最初のブロックが X-ray の場合には
+          その「ファイル名行」となる（例: `0 0 1 0`）。
+          本メソッドは **11 行目のみ** を対象として文字列を書き換える。
+
+        【実験データファイルの中身（確認用の定義）】
+        - 1 行目: N（整数）
+        - 2 行目: タイトル（任意。数値としては読まれない）
+        - 3 行目以降（厳密定義）:
+          - g(r)        : r, g(r)                                         （2 列）
+          - neutron S(Q): Q, S(Q)                                         （2 列）
+          - X-ray F(Q)  : Q, F(Q), c_αβ × M（RMC 順, M = ntypes*(ntypes+1)/2）
+          - EXAFS χ(k)  : k, χ(k)                                         （2 列）
+
+        Args:
+            path: 実験データファイルへのパス（相対・絶対いずれも可）。
+            auto_write: True の場合は即時保存。None の場合はインスタンス既定に従う。
+        """
+        self.set_line(11, str(Path(path)), auto_write=auto_write)
