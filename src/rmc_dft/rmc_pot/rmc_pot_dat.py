@@ -379,6 +379,150 @@ class RmcPotDat:
         """5 行目 r spacing を更新。"""
         self.set_line(5, dr, auto_write=auto_write)
 
+    def get_moveout_option(self) -> bool:
+        """
+        6 行目（whether to use moveout option）を取得する。
+
+        【内容】
+        - RMC 計算において「moveout オプション」を使用するかどうかを指定するブール値。
+          moveout オプションは、原子のランダム移動試行時に追加的な処理を行う機能であり、
+          一般的には「移動後の局所最適化」や「過大な変位の制限」を目的とする。
+
+        【マニュアル定義】
+        - ラベル: “whether to use moveout option”
+        - 型: 論理値（.true. / .false.）
+        - 意味:
+            - .true.  : moveout 処理を有効化。
+                        → 原子移動試行のたびに補助的な判定・制約が加わる。
+            - .false. : moveout 処理を無効化。
+                        → 通常の RMC 移動アルゴリズムを使用。
+        - 挙動の詳細は実装依存（例: moveout モジュール内で距離閾値チェックを行うなど）。
+
+        【例】
+            .true.   ! whether to use moveout option
+                → moveout 処理を有効化（制約付き移動を実施）。
+            .false.  ! whether to use moveout option
+                → 通常のランダム移動。
+
+        Returns:
+            bool: moveout オプションを有効化している場合は True、無効なら False。
+        """
+        token = self.get_line(6).strip().lower()
+        if token in (".true.", "true", "t", "1", "yes", "y"):
+            return True
+        if token in (".false.", "false", "f", "0", "no", "n"):
+            return False
+        raise ValueError(f"6 行目の値が真偽値として解釈できません: {token!r}")
+
+    def set_moveout_option(
+        self,
+        use_moveout: bool,
+        *,
+        auto_write: bool | None = None,
+    ) -> None:
+        """
+        6 行目（whether to use moveout option）を更新する。
+
+        【内容】
+        - moveout オプションを有効化するかどうかを設定する。
+          moveout は RMC における原子移動の特殊処理オプションであり、
+          一般には「移動後の拘束条件」「局所最適化ステップ」「排他領域判定」などを伴う。
+
+        【指定方法】
+        - True  → .true. を書き込み、有効化。
+        - False → .false. を書き込み、無効化。
+
+        【例】
+            set_moveout_option(True)
+                → moveout 処理を有効にする。
+            set_moveout_option(False)
+                → moveout 処理を無効にする。
+
+        Args:
+            use_moveout (bool):
+                moveout オプションを有効化する場合は True、無効化する場合は False。
+            auto_write (bool | None):
+                True なら即時保存、None の場合はインスタンス既定に従う。
+        """
+        token = self._to_bool_token(use_moveout)
+        self.set_line(6, token, auto_write=auto_write)
+
+    def get_num_config_to_collect(self) -> int:
+        """
+        7 行目（number of configuration to collect）を取得する。
+
+        【内容】
+        - RMC 実行中に「構成（configuration）」をどの程度の頻度で収集するかを指定する。
+          ここでいう configuration とは、特定ステップ時点の原子配置を指す。
+          解析や平均化、統計処理に利用するため、指定回数ぶんを記録できる。
+
+        【マニュアル定義】
+        - ラベル: “number of configuration to collect”
+        - 単位: 個数（整数）
+        - 意味:
+            RMC 計算中に「収集用構成」を保存する数。
+            この値が 0 の場合、多くの実装では「構成を収集しない」または
+            「最終構成のみを保存」として扱われる。
+
+        【典型的な設定例】
+            0     ! number of configuration to collect
+                → 構成を収集せず、最終結果のみを出力。
+            10    ! number of configuration to collect
+                → 全実行中に 10 構成を等間隔で保存。
+            100   ! number of configuration to collect
+                → 100 構成を収集（より細かい統計解析に利用）。
+
+        【備考】
+        - 保存間隔は RMC_POT 内部で自動的に均等分配される。
+        - このパラメータは出力用ヒストグラムや g(r) 平均化などに影響を与える。
+
+        Returns:
+            int: 収集する構成数。
+        """
+        tokens = self.get_line(7).split()
+        if not tokens:
+            raise ValueError("7 行目が空です。")
+        try:
+            return int(float(tokens[0]))
+        except ValueError as exc:
+            raise ValueError(f"7 行目に整数以外の値があります: {tokens!r}") from exc
+
+    def set_num_config_to_collect(
+        self,
+        num_config: int,
+        *,
+        auto_write: bool | None = None,
+    ) -> None:
+        """
+        7 行目（number of configuration to collect）を更新する。
+
+        【内容】
+        - RMC 実行中にどのくらいの頻度で「構成（configuration）」を保存するかを指定する。
+          これは構造平均化や g(r) 平均などの統計解析に使う複数構成を得るための設定。
+
+        【指定方法】
+        - 0 の場合:
+            → 構成を収集しないか、最終構成のみを保存。
+        - 正の整数値:
+            → 指定数の構成を収集。
+              RMC_POT はシミュレーション全体を等間隔に分割して収集ステップを決定する。
+
+        【例】
+            set_num_config_to_collect(0)
+                → 収集しない（最終構成のみ）。
+            set_num_config_to_collect(20)
+                → 全体で 20 構成を等間隔で保存。
+
+        Args:
+            num_config (int):
+                収集する構成数（0 以上の整数）
+            auto_write (bool | None):
+                True の場合は即時保存。None の場合はインスタンス既定に従う。
+        """
+        if num_config < 0:
+            raise ValueError(f"num_config は 0 以上を指定してください: {num_config}")
+        self.set_line(7, str(int(num_config)), auto_write=auto_write)
+
     def get_print_interval(self) -> int:
         """
         8 行目（step for printing）を取得する。
@@ -657,3 +801,61 @@ class RmcPotDat:
             auto_write: True の場合は即時保存。None の場合はインスタンス既定に従う。
         """
         self.set_line(11, str(Path(path)), auto_write=auto_write)
+
+    def get_exp_range(self) -> tuple[int, int]:
+        """
+        12 行目（実験データの読み込み範囲）を取得する。
+
+        【定義（旧来固定フォーマット）】
+        - 11 行目: 実験データファイル名
+        - 12 行目: 「開始インデックス」「終了インデックス」の **2 整数**のみ
+          ・いずれも 1 始まり（inclusive）
+          ・対象は実験データファイルの「データ本体行」（1 行目: 点数N、2 行目: タイトル、の次の行から数える）
+
+        【例】
+            1 290   → データ本体の 1〜290 行を利用
+            1 991   → データ本体の 1〜991 行を利用（実データ点数 N を超える指定は推奨しない）
+
+        【注意】
+        - 終了インデックスが実データ点数 N を超えたときの挙動は版依存の可能性があるため、
+          実行前に N 以内へ収めることを推奨（本メソッドは読み取りのみを行う）。
+        """
+        toks = self.get_line(12).split()
+        if len(toks) != 2:
+            raise ValueError(f"12 行目は 2 つの整数のみである必要があります: {toks!r}")
+        try:
+            start = int(float(toks[0]))
+            end = int(float(toks[1]))
+        except ValueError as exc:
+            raise ValueError(f"12 行目に整数以外の値があります: {toks!r}") from exc
+        if start < 1 or end < start:
+            raise ValueError(f"範囲が不正です: start={start}, end={end}")
+        return start, end
+
+    def set_exp_range(
+        self,
+        start: int,
+        end: int,
+        *,
+        auto_write: bool | None = None,
+    ) -> None:
+        """
+        12 行目（実験データの読み込み範囲）を更新する。
+
+        【書式（旧来固定フォーマット）】
+        - 2 整数のみ（1 始まり・inclusive）
+          ・start: 開始インデックス（>=1）
+          ・end  : 終了インデックス（>= start）
+
+        【推奨運用】
+        - 実験データファイル 1 行目の点数 N を参照し、end を N 以下に揃えること。
+
+        Args:
+            start (int): 1 始まりの開始行（inclusive, >=1）
+            end (int):   1 始まりの終了行（inclusive, >=start）
+            auto_write (bool | None): True で即時保存。None はインスタンス既定に従う。
+        """
+        if start < 1 or end < start:
+            raise ValueError(f"範囲が不正です: start={start}, end={end}")
+        # 厳密に「2 トークンのみ」を書き込む
+        self.set_line(12, f"{int(start)} {int(end)}", auto_write=auto_write)
