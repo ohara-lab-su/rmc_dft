@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from typing import List, Sequence, Union, Tuple, Optional
 from pathlib import Path
 
+from rmc_dft.config import Config
 from x_logger import XLogger
 
 
@@ -64,18 +65,24 @@ class RmcPotDat:
 
     def __init__(
         self,
-        dat_name: str,
+        cfg_name: str = None,
         auto_write: bool = True,
-        logger: XLogger | None = None,
+        config: Config = Config(),
+        logger: Optional[XLogger] = XLogger(),
     ) -> None:
         """
         Args:
-            dat_name (str): xxxx.dat の絶対パス、基本名前（拡張子は付けない）
+            cfg_name (str): xxxx.dat の絶対パス、基本名前（拡張子は付けない）
             auto_write (bool): True の場合 set_* / set_line で即時書き出し
+            config (Config):
             logger (XLogger):
         """
-        self._logger = logger or XLogger()
-        self.dat_name: str = dat_name
+        self._logger = logger
+
+        if cfg_name is None:
+            cfg_name = config.cfg_name
+        self.dat_name: str = cfg_name
+
         self._lines: list[_Line] = []
         self._auto_write: bool = auto_write
         self._load()
@@ -84,7 +91,7 @@ class RmcPotDat:
     # 静的フォーマット関数群（クラス内に集約）
     # --------------------
     @staticmethod
-    def _to_bool_token(v: bool | str) -> str:
+    def _to_bool_token(v: Union[bool, str]) -> str:
         """
         真偽入力を .true. / .false. に正規化する。
 
@@ -105,7 +112,9 @@ class RmcPotDat:
         raise ValueError(f"真偽として解釈できません: {v!r}")
 
     @staticmethod
-    def _fmt_number(x: Union[int, float]) -> str:
+    def _fmt_number(
+        x: Union[int, float],
+    ) -> str:
         """
         数値を .dat に過度な科学表記を使わず整形
 
@@ -121,7 +130,10 @@ class RmcPotDat:
         return s
 
     @classmethod
-    def _fmt_sequence(cls, seq: Sequence[Union[int, float]]) -> str:
+    def _fmt_sequence(
+        cls,
+        seq: Sequence[Union[int, float]],
+    ) -> str:
         """数値列を空白区切りで整形。"""
         return " ".join(cls._fmt_number(v) for v in seq)
 
@@ -130,9 +142,9 @@ class RmcPotDat:
     # --------------------
     def _load(self) -> None:
         """ファイルを読み込んで内部行リストを構築。"""
-        self._logger.info(f"== load({self.dat_name}.dat)")
+        self._logger.info(f"== load({self.cfg_name}.dat)")
 
-        p = Path(f"{self.dat_name}.dat")
+        p = Path(f"{self.cfg_name}.dat")
         if not p.exists():
             raise FileNotFoundError(
                 f".dat ファイルが見つかりません: {p} (.dat は自動付加されます)"
@@ -152,14 +164,17 @@ class RmcPotDat:
                         _Line(value=raw.strip(), comment="", had_bang=False)
                     )
 
-    def write(self, out_name: str | None = None) -> None:
+    def write(
+        self,
+        out_name: Optional[str] = None,
+    ) -> None:
         """
         現在の内容を書き出す (.dat は自動付加される)
 
         Args:
-            out_name (str): 出力先。未指定なら self.dat_name に上書き保存。
+            out_name (str): 出力先。未指定なら self.cfg_name に上書き保存。
         """
-        target = Path(f"{self.dat_name if out_name is None else out_name}.dat")
+        target = Path(f"{self.cfg_name if out_name is None else out_name}.dat")
         with target.open("w", encoding="utf-8") as f:
             for ln in self._lines:
                 f.write(ln.render())
@@ -187,7 +202,7 @@ class RmcPotDat:
         line_no_1based: int,
         value: Union[str, int, float, Sequence[Union[int, float]], bool],
         *,
-        auto_write: bool | None = None,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """
         任意行の値部分を更新（コメントは保持）。
@@ -264,7 +279,7 @@ class RmcPotDat:
         self,
         comment: str,
         *,
-        auto_write: bool | None = None,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """1 行目 comment を更新。"""
         self.set_line(1, comment, auto_write=auto_write)
@@ -283,7 +298,10 @@ class RmcPotDat:
         return float(self.get_line(2).split()[0])
 
     def set_density(
-        self, rho: Union[int, float], *, auto_write: bool | None = None
+        self,
+        rho: Union[int, float],
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """2 行目 density を更新。"""
         self.set_line(2, rho, auto_write=auto_write)
@@ -311,7 +329,7 @@ class RmcPotDat:
         self,
         values: Sequence[Union[int, float]],
         *,
-        auto_write: bool | None = None,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """
         3 行目 cut offs を更新。可変長対応。
@@ -351,7 +369,7 @@ class RmcPotDat:
         self,
         values: Sequence[Union[int, float]],
         *,
-        auto_write: bool | None = None,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """4 行目 maximum moves を更新。"""
         seq = list(values)
@@ -375,7 +393,10 @@ class RmcPotDat:
         return float(toks[0])
 
     def set_r_spacing(
-        self, dr: Union[int, float], *, auto_write: bool | None = None
+        self,
+        dr: Union[int, float],
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """5 行目 r spacing を更新。"""
         self.set_line(5, dr, auto_write=auto_write)
@@ -419,7 +440,7 @@ class RmcPotDat:
         self,
         use_moveout: bool,
         *,
-        auto_write: bool | None = None,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """
         6 行目（whether to use moveout option）を更新する。
@@ -492,7 +513,7 @@ class RmcPotDat:
         self,
         num_config: int,
         *,
-        auto_write: bool | None = None,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """
         7 行目（number of configuration to collect）を更新する。
@@ -563,7 +584,7 @@ class RmcPotDat:
         self,
         interval_step: int,
         *,
-        auto_write: bool | None = None,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """
         8 行目（step for printing）を更新する。
@@ -589,7 +610,7 @@ class RmcPotDat:
             )
         self.set_line(8, str(int(interval_step)), auto_write=auto_write)
 
-    def get_time_and_save(self) -> tuple[float, int]:
+    def get_time_and_save(self) -> Tuple[float, int]:
         """
         9 行目（time limit, step for saving）を取得する。
 
@@ -630,7 +651,7 @@ class RmcPotDat:
         time_limit_min: float,
         save_interval_step: int,
         *,
-        auto_write: bool | None = None,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """
         9 行目（time limit, step for saving）を更新する。
@@ -666,7 +687,7 @@ class RmcPotDat:
         values = [self._fmt_number(time_limit_min), str(int(save_interval_step))]
         self.set_line(9, values, auto_write=auto_write)
 
-    def get_data_flags(self) -> tuple[int, int, int, int]:
+    def get_data_flags(self) -> Tuple[int, int, int, int]:
         """
         10 行目（g(r), neutron, x-ray, EXAFS の出力フラグ）を取得する。
 
@@ -701,9 +722,9 @@ class RmcPotDat:
 
     def set_data_flags(
         self,
-        flags: tuple[int, int, int, int],
+        flags: Tuple[int, int, int, int],
         *,
-        auto_write: bool | None = None,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """
         10 行目（g(r), neutron, x-ray, EXAFS の出力フラグ）を更新する。
@@ -803,7 +824,7 @@ class RmcPotDat:
         """
         self.set_line(11, str(Path(path)), auto_write=auto_write)
 
-    def get_exp_range(self) -> tuple[int, int]:
+    def get_exp_range(self) -> Tuple[int, int]:
         """
         12 行目（実験データの読み込み範囲）を取得する。
 
@@ -838,7 +859,7 @@ class RmcPotDat:
         start: int,
         end: int,
         *,
-        auto_write: bool | None = None,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """
         12 行目（実験データの読み込み範囲）を更新する。
@@ -875,7 +896,12 @@ class RmcPotDat:
         """
         return float(self.get_line(13).split()[0])
 
-    def set_scale_factor(self, value: float, *, auto_write: bool | None = None) -> None:
+    def set_scale_factor(
+        self,
+        value: float,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
         """
         13 行目（scale factor）を設定する。
 
@@ -901,7 +927,12 @@ class RmcPotDat:
         toks = self.get_line(14).split()
         return float(toks[0])
 
-    def set_sigma_factor(self, sigma: float, *, auto_write: bool | None = None) -> None:
+    def set_sigma_factor(
+        self,
+        sigma: float,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
         """
         14 行目（standard deviation / temperature factor）を設定する。
 
@@ -924,7 +955,12 @@ class RmcPotDat:
         """
         return self.get_line(15).strip().lower().startswith(".t")
 
-    def set_flag_15(self, value: bool, *, auto_write: bool | None = None) -> None:
+    def set_flag_15(
+        self,
+        value: bool,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
         """15 行目（boolean flag 1）を設定する。"""
         self.set_line(15, self._to_bool_token(value), auto_write=auto_write)
 
@@ -941,7 +977,12 @@ class RmcPotDat:
         """
         return self.get_line(16).strip().lower().startswith(".t")
 
-    def set_flag_16(self, value: bool, *, auto_write: bool | None = None) -> None:
+    def set_flag_16(
+        self,
+        value: bool,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
         """16 行目（boolean flag 2）を設定する。"""
         self.set_line(16, self._to_bool_token(value), auto_write=auto_write)
 
@@ -958,7 +999,12 @@ class RmcPotDat:
         """
         return self.get_line(17).strip().lower().startswith(".t")
 
-    def set_flag_17(self, value: bool, *, auto_write: bool | None = None) -> None:
+    def set_flag_17(
+        self,
+        value: bool,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
         """17 行目（boolean flag 3）を設定する。"""
         self.set_line(17, self._to_bool_token(value), auto_write=auto_write)
 
@@ -975,7 +1021,12 @@ class RmcPotDat:
         """
         return self.get_line(18).strip().lower().startswith(".t")
 
-    def set_flag_18(self, value: bool, *, auto_write: bool | None = None) -> None:
+    def set_flag_18(
+        self,
+        value: bool,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
         """18 行目（boolean flag 4）を設定する。"""
         self.set_line(18, self._to_bool_token(value), auto_write=auto_write)
 
@@ -993,7 +1044,10 @@ class RmcPotDat:
         return int(float(self.get_line(19).split()[0]))
 
     def set_angle_constraint_count(
-        self, value: int, *, auto_write: bool | None = None
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """19 行目（角度制約数）を設定する。"""
         self.set_line(19, str(int(value)), auto_write=auto_write)
@@ -1012,7 +1066,10 @@ class RmcPotDat:
         return int(float(self.get_line(20).split()[0]))
 
     def set_coord_constraint_count(
-        self, value: int, *, auto_write: bool | None = None
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """20 行目（配位数制約数）を設定する。"""
         self.set_line(20, str(int(value)), auto_write=auto_write)
@@ -1031,7 +1088,10 @@ class RmcPotDat:
         return int(float(self.get_line(21).split()[0]))
 
     def set_avg_coord_constraint_count(
-        self, value: int, *, auto_write: bool | None = None
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """21 行目（平均配位数制約数）を設定する。"""
         self.set_line(21, str(int(value)), auto_write=auto_write)
@@ -1049,7 +1109,12 @@ class RmcPotDat:
         """
         return int(float(self.get_line(22).split()[0]))
 
-    def set_potential_flag(self, value: int, *, auto_write: bool | None = None) -> None:
+    def set_potential_flag(
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
         """22 行目（ポテンシャルフラグ）を設定する。"""
         self.set_line(22, str(int(value)), auto_write=auto_write)
 
@@ -1066,7 +1131,12 @@ class RmcPotDat:
         """
         return int(float(self.get_line(23).split()[0]))
 
-    def set_fnc_switch(self, value: int, *, auto_write: bool | None = None) -> None:
+    def set_fnc_switch(
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
         """23 行目（FNCスイッチ）を設定する。"""
         self.set_line(23, str(int(value)), auto_write=auto_write)
 
@@ -1084,7 +1154,10 @@ class RmcPotDat:
         return int(float(self.get_line(24).split()[0]))
 
     def set_initial_bin_shift(
-        self, value: int, *, auto_write: bool | None = None
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """24 行目（initial bin shift）を設定する。"""
         self.set_line(24, str(int(value)), auto_write=auto_write)
@@ -1102,7 +1175,12 @@ class RmcPotDat:
         """
         return float(self.get_line(25).split()[0])
 
-    def set_xmax_used(self, value: float, *, auto_write: bool | None = None) -> None:
+    def set_xmax_used(
+        self,
+        value: float,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
         """25 行目（xmax used in the run）を設定する。"""
         self.set_line(25, self._fmt_number(value), auto_write=auto_write)
 
@@ -1120,7 +1198,10 @@ class RmcPotDat:
         return int(float(self.get_line(26).split()[0]))
 
     def set_num_atoms_per_move(
-        self, value: int, *, auto_write: bool | None = None
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """26 行目（number of atoms moved）を設定する。"""
         self.set_line(26, str(int(value)), auto_write=auto_write)
@@ -1139,7 +1220,10 @@ class RmcPotDat:
         return int(float(self.get_line(27).split()[0]))
 
     def set_history_buffer_size(
-        self, value: int, *, auto_write: bool | None = None
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """27 行目（history buffer size）を設定する。"""
         self.set_line(27, str(int(value)), auto_write=auto_write)
@@ -1154,7 +1238,10 @@ class RmcPotDat:
         return int(float(self.get_line(28).split()[0]))
 
     def set_display_update_interval(
-        self, value: int, *, auto_write: bool | None = None
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """28 行目（display update interval）を設定する。"""
         self.set_line(28, str(int(value)), auto_write=auto_write)
@@ -1169,7 +1256,10 @@ class RmcPotDat:
         return int(float(self.get_line(29).split()[0]))
 
     def set_custom_move_flag(
-        self, value: int, *, auto_write: bool | None = None
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """29 行目（custom move flag）を設定する。"""
         self.set_line(29, str(int(value)), auto_write=auto_write)
@@ -1184,7 +1274,10 @@ class RmcPotDat:
         return int(float(self.get_line(30).split()[0]))
 
     def set_load_histogram_flag(
-        self, value: int, *, auto_write: bool | None = None
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """30 行目（load histogram flag）を設定する。"""
         self.set_line(30, str(int(value)), auto_write=auto_write)
@@ -1199,7 +1292,10 @@ class RmcPotDat:
         return int(float(self.get_line(31).split()[0]))
 
     def set_max_atoms_per_cell(
-        self, value: int, *, auto_write: bool | None = None
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """31 行目（max atoms per gridcell）を設定する。"""
         self.set_line(31, str(int(value)), auto_write=auto_write)
@@ -1217,7 +1313,11 @@ class RmcPotDat:
         return int(float(toks[0])), int(float(toks[1]))
 
     def set_swap_settings(
-        self, fraction: int, allow_flag: int, *, auto_write: bool | None = None
+        self,
+        fraction: int,
+        allow_flag: int,
+        *,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """32 行目（swap fraction と許可フラグ）を設定する。"""
         self.set_line(32, f"{int(fraction)} {int(allow_flag)}", auto_write=auto_write)
@@ -1231,6 +1331,11 @@ class RmcPotDat:
         """
         return int(float(self.get_line(33).split()[0]))
 
-    def set_thread_count(self, value: int, *, auto_write: bool | None = None) -> None:
+    def set_thread_count(
+        self,
+        value: int,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
         """33 行目（スレッド数）を設定する。"""
         self.set_line(33, str(int(value)), auto_write=auto_write)

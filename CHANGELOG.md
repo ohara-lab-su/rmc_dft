@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v0.3.1 nakada
+
+- python3.6 + 非ネットワーク環境対応
+  - setup.py を追加 (tomlと共存)
+  - python 3.10 以上の構文( config: str | None = None) のようなものを廃止
+    - python 3.6 でも動作するように config: Optional[str] = None などとする
+    - dataclass を 内部モジュールから外部モジュール(pip instal dataclasses) 3.6対応のため
+    - アノテーション記法を後方互換性が高いものに変更 list[str] --> List[str]
+- config.py を修正(config.yaml 導入) 
+ 
 ## v0.3.0 nakada
 
 - INPUT 関係を クラスライブラリ上から行う・管理できる仕様に改変

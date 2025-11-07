@@ -2,10 +2,9 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 """
-
 import os
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable
 from pymatgen.io.vasp.inputs import Incar
-from typing import Any
 from x_logger import XLogger
 
 
@@ -24,7 +23,7 @@ class VaspIncar:
         self,
         incar_name: str = "INCAR",
         auto_write: bool = True,
-        logger: XLogger | None = None,
+        logger: Optional[XLogger] = None,
     ):
         self.incar_name: str = os.path.abspath(incar_name)
 

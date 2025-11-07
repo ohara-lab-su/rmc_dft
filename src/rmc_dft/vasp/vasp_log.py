@@ -9,7 +9,7 @@ import sys
 import glob
 import shutil
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable
 
 from x_logger import XLogger
 
@@ -29,11 +29,17 @@ class VaspLog:
     #
 
     @staticmethod
-    def _exists_either(path: Path) -> bool:
+    def _exists_either(
+        path: Path,
+    ) -> bool:
         """通常 or .gz のどちらかが存在するか"""
         return path.exists() or path.with_suffix(path.suffix + ".gz").exists()
 
-    def _copy_either(self, src: Path, dst: Path) -> None:
+    def _copy_either(
+        self,
+        src: Path,
+        dst: Path,
+    ) -> None:
         """通常 or .gz を copy。必要に応じて .gz 拡張子を付与"""
         if src.exists():
             shutil.copyfile(src, dst)
@@ -45,7 +51,11 @@ class VaspLog:
                 shutil.copyfile(gzsrc, gzdst)
                 self._logger.info(f"cp {gzsrc} --> {gzdst}")
 
-    def _move_either(self, src: Path, dst: Path) -> None:
+    def _move_either(
+        self,
+        src: Path,
+        dst: Path,
+    ) -> None:
         """通常 or .gz を move。必要に応じて .gz 拡張子を付与"""
         if src.exists():
             shutil.move(src, dst)
@@ -226,7 +236,10 @@ class VaspLog:
             except FileNotFoundError:
                 pass
 
-    def clean(self, suffixes: list[str] = None) -> None:
+    def clean(
+        self,
+        suffixes: List[str] = None,
+    ) -> None:
         """
         Args:
             suffixes (str):

@@ -6,7 +6,8 @@ K.KOBAYASHI (1st version)
 import os
 import shutil
 
-from typing import Any, Callable, Optional
+from rmc_dft.config import Config
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable
 
 from x_logger import XLogger
 
@@ -15,28 +16,37 @@ class RmcPotLog:
 
     def __init__(
         self,
-        cfg_name: str,
-        logger: XLogger = None,
+        cfg_name: str = None,
+        config: Config = Config(),
+        logger: Optional[XLogger] = XLogger,
     ):
         """
         Args:
             cfg_name (str):
+            config (Config):
             logger (XLogger):
         """
-        if not logger:
-            logger = XLogger()
         self._logger = logger
+
+        if cfg_name is None:
+            cfg_name = config.cfg_name
 
         # default name
         self._cfg_name: str = cfg_name
 
-    def set_cfg_name(self, cfg_name: str) -> None:
+    def set_cfg_name(
+        self,
+        cfg_name: str,
+    ) -> None:
         self._cfg_name: str = cfg_name
 
     def get_cfg_name(self) -> str:
         return self._cfg_name
 
-    def clear(self, cfg_name: str) -> None:
+    def clear(
+        self,
+        cfg_name: str,
+    ) -> None:
         """
         rmc_pot の出力ファイルを消す
 

@@ -3,7 +3,7 @@
 K.NAKADA, kengo.nakada@gmail.com
 """
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable
 
 from rmc_dft.rmc_pot import RmcPot, RmcPotLog
 from rmc_dft.vasp import Vasp, VaspLog
@@ -20,10 +20,10 @@ class RmcDft:
         self,
         rmc_code: str = "RmcPot",
         dft_code: str = "Vasp",
-        cfg_name: str = "aaa",
+        cfg_name: str = None,
         max_loop: int = 10,
         config: Config = Config(),
-        logger: XLogger = None,
+        logger: XLogger = XLogger(),
     ):
         """
         RMCとDFTの統合実行クラス。
@@ -36,10 +36,10 @@ class RmcDft:
             config (Config): 設定オブジェクト
             logger (XLogger): ロガー（指定がなければ新規作成）
         """
-        if logger is None:
-            logger = XLogger()
-
         self._logger = logger
+        if cfg_name is None:
+            cfg_name = config.cfg_name
+
         self._cfg_name = cfg_name
         self._config = config
         self._max_loop = max_loop
@@ -96,7 +96,7 @@ class RmcDft:
 
     def run(
         self,
-        max_loop: int | None = None,
+        max_loop: Optional[int] = None,
         mode: str = "local",
         cfg_name: str = None,
         logger: XLogger = None,
@@ -140,7 +140,7 @@ class RmcDft:
     def poscar2cfg(
         self,
         cfg_name: str,
-        posscar_name: str = None,
+        posscar_name: Optional[str] = None,
     ) -> bool:
         if not posscar_name:
             posscar_name = f"{cfg_name}.vasp"

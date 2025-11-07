@@ -4,18 +4,15 @@ K.NAKADA, kengo.nakada@gmail.com (1st, 3rd varsion)
 K.KOBAYASHI (2nd version)
 """
 import os
-from typing import Any, Dict, List, Optional
-import subprocess
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable
 import shutil
 
 from ase.io import read, write
 
 from rmc_dft.config import Config
-
 from rmc_dft.vasp.vasp_incar import VaspIncar
 from rmc_dft.vasp.vasp_kpoints import VaspKpoints
 from rmc_dft.vasp.vasp_log import VaspLog
-
 from rmc_dft.vasp.util.poscar2cfg import (
     vasp2cfg,
     contcar2cfg,
@@ -46,12 +43,16 @@ class Vasp:
         vasp_name: str,
         incar_name: str = "INCAR",
         kpoints_name: str = "KPOINTS",
+        *,
         auto_write: bool = True,
         mpi_cmd: str = None,
         mpi_flag: str = None,
-        num_procs: int = Config.num_procs,
-        vasp_bin: str = Config.vasp_bin,
+        # num_procs: int = Config.num_procs,
+        # vasp_bin: str = Config.vasp_bin,
+        num_procs: int = None,
+        vasp_bin: str = None,
         job_cmd: str = None,
+        config: Config = Config(),
         logger: XLogger = None,
     ):
         """
@@ -64,6 +65,7 @@ class Vasp:
             mpi_flag (str): 例 "-np"
             num_procs (int): 並列数
             vasp_bin (str): 実行バイナリ（例: "vasp_std"）
+            config (Config):
             job_cmd (str): ジョブ投入コマンド（None ならローカル実行）
             logger (XLogger):  ろがー
         """
@@ -99,9 +101,10 @@ class Vasp:
         # VASP 実行系設定
         self.mpi_cmd = mpi_cmd or "mpirun"  # 規定のMPIコマンド
         self.mpi_flag = mpi_flag or "-np"
-        self.num_procs: int = num_procs or Config.num_procs
-        self.vasp_bin: str = vasp_bin or Config.vasp_bin
-        self.job_cmd = job_cmd or Config.job_cmd
+        self.num_procs: int = num_procs or config.num_procs
+        self.vasp_bin: str = vasp_bin or config.vasp_bin
+        self.job_cmd = job_cmd or config.job_cmd
+        # self.job_cmd = job_cmd
 
         # --- INCAR ---
         self._incar = VaspIncar(
@@ -400,14 +403,14 @@ class Vasp:
     @staticmethod
     def ensure_vasp5_format(
         poscar_name: str,
-        element_info: str | None = None,
+        element_info: Optional[str] = None,
         logger: XLogger = None,
     ) -> bool:
         return ensure_vasp5_format(poscar_name, element_info, logger=logger)
 
     @staticmethod
     def make_potential(
-        elements: list[str],
+        elements: List[str],
         output: str = "POTCAR",
     ) -> bool:
         """
@@ -478,7 +481,7 @@ class Vasp:
 
     def xdatcar2poscar(
         self,
-        input_name: str | None = None,
+        input_name: Optional[str] = None,
     ) -> bool:
         """
         Copy XDATCAR to a new file with the specified name (... .vasp).
