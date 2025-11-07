@@ -19,9 +19,14 @@ class VaspLog:
     VASP の出力ファイルを計算後に整理・解析するクラス
     """
 
-    def __init__(self, logger: XLogger = None):
-        if not logger:
-            logger = XLogger()
+    def __init__(
+        self,
+        logger: Optional[XLogger] = XLogger(),
+    ) -> None:
+        """
+        Args:
+            logger (XLogger): 全てのインスタンスが同じ XLogger()
+        """
         self._logger = logger
 
     #

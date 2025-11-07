@@ -28,41 +28,47 @@ class RmcPot:
         self,
         rmc_log: RmcPotLog = None,
         rmc_dat: RmcPotDat = None,
-        cfg_name: str = "aaa",
         config: Config = Config(),
         logger: XLogger = XLogger(),
-    ):
+        *,
+        cfg_name: str = None,
+    ) -> None:
         """
 
         Args:
             rmc_log: RMC_POT のログ処理用のインスタンス
             rmc_dat: RMC_POT のDAT処理用のインスタンス
+            config (Config): 全てのインスタンスが同じ Config()
+            logger (XLogger): 全てインスタンスが同じ XLogger()
             cfg_name (str): cfg-filename
-            config (Config):
-            logger (XLogger):
         """
         self._logger = logger
         self._config = config
 
+        if cfg_name is None:
+            cfg_name: str = config.cfg_name
+
         # aaa.dat ファイルなどの CFG ファイル名 prefix
         self._cfg_name = cfg_name
-
-        # .dat ファイル処理 instance
-        if rmc_dat is None:
-            rmc_dat = RmcPotDat(
-                logger=logger,
-                cfg_name=cfg_name,  # cfg_name = dat_name (aaa.dat/aaa.cfg)
-                auto_write=True,
-            )
-        self._rmc_dat = rmc_dat
-        if self._rmc_dat:
-            self._logger.info(f"== rmc_pot_dat()")
 
         # RMC 出力ファイル処理
         self._rmc_log = rmc_log
         if self._rmc_log:
             self._logger.info(f"== rmc_log.set_cfg_name({cfg_name})")
             self._rmc_log.set_cfg_name(cfg_name)
+
+        self._rmc_dat = rmc_dat
+        if self._rmc_dat:
+            self._logger.info(f"== rmc_pot_dat()")
+
+        # .dat ファイル処理 instance
+        if rmc_dat is None:
+            rmc_dat = RmcPotDat(
+                cfg_name=cfg_name,  # cfg_name = dat_name (aaa.dat/aaa.cfg)
+                auto_write=True,
+                config=config,
+                logger=logger,
+            )
 
     def set_cfg_name(self, cfg_name: str):
         self._cfg_name = cfg_name

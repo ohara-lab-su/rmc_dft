@@ -22,9 +22,17 @@ class VaspIncar:
     def __init__(
         self,
         incar_name: str = "INCAR",
-        auto_write: bool = True,
         logger: Optional[XLogger] = None,
-    ):
+        *,
+        auto_write: bool = True,
+    ) -> None:
+        """
+
+        Args:
+            incar_name (str):
+            logger (XLogger):
+            auto_write (bool):
+        """
         self.incar_name: str = os.path.abspath(incar_name)
 
         # それぞれの tag 操作で自動的に書き換え

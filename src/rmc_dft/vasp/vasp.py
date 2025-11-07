@@ -40,40 +40,43 @@ class Vasp:
     def __init__(
         self,
         vasp_log: VaspLog,
-        vasp_name: str = None,
         incar_name: str = "INCAR",
         kpoints_name: str = "KPOINTS",
+        config: Config = Config(),
+        logger: XLogger = XLogger,
+        *,
         auto_write: bool = True,
+        vasp_name: str = None,
+        vasp_bin: str = None,
         mpi_cmd: str = None,
         mpi_flag: str = None,
         num_procs: int = None,
-        vasp_bin: str = None,
         job_cmd: str = None,
-        config: Config = Config(),
-        logger: XLogger = XLogger,
-    ):
+    ) -> None:
         """
         Args:
             vasp_log (VaspLog): VASP の log 解析管理
-            vasp_name (str): POSCAR などに関連する系の識別名（例: "aaa.vasp" or "POSCAR）
             incar_name (str): INCAR
             kpoints_name (str): KPOINTS
-            mpi_cmd (str): 例 "mpirun"
-            mpi_flag (str): 例 "-np"
-            num_procs (int): 並列数
+            config (Config): 全てのインスタンスが同じ Config
+            logger (XLogger): ろがー、全てのインスタンスが同じ XLogger
+            auto_write (bool):
+            vasp_name (str): POSCAR などに関連する系の識別名（例: "aaa.vasp" or "POSCAR）
             vasp_bin (str): 実行バイナリ（例: "vasp_std"）
-            config (Config):
+            mpi_cmd (str): 例 "mpirun" (configがあればいらない)
+            mpi_flag (str): 例 "-np" (configがあればいらない)
+            num_procs (int): 並列数 (configがあればいらない)
             job_cmd (str): ジョブ投入コマンド（None ならローカル実行）
-            logger (XLogger):  ろがー
         """
         self._logger = logger
         self._logger.debug("== create Vasp()")
 
         # INCAR ファイルのOUTファイル入出力インスタンスの移譲を受ける
         self._vasp_log: VaspLog = vasp_log
+        self._config: Config = config
 
         # aaa.vasp
-        if not vasp_name:
+        if vasp_name is None:
             vasp_name: str = config.vasp_name
         self._vasp_name: str = vasp_name
 
@@ -102,10 +105,10 @@ class Vasp:
 
         # VASP 実行系設定
         self.vasp_bin: str = vasp_bin or config.vasp_bin
-        self.mpi_cmd = mpi_cmd or config.mpi_cmd
-        self.mpi_flag = mpi_flag or config.mpi_flag
+        self.mpi_cmd: str = mpi_cmd or config.mpi_cmd
+        self.mpi_flag: str = mpi_flag or config.mpi_flag
         self.num_procs: int = num_procs or config.num_procs
-        self.job_cmd = job_cmd or config.job_cmd
+        self.job_cmd: str = job_cmd or config.job_cmd
         # self.job_cmd = job_cmd
 
         # --- INCAR ---
