@@ -30,7 +30,7 @@ class RmcPot:
         rmc_dat: RmcPotDat = None,
         cfg_name: str = "aaa",
         config: Config = Config(),
-        logger: XLogger = None,
+        logger: XLogger = XLogger(),
     ):
         """
 
@@ -38,10 +38,9 @@ class RmcPot:
             rmc_log: RMC_POT のログ処理用のインスタンス
             rmc_dat: RMC_POT のDAT処理用のインスタンス
             cfg_name (str): cfg-filename
+            config (Config):
             logger (XLogger):
         """
-        if not logger:
-            logger = XLogger()
         self._logger = logger
         self._config = config
 
@@ -52,7 +51,7 @@ class RmcPot:
         if rmc_dat is None:
             rmc_dat = RmcPotDat(
                 logger=logger,
-                dat_name=cfg_name,
+                cfg_name=cfg_name,  # cfg_name = dat_name (aaa.dat/aaa.cfg)
                 auto_write=True,
             )
         self._rmc_dat = rmc_dat
@@ -191,8 +190,8 @@ class RmcPot:
 
         return True
 
-    @staticmethod
     def run(
+        self,
         cfg_name: str,
         blocking: bool = True,
     ) -> bool:

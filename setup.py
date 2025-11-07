@@ -39,17 +39,19 @@ def read_version_from_toml() -> str:
 
 
 __version__ = read_version_from_toml()
-__long_description__ = "RMC_DFT"
-__description__ = "RMC_DFT"
+long_description = "RMC_DFT"
+description = "RMC_DFT"
 
 # パッケージ指定
 # packages = find_packages(exclude=["StructureAnalysisEnvironment.bin"])
-__packages__ = find_packages()
+packages = find_packages("src")
+package_dir = {"": "src"}
 
 setup(
-    name="RMC_DFT",
+    name="rmc_dft",
     # packages=find_packages(),
-    packages=__packages__,
+    packages=packages,
+    package_dir=package_dir,
     #       package_dir  = {'':'StructureAnalysisEnvironment'},
     #       include_package_data=True,
     #       package_data = { '': ['LICENSE.txt', 'README.md']},
@@ -57,31 +59,34 @@ setup(
     # data_files=[(package_src_dir, files)],
     # scripts=__script__,
     version=__version__,
-    description=__description__,
-    long_description=__long_description__,
+    description=description,
+    long_description=long_description,
     author=__author__,
     #       author_email = ['kengo.nakada@gmail.com','kengo.nakada@spring8.or.jp'],
     #       author_email = 'kengo.nakada@gmail.com',
     # author_email='kengo.nakada@spring8.or.jp',
     author_email=__email__,
     license=__license__,
+    # python 3.11 などと違う環境にする
     install_requires=[
         "dataclasses",
         "coloredlogs",
         "colorlog",
-        "pytest",
-        "pytest-asyncio",
+        # "pytest",
+        # "pytest-asyncio",
         "pyyaml",
         "toml",
-        "grpcio",
+        # "grpcio",
         "nest_asyncio",
-        "sphinx",
-        "myst-parser",
-        "sphinx-autobuild",
-        "sphinx-rtd-theme",
-        "sphinxcontrib-napoleon",
-        "linkify-it-py",
+        # わざわざ python 3.6 環境(setup.py)だと入れない
+        # "sphinx",
+        # "myst-parser",
+        # "sphinx-autobuild",
+        # "sphinx-rtd-theme",
+        # "sphinxcontrib-napoleon",
+        # "linkify-it-py",  # for sphinx
     ],
+    #
     #       platforms = ['linux','OSX','Window'],
     #       classifiers = [
     #           'Programming Language :: Python :: 2.7',

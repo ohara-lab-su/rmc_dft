@@ -19,9 +19,9 @@ pymatgen.io.vasp.inputs.Kpoints を薄くラップした KPOINTS 管理クラス
 - モード名は "Gamma" または "Monkhorst-Pack" を想定（先頭大文字）。
 - グリッド/シフトは常に長さ3の整数タプルとして厳格に保持。
 """
+# from __future__ import annotations
 
-from __future__ import annotations
-
+import sys
 import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable
 from pymatgen.io.vasp.inputs import Kpoints

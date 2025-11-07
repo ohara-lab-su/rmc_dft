@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from typing import List, Sequence, Union, Tuple, Optional
 from pathlib import Path
 
+from rmc_dft.config import Config
 from x_logger import XLogger
 
 
@@ -64,18 +65,24 @@ class RmcPotDat:
 
     def __init__(
         self,
-        dat_name: str,
+        cfg_name: str = None,
         auto_write: bool = True,
-        logger: Optional[XLogger] = None,
+        config: Config = Config(),
+        logger: Optional[XLogger] = XLogger(),
     ) -> None:
         """
         Args:
-            dat_name (str): xxxx.dat の絶対パス、基本名前（拡張子は付けない）
+            cfg_name (str): xxxx.dat の絶対パス、基本名前（拡張子は付けない）
             auto_write (bool): True の場合 set_* / set_line で即時書き出し
+            config (Config):
             logger (XLogger):
         """
-        self._logger = logger or XLogger()
-        self.dat_name: str = dat_name
+        self._logger = logger
+
+        if cfg_name is None:
+            cfg_name = config.cfg_name
+        self.dat_name: str = cfg_name
+
         self._lines: list[_Line] = []
         self._auto_write: bool = auto_write
         self._load()
@@ -135,9 +142,9 @@ class RmcPotDat:
     # --------------------
     def _load(self) -> None:
         """ファイルを読み込んで内部行リストを構築。"""
-        self._logger.info(f"== load({self.dat_name}.dat)")
+        self._logger.info(f"== load({self.cfg_name}.dat)")
 
-        p = Path(f"{self.dat_name}.dat")
+        p = Path(f"{self.cfg_name}.dat")
         if not p.exists():
             raise FileNotFoundError(
                 f".dat ファイルが見つかりません: {p} (.dat は自動付加されます)"
@@ -165,9 +172,9 @@ class RmcPotDat:
         現在の内容を書き出す (.dat は自動付加される)
 
         Args:
-            out_name (str): 出力先。未指定なら self.dat_name に上書き保存。
+            out_name (str): 出力先。未指定なら self.cfg_name に上書き保存。
         """
-        target = Path(f"{self.dat_name if out_name is None else out_name}.dat")
+        target = Path(f"{self.cfg_name if out_name is None else out_name}.dat")
         with target.open("w", encoding="utf-8") as f:
             for ln in self._lines:
                 f.write(ln.render())

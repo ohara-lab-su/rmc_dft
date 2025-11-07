@@ -20,10 +20,10 @@ class RmcDft:
         self,
         rmc_code: str = "RmcPot",
         dft_code: str = "Vasp",
-        cfg_name: str = "aaa",
+        cfg_name: str = None,
         max_loop: int = 10,
         config: Config = Config(),
-        logger: XLogger = None,
+        logger: XLogger = XLogger(),
     ):
         """
         RMCとDFTの統合実行クラス。
@@ -36,10 +36,10 @@ class RmcDft:
             config (Config): 設定オブジェクト
             logger (XLogger): ロガー（指定がなければ新規作成）
         """
-        if logger is None:
-            logger = XLogger()
-
         self._logger = logger
+        if cfg_name is None:
+            cfg_name = config.cfg_name
+
         self._cfg_name = cfg_name
         self._config = config
         self._max_loop = max_loop

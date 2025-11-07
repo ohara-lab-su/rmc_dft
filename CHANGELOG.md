@@ -8,6 +8,7 @@
     - python 3.6 でも動作するように config: Optional[str] = None などとする
     - dataclass を 内部モジュールから外部モジュール(pip instal dataclasses) 3.6対応のため
     - アノテーション記法を後方互換性が高いものに変更 list[str] --> List[str]
+- config.py を修正(config.yaml 導入) 
  
 ## v0.3.0 nakada
 

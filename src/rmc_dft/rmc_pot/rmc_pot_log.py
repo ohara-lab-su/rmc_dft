@@ -18,15 +18,14 @@ class RmcPotLog:
         self,
         cfg_name: str = None,
         config: Config = Config(),
-        logger: XLogger = None,
+        logger: Optional[XLogger] = XLogger,
     ):
         """
         Args:
             cfg_name (str):
+            config (Config):
             logger (XLogger):
         """
-        if not logger:
-            logger = XLogger()
         self._logger = logger
 
         if cfg_name is None:
