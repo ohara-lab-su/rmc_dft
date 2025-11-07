@@ -40,20 +40,17 @@ class Vasp:
     def __init__(
         self,
         vasp_log: VaspLog,
-        vasp_name: str,
+        vasp_name: str = None,
         incar_name: str = "INCAR",
         kpoints_name: str = "KPOINTS",
-        *,
         auto_write: bool = True,
         mpi_cmd: str = None,
         mpi_flag: str = None,
-        # num_procs: int = Config.num_procs,
-        # vasp_bin: str = Config.vasp_bin,
         num_procs: int = None,
         vasp_bin: str = None,
         job_cmd: str = None,
         config: Config = Config(),
-        logger: XLogger = None,
+        logger: XLogger = XLogger,
     ):
         """
         Args:
@@ -69,17 +66,22 @@ class Vasp:
             job_cmd (str): ジョブ投入コマンド（None ならローカル実行）
             logger (XLogger):  ろがー
         """
-        if not logger:
-            logger = XLogger()
         self._logger = logger
         self._logger.debug("== create Vasp()")
 
         # INCAR ファイルのOUTファイル入出力インスタンスの移譲を受ける
         self._vasp_log: VaspLog = vasp_log
 
+        # aaa.vasp
+        if not vasp_name:
+            vasp_name: str = config.vasp_name
         self._vasp_name: str = vasp_name
+
+        # INCAR/KPOINTS/
         self.incar_name: str = incar_name
         self.kpoints_name: str = kpoints_name
+
+        # write?
         self.auto_write: bool = auto_write
 
         # -------------------------------
@@ -99,10 +101,10 @@ class Vasp:
         }
 
         # VASP 実行系設定
-        self.mpi_cmd = mpi_cmd or "mpirun"  # 規定のMPIコマンド
-        self.mpi_flag = mpi_flag or "-np"
-        self.num_procs: int = num_procs or config.num_procs
         self.vasp_bin: str = vasp_bin or config.vasp_bin
+        self.mpi_cmd = mpi_cmd or config.mpi_cmd
+        self.mpi_flag = mpi_flag or config.mpi_flag
+        self.num_procs: int = num_procs or config.num_procs
         self.job_cmd = job_cmd or config.job_cmd
         # self.job_cmd = job_cmd
 
@@ -227,7 +229,7 @@ class Vasp:
 
     def preprocess(
         self,
-        vasp_name: str = "aaa",
+        vasp_name: str = None,
         element_info: str = "label.txt",
     ) -> bool:
         """
@@ -247,12 +249,14 @@ class Vasp:
             bool:
         """
         self._logger.info("== preprocess()")
+        if not vasp_name:
+            vasp_name = self._vasp_name
         return True
 
     def postprocess(
         self,
         log_dir: str = "log_vasp",
-        cfg_name: str | None = None,
+        cfg_name: Optional[str] = None,
     ) -> bool:
         """
         後処理

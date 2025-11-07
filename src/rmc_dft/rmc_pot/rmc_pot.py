@@ -131,8 +131,8 @@ class RmcPot:
     def postprocess(
         self,
         log_dir: str = "log_rmc",
-        cfg_name: str | None = None,
-        element_info: str | list | None = None,
+        cfg_name: Optional[str] = None,
+        element_info: Union[str, list, None] = None,
     ) -> bool:
         """
         後処理
@@ -193,7 +193,7 @@ class RmcPot:
     def run(
         self,
         cfg_name: str,
-        blocking: bool = True,
+        blocking: Optional[bool] = True,
     ) -> bool:
         """
         RMC を実行する
@@ -214,11 +214,9 @@ class RmcPot:
     @staticmethod
     def ensure_vasp5_format(
         poscar_name: str,
-        element_info: str | None = None,
-        logger: XLogger = None,
+        element_info: Optional[str] = None,
+        logger: XLogger = XLogger(),
     ) -> bool:
-        if not logger:
-            logger = XLogger()
         return ensure_vasp5_format(poscar_name, element_info, logger=logger)
 
     def cfg2poscar(

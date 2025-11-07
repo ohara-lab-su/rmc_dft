@@ -15,19 +15,26 @@ from x_logger import XLogger
 if __name__ == "__main__":
     logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
 
+    config = Config()
+    config.load_yaml("config.yml")
+
     # POSCAR to CFG (rmc用のCFG変換)
-    cfg_name = "aaa"
-    vasp_name = "aaa"
+    # cfg_name = "aaa"
+    # vasp_name = "aaa"
+    cfg_name = config.cfg_name
+    vasp_name = config.vasp_name
 
     vasp_log = VaspLog(logger=logger)
     vasp = Vasp(
         vasp_log=vasp_log,
-        vasp_name=vasp_name,
+        config=config,
         logger=logger,
     )
 
-    rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
-    rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
+    # rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
+    # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
+    rmc_log = RmcPotLog(config=config, logger=logger)
+    rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
 
     # require
     # INCAR, KPOINTS, POTCAR,
