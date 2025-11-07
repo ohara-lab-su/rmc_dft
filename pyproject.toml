@@ -16,14 +16,14 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
 "x_logger",
+"dataclasses",
 "coloredlogs",
 "colorlog",
 "pytest",
 "pytest-asyncio",
-"pytango",
 "pyyaml",
 "toml",
-"grpcio",
+# "grpcio",
 "nest_asyncio",
 "sphinx",
 "myst-parser",

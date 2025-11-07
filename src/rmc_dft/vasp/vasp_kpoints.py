@@ -23,9 +23,10 @@ pymatgen.io.vasp.inputs.Kpoints を薄くラップした KPOINTS 管理クラス
 from __future__ import annotations
 
 import os
-from typing import Optional, Tuple
-
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable
 from pymatgen.io.vasp.inputs import Kpoints
+
+from x_logger import XLogger
 
 
 class VaspKpoints:
@@ -47,7 +48,7 @@ class VaspKpoints:
         self,
         kpoints_name: str = "KPOINTS",
         auto_write: bool = True,
-        logger=None,
+        logger: Optional[XLogger] = None,
     ) -> None:
         self.kpoints_name: str = kpoints_name
         self.auto_write: bool = auto_write
@@ -157,7 +158,12 @@ class VaspKpoints:
         """シフト (sx, sy, sz) を返す。"""
         return self._shift
 
-    def set_shift(self, sx: int, sy: int, sz: int) -> None:
+    def set_shift(
+        self,
+        sx: int,
+        sy: int,
+        sz: int,
+    ) -> None:
         """シフト (sx, sy, sz) を設定する。"""
         self._shift = (int(sx), int(sy), int(sz))
         self._kpts_obj = self._build_kpoints()

@@ -10,6 +10,7 @@ ex) make_poscar.py Li Mn O
 import os
 import sys
 from csv import excel_tab
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable
 
 from x_logger import XLogger
 
@@ -23,7 +24,7 @@ class VaspPotcarBuilder:
     def __init__(
         self,
         base_dir: str = "~/potpaw_PBE.64",
-        logger: XLogger = None,
+        logger: Optional[XLogger] = None,
     ):
         """
 
@@ -162,7 +163,7 @@ class VaspPotcarBuilder:
 
     def build(
         self,
-        elements: list[str],
+        elements: List[str],
         poscar_name: str = "POTCAR",
     ) -> bool:
         """

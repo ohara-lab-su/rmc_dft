@@ -3,7 +3,7 @@
 K.NAKADA, kengo.nakada@gmail.com
 """
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable
 
 from rmc_dft.rmc_pot import RmcPot, RmcPotLog
 from rmc_dft.vasp import Vasp, VaspLog
@@ -96,7 +96,7 @@ class RmcDft:
 
     def run(
         self,
-        max_loop: int | None = None,
+        max_loop: Optional[int] = None,
         mode: str = "local",
         cfg_name: str = None,
         logger: XLogger = None,
@@ -140,7 +140,7 @@ class RmcDft:
     def poscar2cfg(
         self,
         cfg_name: str,
-        posscar_name: str = None,
+        posscar_name: Optional[str] = None,
     ) -> bool:
         if not posscar_name:
             posscar_name = f"{cfg_name}.vasp"

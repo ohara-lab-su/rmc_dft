@@ -29,6 +29,7 @@ class RmcPot:
         rmc_log: RmcPotLog = None,
         rmc_dat: RmcPotDat = None,
         cfg_name: str = "aaa",
+        config: Config = Config(),
         logger: XLogger = None,
     ):
         """
@@ -42,6 +43,7 @@ class RmcPot:
         if not logger:
             logger = XLogger()
         self._logger = logger
+        self._config = config
 
         # aaa.dat ファイルなどの CFG ファイル名 prefix
         self._cfg_name = cfg_name
@@ -204,7 +206,7 @@ class RmcPot:
         Returns:
             bool: 正しく終わったデー
         """
-        subprocess.run([f"{Config.rmc_bin}", f"{cfg_name}"], check=True)
+        subprocess.run([f"{self._config.rmc_bin}", f"{cfg_name}"], check=True)
         return True
 
     #
