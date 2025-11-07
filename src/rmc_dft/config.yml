@@ -20,10 +20,13 @@ rmc_bin: "rmcp.exe"
 # vasp_bin: "/home/hpc/vasp/bin/vasp"
 vasp_bin: "vasp_gam"
 
-
 num_procs: 1
+
 # mpi: "mpirun -np {num_procs} {os.path.expanduser('/home/hpc/vasp/bin/vasp')}"
-# mpi_opt: "-np"
+mpi_cmd: "mpirun"
+
+# mpi_flag
+mpi_flag: "-np"
 
 # default job_name
 job_cmd: "qsub job_hpcs2024_node2.sh"
