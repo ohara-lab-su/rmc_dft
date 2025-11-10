@@ -4,7 +4,7 @@ K.NAKADA, Kengo.nakada@gmail.com (1st, 3rd version)
 K.KOBAYASHI (2nd version)
 """
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import subprocess
 import shutil
 
@@ -26,43 +26,50 @@ class RmcPot:
 
     def __init__(
         self,
-        rmc_log: RmcPotLog = None,
-        rmc_dat: RmcPotDat = None,
-        cfg_name: str = "aaa",
-        config: Config = Config(),
-        logger: XLogger = XLogger(),
-    ):
+        rmc_log: RmcPotLog = None,  # instance
+        rmc_dat: RmcPotDat = None,  # instance
+        config: Config = Config(),  # instance
+        logger: Optional[XLogger] = XLogger(),  # instance
+        *,
+        cfg_name: str = None,
+    ) -> None:
         """
+        config インスタンスを与えると、cfg_name はいらない
 
         Args:
             rmc_log: RMC_POT のログ処理用のインスタンス
             rmc_dat: RMC_POT のDAT処理用のインスタンス
+            config (Config): 全てのインスタンスが同じ Config()
+            logger (XLogger): 全てインスタンスが同じ XLogger()
             cfg_name (str): cfg-filename
-            config (Config):
-            logger (XLogger):
         """
         self._logger = logger
         self._config = config
 
+        if cfg_name is None:
+            cfg_name: str = config.cfg_name
+
         # aaa.dat ファイルなどの CFG ファイル名 prefix
         self._cfg_name = cfg_name
-
-        # .dat ファイル処理 instance
-        if rmc_dat is None:
-            rmc_dat = RmcPotDat(
-                logger=logger,
-                cfg_name=cfg_name,  # cfg_name = dat_name (aaa.dat/aaa.cfg)
-                auto_write=True,
-            )
-        self._rmc_dat = rmc_dat
-        if self._rmc_dat:
-            self._logger.info(f"== rmc_pot_dat()")
 
         # RMC 出力ファイル処理
         self._rmc_log = rmc_log
         if self._rmc_log:
             self._logger.info(f"== rmc_log.set_cfg_name({cfg_name})")
             self._rmc_log.set_cfg_name(cfg_name)
+
+        self._rmc_dat = rmc_dat
+        if self._rmc_dat:
+            self._logger.info(f"== rmc_pot_dat()")
+
+        # .dat ファイル処理 instance
+        if rmc_dat is None:
+            rmc_dat = RmcPotDat(
+                cfg_name=cfg_name,  # cfg_name = dat_name (aaa.dat/aaa.cfg)
+                auto_write=True,
+                config=config,
+                logger=logger,
+            )
 
     def set_cfg_name(self, cfg_name: str):
         self._cfg_name = cfg_name
@@ -130,7 +137,7 @@ class RmcPot:
 
     def postprocess(
         self,
-        log_dir: str = "log_rmc",
+        log_dir: Optional[str] = None,
         cfg_name: Optional[str] = None,
         element_info: Union[str, list, None] = None,
     ) -> bool:
@@ -147,8 +154,8 @@ class RmcPot:
         齟齬は出ない
 
         Args:
-            log_dir (str):
-            cfg_name (str): cfg_name と vasp_name は等しいとする
+            log_dir (str): RMC用の log_dir
+            cfg_name (str): cfg_name と vasp_name は等しいとする(デフォルトはコンストラの引数での cfg_name)
             element_info (str | list): 元素情報
 
         Returns:
@@ -157,7 +164,11 @@ class RmcPot:
         """
         self._logger.info(f"== postprocess()")
 
-        if not cfg_name:
+        if log_dir is None:
+            log_dir = self._config.rmc_log_dir
+        self._logger.info(f"log_dir(RMC) = {log_dir}")
+
+        if cfg_name is None:
             cfg_name = self._cfg_name
         self._logger.info(f"cfg_name = {cfg_name}")
 
@@ -192,7 +203,7 @@ class RmcPot:
 
     def run(
         self,
-        cfg_name: str,
+        cfg_name: Optional[str] = None,
         blocking: Optional[bool] = True,
     ) -> bool:
         """
@@ -205,6 +216,8 @@ class RmcPot:
         Returns:
             bool: 正しく終わったデー
         """
+        if cfg_name is None:
+            cfg_name = self._cfg_name
         subprocess.run([f"{self._config.rmc_bin}", f"{cfg_name}"], check=True)
         return True
 

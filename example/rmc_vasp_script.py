@@ -61,19 +61,22 @@ if __name__ == "__main__":
             os.mkdir(log_rmc_dir)
 
         logger.info("== rmc" + str(i))
-        rmc.run(cfg_name=cfg_name)
-        rmc.postprocess(
-            log_dir=log_rmc_dir,
-            cfg_name=cfg_name,
-            element_info="label.txt",
-        )
+        # rmc.run(cfg_name=cfg_name)
+        # rmc.postprocess(
+        #     log_dir=log_rmc_dir,  # 相対
+        #     cfg_name=cfg_name,
+        #     element_info="label.txt",
+        # )
+        rmc.run()
+        rmc.postprocess(element_info="label.txt")
 
         logger.info("== vasp" + str(i))
         vasp.run(mode=run_mode)
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
-        vasp.postprocess(
-            log_dir=log_vasp_dir,
-            cfg_name=cfg_name,
-        )
+        # vasp.postprocess(
+        #     log_dir=log_vasp_dir,
+        #     cfg_name=cfg_name,
+        # )
+        vasp.postprocess()
         logger.info("loop end " + str(i))

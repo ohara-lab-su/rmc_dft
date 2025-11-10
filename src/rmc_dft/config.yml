@@ -7,6 +7,9 @@ cfg_name: "aaa"
 # aaa.vasp
 vasp_name: "aaa"
 
+rmc_log_dir: "rmc_log"
+vasp_log_dir: "vasp_log"
+
 # RMCPOT path
 # パスが通ってなければフルパスで書く
 # rmc_bin: "/home/k/Downloads/Source_RMC_POT_lin_2023.1/rmcp.exe"
@@ -30,3 +33,6 @@ mpi_flag: "-np"
 
 # default job_name
 job_cmd: "qsub job_hpcs2024_node2.sh"
+
+# 入力ファイルの自動セーブ(パラメーターの変更時)
+auto_write: True

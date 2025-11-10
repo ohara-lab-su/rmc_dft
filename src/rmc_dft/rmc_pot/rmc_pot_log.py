@@ -7,7 +7,7 @@ import os
 import shutil
 
 from rmc_dft.config import Config
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 from x_logger import XLogger
 
@@ -16,20 +16,23 @@ class RmcPotLog:
 
     def __init__(
         self,
-        cfg_name: str = None,
         config: Config = Config(),
         logger: Optional[XLogger] = XLogger,
-    ):
+        *,
+        cfg_name: str = None,
+    ) -> None:
         """
+        config インスタンスを与えると、cfg_name はいらない
+
         Args:
+            config (Config): 全てインスタンスが同じ Config()
+            logger (XLogger): 全てのインスタンスが同じ XLogger()
             cfg_name (str):
-            config (Config):
-            logger (XLogger):
         """
         self._logger = logger
 
         if cfg_name is None:
-            cfg_name = config.cfg_name
+            cfg_name: str = config.cfg_name
 
         # default name
         self._cfg_name: str = cfg_name

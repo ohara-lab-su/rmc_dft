@@ -3,7 +3,7 @@
 K.NAKADA, kengo.nakada@gmail.com
 """
 import os
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 from pymatgen.io.vasp.inputs import Incar
 from x_logger import XLogger
 
@@ -22,9 +22,17 @@ class VaspIncar:
     def __init__(
         self,
         incar_name: str = "INCAR",
-        auto_write: bool = True,
         logger: Optional[XLogger] = None,
-    ):
+        *,
+        auto_write: bool = True,
+    ) -> None:
+        """
+
+        Args:
+            incar_name (str):
+            logger (XLogger):
+            auto_write (bool):
+        """
         self.incar_name: str = os.path.abspath(incar_name)
 
         # それぞれの tag 操作で自動的に書き換え

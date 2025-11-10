@@ -16,7 +16,7 @@ RmcPotDat: RMC_POT の .dat 入力ファイル編集クラス
 """
 
 from dataclasses import dataclass
-from typing import List, Sequence, Union, Tuple, Optional
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 from pathlib import Path
 
 from rmc_dft.config import Config
@@ -65,19 +65,23 @@ class RmcPotDat:
 
     def __init__(
         self,
+        config: Config = Config(),  # instance
+        logger: Optional[XLogger] = XLogger(),  # instance
+        *,
         cfg_name: str = None,
         auto_write: bool = True,
-        config: Config = Config(),
-        logger: Optional[XLogger] = XLogger(),
     ) -> None:
         """
+        config インスタンスを与えると、cfg_name はいらない
+
         Args:
+            config (Config): 全てのインスタンが同じ Config()
+            logger (XLogger): 全てインスタンスが同じ XLogger()
             cfg_name (str): xxxx.dat の絶対パス、基本名前（拡張子は付けない）
             auto_write (bool): True の場合 set_* / set_line で即時書き出し
-            config (Config):
-            logger (XLogger):
         """
         self._logger = logger
+        self._config = config
 
         if cfg_name is None:
             cfg_name = config.cfg_name
@@ -85,6 +89,7 @@ class RmcPotDat:
 
         self._lines: list[_Line] = []
         self._auto_write: bool = auto_write
+
         self._load()
 
     # --------------------

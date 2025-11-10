@@ -3,7 +3,7 @@
 K.NAKADA, kengo.nakada@gmail.com
 """
 import os
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 from rmc_dft.rmc_pot import RmcPot, RmcPotLog
 from rmc_dft.vasp import Vasp, VaspLog
@@ -20,10 +20,11 @@ class RmcDft:
         self,
         rmc_code: str = "RmcPot",
         dft_code: str = "Vasp",
-        cfg_name: str = None,
         max_loop: int = 10,
         config: Config = Config(),
         logger: XLogger = XLogger(),
+        *,
+        cfg_name: str = None,
     ):
         """
         RMCとDFTの統合実行クラス。
@@ -31,10 +32,10 @@ class RmcDft:
         Args:
             rmc_code (str): RMCコード名 ("RmcPot", "RmcProfile" など)
             dft_code (str): DFTコード名 ("Vasp", "QE" など)
-            cfg_name (str): CFGファイルのベース名
             max_loop (int): RMC-DFTループの最大回数
             config (Config): 設定オブジェクト
             logger (XLogger): ロガー（指定がなければ新規作成）
+            cfg_name (str): CFGファイルのベース名
         """
         self._logger = logger
         if cfg_name is None:
