@@ -2,13 +2,14 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 """
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 from x_logger import XLogger
 
 
 def ensure_vasp5_format(
     poscar_name: str,
-    element_info: str | None = None,
+    element_info: Optional[str] = None,
     logger: XLogger = None,
 ) -> bool:
     """

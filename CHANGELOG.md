@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.3.2 nakada
+
+- python 3.6 互換
+  - いくつか 3.6 未対応だったのを修正
+
 ## v0.3.1 nakada
 
 - python3.6 + 非ネットワーク環境対応

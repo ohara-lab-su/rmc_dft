@@ -1305,7 +1305,7 @@ class RmcPotDat:
         """31 行目（max atoms per gridcell）を設定する。"""
         self.set_line(31, str(int(value)), auto_write=auto_write)
 
-    def get_swap_settings(self) -> tuple[int, int]:
+    def get_swap_settings(self) -> Tuple[int, int]:
         """
         32 行目（fraction of swaps, allow flag）を取得する。
 

@@ -142,8 +142,19 @@ class VaspKpoints:
         """現在のモード（"Gamma" or "Monkhorst-Pack"）を返す。"""
         return self._mode
 
-    def set_mode(self, mode: str) -> None:
-        """モードを設定する。大文字小文字はそのまま保存するが、想定は "Gamma" / "Monkhorst-Pack"。"""
+    def set_mode(
+        self,
+        mode: str,
+    ) -> None:
+        """
+        モードを設定する。大文字小文字はそのまま保存するが、想定は "Gamma" / "Monkhorst-Pack"。
+
+        Args:
+            mode:
+
+        Returns:
+
+        """
         if mode not in ("Gamma", "Monkhorst-Pack"):
             raise ValueError('mode must be "Gamma" or "Monkhorst-Pack"')
         self._mode = mode
@@ -155,7 +166,12 @@ class VaspKpoints:
         """k-point グリッド (kx, ky, kz) を返す。"""
         return self._grid
 
-    def set_grid(self, kx: int, ky: int, kz: int) -> None:
+    def set_grid(
+        self,
+        kx: int,
+        ky: int,
+        kz: int,
+    ) -> None:
         """k-point グリッド (kx, ky, kz) を設定する。"""
         self._grid = (int(kx), int(ky), int(kz))
         self._kpts_obj = self._build_kpoints()

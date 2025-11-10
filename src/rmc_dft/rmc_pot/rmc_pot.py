@@ -234,8 +234,8 @@ class RmcPot:
 
     def cfg2poscar(
         self,
-        cfg_name: str | None = None,
-        vasp_name: str = None,
+        cfg_name: Optional[str] = None,
+        vasp_name: Optional[str] = None,
     ) -> bool:
         """
 
