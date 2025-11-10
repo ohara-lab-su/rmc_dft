@@ -16,7 +16,7 @@ RmcPotDat: RMC_POT の .dat 入力ファイル編集クラス
 """
 
 from dataclasses import dataclass
-from typing import List, Sequence, Union, Tuple, Optional
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 from pathlib import Path
 
 from rmc_dft.config import Config

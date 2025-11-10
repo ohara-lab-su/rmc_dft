@@ -7,7 +7,7 @@ import os
 import shutil
 
 from rmc_dft.config import Config
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 from x_logger import XLogger
 

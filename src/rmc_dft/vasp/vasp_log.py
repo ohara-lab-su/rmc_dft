@@ -9,7 +9,7 @@ import sys
 import glob
 import shutil
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 from x_logger import XLogger
 

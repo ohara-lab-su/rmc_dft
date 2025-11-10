@@ -23,7 +23,7 @@ pymatgen.io.vasp.inputs.Kpoints を薄くラップした KPOINTS 管理クラス
 
 import sys
 import os
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 from pymatgen.io.vasp.inputs import Kpoints
 
 from x_logger import XLogger

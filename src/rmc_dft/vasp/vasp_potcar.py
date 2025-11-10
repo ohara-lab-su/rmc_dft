@@ -10,7 +10,7 @@ ex) make_poscar.py Li Mn O
 import os
 import sys
 from csv import excel_tab
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 from x_logger import XLogger
 

@@ -3,7 +3,7 @@
 K.NAKADA, kengo.nakada@gmail.com
 """
 import os
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 from rmc_dft.rmc_pot import RmcPot, RmcPotLog
 from rmc_dft.vasp import Vasp, VaspLog

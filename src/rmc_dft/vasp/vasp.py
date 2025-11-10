@@ -4,7 +4,7 @@ K.NAKADA, kengo.nakada@gmail.com (1st, 3rd varsion)
 K.KOBAYASHI (2nd version)
 """
 import os
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import shutil
 
 from ase.io import read, write
