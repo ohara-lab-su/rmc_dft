@@ -2,13 +2,15 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 """
-from x_logger import XLogger
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
+
 from pathlib import Path
+from x_logger import XLogger
 
 
 def copy_contcar_to_vasp(
     vasp_name: str,
-    logger: XLogger = None,
+    logger: Optional[XLogger] = None,
 ) -> bool:
     """
     CONTCAR ファイルを {name}.vasp にコピーする

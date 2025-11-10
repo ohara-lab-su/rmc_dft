@@ -3,6 +3,7 @@ K.NAKADA, kengo.nakada@gmail.com (1st, 3rd varsion)
 K.KOBAYASHI (2nd version)
 """
 
+import yaml
 import os
 
 
@@ -13,6 +14,8 @@ class Config:
 
     vasp_log_dir: str = "vasp_log"
     rmc_log_dir: str = "rmc_log"
+
+    max_rmc_dft_loop: int = 10
 
     #
     # RMCPOT path

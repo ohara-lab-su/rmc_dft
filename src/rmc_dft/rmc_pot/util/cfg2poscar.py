@@ -19,6 +19,7 @@
 from __future__ import print_function
 
 ################################################################################
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 import sys
 import os
@@ -30,7 +31,7 @@ import numpy as np
 
 def cfg2poscar(
     cfg_name: str,
-    vasp_name: str = None,
+    vasp_name: Optional[str] = None,
 ):
     """
     RMCPOT cfg 形式を poscar 形式にする

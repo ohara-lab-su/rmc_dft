@@ -85,7 +85,7 @@ class RmcPotDat:
 
         if cfg_name is None:
             cfg_name = config.cfg_name
-        self.dat_name: str = cfg_name
+        self.cfg_name: str = cfg_name
 
         self._lines: list[_Line] = []
         self._auto_write: bool = auto_write
@@ -1305,7 +1305,7 @@ class RmcPotDat:
         """31 行目（max atoms per gridcell）を設定する。"""
         self.set_line(31, str(int(value)), auto_write=auto_write)
 
-    def get_swap_settings(self) -> tuple[int, int]:
+    def get_swap_settings(self) -> Tuple[int, int]:
         """
         32 行目（fraction of swaps, allow flag）を取得する。
 

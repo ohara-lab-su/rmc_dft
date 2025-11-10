@@ -8,7 +8,7 @@ RMC-VASP を構成する sample script
 import os
 import shutil
 
-from rmc_dft import Vasp, VaspLog, RmcPot, RmcPotLog
+from rmc_dft import Config, Vasp, VaspLog, RmcPot, RmcPotLog
 from x_logger import XLogger
 
 
@@ -29,6 +29,8 @@ if __name__ == "__main__":
         config=config,
         logger=logger,
     )
+    vasp.set_tag("NSW", 2)
+
     # vasp = Vasp(
     #     vasp_log=vasp_log,
     #     vasp_name=vasp_name,

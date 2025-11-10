@@ -71,7 +71,7 @@ class VaspIncar:
     # ==============================
     # 行操作
     # ==============================
-    def _find_line_index(self, tag: str) -> int | None:
+    def _find_line_index(self, tag: str) -> Optional[int]:
         """指定タグの行番号を返す"""
         tag_upper = tag.upper()
         for i, line in enumerate(self.lines):
@@ -127,7 +127,7 @@ class VaspIncar:
         """再読込（外部修正反映）"""
         self._load()
 
-    def export_dict(self) -> dict[str, Any]:
+    def export_dict(self) -> Dict[str, Any]:
         """内部Incar辞書を返す"""
         return dict(self.incar)
 
