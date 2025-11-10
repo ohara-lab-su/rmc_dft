@@ -41,12 +41,12 @@ class Vasp:
 
     def __init__(
         self,
-        vasp_log: VaspLog = None,  # instance (データー解析用)
+        *,
         incar_name: str = "INCAR",
         kpoints_name: str = "KPOINTS",
+        vasp_log: VaspLog = None,  # instance (データー解析用)
         config: Config = Config(),  # instance
         logger: Optional[XLogger] = XLogger(),  # instance
-        *,
         auto_write: bool = True,
         vasp_name: str = None,
         vasp_bin: str = None,
@@ -56,12 +56,14 @@ class Vasp:
         job_cmd: str = None,
     ) -> None:
         """
-        config インスタンを与えると
+        config インスタンを与えると終わり
+
+        (*) 歴史的経緯で複雑になっているが、config 与えれば終わり
 
         Args:
-            vasp_log (VaspLog): VASP の log 解析管理 instance
             incar_name (str): INCAR
             kpoints_name (str): KPOINTS
+            vasp_log (VaspLog): VASP の log 解析管理 instance
             config (Config): 全てのインスタンスが同じ Config
             logger (XLogger): ろがー、全てのインスタンスが同じ XLogger
             auto_write (bool):
@@ -74,17 +76,9 @@ class Vasp:
         """
         self._logger = logger
         self._logger.debug("== create Vasp()")
-        if not vasp_log:
-            vasp_log = VaspLog(logger=self._logger)
 
         # INCAR ファイルのOUTファイル入出力インスタンスの移譲を受ける
-        self._vasp_log: VaspLog = vasp_log
         self._config: Config = config
-
-        # aaa.vasp
-        if vasp_name is None:
-            vasp_name: str = config.vasp_name
-        self._vasp_name: str = vasp_name
 
         # INCAR/KPOINTS/
         self.incar_name: str = incar_name
@@ -93,10 +87,27 @@ class Vasp:
         # write?
         self.auto_write: bool = auto_write
 
-        # -------------------------------
-        # デフォルト値定義
-        # -------------------------------
-        self._incar_defaults: dict[str, object] = {
+        # aaa.vasp
+        if vasp_name is None:
+            vasp_name: str = config.vasp_name
+        self._vasp_name: str = vasp_name
+
+        # VASP 実行系設定
+        self.vasp_bin: str = vasp_bin or config.vasp_bin
+        self.mpi_cmd: str = mpi_cmd or config.mpi_cmd
+        self.mpi_flag: str = mpi_flag or config.mpi_flag
+        self.num_procs: int = num_procs or config.num_procs
+        self.job_cmd: str = job_cmd or config.job_cmd
+        # self.job_cmd = job_cmd
+
+        # --- VaspLog() instance ---
+        if vasp_log is None:
+            vasp_log = VaspLog(logger=self._logger)
+        self._vasp_log: VaspLog = vasp_log
+
+        # --- INCAR ---
+        self._incar_defaults: Dict[str, object] = {
+            # INCAR デフォルト値定義
             "EDIFF": 1e-04,
             "EDIFFG": 1e-05,
             "ISTART": 0,
@@ -108,16 +119,6 @@ class Vasp:
             "ISIF": 2,
             "LREAL": "auto",
         }
-
-        # VASP 実行系設定
-        self.vasp_bin: str = vasp_bin or config.vasp_bin
-        self.mpi_cmd: str = mpi_cmd or config.mpi_cmd
-        self.mpi_flag: str = mpi_flag or config.mpi_flag
-        self.num_procs: int = num_procs or config.num_procs
-        self.job_cmd: str = job_cmd or config.job_cmd
-        # self.job_cmd = job_cmd
-
-        # --- INCAR ---
         self._incar = VaspIncar(
             incar_name=self.incar_name,
             auto_write=self.auto_write,
@@ -125,7 +126,8 @@ class Vasp:
         )
         # INCAR が存在すれば読み込み、なければデフォルトで新規作成
         if not os.path.exists(self.incar_name):
-            for key, val in self.incar_defaults.items():
+            for key, val in self._incar_defaults.items():
+                self._logger.debug(f"set {key} = {val}")
                 self._incar.set(key, val)
 
         # --- KPOINTS ---
@@ -258,8 +260,22 @@ class Vasp:
             bool:
         """
         self._logger.info("== preprocess()")
-        if not vasp_name:
+        if vasp_name is None:
             vasp_name = self._vasp_name
+
+        # 実行スクリプトのあるディレクトリを基準にする
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        self._logger.info(f"script_dir = {script_dir}")
+
+        for filename in ["INCAR", "KPOINTS", "POTCAR", "POSCAR"]:
+            target_path = os.path.join(script_dir, filename)
+            self._logger.info(f"target_path = {target_path}")
+
+            # 実験のファイル存在チェック
+            if not os.path.exists(target_path):
+                self._logger.error(f"**Error**: {target_path} が見つかりません。")
+                sys.exit(-1)
+
         return True
 
     def postprocess(
@@ -314,8 +330,8 @@ class Vasp:
 
     def run(
         self,
-        mode: str = "local",
-        job_cmd: str = None,
+        mode: Optional[str] = None,
+        job_cmd: Optional[str] = None,
         postprocess: bool = False,
         preprocess: bool = False,
         blocking: bool = True,
@@ -352,6 +368,9 @@ class Vasp:
             self.preprocess(self._input_name)
         ########################
 
+        if mode is None:
+            mode = self._config.run_mode
+
         if mode == "local":
             # MPI build された vasp を local で動かすためのもの (infinibandを使わない)
             env["FI_PROVIDER"] = "tcp"
@@ -360,21 +379,34 @@ class Vasp:
             cmd = ["mpirun", "-np", "1", f"{self.vasp_bin}"]
             # cmd = [self.vasp_bin]
 
-        elif mode == "mpi":
-            cmd = [self.mpi_cmd, self.mpi_flag, str(self.num_procs), self.vasp_bin]
-
         elif mode == "job":
             if not job_cmd:
                 job_cmd = self.job_cmd
             cmd = [job_cmd]
 
+        elif mode == "mpi":
+            cmd = [self.mpi_cmd, self.mpi_flag, str(self.num_procs), self.vasp_bin]
+
         else:
-            raise ValueError(f"未知の mode: {mode}")
+            raise ValueError(f"**Error**: 未知の mode: {mode}")
+
+        # vasp_bin がパス上に存在するか確認
+        if mode != "job":
+            if shutil.which(self.vasp_bin) is None:
+                self._logger.error(
+                    f"**Error**: {self.vasp_bin} が見つかりません。PATHを確認してください。"
+                )
+                sys.exit(1)
 
         self._logger.info(f"move = {mode}")
         self._logger.info(f"env = {json.dumps(env, indent=2)}")
         self._logger.info(f"cmd = {cmd}")
-        subprocess.run(cmd, check=True, env=env)
+
+        try:
+            subprocess.run(cmd, check=True, env=env)
+        except subprocess.CalledProcessError as e:
+            self._logger.error(f"**Error**: VASP実行中にエラーが発生しました: {e}")
+            sys.exit(1)
 
         ########################
         if postprocess:
