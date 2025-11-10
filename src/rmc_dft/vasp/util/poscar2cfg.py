@@ -21,6 +21,7 @@
 from __future__ import print_function
 
 ################################################################################
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 import sys
 import os
@@ -33,7 +34,7 @@ from x_logger import XLogger
 
 def contcar2cfg(
     cfg_name: str,
-    logger: XLogger = None,
+    logger: Optional[XLogger] = None,
 ):
     """
     2025.10.29 update CONTCAR タイプ対応
