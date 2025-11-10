@@ -10,7 +10,7 @@ ex) make_poscar.py Li Mn O
 import os
 import sys
 from csv import excel_tab
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 from x_logger import XLogger
 
@@ -24,17 +24,13 @@ class VaspPotcarBuilder:
     def __init__(
         self,
         base_dir: str = "~/potpaw_PBE.64",
-        logger: Optional[XLogger] = None,
+        logger: Optional[XLogger] = XLogger(),
     ):
         """
-
         Args:
             base_dir (str):
-            logger (XLogger):
+            logger (XLogger): 全てのインスタンスが同じ XLogger()
         """
-
-        if not logger:
-            logger = XLogger()
         self._logger = logger
 
         self.base_dir = os.path.expanduser(base_dir)

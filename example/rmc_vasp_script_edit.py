@@ -19,15 +19,26 @@ if __name__ == "__main__":
     cfg_name = "aaa"
     vasp_name = "aaa"
 
+    config = Config("config.yml")
+    config.vasp_name = vasp_name
+    config.cfg_name = cfg_name
+
     vasp_log = VaspLog(logger=logger)
     vasp = Vasp(
         vasp_log=vasp_log,
-        vasp_name=vasp_name,
+        config=config,
         logger=logger,
     )
+    # vasp = Vasp(
+    #     vasp_log=vasp_log,
+    #     vasp_name=vasp_name,
+    #     logger=logger,
+    # )
 
-    rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
-    rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
+    # rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
+    # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
+    rmc_log = RmcPotLog(config=config, logger=logger)
+    rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, config=config, logger=logger)
 
     # require
     # INCAR, KPOINTS, POTCAR,
@@ -54,19 +65,22 @@ if __name__ == "__main__":
             os.mkdir(log_rmc_dir)
 
         logger.info("== rmc" + str(i))
-        rmc.run(cfg_name=cfg_name)
-        rmc.postprocess(
-            log_dir=log_rmc_dir,
-            cfg_name=cfg_name,
-            element_info="label.txt",
-        )
+        rmc.run()
+        rmc.postprocess(element_info="label.txt")
+        # rmc.run(cfg_name=cfg_name)
+        # rmc.postprocess(
+        #     log_dir=log_rmc_dir,
+        #     cfg_name=cfg_name,
+        #     element_info="label.txt",
+        # )
 
         logger.info("== vasp" + str(i))
         vasp.run(mode=run_mode)
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
-        vasp.postprocess(
-            log_dir=log_vasp_dir,
-            cfg_name=cfg_name,
-        )
+        # vasp.postprocess(
+        #     log_dir=log_vasp_dir,
+        #     cfg_name=cfg_name,
+        # )
+        vasp.postprocess()
         logger.info("loop end " + str(i))

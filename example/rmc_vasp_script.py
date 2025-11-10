@@ -15,19 +15,26 @@ from x_logger import XLogger
 if __name__ == "__main__":
     logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
 
+    config = Config()
+    config.load_yaml("config.yml")
+
     # POSCAR to CFG (rmc用のCFG変換)
-    cfg_name = "aaa"
-    vasp_name = "aaa"
+    # cfg_name = "aaa"
+    # vasp_name = "aaa"
+    cfg_name = config.cfg_name
+    vasp_name = config.vasp_name
 
     vasp_log = VaspLog(logger=logger)
     vasp = Vasp(
         vasp_log=vasp_log,
-        vasp_name=vasp_name,
+        config=config,
         logger=logger,
     )
 
-    rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
-    rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
+    # rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
+    # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
+    rmc_log = RmcPotLog(config=config, logger=logger)
+    rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
 
     # require
     # INCAR, KPOINTS, POTCAR,
@@ -54,19 +61,22 @@ if __name__ == "__main__":
             os.mkdir(log_rmc_dir)
 
         logger.info("== rmc" + str(i))
-        rmc.run(cfg_name=cfg_name)
-        rmc.postprocess(
-            log_dir=log_rmc_dir,
-            cfg_name=cfg_name,
-            element_info="label.txt",
-        )
+        # rmc.run(cfg_name=cfg_name)
+        # rmc.postprocess(
+        #     log_dir=log_rmc_dir,  # 相対
+        #     cfg_name=cfg_name,
+        #     element_info="label.txt",
+        # )
+        rmc.run()
+        rmc.postprocess(element_info="label.txt")
 
         logger.info("== vasp" + str(i))
         vasp.run(mode=run_mode)
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
-        vasp.postprocess(
-            log_dir=log_vasp_dir,
-            cfg_name=cfg_name,
-        )
+        # vasp.postprocess(
+        #     log_dir=log_vasp_dir,
+        #     cfg_name=cfg_name,
+        # )
+        vasp.postprocess()
         logger.info("loop end " + str(i))
