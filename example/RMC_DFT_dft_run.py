@@ -18,18 +18,19 @@ from x_logger import XLogger
 
 if __name__ == "__main__":
     cfg_name = "aaa"
+    max_rmc_dft_loop = 3
 
     logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
     config = Config("config.yml")
     config.cfg_name = cfg_name
+    config.max_rmc_dft_loop = max_rmc_dft_loop
 
     # POSCAR to CFG (rmc用のCFG変換)
 
     rmc_dft = RmcDft(
         rmc_code="RmcPot",
         dft_code="Vasp",
-        cfg_name="aaa",
-        max_loop=3,
+        # max_rmc_dft_loop=3,
         config=config,
         logger=logger,
     )

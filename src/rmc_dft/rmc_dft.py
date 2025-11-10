@@ -20,7 +20,7 @@ class RmcDft:
         self,
         rmc_code: str = "RmcPot",
         dft_code: str = "Vasp",
-        max_rmc_dft_loop: int = 10,
+        max_rmc_dft_loop: Optional[int] = None,
         config: Config = Config(),
         logger: XLogger = XLogger(),
         *,
@@ -40,6 +40,9 @@ class RmcDft:
         self._logger = logger
         if cfg_name is None:
             cfg_name = config.cfg_name
+
+        if max_rmc_dft_loop is None:
+            max_rmc_dft_loop = config.max_rmc_dft_loop
 
         self._cfg_name = cfg_name
         self._config = config

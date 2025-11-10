@@ -12,8 +12,10 @@ class Config:
     cfg_name: str = "aaa"  # aaa.cfg
     vasp_name: str = "aaa"  # aaa.vasp
 
-    vasp_log_dir: str = "vasp_lyog"
+    vasp_log_dir: str = "vasp_log"
     rmc_log_dir: str = "rmc_log"
+
+    max_rmc_dft_loop: int = 10
 
     #
     # RMCPOT path
