@@ -22,6 +22,7 @@ if __name__ == "__main__":
 
     logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
     config = Config("config.yml")
+
     config.cfg_name = cfg_name
     config.max_rmc_dft_loop = max_rmc_dft_loop
 
@@ -40,4 +41,5 @@ if __name__ == "__main__":
     poscar2cfg(cfg_name=cfg_name)
 
     # rmc_dft.run(mode="local", cfg_name=cfg_name)
-    rmc_dft.run(mode="local")
+    # rmc_dft.run(mode="local")
+    rmc_dft.run()

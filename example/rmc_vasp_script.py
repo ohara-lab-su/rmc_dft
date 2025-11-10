@@ -23,18 +23,25 @@ if __name__ == "__main__":
     # vasp_name = "aaa"
     cfg_name = config.cfg_name
     vasp_name = config.vasp_name
+    run_mode = config.run_mode
+    element_info = config.element_info
+    max_rmc_dft_loop = config.max_rmc_dft_loop
 
-    vasp_log = VaspLog(logger=logger)
-    vasp = Vasp(
-        vasp_log=vasp_log,
-        config=config,
-        logger=logger,
-    )
+    # vasp_log = VaspLog(logger=logger)
+    # vasp = Vasp(
+    #     vasp_log=vasp_log,
+    #     config=config,
+    #     logger=logger,
+    # )
+
+    vasp = Vasp(config=config, logger=logger)
 
     # rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
+    # rmc_log = RmcPotLog(config=config, logger=logger)
     # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
-    rmc_log = RmcPotLog(config=config, logger=logger)
-    rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
+    # rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
+
+    rmc = RmcPot(config=config, logger=logger)
 
     # require
     # INCAR, KPOINTS, POTCAR,
@@ -43,16 +50,15 @@ if __name__ == "__main__":
     # Also, high precision cell length need to be set (manually) from "number density".
     # aaa.dat, ???.??? (e.g. Hg.sq specified in aaa.dat)
 
-    max_loop = 3
+    # max_rmc_dft_loop = 3
 
     # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
     vasp.poscar2cfg(cfg_name)
 
-    run_mode = "local"
     digits = len(str(max_loop - 1))
 
     i = 0
-    for i in range(0, max_loop):
+    for i in range(0, max_rmc_dft_loop):
 
         log_rmc_dir = f"log{str(i).zfill(digits)}"
         log_vasp_dir = f"log{str(i).zfill(digits)}"
@@ -61,20 +67,24 @@ if __name__ == "__main__":
             os.mkdir(log_rmc_dir)
 
         logger.info("== rmc" + str(i))
+
+        rmc.postprocess()
         # rmc.run(cfg_name=cfg_name)
+        rmc.run()
+        rmc.postprocess()
+        # rmc.postprocess(element_info="label.txt")
         # rmc.postprocess(
         #     log_dir=log_rmc_dir,  # 相対
         #     cfg_name=cfg_name,
         #     element_info="label.txt",
         # )
-        rmc.run()
-        rmc.postprocess(element_info="label.txt")
 
         logger.info("== vasp" + str(i))
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
 
-        vasp.run(mode=run_mode)
+        vasp.run()
+        # vasp.run(mode=run_mode)
         # vasp.postprocess(
         #     log_dir=log_vasp_dir,
         #     cfg_name=cfg_name,

@@ -1,17 +1,22 @@
 
-# RMC_POT: aaa.cfg
+# input_file: RMC_POT: aaa.cfg
 cfg_name: "aaa"
 
-# VASP: aaa.vasp
+# input_file: VASP: aaa.vasp
 vasp_name: "aaa"
 
+# VASP4(Rmc.cfg) type --> VASP5 type
+element_info: "label.txt"
+
+# LOG 保存
 rmc_log_dir: "rmc_log"
 vasp_log_dir: "vasp_log"
 
 max_rmc_dft_loop: 10
 
-# RMCPOT path
-# パスが通ってなければフルパスで書く
+run_mode: "local"
+
+# RMCPOT path (パスが通ってなければフルパスで書く)
 # rmc_bin: "/home/k/Downloads/Source_RMC_POT_lin_2023.1/rmcp.exe"
 # rmc_bin: "/usr/local/src/RMCPOT/rmcp.exe"
 rmc_bin: "rmcp.exe"
@@ -19,9 +24,9 @@ rmc_bin: "rmcp.exe"
 # VASP  path
 # vasp_bin: "/home/hpc/vasp/bin/vasp-gamma"
 # vasp_bin: "/home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
-# vasp_bin: "/home/hpc/vasp/bin/vasp"
 vasp_bin: "vasp_gam"
 
+# MPI process 数
 num_procs: 1
 
 # mpi: "mpirun -np {num_procs} {os.path.expanduser('/home/hpc/vasp/bin/vasp')}"

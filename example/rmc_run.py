@@ -26,8 +26,10 @@ if __name__ == "__main__":
 
     # rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
     # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, config=config, logger=logger)
-    rmc_log = RmcPotLog(config=config, logger=logger)
-    rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
+    # rmc_log = RmcPotLog(config=config, logger=logger)
+    # rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
+
+    rmc = RmcPot(config=config, logger=logger)
 
     # ret = rmc.get_tag("density")
     # print(ret)
@@ -36,5 +38,6 @@ if __name__ == "__main__":
     # print(ret)
 
     # rmc.run(cfg_name=cfg_name)
+    rmc.preprocess()
     rmc.run()
     rmc.postprocess()

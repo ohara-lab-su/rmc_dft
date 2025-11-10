@@ -796,6 +796,7 @@ class RmcPotDat:
           5 列ファイルは 2 元系（Q, F(Q), c11, c12, c22）、
           8 列ファイルは 3 元系（Q, F(Q), c11, c12, c13, c22, c23, c33）。
         """
+        self._logger.info(f'== get_exp_filename: "{self.get_line(11)}"')
         return self.get_line(11).split()[0]
 
     def set_exp_filename(

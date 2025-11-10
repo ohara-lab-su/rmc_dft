@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.3.3 nakada
+
+- python 3.6 互換
+    - いくつか 3.6 未対応だったのを修正
+- VASP / RMC 実行前の必要ファイルチェックなどを導入
+- Vasp/RmcPot などの各主要クラスにおいて VaspLog() や RmcPotLog() などの
+  ログ結果を取得すクラスを委譲しなくても、None のときはコンストラクにて生成する
+  仕様に変更（仕様を追加)。従来型もOK
+
 ## v0.3.2 nakada
 
 - python 3.6 互換
@@ -7,7 +16,7 @@
 
 ## v0.3.1 nakada
 
-- python3.6 + 非ネットワーク環境対応
+- python3.6 + 非ネットワーク環境対応 (尾原研 hpcs 環境対応)
   - setup.py を追加 (tomlと共存)
   - python 3.10 以上の構文( config: str | None = None) のようなものを廃止
     - python 3.6 でも動作するように config: Optional[str] = None などとする
