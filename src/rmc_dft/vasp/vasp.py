@@ -6,6 +6,8 @@ K.KOBAYASHI (2nd version)
 import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import shutil
+import subprocess
+import json
 
 from ase.io import read, write
 
@@ -369,7 +371,9 @@ class Vasp:
         else:
             raise ValueError(f"未知の mode: {mode}")
 
-        self._logger.info("Executing: " + " ".join(cmd))
+        self._logger.info(f"move = {mode}")
+        self._logger.info(f"env = {json.dumps(env, indent=2)}")
+        self._logger.info(f"cmd = {cmd}")
         subprocess.run(cmd, check=True, env=env)
 
         ########################

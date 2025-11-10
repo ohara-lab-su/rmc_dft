@@ -9,7 +9,7 @@ import sys
 import argparse
 import shutil
 
-from rmc_dft import Vasp, VaspLog, RmcPot, RmcPotLog
+from rmc_dft import Config, Vasp, VaspLog, RmcPot, RmcPotLog
 from x_logger import XLogger
 
 

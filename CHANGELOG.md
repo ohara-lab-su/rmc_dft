@@ -9,6 +9,9 @@
     - dataclass を 内部モジュールから外部モジュール(pip instal dataclasses) 3.6対応のため
     - アノテーション記法を後方互換性が高いものに変更 list[str] --> List[str]
 - config.py を修正(config.yaml 導入) 
+- config.py を instance 形にする
+  - 直接 cfg_name などを引かなくても、config を引けば、cinfig 情報をクラスやメソッドで参照できるように統合
+  - config.yml による編集部分
  
 ## v0.3.0 nakada
 

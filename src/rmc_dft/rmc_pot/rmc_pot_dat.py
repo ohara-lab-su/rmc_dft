@@ -85,7 +85,7 @@ class RmcPotDat:
 
         if cfg_name is None:
             cfg_name = config.cfg_name
-        self.dat_name: str = cfg_name
+        self.cfg_name: str = cfg_name
 
         self._lines: list[_Line] = []
         self._auto_write: bool = auto_write

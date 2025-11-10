@@ -1,14 +1,14 @@
 
-# RMC_POT.cfg
-# aaa.cfg
+# RMC_POT: aaa.cfg
 cfg_name: "aaa"
 
-# RMC_POT.vasp
-# aaa.vasp
+# VASP: aaa.vasp
 vasp_name: "aaa"
 
 rmc_log_dir: "rmc_log"
 vasp_log_dir: "vasp_log"
+
+max_rmc_dft_loop: 10
 
 # RMCPOT path
 # パスが通ってなければフルパスで書く
@@ -19,7 +19,6 @@ rmc_bin: "rmcp.exe"
 # VASP  path
 # vasp_bin: "/home/hpc/vasp/bin/vasp-gamma"
 # vasp_bin: "/home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
-# vasp_bin: "mpirun -np 4 vasp"
 # vasp_bin: "/home/hpc/vasp/bin/vasp"
 vasp_bin: "vasp_gam"
 
