@@ -4,6 +4,7 @@ K.NAKADA, Kengo.nakada@gmail.com (1st, 3rd version)
 K.KOBAYASHI (2nd version)
 """
 import os
+import sys
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import subprocess
 import shutil
@@ -26,11 +27,11 @@ class RmcPot:
 
     def __init__(
         self,
+        *,
         rmc_log: RmcPotLog = None,  # instance
         rmc_dat: RmcPotDat = None,  # instance
         config: Config = Config(),  # instance
         logger: Optional[XLogger] = XLogger(),  # instance
-        *,
         cfg_name: str = None,
     ) -> None:
         """
@@ -52,24 +53,27 @@ class RmcPot:
         # aaa.dat ファイルなどの CFG ファイル名 prefix
         self._cfg_name = cfg_name
 
-        # RMC 出力ファイル処理
-        self._rmc_log = rmc_log
-        if self._rmc_log:
-            self._logger.info(f"== rmc_log.set_cfg_name({cfg_name})")
-            self._rmc_log.set_cfg_name(cfg_name)
+        auto_write = config.auto_write
 
-        self._rmc_dat = rmc_dat
-        if self._rmc_dat:
-            self._logger.info(f"== rmc_pot_dat()")
+        # RMC 出力ファイル処理 instance
+        if rmc_log is None:
+            rmc_log = RmcPotLog(config=config, logger=logger)
+
+        self._rmc_log = rmc_log
+        self._logger.info(f"== rmc_log.set_cfg_name({cfg_name})")
+        self._rmc_log.set_cfg_name(cfg_name)
 
         # .dat ファイル処理 instance
         if rmc_dat is None:
             rmc_dat = RmcPotDat(
-                cfg_name=cfg_name,  # cfg_name = dat_name (aaa.dat/aaa.cfg)
-                auto_write=True,
+                cfg_name=cfg_name,  # cfg_name = aaa.dat/aaa.cfg
+                auto_write=auto_write,
                 config=config,
                 logger=logger,
             )
+
+        self._rmc_dat = rmc_dat
+        self._logger.info(f"== rmc_pot_dat()")
 
     def set_cfg_name(self, cfg_name: str):
         self._cfg_name = cfg_name
@@ -132,8 +136,22 @@ class RmcPot:
     def preprocess(self):
         """
         このコードを動かすときは RMC_POT 入力が揃って意前提とする
+        1. プロファイル情報のあるファイルがぞんざいしないときは止める
         """
         self._logger.info("== preprocess()")
+
+        filename = self._rmc_dat.get_exp_filename()
+
+        # 実行スクリプトのあるディレクトリを基準にする
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        target_path = os.path.join(script_dir, filename)
+        self._logger.info(f"script_dir = {script_dir}")
+        self._logger.info(f"target_path = {target_path}")
+
+        # 実験のファイル存在チェック
+        if not os.path.exists(target_path):
+            self._logger.error(f"**Error**: {target_path} が見つかりません。")
+            sys.exit(-1)
 
     def postprocess(
         self,
@@ -172,8 +190,9 @@ class RmcPot:
             cfg_name = self._cfg_name
         self._logger.info(f"cfg_name = {cfg_name}")
 
-        if not element_info:
-            element_info = "label.txt"
+        if element_info is None:
+            # element_info = "label.txt"
+            element_info = self._config.element_info
 
         # DATA-collect
         self._rmc_log.collect_result()

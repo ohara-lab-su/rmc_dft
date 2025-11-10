@@ -71,8 +71,14 @@ class VaspIncar:
     # ==============================
     # 行操作
     # ==============================
-    def _find_line_index(self, tag: str) -> Optional[int]:
-        """指定タグの行番号を返す"""
+    def _find_line_index(
+        self,
+        tag: str,
+    ) -> Optional[int]:
+        """
+        指定タグの行番号を返す
+        実際の INCAR に、指定のタグがどの行にあるのか？を調べる
+        """
         tag_upper = tag.upper()
         for i, line in enumerate(self.lines):
             if "=" in line and not line.strip().startswith("#"):
@@ -89,12 +95,38 @@ class VaspIncar:
     # ==============================
     # 値操作（pymatgen互換）
     # ==============================
-    def get(self, tag: str, default: Any = None) -> Any:
-        """値取得。存在しない場合はdefaultを返す。"""
+    def get(
+        self,
+        tag: str,
+        default: Any = None,
+    ) -> Any:
+        """
+        値取得。存在しない場合はdefaultを返す。
+
+        Args:
+            tag (str):
+            default (Any):
+
+        Returns:
+            Any:
+        """
         return self.incar.get(tag, default)
 
-    def set(self, tag: str, value: Any) -> None:
-        """値設定。コメント保持したまま編集。"""
+    def set(
+        self,
+        tag: str,
+        value: Any,
+    ) -> None:
+        """
+        値設定。コメント保持したまま編集。
+
+        Args:
+            tag (str):  INCAR のキー
+            value (Any):  value
+
+        Returns:
+            None:
+        """
         idx = self._find_line_index(tag)
         new_line = self._format_line(tag, value)
 

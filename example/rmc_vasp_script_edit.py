@@ -23,12 +23,17 @@ if __name__ == "__main__":
     config.vasp_name = vasp_name
     config.cfg_name = cfg_name
 
-    vasp_log = VaspLog(logger=logger)
-    vasp = Vasp(
-        vasp_log=vasp_log,
-        config=config,
-        logger=logger,
-    )
+    run_mode = config.run_mode
+    max_rmc_dft_loop = config.max_rmc_dft_loop
+    element_info = config.element_info
+
+    # vasp_log = VaspLog(logger=logger)
+    # vasp = Vasp(
+    #     vasp_log=vasp_log,
+    #     config=config,
+    #     logger=logger,
+    # )
+    vasp = Vasp(config=config, logger=logger)
     vasp.set_tag("NSW", 2)
 
     # vasp = Vasp(
@@ -39,8 +44,10 @@ if __name__ == "__main__":
 
     # rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
     # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
-    rmc_log = RmcPotLog(config=config, logger=logger)
-    rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, config=config, logger=logger)
+    # rmc_log = RmcPotLog(config=config, logger=logger)
+    # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, config=config, logger=logger)
+
+    rmc = RmcPot(config=config, logger=logger)
 
     # require
     # INCAR, KPOINTS, POTCAR,
@@ -49,12 +56,12 @@ if __name__ == "__main__":
     # Also, high precision cell length need to be set (manually) from "number density".
     # aaa.dat, ???.??? (e.g. Hg.sq specified in aaa.dat)
 
-    max_loop = 3
+    # max_rmc_dft_loop = 3
 
     # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
     vasp.poscar2cfg(cfg_name)
 
-    run_mode = "local"
+    # run_mode = "local"
     digits = len(str(max_loop - 1))
 
     i = 0
@@ -67,9 +74,13 @@ if __name__ == "__main__":
             os.mkdir(log_rmc_dir)
 
         logger.info("== rmc" + str(i))
+        rmc.postprocess()
+
         rmc.run()
-        rmc.postprocess(element_info="label.txt")
         # rmc.run(cfg_name=cfg_name)
+
+        rmc.postprocess()
+        # rmc.postprocess(element_info="label.txt")
         # rmc.postprocess(
         #     log_dir=log_rmc_dir,
         #     cfg_name=cfg_name,
@@ -77,7 +88,8 @@ if __name__ == "__main__":
         # )
 
         logger.info("== vasp" + str(i))
-        vasp.run(mode=run_mode)
+        vasp.run()
+        # vasp.run(mode=run_mode)
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
         # vasp.postprocess(
