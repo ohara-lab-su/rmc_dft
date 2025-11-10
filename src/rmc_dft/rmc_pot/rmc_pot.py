@@ -26,10 +26,10 @@ class RmcPot:
 
     def __init__(
         self,
-        rmc_log: RmcPotLog = None,
-        rmc_dat: RmcPotDat = None,
-        config: Config = Config(),
-        logger: XLogger = XLogger(),
+        rmc_log: RmcPotLog = None,  # instance
+        rmc_dat: RmcPotDat = None,  # instance
+        config: Config = Config(),  # instance
+        logger: Optional[XLogger] = XLogger(),  # instance
         *,
         cfg_name: str = None,
     ) -> None:
@@ -137,7 +137,7 @@ class RmcPot:
 
     def postprocess(
         self,
-        log_dir: str = "log_rmc",
+        log_dir: Optional[str] = None,
         cfg_name: Optional[str] = None,
         element_info: Union[str, list, None] = None,
     ) -> bool:
@@ -154,8 +154,8 @@ class RmcPot:
         齟齬は出ない
 
         Args:
-            log_dir (str):
-            cfg_name (str): cfg_name と vasp_name は等しいとする
+            log_dir (str): RMC用の log_dir
+            cfg_name (str): cfg_name と vasp_name は等しいとする(デフォルトはコンストラの引数での cfg_name)
             element_info (str | list): 元素情報
 
         Returns:
@@ -164,7 +164,11 @@ class RmcPot:
         """
         self._logger.info(f"== postprocess()")
 
-        if not cfg_name:
+        if log_dir is None:
+            log_dir = self._config.rmc_log_dir
+        self._logger.info(f"log_dir(RMC) = {log_dir}")
+
+        if cfg_name is None:
             cfg_name = self._cfg_name
         self._logger.info(f"cfg_name = {cfg_name}")
 
@@ -199,7 +203,7 @@ class RmcPot:
 
     def run(
         self,
-        cfg_name: str,
+        cfg_name: Optional[str] = None,
         blocking: Optional[bool] = True,
     ) -> bool:
         """
@@ -212,6 +216,8 @@ class RmcPot:
         Returns:
             bool: 正しく終わったデー
         """
+        if cfg_name is None:
+            cfg_name = self._cfg_name
         subprocess.run([f"{self._config.rmc_bin}", f"{cfg_name}"], check=True)
         return True
 

@@ -65,8 +65,8 @@ class RmcPotDat:
 
     def __init__(
         self,
-        config: Config = Config(),
-        logger: Optional[XLogger] = XLogger(),
+        config: Config = Config(),  # instance
+        logger: Optional[XLogger] = XLogger(),  # instance
         *,
         cfg_name: str = None,
         auto_write: bool = True,
@@ -81,6 +81,7 @@ class RmcPotDat:
             auto_write (bool): True の場合 set_* / set_line で即時書き出し
         """
         self._logger = logger
+        self._config = config
 
         if cfg_name is None:
             cfg_name = config.cfg_name

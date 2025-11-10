@@ -35,5 +35,6 @@ if __name__ == "__main__":
     # ret = rmc.get_tag("density")
     # print(ret)
 
-    rmc.run(cfg_name=cfg_name)
+    # rmc.run(cfg_name=cfg_name)
+    rmc.run()
     rmc.postprocess()

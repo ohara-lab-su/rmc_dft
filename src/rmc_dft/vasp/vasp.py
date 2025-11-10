@@ -39,11 +39,11 @@ class Vasp:
 
     def __init__(
         self,
-        vasp_log: VaspLog,
+        vasp_log: VaspLog = None,  # instance (データー解析用)
         incar_name: str = "INCAR",
         kpoints_name: str = "KPOINTS",
-        config: Config = Config(),
-        logger: XLogger = XLogger,
+        config: Config = Config(),  # instance
+        logger: Optional[XLogger] = XLogger(),  # instance
         *,
         auto_write: bool = True,
         vasp_name: str = None,
@@ -57,7 +57,7 @@ class Vasp:
         config インスタンを与えると
 
         Args:
-            vasp_log (VaspLog): VASP の log 解析管理
+            vasp_log (VaspLog): VASP の log 解析管理 instance
             incar_name (str): INCAR
             kpoints_name (str): KPOINTS
             config (Config): 全てのインスタンスが同じ Config
@@ -72,6 +72,8 @@ class Vasp:
         """
         self._logger = logger
         self._logger.debug("== create Vasp()")
+        if not vasp_log:
+            vasp_log = VaspLog(logger=self._logger)
 
         # INCAR ファイルのOUTファイル入出力インスタンスの移譲を受ける
         self._vasp_log: VaspLog = vasp_log
@@ -260,7 +262,7 @@ class Vasp:
 
     def postprocess(
         self,
-        log_dir: str = "log_vasp",
+        log_dir: Optional[str] = None,
         cfg_name: Optional[str] = None,
     ) -> bool:
         """
@@ -273,16 +275,20 @@ class Vasp:
 
 
         Args:
-            log_dir (str):
-            cfg_name (str): POSCAR -> cfg_name.cfg
+            log_dir (str): VASP_log_dir_name デフォルトは config() から vasp_log_dir を取得
+            cfg_name (str): POSCAR -> cfg_name.cfg (デフォルトは config() から cfg_name を取得する)
 
         Returns:
             bool:
         """
         self._logger.info("== postprocess()")
 
-        if not cfg_name:
-            cfg_name = self._cfg_name
+        if log_dir is None:
+            log_dir = self._config.vasp_log_dir
+        self._logger.info(f"log_dir(VASP)={log_dir})")
+
+        if cfg_name is None:
+            cfg_name = self._config.cfg_name
         self._logger.info(f"cfg_name={cfg_name})")
 
         # DATA-collect

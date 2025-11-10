@@ -11,6 +11,9 @@ class Config:
     cfg_name: str = "aaa"  # aaa.cfg
     vasp_name: str = "aaa"  # aaa.vasp
 
+    vasp_log_dir: str = "vasp_log"
+    rmc_log_dir: str = "rmc_log"
+
     #
     # RMCPOT path
     #
@@ -35,6 +38,9 @@ class Config:
 
     # default job_name
     job_cmd: str = "qsub job_hpcs2024_node2.sh"
+
+    # 自動セーブ
+    auto_write: bool = True
 
     def __init__(self, yaml_path=None):
         # インスタンスで使いたいときだけ、ここで個別設定
