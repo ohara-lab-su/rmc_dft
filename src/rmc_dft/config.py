@@ -3,6 +3,7 @@ K.NAKADA, kengo.nakada@gmail.com (1st, 3rd varsion)
 K.KOBAYASHI (2nd version)
 """
 
+import yaml
 import os
 
 
@@ -11,7 +12,7 @@ class Config:
     cfg_name: str = "aaa"  # aaa.cfg
     vasp_name: str = "aaa"  # aaa.vasp
 
-    vasp_log_dir: str = "vasp_log"
+    vasp_log_dir: str = "vasp_lyog"
     rmc_log_dir: str = "rmc_log"
 
     #

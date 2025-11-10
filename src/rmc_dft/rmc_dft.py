@@ -20,7 +20,7 @@ class RmcDft:
         self,
         rmc_code: str = "RmcPot",
         dft_code: str = "Vasp",
-        max_loop: int = 10,
+        max_rmc_dft_loop: int = 10,
         config: Config = Config(),
         logger: XLogger = XLogger(),
         *,
@@ -32,7 +32,7 @@ class RmcDft:
         Args:
             rmc_code (str): RMCコード名 ("RmcPot", "RmcProfile" など)
             dft_code (str): DFTコード名 ("Vasp", "QE" など)
-            max_loop (int): RMC-DFTループの最大回数
+            max_rmc_dft_loop (int): RMC-DFTループの最大回数
             config (Config): 設定オブジェクト
             logger (XLogger): ロガー（指定がなければ新規作成）
             cfg_name (str): CFGファイルのベース名
@@ -43,7 +43,7 @@ class RmcDft:
 
         self._cfg_name = cfg_name
         self._config = config
-        self._max_loop = max_loop
+        self._max_rmc_dft_loop = max_rmc_dft_loop
         self._dft_code = dft_code
         self._rmc_code = rmc_code
 
@@ -81,8 +81,8 @@ class RmcDft:
     def set_cfg_name(self, cfg_name: str):
         self._cfg_name: str = cfg_name
 
-    def set_max_loop(self, max_loop: int):
-        self._max_loop: int = max_loop
+    def set_max_rmc_dft_loop(self, max_rmc_dft_loop: int):
+        self._max_rmc_dft_loop: int = max_rmc_dft_loop
 
     def init(self, cfg_name: str):
         # self._dft.init(cfg_name)
@@ -97,21 +97,34 @@ class RmcDft:
 
     def run(
         self,
-        max_loop: Optional[int] = None,
-        mode: str = "local",
-        cfg_name: str = None,
-        logger: XLogger = None,
+        mode: Optional[str] = "local",
+        max_rmc_dft_loop: Optional[int] = None,
+        cfg_name: Optional[str] = None,
+        *,
+        logger: Optional[XLogger] = XLogger(),
     ):
-        if not max_loop:
-            max_loop: int = self._max_loop
+        """
 
-        if not cfg_name:
+        Args:
+            mode (str):
+            max_rmc_dft_loop:
+            cfg_name (str):
+            logger (XLogger):
+
+        Returns:
+
+        """
+        if max_rmc_dft_loop is None:
+            max_rmc_dft_loop: int = self._max_rmc_dft_loop
+
+        # コンストラクで Config() から cfg_name にとってくる形
+        if cfg_name is None:
             cfg_name: str = self._cfg_name
 
-        digits: int = len(str(max_loop - 1))
+        digits: int = len(str(max_rmc_dft_loop - 1))
 
         i = 0
-        for i in range(0, max_loop):
+        for i in range(0, max_rmc_dft_loop):
 
             log_rmc_dir = f"log{str(i).zfill(digits)}"
             log_dft_dir = f"log{str(i).zfill(digits)}"
@@ -168,7 +181,7 @@ if __name__ == "__main__":
         rmc_code="RmcPot",
         dft_code="Vasp",
         cfg_name="aaa",
-        max_loop=5,
+        max_rmc_dft_loop=5,
         logger=_logger,
     )
 

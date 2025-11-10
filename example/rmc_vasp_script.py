@@ -8,7 +8,7 @@ RMC-VASP を構成する sample script
 import os
 import shutil
 
-from rmc_dft import Vasp, VaspLog, RmcPot, RmcPotLog
+from rmc_dft import Config, Vasp, VaspLog, RmcPot, RmcPotLog
 from x_logger import XLogger
 
 
@@ -71,9 +71,10 @@ if __name__ == "__main__":
         rmc.postprocess(element_info="label.txt")
 
         logger.info("== vasp" + str(i))
-        vasp.run(mode=run_mode)
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
+
+        vasp.run(mode=run_mode)
         # vasp.postprocess(
         #     log_dir=log_vasp_dir,
         #     cfg_name=cfg_name,
