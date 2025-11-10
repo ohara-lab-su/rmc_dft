@@ -4,6 +4,7 @@ K.NAKADA, kengo.nakada@gmail.com (1st, 3rd varsion)
 K.KOBAYASHI (2nd version)
 """
 import os
+import sys
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import shutil
 import subprocess
@@ -527,8 +528,7 @@ class Vasp:
         """
         self._logger.info(f"== poscar2cfg({cfg_name})")
         # xdatcar2poscar(cfg_name)
-        poscar2cfg(cfg_name)
-        return True
+        return poscar2cfg(cfg_name)
 
     def xdatcar2poscar(
         self,
@@ -544,8 +544,7 @@ class Vasp:
             bool: 正しく終わったデー
         """
         self._logger.info(f"== xdatcar2poscar({input_name})")
-        xdatcar2poscar(input_name)
-        return True
+        return xdatcar2poscar(input_name)
 
     @staticmethod
     def pdb2poscar(pdb_name: str = "aaa"):

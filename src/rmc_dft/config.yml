@@ -25,6 +25,7 @@ rmc_bin: "rmcp.exe"
 # vasp_bin: "/home/hpc/vasp/bin/vasp-gamma"
 # vasp_bin: "/home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
 vasp_bin: "vasp_gam"
+# vasp_bin: "vasp-gamma"  # hpcs
 
 # MPI process 数
 num_procs: 1

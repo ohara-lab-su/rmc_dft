@@ -24,7 +24,7 @@ if __name__ == "__main__":
         rmc_code="RmcPot",
         dft_code="Vasp",
         # cfg_name="aaa",
-        max_loop=3,
+        max_rmc_dft_loop=3,
         config=config,
         logger=logger,
     )
