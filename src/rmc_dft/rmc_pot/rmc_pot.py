@@ -34,6 +34,7 @@ class RmcPot:
         cfg_name: str = None,
     ) -> None:
         """
+        config インスタンスを与えると、cfg_name はいらない
 
         Args:
             rmc_log: RMC_POT のログ処理用のインスタンス

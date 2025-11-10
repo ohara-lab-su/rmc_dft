@@ -54,6 +54,8 @@ class Vasp:
         job_cmd: str = None,
     ) -> None:
         """
+        config インスタンを与えると
+
         Args:
             vasp_log (VaspLog): VASP の log 解析管理
             incar_name (str): INCAR

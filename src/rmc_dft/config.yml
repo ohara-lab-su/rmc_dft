@@ -30,3 +30,6 @@ mpi_flag: "-np"
 
 # default job_name
 job_cmd: "qsub job_hpcs2024_node2.sh"
+
+#
+auto_write: True

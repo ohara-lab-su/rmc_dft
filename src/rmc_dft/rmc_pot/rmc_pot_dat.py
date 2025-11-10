@@ -72,6 +72,7 @@ class RmcPotDat:
         auto_write: bool = True,
     ) -> None:
         """
+        config インスタンスを与えると、cfg_name はいらない
 
         Args:
             config (Config): 全てのインスタンが同じ Config()

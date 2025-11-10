@@ -22,6 +22,8 @@ class RmcPotLog:
         cfg_name: str = None,
     ) -> None:
         """
+        config インスタンスを与えると、cfg_name はいらない
+
         Args:
             config (Config): 全てインスタンスが同じ Config()
             logger (XLogger): 全てのインスタンスが同じ XLogger()
