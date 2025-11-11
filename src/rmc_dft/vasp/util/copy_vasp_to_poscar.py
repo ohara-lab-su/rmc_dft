@@ -10,7 +10,7 @@ from x_logger import XLogger
 
 def copy_vasp_to_poscar(
     vasp_name: str,
-    logger: Optional[XLogger] = None,
+    logger: Optional[XLogger] = XLogger(),
 ) -> bool:
     """
     {vasp_name}.vasp ファイルを POSCAR にコピーする
@@ -22,9 +22,6 @@ def copy_vasp_to_poscar(
     Returns:
         bool: 成功時 True、失敗時 False
     """
-    if not logger:
-        logger = XLogger()
-
     src = Path(f"{vasp_name}.vasp")
     dst = Path("POSCAR")
 

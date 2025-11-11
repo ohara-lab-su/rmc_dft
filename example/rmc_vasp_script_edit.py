@@ -26,6 +26,8 @@ if __name__ == "__main__":
     run_mode = config.run_mode
     max_rmc_dft_loop = config.max_rmc_dft_loop
     element_info = config.element_info
+    log_vasp_dir = config.vasp_log_dir
+    log_rmc_dir = config.rmc_log_dir
 
     # vasp_log = VaspLog(logger=logger)
     # vasp = Vasp(
@@ -62,10 +64,10 @@ if __name__ == "__main__":
     vasp.poscar2cfg(cfg_name)
 
     # run_mode = "local"
-    digits = len(str(max_loop - 1))
+    digits = len(str(max_rmc_dft_loop - 1))
 
     i = 0
-    for i in range(0, max_loop):
+    for i in range(0, max_rmc_dft_loop):
 
         log_rmc_dir = f"log{str(i).zfill(digits)}"
         log_vasp_dir = f"log{str(i).zfill(digits)}"
@@ -74,7 +76,7 @@ if __name__ == "__main__":
             os.mkdir(log_rmc_dir)
 
         logger.info("== rmc" + str(i))
-        rmc.postprocess()
+        rmc.postprocess(log_dir=log_rmc_dir)  # loop番号付き
 
         rmc.run()
         # rmc.run(cfg_name=cfg_name)
@@ -96,5 +98,5 @@ if __name__ == "__main__":
         #     log_dir=log_vasp_dir,
         #     cfg_name=cfg_name,
         # )
-        vasp.postprocess()
+        vasp.postprocess(log_dir=log_vasp_dir)  # loop番号付き
         logger.info("loop end " + str(i))

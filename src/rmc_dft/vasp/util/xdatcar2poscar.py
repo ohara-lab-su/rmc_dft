@@ -36,7 +36,7 @@ from x_logger import XLogger
 
 def xdatcar2poscar(
     vasp_name: str,
-    logger: Optional[XLogger] = None,
+    logger: Optional[XLogger] = XLogger(),
 ):
     """
     VASP の XDATCAR ファイルを POSCAR 形式にする
@@ -45,12 +45,8 @@ def xdatcar2poscar(
         vasp_name (str): Base name for output files.
         logger (Xlogger):
     """
-    if not logger:
-        logger = XLogger()
-
-    if vasp_name:
-        logger.info("INPUT file name : XDATCAR")
-        logger.info(f"OUTPUT file name: {vasp_name}.vasp")
+    logger.info("INPUT file name : XDATCAR")
+    logger.info(f"OUTPUT file name: {vasp_name}.vasp")
 
     if not os.path.exists("XDATCAR"):
         # sys.exit("XDATCAR file not found")

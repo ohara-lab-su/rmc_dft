@@ -34,7 +34,7 @@ from x_logger import XLogger
 
 def contcar2cfg(
     cfg_name: str,
-    logger: Optional[XLogger] = None,
+    logger: Optional[XLogger] = XLogger(),
 ):
     """
     2025.10.29 update CONTCAR タイプ対応
@@ -47,9 +47,6 @@ def contcar2cfg(
     Returns:
 
     """
-    if not logger:
-        logger = XLogger()
-
     logger.info(f"INPUT file name : CONTCAR")
     logger.info(f"OUTPUT file name: {cfg_name}.cfg")
 
@@ -58,8 +55,8 @@ def contcar2cfg(
 
 def poscar2cfg(
     cfg_name: str,
-    logger: XLogger = None,
-):
+    logger: Optional[XLogger] = XLogger(),
+) -> bool:
     """
     2025.10.29 update CONTCAR タイプ対応
     コア部分を分離
@@ -71,8 +68,6 @@ def poscar2cfg(
     Returns:
 
     """
-    if not logger:
-        logger = XLogger()
     logger.info(f"== poscar2cfg(poscar_name=POSCAR, cfg_name={cfg_name})")
 
     logger.info(f"INPUT file name : POSCAR")
@@ -84,7 +79,7 @@ def poscar2cfg(
 def vasp2cfg(
     vasp_name: str,
     cfg_name: str = None,
-    logger: XLogger = None,
+    logger: Optional[XLogger] = XLogger(),
 ):
     """
     2025.10.29 update CONTCAR タイプ対応
@@ -103,10 +98,7 @@ def vasp2cfg(
     Returns:
 
     """
-    if not logger:
-        logger = XLogger()
-
-    if not cfg_name:
+    if cfg_name is None:
         cfg_name = vasp_name
 
     logger.info(f"INPUT file name : {vasp_name}.vasp")
@@ -122,8 +114,8 @@ def vasp2cfg(
 def convert_to_cfg(
     poscar_name: str = "POSCAR",
     cfg_name: str = "aaa",
-    logger: XLogger = None,
-):
+    logger: Optional[XLogger] = XLogger(),
+) -> bool:
     """
     name ファイルを中身 POSCAR/CONTCAR とみなして、そのファイルを cfg 形式にする
 

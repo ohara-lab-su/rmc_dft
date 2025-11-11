@@ -28,11 +28,14 @@ import optparse
 # from numpy import *
 import numpy as np
 
+from x_logger import XLogger
+
 
 def cfg2poscar(
     cfg_name: str,
     vasp_name: Optional[str] = None,
-):
+    logger: Optional[XLogger] = XLogger(),
+) -> bool:
     """
     RMCPOT cfg 形式を poscar 形式にする
     SAE を使わない独立版(noLIB)
@@ -40,158 +43,167 @@ def cfg2poscar(
     Args:
         cfg_name (str)::
         vasp_name (str):
-
+        logger (XLogger):
     Returns:
-
+        bool:
     """
     if not vasp_name:
         vasp_name = cfg_name
 
-    print("INPUT file name :", cfg_name + ".cfg")
-    print("OUTPUT file name:", vasp_name + ".vasp")
+    logger.info(f"INPUT file name : {cfg_name}.cfg")
+    logger.info(f"OUTPUT file name: {vasp_name}.vasp")
 
     if not os.path.exists(cfg_name + ".cfg"):
         sys.exit(cfg_name + ".cfg file not found")
 
-    # def readcfg():
-    ###############################################
-    # comment
-    # ntype
-    # type
-    # natom
-    # t1_x,t1_y,t1_z
-    # t2_x,t2_y,t2_z
-    # t3_x,t3_y,t3_z
-    # position
+    try:
+        # def readcfg():
+        ###############################################
+        # comment
+        # ntype
+        # type
+        # natom
+        # t1_x,t1_y,t1_z
+        # t2_x,t2_y,t2_z
+        # t3_x,t3_y,t3_z
+        # position
 
-    ###############################################
-    ## Open RMC_POT cfg file
-    ##
-    tmp = open(cfg_name + ".cfg")
-    datfile = tmp.read()
-    tmp.close()
-    datlines = datfile.split("\n")
+        ###############################################
+        ## Open RMC_POT cfg file
+        ##
+        tmp = open(cfg_name + ".cfg")
+        datfile = tmp.read()
+        tmp.close()
+        datlines = datfile.split("\n")
 
-    ###############################################
-    ## Read Header
-    ##
-    header = datlines[0]
-    comment = datlines[1]
-    tmp = datlines[2]
-    tmp = datlines[3]
+        ###############################################
+        ## Read Header
+        ##
+        header = datlines[0]
+        comment = datlines[1]
+        tmp = datlines[2]
+        tmp = datlines[3]
 
-    moves = datlines[4]
-    saved = datlines[5]
-    tmp = datlines[6]
+        moves = datlines[4]
+        saved = datlines[5]
+        tmp = datlines[6]
 
-    t = datlines[7].split()
-    natom = t[0]
+        t = datlines[7].split()
+        natom = t[0]
 
-    t = datlines[8].split()
-    ntype = t[0]
+        t = datlines[8].split()
+        ntype = t[0]
 
-    nmoles = datlines[9]
-    angles = datlines[10]
-    tmp = datlines[11]
+        nmoles = datlines[9]
+        angles = datlines[10]
+        tmp = datlines[11]
 
-    tmp = datlines[12]
-    tmp = datlines[13]
+        tmp = datlines[12]
+        tmp = datlines[13]
 
-    ###############################################
-    ## Read Lattice Vector
-    ##
-    v = datlines[14].split()
-    t1_x = float(v[0])  # lattice constant/2
-    t1_y = float(v[1])
-    t1_z = float(v[2])
+        ###############################################
+        ## Read Lattice Vector
+        ##
+        v = datlines[14].split()
+        t1_x = float(v[0])  # lattice constant/2
+        t1_y = float(v[1])
+        t1_z = float(v[2])
 
-    v = datlines[15].split()
-    t2_x = float(v[0])
-    t2_y = float(v[1])
-    t2_z = float(v[2])
+        v = datlines[15].split()
+        t2_x = float(v[0])
+        t2_y = float(v[1])
+        t2_z = float(v[2])
 
-    v = datlines[16].split()
-    t3_x = float(v[0])
-    t3_y = float(v[1])
-    t3_z = float(v[2])
+        v = datlines[16].split()
+        t3_x = float(v[0])
+        t3_y = float(v[1])
+        t3_z = float(v[2])
 
-    tmp = datlines[17]
+        tmp = datlines[17]
 
-    ###############################################
-    ## Read Atoms
-    ##
-    lines = 17
-    type = np.zeros((int(ntype) + 1))
-    for i in range(int(ntype)):
-        lines += 1
-        n = datlines[lines].split()
-        type[i] = n[0]
-        lines += 1
-        tmp = datlines[lines]
-        lines += 1
-        tmp = datlines[lines]
-        lines += 1
-        tmp = datlines[lines]
+        ###############################################
+        ## Read Atoms
+        ##
+        lines = 17
+        type = np.zeros((int(ntype) + 1))
+        for i in range(int(ntype)):
+            lines += 1
+            n = datlines[lines].split()
+            type[i] = n[0]
+            lines += 1
+            tmp = datlines[lines]
+            lines += 1
+            tmp = datlines[lines]
+            lines += 1
+            tmp = datlines[lines]
 
-    ###############################################
-    ## Read Internal Coordinate
-    ##
-    position = np.zeros((int(natom) + 1, 3))
-    for i in range(int(natom)):
-        lines += 1
-        xyz = datlines[lines].split()
-        position[i, 0] = xyz[0]
-        position[i, 1] = xyz[1]
-        position[i, 2] = xyz[2]
-    # print position[i,0], position[i,1], position[i,2]
+        ###############################################
+        ## Read Internal Coordinate
+        ##
+        position = np.zeros((int(natom) + 1, 3))
+        for i in range(int(natom)):
+            lines += 1
+            xyz = datlines[lines].split()
+            position[i, 0] = xyz[0]
+            position[i, 1] = xyz[1]
+            position[i, 2] = xyz[2]
+        # print position[i,0], position[i,1], position[i,2]
 
-    ###############################################
-    ## DATA convert
-    ##
-    t1_x = t1_x * 2
-    t1_y = t1_y * 2
-    t1_z = t1_z * 2
+        ###############################################
+        ## DATA convert
+        ##
+        t1_x = t1_x * 2
+        t1_y = t1_y * 2
+        t1_z = t1_z * 2
 
-    t2_x = t2_x * 2
-    t2_y = t2_y * 2
-    t2_z = t2_z * 2
+        t2_x = t2_x * 2
+        t2_y = t2_y * 2
+        t2_z = t2_z * 2
 
-    t3_x = t3_x * 2
-    t3_y = t3_y * 2
-    t3_z = t3_z * 2
+        t3_x = t3_x * 2
+        t3_y = t3_y * 2
+        t3_z = t3_z * 2
 
-    x_offset = 0.5
-    y_offset = 0.5
-    z_offset = 0.5
-    for i in range(int(natom)):
-        position[i, 0] = position[i, 0] / 2 + x_offset
-        position[i, 1] = position[i, 1] / 2 + y_offset
-        position[i, 2] = position[i, 2] / 2 + z_offset
+        x_offset = 0.5
+        y_offset = 0.5
+        z_offset = 0.5
+        for i in range(int(natom)):
+            position[i, 0] = position[i, 0] / 2 + x_offset
+            position[i, 1] = position[i, 1] / 2 + y_offset
+            position[i, 2] = position[i, 2] / 2 + z_offset
 
-    ###############################################
-    ## OUTPUT for VASP
-    vasp = open(vasp_name + ".vasp", "w")
+        ###############################################
+        ## OUTPUT for VASP
+        vasp = open(vasp_name + ".vasp", "w")
 
-    print(comment, file=vasp)
-    print("1.0", file=vasp)
-    print("  %13.9f %13.9f %13.9f" % (t1_x, t1_y, t1_z), file=vasp)
-    print("  %13.9f %13.9f %13.9f" % (t2_x, t2_y, t2_z), file=vasp)
-    print("  %13.9f %13.9f %13.9f" % (t3_x, t3_y, t3_z), file=vasp)
+        # ***.vasp へ出力
+        print(comment, file=vasp)
+        print("1.0", file=vasp)
+        print("  %13.9f %13.9f %13.9f" % (t1_x, t1_y, t1_z), file=vasp)
+        print("  %13.9f %13.9f %13.9f" % (t2_x, t2_y, t2_z), file=vasp)
+        print("  %13.9f %13.9f %13.9f" % (t3_x, t3_y, t3_z), file=vasp)
 
-    ####
-    # print >> vasp, " atoms"
-    print(" atoms", file=vasp)
-    ####
+        ####
+        # print >> vasp, " atoms"
+        print(" atoms", file=vasp)
+        ####
 
-    for i in range(int(ntype)):
-        print(int(type[i]), file=vasp, end=" ")
-    print("", file=vasp)
-    print("Direct", file=vasp)
+        for i in range(int(ntype)):
+            print(int(type[i]), file=vasp, end=" ")
+        print("", file=vasp)
+        print("Direct", file=vasp)
 
-    for i in range(int(natom)):
-        print(
-            " %13.9f %13.9f %13.9f" % (position[i, 0], position[i, 1], position[i, 2]),
-            file=vasp,
-        )
+        for i in range(int(natom)):
+            print(
+                " %13.9f %13.9f %13.9f"
+                % (position[i, 0], position[i, 1], position[i, 2]),
+                file=vasp,
+            )
 
-    vasp.close()
+        vasp.close()
+    except Exception as e:
+        logger.error(e)
+        return False
+        # sys.exit(1)
+
+    return True

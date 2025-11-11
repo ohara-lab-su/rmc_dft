@@ -4,6 +4,7 @@ K.NAKADA, kengo.nakada@gmail.com (1st, 3rd varsion)
 K.KOBAYASHI (2nd version)
 """
 import os
+import sys
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import shutil
 import subprocess
@@ -210,7 +211,10 @@ class Vasp:
     # RMC-DFT の VASP 側の init/preprocess/postprocess
     #
 
-    def init(self, cfg_name: str = None):
+    def init(
+        self,
+        cfg_name: str = None,
+    ):
         """
         POSCAR から cfg を作る
 
@@ -455,7 +459,7 @@ class Vasp:
     def ensure_vasp5_format(
         poscar_name: str,
         element_info: Optional[str] = None,
-        logger: XLogger = None,
+        logger: Optional[XLogger] = XLogger(),
     ) -> bool:
         return ensure_vasp5_format(poscar_name, element_info, logger=logger)
 
@@ -485,7 +489,6 @@ class Vasp:
 
     @staticmethod
     def convert_to_cfg(
-        self,
         name: str = "aaa",
     ) -> bool:
         convert_to_cfg(name)
@@ -527,8 +530,7 @@ class Vasp:
         """
         self._logger.info(f"== poscar2cfg({cfg_name})")
         # xdatcar2poscar(cfg_name)
-        poscar2cfg(cfg_name)
-        return True
+        return poscar2cfg(cfg_name)
 
     def xdatcar2poscar(
         self,
@@ -544,11 +546,12 @@ class Vasp:
             bool: 正しく終わったデー
         """
         self._logger.info(f"== xdatcar2poscar({input_name})")
-        xdatcar2poscar(input_name)
-        return True
+        return xdatcar2poscar(input_name)
 
     @staticmethod
-    def pdb2poscar(pdb_name: str = "aaa"):
+    def pdb2poscar(
+        pdb_name: str = "aaa",
+    ):
         atoms = read((str + ".pdb"), format="pdb")
         write((str + ".vasp"), atoms, format="vasp", direct=True)
 
@@ -557,7 +560,7 @@ if __name__ == "__main__":
     _logger = XLogger()
     _vasp_log = VaspLog(logger=_logger)
     vasp = Vasp(
-        _vasp_log,
+        vasp_log=_vasp_log,
         vasp_name="INCAR",
         mpi_cmd="mpirun",
         mpi_flag="-np",
