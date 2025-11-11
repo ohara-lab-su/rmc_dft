@@ -7,7 +7,7 @@ ROOT_DIR="$(cd "$DOCS_DIR/.." && pwd)"
 SRC_DIR="$ROOT_DIR/src"
 
 ####################
-PKG_NAME="rmf_dft"   # パッケージ名を明示
+PKG_NAME="rmc_dft"   # パッケージ名を明示
 ####################
 
 export PYTHONPATH="$SRC_DIR:${PYTHONPATH:-}"

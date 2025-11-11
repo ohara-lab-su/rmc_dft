@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RMC POT のアウトプットファイル（解説） &mdash; Project  ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=c033477b"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=4755f45a"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="prev" title="RMCPOT のインプットファイル解説" href="rmcpot_input_explained.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Project
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">rmc_dft</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/rmc_dft.html">rmc_dft package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/rmc_dft.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/rmc_dft.util.html">rmc_dft.util package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/rmc_dft.vasp.html">rmc_dft.vasp package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/rmc_dft.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/rmc_dft.html#module-rmc_dft.config">rmc_dft.config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/rmc_dft.html#rmc_dft.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/rmc_dft.html#module-rmc_dft.rmc_dft">rmc_dft.rmc_dft module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft"><code class="docutils literal notranslate"><span class="pre">RmcDft</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/rmc_dft.html#module-rmc_dft.util">rmc_dft.util module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">チュートリアル</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="rmc_theory_explained.html">RMCとは</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_theory_explained.html#id1">シミュレーティッド・アニーリング(焼きなまし法)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmcpot_cfg_explained.html">RMC POTのcfgファイルの説明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmcpot_cfg_explained.html#aaa-cfg">例：aaa.cfg の一部</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rmcpot_cfg_explained.html#id1">各セクションの説明（順に）</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rmcpot_cfg_explained.html#id2">実務メモ / チェックリスト</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmcpot_input_explained.html">RMCPOT のインプットファイル解説</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmcpot_input_explained.html#cfg">cfgファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmcpot_input_explained.html#sq">sqファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmcpot_input_explained.html#dat">datファイル</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RMC POT のアウトプットファイル（解説）</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">共通の注意点</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#gij-r">二対分布関数 gij(r)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">原子配置（3次元モデリング）</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#id2">作者(1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#id3">作者(2)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Project</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">チュートリアル</a></li>
+      <li class="breadcrumb-item active">RMC POT のアウトプットファイル（解説）</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/rmcpot_output_explained.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rmc-pot">
+<h1>RMC POT のアウトプットファイル（解説）<a class="headerlink" href="#rmc-pot" title="Link to this heading"></a></h1>
+<p>この文書は RMC POT の代表的なアウトプットファイルについて、各ファイルの形式と中身の見方を簡潔に説明します。主に以下のファイル形式を扱います。</p>
+<ul class="simple">
+<li><p>.fit — 構造因子 S(Q)（または F(Q)）のフィッティング結果</p></li>
+<li><p>.ppcf — 部分二体分布関数 gij(r)（PPCF）の出力</p></li>
+<li><p>.cfg — 原子配置（構成ファイル）</p></li>
+</ul>
+<hr class="docutils" />
+<section id="id1">
+<h2>共通の注意点<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>多くの出力はスペース区切りのテキストで人間が読み取れる形式になっています。可視化や解析のために CSV 等に変換しても良いです。</p></li>
+<li><p>単位：距離は Å（オングストローム）で表示されることが多いです。</p></li>
+<li><p>参照マニュアル（RMC++ user guide）も併せて参照してください: <a class="reference external" href="https://www.szfki.hu/~nphys/rmc++/RMC_POT_user_guide.pdf">https://www.szfki.hu/~nphys/rmc++/RMC_POT_user_guide.pdf</a></p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="fit-s-q">
+<h2>.fit ファイル — 構造因子S(Q)へのフィッティング状況<a class="headerlink" href="#fit-s-q" title="Link to this heading"></a></h2>
+<p>ファイルには計算で得られたデータと実験データの比較が出力されます。ファイル冒頭には各データセットの種類と数が表示されます（例：g(r), S(Q), F(Q) などのデータセット数）。</p>
+<p>aaa.fit</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Calculated and experimental total data for each data sets
+0	 g(r) data sets
+0	 S(Q) data sets
+1	 F(Q) data sets
+0	 F(g) data sets
+0	 E(k) data sets
+
+Total F(Q) for data set #1/1
+Renormalization factor a=	1.000000e+00
+Renormalization factor b=	-1.186518e+01
+Renormalization factor c=	0.000000e+00
+Renormalization factor d=	0.000000e+00
+           Q	          F(Q) RMC++	       renorm exp. F(Q)	  original exp. F(Q)	          background
+2.635850e-01	 -1.290579277856e+00	    -1.005258621913e+01	  1.812590000000e+00	 -1.186517621913e+01
+2.812760e-01	 -1.294920422437e+00	    -1.052247621913e+01	  1.342700000000e+00	 -1.186517621913e+01
+2.989660e-01	 -1.299385311315e+00	    -1.094524621913e+01	  9.199300000000e-01	 -1.186517621913e+01
+   :                  :                      :                      :                      :
+</pre></div>
+</div>
+<p>主要な項目の意味</p>
+<ul class="simple">
+<li><p>Q：波数（単位は通常 Å⁻¹）</p></li>
+<li><p>F(Q) RMC++：RMC によって計算された F(Q) の値（出力名は F(Q) になっている場合がある）</p></li>
+<li><p>renorm exp. F(Q)：実験データに対して何らかの正規化（renormalization）を適用した後の F(Q)</p></li>
+<li><p>original exp. F(Q)：元の実験データ（補正前）の F(Q)</p></li>
+<li><p>background：背景項（背景補正値）</p></li>
+</ul>
+<p>13行目からは、Q値に対するF(Q)の計算結果と実験結果が並んでいます。</p>
+<div class="highlight-math notranslate"><div class="highlight"><pre><span></span>F(Q) = S(Q) - 1 
+</pre></div>
+</div>
+<p>ここで用いられるF(Q)は、通常表示される構造因子S(Q)から1を引いたものであることに注意してください。
+この結果をプロットするときには、
+S(Q)=F(Q)+1
+と、してプロットします。</p>
+<p>詳細は以下のユーザーマニュアルの式(E3)周辺を参照してください
+<a class="reference external" href="https://www.szfki.hu/~nphys/rmc++/RMC_POT_user_guide.pdf">https://www.szfki.hu/~nphys/rmc++/RMC_POT_user_guide.pdf</a></p>
+</section>
+</section>
+<section id="gij-r">
+<h1>二対分布関数 gij(r)<a class="headerlink" href="#gij-r" title="Link to this heading"></a></h1>
+<p>aaa.ppcf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">This</span> <span class="ow">is</span> <span class="n">an</span> <span class="nb">object</span> <span class="n">of</span> <span class="n">Class</span> <span class="n">PPCFSet</span> 
+<span class="mi">3</span>	 <span class="n">number</span> <span class="n">of</span> <span class="n">atom</span> <span class="n">types</span>
+
+<span class="n">For</span> <span class="n">data</span> <span class="nb">set</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="mi">1</span>
+<span class="mi">306</span>	 <span class="n">number</span> <span class="n">of</span> <span class="n">discretization</span> <span class="n">bins</span> <span class="k">for</span> <span class="n">the</span> <span class="n">ppcf</span> 
+<span class="mf">0.000000000</span>	 <span class="n">rmin</span> <span class="n">value</span> <span class="p">(</span><span class="n">Angstroms</span><span class="p">)</span>
+<span class="mf">7.650000000</span>	 <span class="n">rmax</span> <span class="n">value</span> <span class="p">(</span><span class="n">Angstroms</span><span class="p">)</span>
+<span class="mf">0.025000000</span>	 <span class="n">discretization</span> <span class="n">step</span> <span class="p">(</span><span class="n">Angstroms</span><span class="p">)</span> 
+
+<span class="n">r</span> <span class="n">value</span> <span class="o">+</span> <span class="mi">6</span> <span class="n">partial</span> <span class="n">g</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="n">at</span> <span class="n">the</span> <span class="n">middle</span> <span class="n">of</span> <span class="n">the</span> <span class="n">histogram</span> <span class="nb">bin</span>
+<span class="mf">0.012500000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>
+<span class="mf">0.037500000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>
+<span class="mf">0.062500000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>
+<span class="mf">0.087500000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>
+<span class="mf">0.112500000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         <span class="mf">0.000000000</span>	         
+    <span class="p">:</span>                    <span class="p">:</span>                   <span class="p">:</span>                   <span class="p">:</span>                   <span class="p">:</span>                   <span class="p">:</span>
+</pre></div>
+</div>
+<p>このファイルは、二対分布関数gij(r)の計算結果を示しています。
+11行目からは、r値に対する各原子種間のgij(r)が並んでいます。
+今、3種類の原子種を扱っているので、6つのgij(r)が表示されています。
+r[Å], g11(r), g12(r), g13(r), g22(r), g23(r), g33(r)の順で表示されています。
+（ユーザーマニュアル、B章最終行）</p>
+</section>
+<section id="id2">
+<h1>原子配置（3次元モデリング）<a class="headerlink" href="#id2" title="Link to this heading"></a></h1>
+<p>aaa.cfg</p>
+<p>これはインプットファイルと同じ形式のものです。
+シミュレーションを続けると上書きされます。
+適宜、変換して、VESTAなどで可視化します。</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rmcpot_input_explained.html" class="btn btn-neutral float-left" title="RMCPOT のインプットファイル解説" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

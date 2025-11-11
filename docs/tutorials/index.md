@@ -4,29 +4,21 @@
 :maxdepth: 4
 :caption: Contents:
 
-abstract
-quick_start
-install_server
-install_client
-config
-start_server
-basic_ctrl
-camera
-var
-manager
-pacscript
-local_ctrl
-develop
+rmc_theory_explained
+rmcpot_cfg_explained
+rmcpot_input_explained
+rmcpot_output_explained
 ```
 
-このセクションでは cobotta2 の使い方を段階的に説明します。
+このセクションでは RMC-DFT の使い方を段階的に説明します。
+
+
+
+
+# 作者(1)
+- K. Kobahash
  
-- ロボットアームの基本(６軸操作)を前提とします。
-
-
-
-
-# 作者
+# 作者(2)
 - Kengo NAKADA (中田謙吾)
   - kengo.nakada@mat.shimane-u.ac.jp
   - kengo.nakada@gmail.com

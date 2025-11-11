@@ -1,0 +1,600 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rmc_dft package &mdash; Project  ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=c033477b"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=4755f45a"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="rmc_dft.rmc_pot package" href="rmc_dft.rmc_pot.html" />
+    <link rel="prev" title="rmc_dft" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Project
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">rmc_dft</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">rmc_dft package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.util.html">rmc_dft.util package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html">rmc_dft.vasp package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rmc_dft.config">rmc_dft.config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rmc_dft.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rmc_dft.rmc_dft">rmc_dft.rmc_dft module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rmc_dft.rmc_dft.RmcDft"><code class="docutils literal notranslate"><span class="pre">RmcDft</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rmc_dft.util">rmc_dft.util module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">チュートリアル</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc_theory_explained.html">RMCとは</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc_theory_explained.html#id1">シミュレーティッド・アニーリング(焼きなまし法)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmcpot_cfg_explained.html">RMC POTのcfgファイルの説明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmcpot_cfg_explained.html#aaa-cfg">例：aaa.cfg の一部</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmcpot_cfg_explained.html#id1">各セクションの説明（順に）</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmcpot_cfg_explained.html#id2">実務メモ / チェックリスト</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmcpot_input_explained.html">RMCPOT のインプットファイル解説</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmcpot_input_explained.html#cfg">cfgファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmcpot_input_explained.html#sq">sqファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmcpot_input_explained.html#dat">datファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmcpot_output_explained.html">RMC POT のアウトプットファイル（解説）</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmcpot_output_explained.html#id1">共通の注意点</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html#id2">作者(1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html#id3">作者(2)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Project</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">rmc_dft</a></li>
+      <li class="breadcrumb-item active">rmc_dft package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/rmc_dft.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-rmc_dft">
+<span id="rmc-dft-package"></span><h1>rmc_dft package<a class="headerlink" href="#module-rmc_dft" title="Link to this heading"></a></h1>
+<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.rmc_pot.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.rmc_pot.util.html">rmc_dft.rmc_pot.util package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.util.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.util.html#module-rmc_dft.rmc_pot.util.cfg2poscar">rmc_dft.rmc_pot.util.cfg2poscar module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.rmc_pot.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.rmc_pot.html#module-rmc_dft.rmc_pot.rmc_pot">rmc_dft.rmc_pot.rmc_pot module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot.RmcPot"><code class="docutils literal notranslate"><span class="pre">RmcPot</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot.RmcPot.cfg2poscar"><code class="docutils literal notranslate"><span class="pre">RmcPot.cfg2poscar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot.RmcPot.ensure_vasp5_format"><code class="docutils literal notranslate"><span class="pre">RmcPot.ensure_vasp5_format()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot.RmcPot.get_tag"><code class="docutils literal notranslate"><span class="pre">RmcPot.get_tag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot.RmcPot.init"><code class="docutils literal notranslate"><span class="pre">RmcPot.init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot.RmcPot.postprocess"><code class="docutils literal notranslate"><span class="pre">RmcPot.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot.RmcPot.preprocess"><code class="docutils literal notranslate"><span class="pre">RmcPot.preprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot.RmcPot.run"><code class="docutils literal notranslate"><span class="pre">RmcPot.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot.RmcPot.set_cfg_name"><code class="docutils literal notranslate"><span class="pre">RmcPot.set_cfg_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot.RmcPot.set_tag"><code class="docutils literal notranslate"><span class="pre">RmcPot.set_tag()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.rmc_pot.html#module-rmc_dft.rmc_pot.rmc_pot_dat">rmc_dft.rmc_pot.rmc_pot_dat module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat"><code class="docutils literal notranslate"><span class="pre">RmcPotDat</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat._coerce_value"><code class="docutils literal notranslate"><span class="pre">RmcPotDat._coerce_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat._fmt_number"><code class="docutils literal notranslate"><span class="pre">RmcPotDat._fmt_number()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat._fmt_sequence"><code class="docutils literal notranslate"><span class="pre">RmcPotDat._fmt_sequence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat._index"><code class="docutils literal notranslate"><span class="pre">RmcPotDat._index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat._load"><code class="docutils literal notranslate"><span class="pre">RmcPotDat._load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat._to_bool_token"><code class="docutils literal notranslate"><span class="pre">RmcPotDat._to_bool_token()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_angle_constraint_count"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_angle_constraint_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_avg_coord_constraint_count"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_avg_coord_constraint_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_comment"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_coord_constraint_count"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_coord_constraint_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_custom_move_flag"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_custom_move_flag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_cutoffs"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_cutoffs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_data_flags"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_data_flags()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_density"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_density()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_display_update_interval"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_display_update_interval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_exp_filename"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_exp_filename()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_exp_range"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_exp_range()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_flag_15"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_flag_15()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_flag_16"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_flag_16()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_flag_17"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_flag_17()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_flag_18"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_flag_18()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_fnc_switch"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_fnc_switch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_history_buffer_size"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_history_buffer_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_initial_bin_shift"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_initial_bin_shift()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_line"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_load_histogram_flag"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_load_histogram_flag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_max_atoms_per_cell"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_max_atoms_per_cell()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_max_moves"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_max_moves()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_moveout_option"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_moveout_option()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_num_atoms_per_move"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_num_atoms_per_move()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_num_config_to_collect"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_num_config_to_collect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_potential_flag"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_potential_flag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_print_interval"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_print_interval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_r_spacing"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_r_spacing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_scale_factor"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_scale_factor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_sigma_factor"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_sigma_factor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_swap_settings"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_swap_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_thread_count"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_thread_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_time_and_save"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_time_and_save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_xmax_used"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.get_xmax_used()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_angle_constraint_count"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_angle_constraint_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_avg_coord_constraint_count"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_avg_coord_constraint_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_comment"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_coord_constraint_count"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_coord_constraint_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_custom_move_flag"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_custom_move_flag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_cutoffs"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_cutoffs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_data_flags"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_data_flags()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_density"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_density()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_display_update_interval"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_display_update_interval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_exp_filename"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_exp_filename()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_exp_range"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_exp_range()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_flag_15"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_flag_15()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_flag_16"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_flag_16()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_flag_17"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_flag_17()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_flag_18"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_flag_18()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_fnc_switch"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_fnc_switch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_history_buffer_size"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_history_buffer_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_initial_bin_shift"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_initial_bin_shift()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_line"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_load_histogram_flag"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_load_histogram_flag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_max_atoms_per_cell"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_max_atoms_per_cell()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_max_moves"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_max_moves()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_moveout_option"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_moveout_option()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_num_atoms_per_move"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_num_atoms_per_move()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_num_config_to_collect"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_num_config_to_collect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_potential_flag"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_potential_flag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_print_interval"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_print_interval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_r_spacing"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_r_spacing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_scale_factor"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_scale_factor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_sigma_factor"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_sigma_factor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_swap_settings"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_swap_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_thread_count"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_thread_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_time_and_save"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_time_and_save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_xmax_used"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.set_xmax_used()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.write"><code class="docutils literal notranslate"><span class="pre">RmcPotDat.write()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat._Line"><code class="docutils literal notranslate"><span class="pre">_Line</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat._Line.value"><code class="docutils literal notranslate"><span class="pre">_Line.value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat._Line.comment"><code class="docutils literal notranslate"><span class="pre">_Line.comment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat._Line.had_bang"><code class="docutils literal notranslate"><span class="pre">_Line.had_bang</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#id0"><code class="docutils literal notranslate"><span class="pre">_Line.comment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#id3"><code class="docutils literal notranslate"><span class="pre">_Line.had_bang</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat._Line.render"><code class="docutils literal notranslate"><span class="pre">_Line.render()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#id4"><code class="docutils literal notranslate"><span class="pre">_Line.value</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.rmc_pot.html#module-rmc_dft.rmc_pot.rmc_pot_log">rmc_dft.rmc_pot.rmc_pot_log module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog"><code class="docutils literal notranslate"><span class="pre">RmcPotLog</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog.backup_result"><code class="docutils literal notranslate"><span class="pre">RmcPotLog.backup_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog.clear"><code class="docutils literal notranslate"><span class="pre">RmcPotLog.clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog.collect_result"><code class="docutils literal notranslate"><span class="pre">RmcPotLog.collect_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog.get_cfg_name"><code class="docutils literal notranslate"><span class="pre">RmcPotLog.get_cfg_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog.remove_file"><code class="docutils literal notranslate"><span class="pre">RmcPotLog.remove_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog.set_cfg_name"><code class="docutils literal notranslate"><span class="pre">RmcPotLog.set_cfg_name()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rmc_dft.util.html">rmc_dft.util package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rmc_dft.vasp.html">rmc_dft.vasp package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.util.html">rmc_dft.vasp.util package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.util.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.util.html#module-rmc_dft.vasp.util.copy_contcar_to_vasp">rmc_dft.vasp.util.copy_contcar_to_vasp module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.util.html#module-rmc_dft.vasp.util.copy_vasp_to_poscar">rmc_dft.vasp.util.copy_vasp_to_poscar module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.util.html#module-rmc_dft.vasp.util.ensure_vasp5_format">rmc_dft.vasp.util.ensure_vasp5_format module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.util.html#module-rmc_dft.vasp.util.make_potcar">rmc_dft.vasp.util.make_potcar module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.util.html#module-rmc_dft.vasp.util.poscar2cfg">rmc_dft.vasp.util.poscar2cfg module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.util.html#module-rmc_dft.vasp.util.xdatcar2poscar">rmc_dft.vasp.util.xdatcar2poscar module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.html#module-rmc_dft.vasp.vasp">rmc_dft.vasp.vasp module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp"><code class="docutils literal notranslate"><span class="pre">Vasp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.cat"><code class="docutils literal notranslate"><span class="pre">Vasp.cat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.contcar2cfg"><code class="docutils literal notranslate"><span class="pre">Vasp.contcar2cfg()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.convert_to_cfg"><code class="docutils literal notranslate"><span class="pre">Vasp.convert_to_cfg()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.ensure_vasp5_format"><code class="docutils literal notranslate"><span class="pre">Vasp.ensure_vasp5_format()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.export_incar_dict"><code class="docutils literal notranslate"><span class="pre">Vasp.export_incar_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.export_kpoints_dict"><code class="docutils literal notranslate"><span class="pre">Vasp.export_kpoints_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.get_kpoints"><code class="docutils literal notranslate"><span class="pre">Vasp.get_kpoints()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.get_tag"><code class="docutils literal notranslate"><span class="pre">Vasp.get_tag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.init"><code class="docutils literal notranslate"><span class="pre">Vasp.init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.make_potential"><code class="docutils literal notranslate"><span class="pre">Vasp.make_potential()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.pdb2poscar"><code class="docutils literal notranslate"><span class="pre">Vasp.pdb2poscar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.poscar2cfg"><code class="docutils literal notranslate"><span class="pre">Vasp.poscar2cfg()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.postprocess"><code class="docutils literal notranslate"><span class="pre">Vasp.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.preprocess"><code class="docutils literal notranslate"><span class="pre">Vasp.preprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.reload_incar"><code class="docutils literal notranslate"><span class="pre">Vasp.reload_incar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.reload_kpoints"><code class="docutils literal notranslate"><span class="pre">Vasp.reload_kpoints()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.remove_tag"><code class="docutils literal notranslate"><span class="pre">Vasp.remove_tag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.run"><code class="docutils literal notranslate"><span class="pre">Vasp.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.set_job_cmd"><code class="docutils literal notranslate"><span class="pre">Vasp.set_job_cmd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.set_kpoints"><code class="docutils literal notranslate"><span class="pre">Vasp.set_kpoints()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.set_mpi"><code class="docutils literal notranslate"><span class="pre">Vasp.set_mpi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.set_tag"><code class="docutils literal notranslate"><span class="pre">Vasp.set_tag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.xdatcar2poscar"><code class="docutils literal notranslate"><span class="pre">Vasp.xdatcar2poscar()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.html#module-rmc_dft.vasp.vasp_incar">rmc_dft.vasp.vasp_incar module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar"><code class="docutils literal notranslate"><span class="pre">VaspIncar</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar._find_line_index"><code class="docutils literal notranslate"><span class="pre">VaspIncar._find_line_index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar._format_line"><code class="docutils literal notranslate"><span class="pre">VaspIncar._format_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar._load"><code class="docutils literal notranslate"><span class="pre">VaspIncar._load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar.export_dict"><code class="docutils literal notranslate"><span class="pre">VaspIncar.export_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar.get"><code class="docutils literal notranslate"><span class="pre">VaspIncar.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar.reload"><code class="docutils literal notranslate"><span class="pre">VaspIncar.reload()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar.remove"><code class="docutils literal notranslate"><span class="pre">VaspIncar.remove()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar.set"><code class="docutils literal notranslate"><span class="pre">VaspIncar.set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar.write"><code class="docutils literal notranslate"><span class="pre">VaspIncar.write()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.html#module-rmc_dft.vasp.vasp_kpoints">rmc_dft.vasp.vasp_kpoints module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.html#vaspkpoints">VaspKpoints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints"><code class="docutils literal notranslate"><span class="pre">VaspKpoints</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints._build_kpoints"><code class="docutils literal notranslate"><span class="pre">VaspKpoints._build_kpoints()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.export_dict"><code class="docutils literal notranslate"><span class="pre">VaspKpoints.export_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_comment"><code class="docutils literal notranslate"><span class="pre">VaspKpoints.get_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_grid"><code class="docutils literal notranslate"><span class="pre">VaspKpoints.get_grid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_mode"><code class="docutils literal notranslate"><span class="pre">VaspKpoints.get_mode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_shift"><code class="docutils literal notranslate"><span class="pre">VaspKpoints.get_shift()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_comment"><code class="docutils literal notranslate"><span class="pre">VaspKpoints.set_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_grid"><code class="docutils literal notranslate"><span class="pre">VaspKpoints.set_grid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_mode"><code class="docutils literal notranslate"><span class="pre">VaspKpoints.set_mode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_shift"><code class="docutils literal notranslate"><span class="pre">VaspKpoints.set_shift()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.update"><code class="docutils literal notranslate"><span class="pre">VaspKpoints.update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.write"><code class="docutils literal notranslate"><span class="pre">VaspKpoints.write()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.html#module-rmc_dft.vasp.vasp_log">rmc_dft.vasp.vasp_log module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_log.VaspLog"><code class="docutils literal notranslate"><span class="pre">VaspLog</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_log.VaspLog._copy_either"><code class="docutils literal notranslate"><span class="pre">VaspLog._copy_either()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_log.VaspLog._exists_either"><code class="docutils literal notranslate"><span class="pre">VaspLog._exists_either()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_log.VaspLog._move_either"><code class="docutils literal notranslate"><span class="pre">VaspLog._move_either()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_log.VaspLog.backup_result"><code class="docutils literal notranslate"><span class="pre">VaspLog.backup_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_log.VaspLog.clean"><code class="docutils literal notranslate"><span class="pre">VaspLog.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_log.VaspLog.collect_result"><code class="docutils literal notranslate"><span class="pre">VaspLog.collect_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_log.VaspLog.get_E0"><code class="docutils literal notranslate"><span class="pre">VaspLog.get_E0()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_log.VaspLog.remove_file"><code class="docutils literal notranslate"><span class="pre">VaspLog.remove_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_log.VaspLog.remove_pattern"><code class="docutils literal notranslate"><span class="pre">VaspLog.remove_pattern()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_log.VaspLog.vcopy"><code class="docutils literal notranslate"><span class="pre">VaspLog.vcopy()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.html#module-rmc_dft.vasp.vasp_potcar">rmc_dft.vasp.vasp_potcar module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_potcar.VaspPotcarBuilder"><code class="docutils literal notranslate"><span class="pre">VaspPotcarBuilder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_potcar.VaspPotcarBuilder.build"><code class="docutils literal notranslate"><span class="pre">VaspPotcarBuilder.build()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html#rmc_dft.vasp.vasp_potcar.VaspPotcarBuilder.choose_potential"><code class="docutils literal notranslate"><span class="pre">VaspPotcarBuilder.choose_potential()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rmc_dft.config">
+<span id="rmc-dft-config-module"></span><h2>rmc_dft.config module<a class="headerlink" href="#module-rmc_dft.config" title="Link to this heading"></a></h2>
+<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a> (1st, 3rd varsion)
+K.KOBAYASHI (2nd version)</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rmc_dft.config.Config">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/config.html#Config"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.config.Config" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.config.Config._load_yaml">
+<span class="sig-name descname"><span class="pre">_load_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/config.html#Config._load_yaml"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.config.Config._load_yaml" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.auto_write">
+<span class="sig-name descname"><span class="pre">auto_write</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#rmc_dft.config.Config.auto_write" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.cfg_name">
+<span class="sig-name descname"><span class="pre">cfg_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'aaa'</span></em><a class="headerlink" href="#rmc_dft.config.Config.cfg_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.dft_bin">
+<span class="sig-name descname"><span class="pre">dft_bin</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'vasp_gam'</span></em><a class="headerlink" href="#rmc_dft.config.Config.dft_bin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.dft_code">
+<span class="sig-name descname"><span class="pre">dft_code</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Vasp'</span></em><a class="headerlink" href="#rmc_dft.config.Config.dft_code" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.dft_log_dir">
+<span class="sig-name descname"><span class="pre">dft_log_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'vasp_log'</span></em><a class="headerlink" href="#rmc_dft.config.Config.dft_log_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.element_info">
+<span class="sig-name descname"><span class="pre">element_info</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'label.txt'</span></em><a class="headerlink" href="#rmc_dft.config.Config.element_info" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.job_cmd">
+<span class="sig-name descname"><span class="pre">job_cmd</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'qsub</span> <span class="pre">job_hpcs2024_node2.sh'</span></em><a class="headerlink" href="#rmc_dft.config.Config.job_cmd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.load_yaml">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/config.html#Config.load_yaml"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.config.Config.load_yaml" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.max_rmc_dft_loop">
+<span class="sig-name descname"><span class="pre">max_rmc_dft_loop</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#rmc_dft.config.Config.max_rmc_dft_loop" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.mpi_cmd">
+<span class="sig-name descname"><span class="pre">mpi_cmd</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mpirun'</span></em><a class="headerlink" href="#rmc_dft.config.Config.mpi_cmd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.mpi_flag">
+<span class="sig-name descname"><span class="pre">mpi_flag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'-np'</span></em><a class="headerlink" href="#rmc_dft.config.Config.mpi_flag" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.num_procs">
+<span class="sig-name descname"><span class="pre">num_procs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#rmc_dft.config.Config.num_procs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.rmc_bin">
+<span class="sig-name descname"><span class="pre">rmc_bin</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rmcp.exe'</span></em><a class="headerlink" href="#rmc_dft.config.Config.rmc_bin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.rmc_code">
+<span class="sig-name descname"><span class="pre">rmc_code</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'RmcPot'</span></em><a class="headerlink" href="#rmc_dft.config.Config.rmc_code" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.rmc_log_dir">
+<span class="sig-name descname"><span class="pre">rmc_log_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rmc_log'</span></em><a class="headerlink" href="#rmc_dft.config.Config.rmc_log_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.run_mode">
+<span class="sig-name descname"><span class="pre">run_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'local'</span></em><a class="headerlink" href="#rmc_dft.config.Config.run_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.vasp_name">
+<span class="sig-name descname"><span class="pre">vasp_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'aaa'</span></em><a class="headerlink" href="#rmc_dft.config.Config.vasp_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rmc_dft.rmc_dft">
+<span id="rmc-dft-rmc-dft-module"></span><h2>rmc_dft.rmc_dft module<a class="headerlink" href="#module-rmc_dft.rmc_dft" title="Link to this heading"></a></h2>
+<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rmc_dft.rmc_dft.RmcDft">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RmcDft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rmc_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rmc_dft_loop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Config()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_dft.html#RmcDft"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_dft.RmcDft" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rmc_code</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>dft_code</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>max_rmc_dft_loop</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="#rmc_dft.config.Config" title="rmc_dft.config.Config"><em>Config</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>x_logger.XLogger</em>)</p></li>
+<li><p><strong>cfg_name</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_dft.RmcDft.init">
+<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_dft.html#RmcDft.init"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_dft.RmcDft.init" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cfg_name</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_dft.RmcDft.poscar2cfg">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">poscar2cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posscar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_dft.html#RmcDft.poscar2cfg"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_dft.RmcDft.poscar2cfg" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cfg_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>posscar_name</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_dft.RmcDft.postprocess">
+<span class="sig-name descname"><span class="pre">postprocess</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_dft.html#RmcDft.postprocess"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_dft.RmcDft.postprocess" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_dft.RmcDft.preprocess">
+<span class="sig-name descname"><span class="pre">preprocess</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_dft.html#RmcDft.preprocess"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_dft.RmcDft.preprocess" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_dft.RmcDft.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'local'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rmc_dft_loop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_dft.html#RmcDft.run"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_dft.RmcDft.run" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>str</em>)</p></li>
+<li><p><strong>max_rmc_dft_loop</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>logger</strong> (<em>XLogger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_dft.RmcDft.set_cfg_name">
+<span class="sig-name descname"><span class="pre">set_cfg_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_dft.html#RmcDft.set_cfg_name"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_dft.RmcDft.set_cfg_name" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cfg_name</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_dft.RmcDft.set_max_rmc_dft_loop">
+<span class="sig-name descname"><span class="pre">set_max_rmc_dft_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_rmc_dft_loop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_dft.html#RmcDft.set_max_rmc_dft_loop"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_dft.RmcDft.set_max_rmc_dft_loop" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>max_rmc_dft_loop</strong> (<em>int</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rmc_dft.util">
+<span id="rmc-dft-util-module"></span><h2>rmc_dft.util module<a class="headerlink" href="#module-rmc_dft.util" title="Link to this heading"></a></h2>
+<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="rmc_dft" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rmc_dft.rmc_pot.html" class="btn btn-neutral float-right" title="rmc_dft.rmc_pot package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
