@@ -133,22 +133,25 @@ class RmcPot:
         """
         pass
 
-    def preprocess(self):
+    def preprocess(self) -> None:
         """
-        このコードを動かすときは RMC_POT 入力が揃って意前提とする
-        1. プロファイル情報のあるファイルがぞんざいしないときは止める
+        このコードを動かすときは RMC_POT 入力が揃っている前提とする
+        1. 実験プロファイル（例: fesi04_smbt-rmc.txt）が実行カレントに存在しないときは止める
         """
         self._logger.info("== preprocess()")
 
+        # RmcPotDat から実験データのファイル名を取得
         filename = self._rmc_dat.get_exp_filename()
+        self._logger.info(f'== get_exp_filename: "{filename}"')
 
-        # 実行スクリプトのあるディレクトリを基準にする
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        target_path = os.path.join(script_dir, filename)
-        self._logger.info(f"script_dir = {script_dir}")
-        self._logger.info(f"target_path = {target_path}")
+        # 実行カレント（実行したPythonのパス）を基準にする
+        work_dir = os.getcwd()
+        target_path = os.path.join(work_dir, filename)
 
-        # 実験のファイル存在チェック
+        self._logger.info(f"work_dir   = {work_dir}")
+        self._logger.info(f"target_path= {target_path}")
+
+        # 実験ファイルの存在チェック
         if not os.path.exists(target_path):
             self._logger.error(f"**Error**: {target_path} が見つかりません。")
             sys.exit(-1)
@@ -209,7 +212,7 @@ class RmcPot:
         self.cfg2poscar(cfg_name=cfg_name, vasp_name=cfg_name)
 
         # VASP4 --> VASP5
-        self._logger.info(f"== encure vasp5 format ({cfg_name}.vasp)")
+        self._logger.info(f"== ensure vasp5 format ({cfg_name}.vasp)")
         self.ensure_vasp5_format(
             poscar_name=f"{cfg_name}.vasp",
             element_info="label.txt",
@@ -257,21 +260,17 @@ class RmcPot:
         vasp_name: Optional[str] = None,
     ) -> bool:
         """
-
         Args:
-            cfg_name (str):  xxx.cfg
-            vasp_name (str):  xxx.vasp
-
-        Returns:
-
+            cfg_name (str):  xxx.cfg（拡張子なしのベース名を想定）
+            vasp_name (str): xxx.vasp（拡張子なしのベース名を想定）
         """
-        if not cfg_name:
+        if cfg_name is None:
             cfg_name = self._cfg_name
-
-        if not vasp_name:
+        if vasp_name is None:
             vasp_name = cfg_name
-        self._logger.info(f"cfg_name = {cfg_name}")
-        self._logger.info(f"vasp_name = {cfg_name}")
+
+        self._logger.info(f"cfg_name  = {cfg_name}")
+        self._logger.info(f"vasp_name = {vasp_name}")
 
         cfg2poscar(cfg_name=cfg_name, vasp_name=vasp_name)
 
@@ -279,7 +278,6 @@ class RmcPot:
         if os.path.exists("POSCAR"):
             shutil.copy("POSCAR", "POSCAR.bak")
 
-        # xxx.vasp を POSCAR の名前でもコピーしておく
-        shutil.copy((cfg_name + ".vasp"), "POSCAR")
-
+        # xxx.vasp を POSCAR 名でもコピー
+        shutil.copy((vasp_name + ".vasp"), "POSCAR")
         return True
