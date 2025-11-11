@@ -29,8 +29,8 @@ if __name__ == "__main__":
     # POSCAR to CFG (rmc用のCFG変換)
 
     rmc_dft = RmcDft(
-        rmc_code="RmcPot",
-        dft_code="Vasp",
+        # rmc_code="RmcPot",
+        # dft_code="Vasp",
         # max_rmc_dft_loop=3,
         config=config,
         logger=logger,
