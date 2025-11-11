@@ -14,17 +14,23 @@ from x_logger import XLogger
 
 
 if __name__ == "__main__":
-
+    """"""
     logger = XLogger(log_level="debug", logger_name="dft")
-    vasp_log = VaspLog(logger=logger)
+    # vasp_log = VaspLog(logger=logger)
+    # vasp = Vasp(
+    #     vasp_log=vasp_log,
+    #     vasp_name="INCAR",
+    #     mpi_cmd="mpirun",
+    #     mpi_flag="-np",
+    #     num_procs=1,
+    #     vasp_bin="vasp_std",
+    #     job_cmd=None,
+    #     logger=logger,
+    # )
+
+    config = Config("config.yml")
     vasp = Vasp(
-        vasp_log,
-        vasp_name="INCAR",
-        mpi_cmd="mpirun",
-        mpi_flag="-np",
-        num_procs=1,
-        vasp_bin="vasp_std",
-        job_cmd=None,
+        config=config,
         logger=logger,
     )
 
