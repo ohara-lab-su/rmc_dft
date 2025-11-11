@@ -9,6 +9,9 @@ import os
 
 class Config:
 
+    rmc_code: str = "RmcPot"
+    dft_code: str = "Vasp"
+
     cfg_name: str = "aaa"  # aaa.cfg
     vasp_name: str = "aaa"  # aaa.vasp
     element_info: str = "label.txt"

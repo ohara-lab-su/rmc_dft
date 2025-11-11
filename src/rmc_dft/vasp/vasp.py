@@ -211,7 +211,10 @@ class Vasp:
     # RMC-DFT の VASP 側の init/preprocess/postprocess
     #
 
-    def init(self, cfg_name: str = None):
+    def init(
+        self,
+        cfg_name: str = None,
+    ):
         """
         POSCAR から cfg を作る
 
@@ -456,7 +459,7 @@ class Vasp:
     def ensure_vasp5_format(
         poscar_name: str,
         element_info: Optional[str] = None,
-        logger: XLogger = None,
+        logger: Optional[XLogger] = XLogger(),
     ) -> bool:
         return ensure_vasp5_format(poscar_name, element_info, logger=logger)
 
@@ -486,7 +489,6 @@ class Vasp:
 
     @staticmethod
     def convert_to_cfg(
-        self,
         name: str = "aaa",
     ) -> bool:
         convert_to_cfg(name)
@@ -547,7 +549,9 @@ class Vasp:
         return xdatcar2poscar(input_name)
 
     @staticmethod
-    def pdb2poscar(pdb_name: str = "aaa"):
+    def pdb2poscar(
+        pdb_name: str = "aaa",
+    ):
         atoms = read((str + ".pdb"), format="pdb")
         write((str + ".vasp"), atoms, format="vasp", direct=True)
 
@@ -556,7 +560,7 @@ if __name__ == "__main__":
     _logger = XLogger()
     _vasp_log = VaspLog(logger=_logger)
     vasp = Vasp(
-        _vasp_log,
+        vasp_log=_vasp_log,
         vasp_name="INCAR",
         mpi_cmd="mpirun",
         mpi_flag="-np",

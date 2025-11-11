@@ -34,7 +34,7 @@ from x_logger import XLogger
 
 def contcar2cfg(
     cfg_name: str,
-    logger: Optional[XLogger] = None,
+    logger: Optional[XLogger] = XLogger(),
 ):
     """
     2025.10.29 update CONTCAR タイプ対応
@@ -47,9 +47,6 @@ def contcar2cfg(
     Returns:
 
     """
-    if not logger:
-        logger = XLogger()
-
     logger.info(f"INPUT file name : CONTCAR")
     logger.info(f"OUTPUT file name: {cfg_name}.cfg")
 

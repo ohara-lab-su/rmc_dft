@@ -18,8 +18,8 @@ class RmcDft:
 
     def __init__(
         self,
-        rmc_code: str = "RmcPot",
-        dft_code: str = "Vasp",
+        rmc_code: Optional[str] = None,  # "RmcPot"
+        dft_code: Optional[str] = None,  # "Vasp",
         max_rmc_dft_loop: Optional[int] = None,
         config: Config = Config(),
         logger: XLogger = XLogger(),
@@ -38,9 +38,12 @@ class RmcDft:
             cfg_name (str): CFGファイルのベース名
         """
         self._logger = logger
+        if rmc_code is None:
+            rmc_code = config.rmc_code
+        if dft_code is None:
+            dft_code = config.dft_code
         if cfg_name is None:
             cfg_name = config.cfg_name
-
         if max_rmc_dft_loop is None:
             max_rmc_dft_loop = config.max_rmc_dft_loop
 
@@ -57,13 +60,12 @@ class RmcDft:
         if rmc_log_class is None or rmc_class is None:
             raise ValueError(f"Unknown RMC code: {rmc_code}")
 
-        self._rmc_log = rmc_log_class(
-            cfg_name=cfg_name,
-            logger=logger,
-        )
+        # self._rmc_log = rmc_log_class(
+        #     config=self._config,
+        #     logger=logger,
+        # )
         self._rmc = rmc_class(
-            self._rmc_log,
-            cfg_name=cfg_name,
+            config=self._config,
             logger=logger,
         )
 
@@ -74,10 +76,12 @@ class RmcDft:
         if dft_log_class is None or dft_class is None:
             raise ValueError(f"Unknown DFT code: {dft_code}")
 
-        self._dft_log = dft_log_class(logger=logger)
+        # self._dft_log = dft_log_class(
+        #     self._config,
+        #     logger=logger,
+        # )
         self._dft = dft_class(
-            self._dft_log,
-            vasp_name=cfg_name,
+            config=config,
             logger=logger,
         )
 
@@ -92,17 +96,18 @@ class RmcDft:
         # self._rmc.init(cfg_name)
         pass
 
-    def preprocess(self, cfg_name: str):
-        self._dft.preprocess(cfg_name)
+    def preprocess(self):
+        # self._dft.preprocess(cfg_name)
+        self._dft.preprocess()
 
-    def postprocess(self, cfg_name: str):
-        self._dft.postprocess(cfg_name)
+    def postprocess(self):
+        # self._dft.postprocess(cfg_name)
+        self._dft.postprocess()
 
     def run(
         self,
         mode: Optional[str] = "local",
         max_rmc_dft_loop: Optional[int] = None,
-        cfg_name: Optional[str] = None,
         *,
         logger: Optional[XLogger] = XLogger(),
     ):
@@ -111,36 +116,41 @@ class RmcDft:
         Args:
             mode (str):
             max_rmc_dft_loop:
-            cfg_name (str):
             logger (XLogger):
 
         Returns:
 
         """
+        self._logger.info(f"== run({mode})")
+
         if max_rmc_dft_loop is None:
             max_rmc_dft_loop: int = self._max_rmc_dft_loop
+        self._config.max_rmc_dft_loop = max_rmc_dft_loop
+        self._logger.info(f"max_rmc_dft_loop = {max_rmc_dft_loop}")
 
         # コンストラクで Config() から cfg_name にとってくる形
-        if cfg_name is None:
-            cfg_name: str = self._cfg_name
+        cfg_name: str = self._cfg_name
 
         digits: int = len(str(max_rmc_dft_loop - 1))
 
         i = 0
         for i in range(0, max_rmc_dft_loop):
 
-            log_rmc_dir = f"log{str(i).zfill(digits)}"
-            log_dft_dir = f"log{str(i).zfill(digits)}"
+            log_rmc_dir = f"{self._config.rmc_log_dir}{str(i).zfill(digits)}"
+            log_dft_dir = f"{self._config.vasp_log_dir}{str(i).zfill(digits)}"
+            # log_rmc_dir = f"log{str(i).zfill(digits)}"
+            # log_dft_dir = f"log{str(i).zfill(digits)}"
 
             if not os.path.exists(log_dft_dir):
                 os.mkdir(log_dft_dir)
 
             self._logger.info(f"== {self._rmc_code}" + str(i))
-            self._rmc.run(cfg_name=cfg_name)
+            # self._rmc.run(cfg_name=cfg_name)
+            self._rmc.run()
             self._rmc.postprocess(
-                log_dir=log_rmc_dir,
-                cfg_name=cfg_name,
-                element_info="label.txt",
+                # log_dir=log_rmc_dir,
+                # cfg_name=cfg_name,
+                # element_info="label.txt",
             )
 
             self._logger.info(f"== {self._dft_code}" + str(i))
@@ -148,10 +158,11 @@ class RmcDft:
             # self._dft.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
             # self._dft.run(mode="test")
             self._dft.postprocess(
-                log_dir=log_dft_dir,
-                cfg_name=cfg_name,
+                # log_dir=log_dft_dir,
+                # cfg_name=cfg_name,
             )
             self._logger.info("loop end " + str(i))
+        self._logger.info("run end")
 
     @staticmethod
     def poscar2cfg(
@@ -180,11 +191,17 @@ globals().update(
 if __name__ == "__main__":
     _logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
 
+    _config = Config()
+    # rmc_dft = RmcDft(
+    #     rmc_code="RmcPot",
+    #     dft_code="Vasp",
+    #     cfg_name="aaa",
+    #     max_rmc_dft_loop=5,
+    #     logger=_logger,
+    # )
+
     rmc_dft = RmcDft(
-        rmc_code="RmcPot",
-        dft_code="Vasp",
-        cfg_name="aaa",
-        max_rmc_dft_loop=5,
+        config=_config,
         logger=_logger,
     )
 

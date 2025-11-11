@@ -50,8 +50,8 @@ def cfg2poscar(
     if not vasp_name:
         vasp_name = cfg_name
 
-    logger.info("INPUT file name :", cfg_name + ".cfg")
-    logger.info("OUTPUT file name:", vasp_name + ".vasp")
+    logger.info(f"INPUT file name : {cfg_name}.cfg")
+    logger.info(f"OUTPUT file name: {vasp_name}.vasp")
 
     if not os.path.exists(cfg_name + ".cfg"):
         sys.exit(cfg_name + ".cfg file not found")

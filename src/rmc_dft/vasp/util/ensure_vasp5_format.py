@@ -10,7 +10,7 @@ from x_logger import XLogger
 def ensure_vasp5_format(
     poscar_name: str,
     element_info: Optional[str] = None,
-    logger: XLogger = None,
+    logger: Optional[XLogger] = XLogger(),
 ) -> bool:
     """
     VASPファイルの6行目にラベルを設定する
@@ -28,9 +28,6 @@ def ensure_vasp5_format(
     Returns:
         bool: True/False
     """
-    if not logger:
-        logger = XLogger()
-
     if element_info is None:
         element_info = "label.txt"
 

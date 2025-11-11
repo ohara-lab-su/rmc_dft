@@ -10,7 +10,7 @@ from x_logger import XLogger
 
 def copy_contcar_to_vasp(
     vasp_name: str,
-    logger: Optional[XLogger] = None,
+    logger: Optional[XLogger] = XLogger(),
 ) -> bool:
     """
     CONTCAR ファイルを {name}.vasp にコピーする
@@ -23,9 +23,6 @@ def copy_contcar_to_vasp(
         bool:
 
     """
-    if not logger:
-        logger = XLogger()
-
     src = Path("CONTCAR")
     dst = Path(f"{vasp_name}.vasp")
 

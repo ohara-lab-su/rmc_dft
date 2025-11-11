@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.3.4 nakada
+
+- python 3.6/hpcs(idss) でテスト/調整
+  - VASP/RMC 個別試験は概ね終わり
+  - DFT_RMC クラスでのテスト開始
+
 ## v0.3.3 nakada
 
 - python 3.6 互換

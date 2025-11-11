@@ -26,6 +26,8 @@ if __name__ == "__main__":
     run_mode = config.run_mode
     element_info = config.element_info
     max_rmc_dft_loop = config.max_rmc_dft_loop
+    log_vasp_dir = config.vasp_log_dir
+    log_rmc_dir = config.rmc_log_dir
 
     # vasp_log = VaspLog(logger=logger)
     # vasp = Vasp(
@@ -55,23 +57,25 @@ if __name__ == "__main__":
     # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
     vasp.poscar2cfg(cfg_name)
 
-    digits = len(str(max_loop - 1))
+    digits = len(str(max_rmc_dft_loop - 1))
 
     i = 0
     for i in range(0, max_rmc_dft_loop):
 
-        log_rmc_dir = f"log{str(i).zfill(digits)}"
-        log_vasp_dir = f"log{str(i).zfill(digits)}"
+        _rmc_dir = f"{log_rmc_dir}{str(i).zfill(digits)}"
+        _vasp_dir = f"{log_vasp_dir}{str(i).zfill(digits)}"
 
-        if not os.path.exists(log_rmc_dir):
-            os.mkdir(log_rmc_dir)
+        if not os.path.exists(_rmc_dir):
+            os.mkdir(_rmc_dir)
+        if not os.path.exists(_vasp_dir):
+            os.mkdir(_vasp_dir)
 
         logger.info("== rmc" + str(i))
 
         rmc.postprocess()
         # rmc.run(cfg_name=cfg_name)
         rmc.run()
-        rmc.postprocess()
+        rmc.postprocess(log_dir=_rmc_dir)  # loop番号つき
         # rmc.postprocess(element_info="label.txt")
         # rmc.postprocess(
         #     log_dir=log_rmc_dir,  # 相対
@@ -89,5 +93,5 @@ if __name__ == "__main__":
         #     log_dir=log_vasp_dir,
         #     cfg_name=cfg_name,
         # )
-        vasp.postprocess()
+        vasp.postprocess(log_dir=_vasp_dir)  # loop番号き
         logger.info("loop end " + str(i))
