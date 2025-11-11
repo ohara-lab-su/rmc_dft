@@ -50,7 +50,7 @@ class Vasp:
         logger: Optional[XLogger] = XLogger(),  # instance
         auto_write: bool = True,
         vasp_name: str = None,
-        vasp_bin: str = None,
+        dft_bin: str = None,
         mpi_cmd: str = None,
         mpi_flag: str = None,
         num_procs: int = None,
@@ -69,7 +69,7 @@ class Vasp:
             logger (XLogger): ろがー、全てのインスタンスが同じ XLogger
             auto_write (bool):
             vasp_name (str): POSCAR などに関連する系の識別名（例: "aaa.vasp" or "POSCAR）
-            vasp_bin (str): 実行バイナリ（例: "vasp_std"）
+            dft_bin (str): 実行バイナリ（例: "vasp_std"）
             mpi_cmd (str): 例 "mpirun" (configがあればいらない)
             mpi_flag (str): 例 "-np" (configがあればいらない)
             num_procs (int): 並列数 (configがあればいらない)
@@ -94,7 +94,7 @@ class Vasp:
         self._vasp_name: str = vasp_name
 
         # VASP 実行系設定
-        self.vasp_bin: str = vasp_bin or config.vasp_bin
+        self.dft_bin: str = dft_bin or config.dft_bin
         self.mpi_cmd: str = mpi_cmd or config.mpi_cmd
         self.mpi_flag: str = mpi_flag or config.mpi_flag
         self.num_procs: int = num_procs or config.num_procs
@@ -297,7 +297,7 @@ class Vasp:
 
 
         Args:
-            log_dir (str): VASP_log_dir_name デフォルトは config() から vasp_log_dir を取得
+            log_dir (str): VASP_log_dir_name デフォルトは config() から dft_log_dir を取得
             cfg_name (str): POSCAR -> cfg_name.cfg (デフォルトは config() から cfg_name を取得する)
 
         Returns:
@@ -306,7 +306,7 @@ class Vasp:
         self._logger.info("== postprocess()")
 
         if log_dir is None:
-            log_dir = self._config.vasp_log_dir
+            log_dir = self._config.dft_log_dir
         self._logger.info(f"log_dir(VASP)={log_dir})")
 
         if cfg_name is None:
@@ -349,9 +349,9 @@ class Vasp:
         I_MPI_DEBUG="5"
 
         Args:
-            mode (str): "local" vasp_bin
-                        "mpi" mpi_cmd + mpi_flag + num_procs + vasp_bin
-                        "job" job_cmd + vasp_bin
+            mode (str): "local" dft_bin
+                        "mpi" mpi_cmd + mpi_flag + num_procs + dft_bin
+                        "job" job_cmd + dft_bin
             job_cmd (str): ジョブコマンド(mode=job時に使う)
                         　　優先順番
                            instance(job_cmd=xxx)< set_job_cmd(xxx) < run(job_cmd=xxx)
@@ -380,8 +380,8 @@ class Vasp:
             env["FI_PROVIDER"] = "tcp"
             env["I_MPI_FABRICS"] = "shm:tcp"
             env["I_MPI_DEBUG"] = "5"
-            cmd = ["mpirun", "-np", "1", f"{self.vasp_bin}"]
-            # cmd = [self.vasp_bin]
+            cmd = ["mpirun", "-np", "1", f"{self.dft_bin}"]
+            # cmd = [self.dft_bin]
 
         elif mode == "job":
             if not job_cmd:
@@ -389,16 +389,16 @@ class Vasp:
             cmd = [job_cmd]
 
         elif mode == "mpi":
-            cmd = [self.mpi_cmd, self.mpi_flag, str(self.num_procs), self.vasp_bin]
+            cmd = [self.mpi_cmd, self.mpi_flag, str(self.num_procs), self.dft_bin]
 
         else:
             raise ValueError(f"**Error**: 未知の mode: {mode}")
 
-        # vasp_bin がパス上に存在するか確認
+        # dft_bin がパス上に存在するか確認
         if mode != "job":
-            if shutil.which(self.vasp_bin) is None:
+            if shutil.which(self.dft_bin) is None:
                 self._logger.error(
-                    f"**Error**: {self.vasp_bin} が見つかりません。PATHを確認してください。"
+                    f"**Error**: {self.dft_bin} が見つかりません。PATHを確認してください。"
                 )
                 sys.exit(1)
 
@@ -420,9 +420,9 @@ class Vasp:
         return True
 
         self._logger.info("=== run()")
-        # subprocess.run(f"{Config.vasp_bin}", check=True, shell=True)
+        # subprocess.run(f"{Config.dft_bin}", check=True, shell=True)
         subprocess.run(
-            ["mpirun", "-np", f"{Config.num_procs}", f"{Config.vasp_bin}"], check=True
+            ["mpirun", "-np", f"{Config.num_procs}", f"{Config.dft_bin}"], check=True
         )
         return True
 
@@ -565,7 +565,7 @@ if __name__ == "__main__":
         mpi_cmd="mpirun",
         mpi_flag="-np",
         num_procs=1,
-        vasp_bin="vasp_std",
+        dft_bin="vasp_std",
         job_cmd=None,
         logger=_logger,
     )

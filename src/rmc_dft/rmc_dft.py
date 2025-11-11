@@ -137,7 +137,7 @@ class RmcDft:
         for i in range(0, max_rmc_dft_loop):
 
             log_rmc_dir = f"{self._config.rmc_log_dir}{str(i).zfill(digits)}"
-            log_dft_dir = f"{self._config.vasp_log_dir}{str(i).zfill(digits)}"
+            log_dft_dir = f"{self._config.dft_log_dir}{str(i).zfill(digits)}"
             # log_rmc_dir = f"log{str(i).zfill(digits)}"
             # log_dft_dir = f"log{str(i).zfill(digits)}"
 

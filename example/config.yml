@@ -1,17 +1,17 @@
 # K.NAKADA, kengo.nakada@gmail.com
 
-rmc_code: "RmcPot" # RMC code ClassNames
 cfg_name: "aaa" # input_file: RMC: aaa.cfg
+vasp_name: "aaa" # input_file: VASP: aaa.vasp (for VASP)
+max_rmc_dft_loop: 2
+
+rmc_code: "RmcPot" # RMC code ClassNames
 rmc_log_dir: "rmc_log" # LOG 保存
 
 dft_code: "Vasp" # VASP code ClassNames
-vasp_name: "aaa" # input_file: VASP: aaa.vasp (for VASP)
-vasp_log_dir: "vasp_log" # LOG 保存 (for VASP)
+dft_log_dir: "vasp_log" # LOG 保存 (for VASP)
 
 # VASP4(Rmc.cfg) type --> VASP5 type
 element_info: "label.txt"
-
-max_rmc_dft_loop: 2
 
 run_mode: "local"
 
@@ -21,10 +21,10 @@ run_mode: "local"
 rmc_bin: "rmcp.exe"
 
 # VASP  path
-# vasp_bin: "/home/hpc/vasp/bin/vasp-gamma"
-# vasp_bin: "/home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
-vasp_bin: "vasp_gam"
-# vasp_bin: "vasp-gamma"  # hpcs
+# dft_bin: "/home/hpc/vasp/bin/vasp-gamma"
+# dft_bin: "/home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
+dft_bin: "vasp_gam"
+# dft_bin: "vasp-gamma"  # hpcs
 
 # MPI process 数
 num_procs: 1

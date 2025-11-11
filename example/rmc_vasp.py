@@ -23,7 +23,7 @@ if __name__ == "__main__":
     # vasp_name = "aaa"
     cfg_name = config.cfg_name
     vasp_name = config.vasp_name
-    log_vasp_dir = config.vasp_log_dir
+    log_vasp_dir = config.dft_log_dir
 
     # vasp_log = VaspLog(logger=logger)
     # vasp = Vasp(

@@ -26,7 +26,7 @@ if __name__ == "__main__":
     run_mode = config.run_mode
     max_rmc_dft_loop = config.max_rmc_dft_loop
     element_info = config.element_info
-    log_vasp_dir = config.vasp_log_dir
+    log_vasp_dir = config.dft_log_dir
     log_rmc_dir = config.rmc_log_dir
 
     # vasp_log = VaspLog(logger=logger)
