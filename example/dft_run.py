@@ -23,7 +23,7 @@ if __name__ == "__main__":
     #     mpi_cmd="mpirun",
     #     mpi_flag="-np",
     #     num_procs=1,
-    #     vasp_bin="vasp_std",
+    #     dft_bin="vasp_std",
     #     job_cmd=None,
     #     logger=logger,
     # )

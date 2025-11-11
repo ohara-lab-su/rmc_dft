@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.3.5 nakada
+
+- 名前変更
+  - vasp_bin --> dft_bin
+
 ## v0.3.4 nakada
 
 - python 3.6/hpcs(idss) でテスト/調整

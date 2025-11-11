@@ -6,13 +6,13 @@ class Config:
     """
     RMCPOT path
     """
-    # vasp_bin = "mpirun -np 4 vasp"
+    # dft_bin = "mpirun -np 4 vasp"
     num_procs = 4
-    #vasp_bin = f"mpirun -np 4 /home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
-    vasp_bin = f"/home/k/Downloads/vasp.6.4.2/bin/vasp_std"
+    # dft_bin = f"mpirun -np 4 /home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
+    dft_bin = f"/home/k/Downloads/vasp.6.4.2/bin/vasp_std"
     # mpi = f"mpirun -np {num_procs} {os.path.expanduser('/home/hpc/vasp/bin/vasp')}"
     # mpi_opt =
-    # vasp_bin = "/home/hpc/vasp/bin/vasp"
+    # dft_bin = "/home/hpc/vasp/bin/vasp"
     """
     VASP  path
     """

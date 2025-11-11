@@ -16,7 +16,7 @@ class Config:
     vasp_name: str = "aaa"  # aaa.vasp
     element_info: str = "label.txt"
 
-    vasp_log_dir: str = "vasp_log"
+    dft_log_dir: str = "vasp_log"
     rmc_log_dir: str = "rmc_log"
 
     max_rmc_dft_loop: int = 10
@@ -33,10 +33,10 @@ class Config:
     #
     # VASP  path
     #
-    # vasp_bin = f"/home/hpc/vasp/bin/vasp-gamma"
-    # vasp_bin = f"/home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
-    # vasp_bin = "/home/hpc/vasp/bin/vasp"
-    vasp_bin: str = f"vasp_gam"
+    # dft_bin = f"/home/hpc/vasp/bin/vasp-gamma"
+    # dft_bin = f"/home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
+    # dft_bin = "/home/hpc/vasp/bin/vasp"
+    dft_bin: str = f"vasp_gam"
 
     num_procs: int = 1
 
