@@ -144,21 +144,21 @@ class RmcDft:
             if not os.path.exists(log_dft_dir):
                 os.mkdir(log_dft_dir)
 
-            self._logger.info(f"== {self._rmc_code}" + str(i))
+            self._logger.info(f"== {self._rmc_code}{str(i)}, log_dir={log_rmc_dir}")
             # self._rmc.run(cfg_name=cfg_name)
             self._rmc.run()
             self._rmc.postprocess(
-                # log_dir=log_rmc_dir,
+                log_dir=log_rmc_dir,  # loop での名前変更に対応
                 # cfg_name=cfg_name,
                 # element_info="label.txt",
             )
 
-            self._logger.info(f"== {self._dft_code}" + str(i))
+            self._logger.info(
+                f"== {self._dft_code}{str(i)}, mode={mode}, log_dir={log_dft_dir}"
+            )
             self._dft.run(mode=mode)
-            # self._dft.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
-            # self._dft.run(mode="test")
             self._dft.postprocess(
-                # log_dir=log_dft_dir,
+                log_dir=log_dft_dir,  # loop での名前変更に対応
                 # cfg_name=cfg_name,
             )
             self._logger.info("loop end " + str(i))
