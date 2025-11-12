@@ -15,6 +15,6 @@ tutorials/index
   - kengo.nakada@mat.shimane-u.ac.jp
   - kengo.nakada@gmail.com
 
-#  作者
+# コラボレーター
 - K. Kobahashi
 - K. NAKADA
