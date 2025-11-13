@@ -15,7 +15,8 @@ dft_log_dir: "log" # LOG 保存 (for VASP)
 # VASP4(Rmc.cfg) type --> VASP5 type
 element_info: "label.txt"
 
-run_mode: "local"
+# run_mode: "local"
+run_mode: "mpi"
 
 # RMCPOT path (パスが通ってなければフルパスで書く)
 # rmc_bin: "/home/k/Downloads/Source_RMC_POT_lin_2023.1/rmcp.exe"

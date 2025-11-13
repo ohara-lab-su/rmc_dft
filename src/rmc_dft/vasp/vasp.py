@@ -103,6 +103,14 @@ class Vasp:
         self.job_cmd: Optional[str] = job_cmd or config.job_cmd
         # self.job_cmd = job_cmd
 
+        self._logger.info(f"")
+        self._logger.info(f"dft_bin={self.dft_bin}")
+        self._logger.info(f"mpi_cmd={self.mpi_cmd}")
+        self._logger.info(f"mpi_flag={self.mpi_flag}")
+        self._logger.info(f"num_procs={self.num_procs}")
+        self._logger.info(f"job_cmd={self.job_cmd}")
+        self._logger.info(f"")
+
         # --- VaspLog() instance ---
         if vasp_log is None:
             vasp_log = VaspLog(logger=self._logger)
