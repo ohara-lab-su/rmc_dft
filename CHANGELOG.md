@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.3.6 nakada
+
+- setup.py の python 3.6(hpcs) とそれ以外を pythonバージョンで切り替えられるようにした
+ 
 ## v0.3.5 nakada
 
 - 名前変更

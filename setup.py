@@ -72,19 +72,20 @@ setup(
         "dataclasses",
         "coloredlogs",
         "colorlog",
-        # "pytest",
-        # "pytest-asyncio",
+        # python 3.6 だと test を入れない
+        "pytest; python_version > '3.7'",
+        "pytest-asyncio; python_version > '3.7'",
         "pyyaml",
         "toml",
         # "grpcio",
         "nest_asyncio",
         # わざわざ python 3.6 環境(setup.py)だと入れない
-        # "sphinx",
-        # "myst-parser",
-        # "sphinx-autobuild",
-        # "sphinx-rtd-theme",
-        # "sphinxcontrib-napoleon",
-        # "linkify-it-py",  # for sphinx
+        "sphinx; python_version > '3.7'",
+        "myst-parser; python_version > '3.7'",
+        "sphinx-autobuild; python_version > '3.7'",
+        "sphinx-rtd-theme; python_version > '3.7'",
+        "sphinxcontrib-napoleon; python_version > '3.7'",
+        "linkify-it-py; python_version > '3.7'",  # for sphinx
     ],
     #
     #       platforms = ['linux','OSX','Window'],
