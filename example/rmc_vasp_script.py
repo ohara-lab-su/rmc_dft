@@ -87,7 +87,7 @@ if __name__ == "__main__":
         logger.info("== vasp" + str(i))
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
-        vasp.run()
+        vasp.run(mode="mpi")
         # vasp.run(mode=run_mode)
         # vasp.postprocess(
         #     log_dir=log_vasp_dir,
