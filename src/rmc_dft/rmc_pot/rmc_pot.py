@@ -49,6 +49,8 @@ class RmcPot:
 
         if cfg_name is None:
             cfg_name: str = config.cfg_name
+        else:
+            config.cfg_name = cfg_name
 
         # aaa.dat ファイルなどの CFG ファイル名 prefix
         self._cfg_name = cfg_name
@@ -74,6 +76,10 @@ class RmcPot:
 
         self._rmc_dat = rmc_dat
         self._logger.info(f"== rmc_pot_dat()")
+
+    @property
+    def rmc_dat(self):
+        return self._rmc_dat
 
     def set_cfg_name(self, cfg_name: str):
         self._cfg_name = cfg_name
@@ -142,6 +148,16 @@ class RmcPot:
         *) 初期の構造変換は誤解が起きやすいので RmcPot クラスでは Preprocess() で勝手にやらないようにする
         """
         self._logger.info("== preprocess()")
+
+        # aaa.cfg が存在しないときは止める
+        if not os.path.exists(f"{self._cfg_name}.cfg"):
+            self._logger.error(f"**Error**: {self._cfg_name}.cfg が見つかりません。")
+            sys.exit(-1)
+
+        # aaa.dat が存在しないときは止める
+        if not os.path.exists(f"{self._cfg_name}.dat"):
+            self._logger.error(f"**Error**: {self._cfg_name}.dat が見つかりません。")
+            sys.exit(-1)
 
         # 実行カレント（実行したPythonのパス）を基準にする
         work_dir = os.getcwd()
