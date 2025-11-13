@@ -349,11 +349,64 @@ class RmcPotDat:
         """
         3 行目 cut offs を更新。可変長対応。
 
+        Fe Si B の３つのときは 6つのパターンが生まれる
+
+        Fe–Fe
+        Fe–Si
+        Fe–B
+        Si–Si
+        Si–B
+        B–B
+
+        6つが必要
+
+        【cutoff の与え方（固定フォーマット版 RMC_POT の厳密仕様）】
+
+        cutoff は「原子種の組み合わせごと」に 1 つずつ値を並べる。
+        原子種数を ntypes とすると、必要となる cutoff の数は
+
+            ntypes * (ntypes + 1) / 2
+
+        である。
+
+        並べる順序は RMC_POT 固定フォーマットの既定順で、以下のように
+        “11, 12, 13, …, 22, 23, …, 33, …” のような三角行列形式で並べる。
+
+        例）3 元系（Fe, Si, B）の場合（ntypes = 3）
+
+            必要な cutoff は 6 個：
+                11, 12, 13, 22, 23, 33
+
+            set_cutoffs へ渡すリストは次のように 6 要素で指定する：
+
+                set_cutoffs([c11, c12, c13, c22, c23, c33])
+
+            実際の実行例：
+
+                set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
+
+        例）2 元系（A, B）の場合（ntypes = 2）
+
+            必要な cutoff は 3 個：
+                11, 12, 22
+
+            set_cutoffs([c11, c12, c22])
+
+        【注意】
+        - cutoff の個数は必ず ntypes*(ntypes+1)/2 と一致させること。
+        - 固定フォーマット版 RMC_POT ではこの並びと個数が崩れると、
+          直後の行（maximum moves 等）の読み込み位置がずれ、実行時エラーになる。
+        - 可変長の free-format (#003) ではこの限りではないが、
+          本クラスは固定フォーマット互換を前提としている。
+
         Args:
-            values (Sequence[Union[int, float]]):
-                 原子種ごとのカットオフ距離リストを指定する。
-                 要素数は ntypes に応じて可変（3 要素に限定しない）
-            auto_write (bool | None, optional):
+            values (Sequence[Union[int|float]]):
+                上記の定義に従い、原子種組み合わせごとの cutoff を並べたリスト。
+                原子種ごとのカットオフ距離リストを指定する。
+                要素数は ntypes に応じて可変（3 要素に限定しない）
+
+            auto_write (bool | None):
+                True の場合は即時書き出し。None はインスタンス既定値に従う。
         """
         seq = list(values)
         self._logger.info(f"set_cutoffs = {seq}")
@@ -388,12 +441,25 @@ class RmcPotDat:
         auto_write: Optional[bool] = True,
     ) -> None:
         """
-        4 行目 maximum moves を更新。
+        4 行目 maximum moves を可変長で更新する。
+
+
+        Args:
+            values (Sequence[Union[int, float]]):
+                任意個数の maximum move 値。順序はそのまま書き込み。
+
+            auto_write (bool | None):
+                True の場合即時保存。None の場合はインスタンス既定に従う。
         """
         seq = list(values)
         self._logger.info(f"set_maximu_moves = {seq}")
-        if len(seq) != 2:
-            raise ValueError(f"maximum moves は 2 要素が必要です: {values!r}")
+
+        # 各要素が数値であることのみ検査する
+        for v in seq:
+            if not isinstance(v, (int, float)):
+                raise ValueError(f"maximum moves には数値のみ指定してください: {v!r}")
+
+        # 4 行目へそのまま書き込む
         self.set_line(4, seq, auto_write=auto_write)
 
     def get_r_spacing(self) -> float:
