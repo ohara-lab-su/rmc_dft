@@ -138,6 +138,8 @@ class RmcPot:
         このコードを動かすときは RMC_POT 入力が揃っている前提とする
         1. 実験プロファイル（例: fesi04_smbt-rmc.txt）が実行カレントに存在しないときは止める
         2. label.txt が存在しないと止める
+
+        *) 初期の構造変換は誤解が起きやすいので RmcPot クラスでは Preprocess() で勝手にやらないようにする
         """
         self._logger.info("== preprocess()")
 

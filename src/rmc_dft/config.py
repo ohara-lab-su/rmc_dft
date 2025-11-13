@@ -3,8 +3,11 @@ K.NAKADA, kengo.nakada@gmail.com (1st, 3rd varsion)
 K.KOBAYASHI (2nd version)
 """
 
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import yaml
 import os
+
+from x_logger import XLogger
 
 
 class Config:
@@ -51,7 +54,20 @@ class Config:
     # 自動セーブ
     auto_write: bool = True
 
-    def __init__(self, yaml_path=None):
+    def __init__(
+        self,
+        yaml_path: str = None,
+        *,
+        logger: Optional[XLogger] = XLogger(),
+    ):
+        """
+
+        Args:
+            yaml_path (str):
+            logger (XLogger):
+        """
+        self._logger = logger
+
         # インスタンスで使いたいときだけ、ここで個別設定
         if yaml_path:
             self._load_yaml(yaml_path)
@@ -72,13 +88,13 @@ class Config:
 
     def _load_yaml(self, yaml_path=None):
         # インスタンス用：インスタンスdictにのみ上書き
-        print("load_yaml:", yaml_path)
+        self._logger.info(f"load_yaml: {yaml_path}")
         if yaml_path is None:
             yaml_path = os.environ.get("RMC_DFT_CONFIG_YAML")
             if yaml_path is None:
                 return
         yaml_path = os.path.abspath(yaml_path)
-        print("abspath:", yaml_path)
+        self._logger.info(f"abspath: {yaml_path}")
         with open(yaml_path, "r") as f:
             data = yaml.safe_load(f)
         for k, v in data.items():

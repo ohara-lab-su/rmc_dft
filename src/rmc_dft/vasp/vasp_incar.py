@@ -44,29 +44,28 @@ class VaspIncar:
         self.incar: Incar = Incar()
 
         if os.path.exists(self.incar_name):
-            self._load()
-        else:
-            self.logger.info(
-                f"[VaspIncarUnified] INCAR not found, new one will be created: {self.incar_name}"
-            )
+            self.load()
 
     # ==============================
     # 基本入出力
     # ==============================
-    def _load(self) -> None:
-        """ファイルを読み込み、pymatgen.Incarとテキスト行を両方保持"""
+
+    def load(self) -> None:
+        """
+        ファイルを読み込み、pymatgen.Incarとテキスト行を両方保持
+        """
         with open(self.incar_name, "r") as f:
             self.lines = f.readlines()
 
         # pymatgen Incar()
         self.incar = Incar.from_file(self.incar_name)
-        self.logger.info(f"[VaspIncarUnified] Loaded INCAR: {self.incar_name}")
+        self.logger.info(f"[VaspIncar] Loaded INCAR: {self.incar_name}")
 
     def write(self) -> None:
         """内部linesを書き戻し"""
         with open(self.incar_name, "w") as f:
             f.writelines(self.lines)
-        self.logger.info(f"[VaspIncarUnified] Wrote INCAR: {self.incar_name}")
+        self.logger.info(f"[VaspIncar] Wrote INCAR: {self.incar_name}")
 
     # ==============================
     # 行操作
@@ -132,11 +131,11 @@ class VaspIncar:
 
         if idx is not None:
             self.lines[idx] = new_line
-            self.logger.info(f"[VaspIncarUnified] Updated tag: {tag} -> {value}")
+            self.logger.info(f"[VaspIncar] Updated tag: {tag} -> {value}")
         else:
             # 新規タグは末尾に追記
             self.lines.append(new_line)
-            self.logger.info(f"[VaspIncarUnified] Added tag: {tag} = {value}")
+            self.logger.info(f"[VaspIncar] Added tag: {tag} = {value}")
 
         # pymatgen側更新
         self.incar[tag] = value
@@ -149,7 +148,7 @@ class VaspIncar:
         if idx is not None:
             del self.lines[idx]
 
-            self.logger.info(f"[VaspIncarUnified] Removed tag: {tag}")
+            self.logger.info(f"[VaspIncar] Removed tag: {tag}")
             if tag in self.incar:
                 del self.incar[tag]
             if self.auto_write:
@@ -157,7 +156,7 @@ class VaspIncar:
 
     def reload(self) -> None:
         """再読込（外部修正反映）"""
-        self._load()
+        self.load()
 
     def export_dict(self) -> Dict[str, Any]:
         """内部Incar辞書を返す"""
