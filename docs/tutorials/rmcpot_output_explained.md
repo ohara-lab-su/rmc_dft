@@ -126,8 +126,7 @@ RMCのステップが進むにつれて、フィッティングがどう改善�
 プロットしてみると、ステップが進むにつれ、減少している事がわかる。つまり、フィッティングはよくなっている様子が見れる。
 これが、じゅうぶん小さくなるとか、S(Q)を実際プロットとしたり、gij(r)をみたりしながら、収束を判定する。
 
-<img title="a title" src="[https://github.com/shimane-dev/rmc_dft/blob/develop_kobayashi3/docs/tutorials/hst.png]" alt="hst">
-図. プロット例
+![](hst.png)
 
       
 
