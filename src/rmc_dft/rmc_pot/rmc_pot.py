@@ -192,7 +192,7 @@ class RmcPot:
         RMC 後に DFT を動かすにあたっての
         1) DATA-collect
         2) BACKUP
-        3) CFG --> POSCAR (VASP4) 変換 --> VASP5 変換
+        3) xxx.CFG --> POSCAR (VASP4) 変換(xxx.vasp) --> VASP5 変換(xxx.vasp)
 
         他のコードを使っても基本は poscar 経由を念頭におくので
         postprocess は poscar にしておけば他のライブラリを使っても
@@ -242,8 +242,11 @@ class RmcPot:
             element_info="label.txt",
         )
 
+        # ここで POSCAR にすると入力の元になった POSCAR があると
+        # 干渉するので method の使い方で破綻する恐れがある。
+
         # xxx.vasp --> POSCAR
-        shutil.copy(f"{cfg_name}.vasp", "POSCAR")
+        # shutil.copy(f"{cfg_name}.vasp", "POSCAR")
 
         return True
 

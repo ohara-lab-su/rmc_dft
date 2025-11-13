@@ -36,13 +36,7 @@ if __name__ == "__main__":
 
     rmc = RmcPot(rmc_dat=rmc_dat, config=config, logger=logger)
 
-    # ret = rmc.get_tag("density")
-    # print(ret)
-    # rmc.set_tag("density", 0.1)
-    # ret = rmc.get_tag("density")
-    # print(ret)
-
     # rmc.run(cfg_name=cfg_name)
-    rmc.preprocess()
+    rmc.preprocess()  ## check input file
     rmc.run()
-    # rmc.postprocess()
+    rmc.postprocess()  ## backup and output xxx.vasp

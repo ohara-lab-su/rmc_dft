@@ -97,11 +97,19 @@ class Vasp:
 
         # VASP 実行系設定
         self.dft_bin: str = dft_bin or config.dft_bin
-        self.mpi_cmd: str = mpi_cmd or config.mpi_cmd
-        self.mpi_flag: str = mpi_flag or config.mpi_flag
-        self.num_procs: int = num_procs or config.num_procs
-        self.job_cmd: str = job_cmd or config.job_cmd
+        self.mpi_cmd: Optional[str] = mpi_cmd or config.mpi_cmd
+        self.mpi_flag: Optional[str] = mpi_flag or config.mpi_flag
+        self.num_procs: Optional[int] = num_procs or config.num_procs
+        self.job_cmd: Optional[str] = job_cmd or config.job_cmd
         # self.job_cmd = job_cmd
+
+        self._logger.info(f"")
+        self._logger.info(f"dft_bin={self.dft_bin}")
+        self._logger.info(f"mpi_cmd={self.mpi_cmd}")
+        self._logger.info(f"mpi_flag={self.mpi_flag}")
+        self._logger.info(f"num_procs={self.num_procs}")
+        self._logger.info(f"job_cmd={self.job_cmd}")
+        self._logger.info(f"")
 
         # --- VaspLog() instance ---
         if vasp_log is None:
@@ -341,8 +349,6 @@ class Vasp:
         self,
         mode: Optional[str] = None,
         job_cmd: Optional[str] = None,
-        postprocess: bool = False,
-        preprocess: bool = False,
         blocking: bool = True,
     ) -> bool:
         """
@@ -360,8 +366,6 @@ class Vasp:
             job_cmd (str): ジョブコマンド(mode=job時に使う)
                         　　優先順番
                            instance(job_cmd=xxx)< set_job_cmd(xxx) < run(job_cmd=xxx)
-            postprocess (bool): RMC-VASP 用の postprocess を run 中に行う
-            preprocess (bool): RMC-VASP 用の postprocess を run 中に行う
             blocking (bool):  subprocessをブロッキングで起動(default: True)
 
         Returns:
@@ -372,15 +376,11 @@ class Vasp:
         # すべてのモードで共通の環境変数を定義
         env = os.environ.copy()
 
-        ########################
-        if preprocess:
-            self.preprocess(self._input_name)
-        ########################
-
         if mode is None:
             mode = self._config.run_mode
 
         if mode == "local":
+            self._logger.info(f"== local mpi mode")
             # MPI build された vasp を local で動かすためのもの (infinibandを使わない)
             env["FI_PROVIDER"] = "tcp"
             env["I_MPI_FABRICS"] = "shm:tcp"
@@ -388,13 +388,28 @@ class Vasp:
             cmd = ["mpirun", "-np", "1", f"{self.dft_bin}"]
             # cmd = [self.dft_bin]
 
+        elif mode == "mpi":
+            self._logger.info(f"== mpi mode")
+            self._logger.info(f"mpi_cmd = {self.mpi_cmd}")
+            self._logger.info(f"mpi_flag = {self.mpi_flag}")
+            self._logger.info(f"dft_bin = {self.dft_bin}")
+            self._logger.info(f"num_procs = {self.num_procs}")
+
+            cmd = [self.mpi_cmd]
+
+            if self.mpi_flag is not None:
+                cmd.append(self.mpi_flag)
+
+            if self.num_procs is not None:
+                cmd.append(str(self.num_procs))
+
+            cmd.append(f"{self.dft_bin}")
+
         elif mode == "job":
+            self._logger.info(f"== job mode")
             if not job_cmd:
                 job_cmd = self.job_cmd
             cmd = [job_cmd]
-
-        elif mode == "mpi":
-            cmd = [self.mpi_cmd, self.mpi_flag, str(self.num_procs), self.dft_bin]
 
         else:
             raise ValueError(f"**Error**: 未知の mode: {mode}")
@@ -408,7 +423,7 @@ class Vasp:
                 sys.exit(1)
 
         self._logger.info(f"move = {mode}")
-        self._logger.info(f"env = {json.dumps(env, indent=2)}")
+        # self._logger.info(f"env = {json.dumps(env, indent=2)}")
         self._logger.info(f"cmd = {cmd}")
 
         try:
@@ -416,11 +431,6 @@ class Vasp:
         except subprocess.CalledProcessError as e:
             self._logger.error(f"**Error**: VASP実行中にエラーが発生しました: {e}")
             sys.exit(1)
-
-        ########################
-        if postprocess:
-            self.postprocess(self._input_name)
-        ########################
 
         return True
 

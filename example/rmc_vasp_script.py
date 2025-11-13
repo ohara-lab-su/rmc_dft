@@ -74,7 +74,7 @@ if __name__ == "__main__":
         rmc.postprocess()
         # rmc.run(cfg_name=cfg_name)
         rmc.run()
-        rmc.postprocess(log_dir=_rmc_dir)  # loop番号つき
+        rmc.postprocess(log_dir=_rmc_dir)  # backup(loop番号つき), cfg --> xxx.vasp
         # rmc.postprocess(element_info="label.txt")
         # rmc.postprocess(
         #     log_dir=log_rmc_dir,  # 相対
@@ -82,15 +82,16 @@ if __name__ == "__main__":
         #     element_info="label.txt",
         # )
 
+        shutil.copy(f"{cfg_name}.vasp", "POSCAR")
+
         logger.info("== vasp" + str(i))
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
-
         vasp.run()
         # vasp.run(mode=run_mode)
         # vasp.postprocess(
         #     log_dir=log_vasp_dir,
         #     cfg_name=cfg_name,
         # )
-        vasp.postprocess(log_dir=_vasp_dir)  # loop番号き
+        vasp.postprocess(log_dir=_vasp_dir)  # BACKUP(loop番号き),
         logger.info("loop end " + str(i))

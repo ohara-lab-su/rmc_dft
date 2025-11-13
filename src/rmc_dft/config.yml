@@ -28,14 +28,14 @@ rmc_bin: "rmcp.exe"
 dft_bin: "vasp_gam"
 # dft_bin: "vasp-gamma"  # hpcs
 
-# MPI process 数
-num_procs: 1
-
 # mpi: "mpirun -np {num_procs} {os.path.expanduser('/home/hpc/vasp/bin/vasp')}"
 mpi_cmd: "mpirun"
 
 # mpi_flag
 mpi_flag: "-np"
+
+# MPI process 数
+num_procs: 1
 
 # default job_name
 job_cmd: "qsub job_hpcs2024_node2.sh"

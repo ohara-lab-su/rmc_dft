@@ -39,17 +39,17 @@ class Config:
     # dft_bin = f"/home/hpc/vasp/bin/vasp-gamma"
     # dft_bin = f"/home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
     # dft_bin = "/home/hpc/vasp/bin/vasp"
-    dft_bin: str = f"vasp_gam"
+    dft_bin: Optional[str] = f"vasp_gam"
 
-    num_procs: int = 1
+    num_procs: Optional[int] = 1
 
-    mpi_cmd: str = "mpirun"
+    mpi_cmd: Optional[str] = "mpirun"
     # mpi = f"mpirun -np {num_procs} {os.path.expanduser('/home/hpc/vasp/bin/vasp')}"
 
-    mpi_flag: str = "-np"
+    mpi_flag: Optional[str] = "-np"
 
     # default job_name
-    job_cmd: str = "qsub job_hpcs2024_node2.sh"
+    job_cmd: Optional[str] = "qsub job_hpcs2024_node2.sh"
 
     # 自動セーブ
     auto_write: bool = True
@@ -99,3 +99,9 @@ class Config:
             data = yaml.safe_load(f)
         for k, v in data.items():
             setattr(self, k, v)
+
+
+if __name__ == "__main__":
+    config = Config("config.yml")
+    print(config.num_procs)
+    print(type(config.num_procs))
