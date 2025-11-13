@@ -33,17 +33,17 @@ if __name__ == "__main__":
     vasp = Vasp(config=config, logger=logger)
 
     # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
-    vasp.poscar2cfg(cfg_name)
+    # vasp.poscar2cfg(cfg_name)
 
     # run_mode = "local"
 
     if not os.path.exists(log_vasp_dir):
         os.mkdir(log_vasp_dir)
 
-    vasp.run()
+    vasp.run(mode="mpi")
     # vasp.run(mode=run_mode)
     # vasp.postprocess(
     #     log_dir=log_vasp_dir,
     #     cfg_name=cfg_name,
     # )
-    vasp.postprocess()
+    vasp.postprocess()  ## backup, contcar to poscar, poscar2cfg(xxx,cfg)
