@@ -25,20 +25,16 @@ if __name__ == "__main__":
         help="対象とするCFGファイル名（拡張子なし）",
     )
 
-    logger = XLogger(
-        log_level="debug",
-        logger_name="rmc_clear",
-    )
+    logger = XLogger(log_level="debug", logger_name="rmc_clear")
 
     args = parser.parse_args()
-
-    # 引数が指定されていない場合は説明を出して終了
-    if args.cfg_name is None:
+    if args.cfg_name is None:  # 引数が指定されていない場合は説明を出して終了
         logger.error("エラー: cfg_name が指定されていません。")
         logger.error("使用方法: ./rmc_clear.py <cfg_name>")
-        sys.exit(1)
-
-    cfg_name = args.cfg_name
+        logger.info("cfg_name = aaa を名前ととして使います")
+        cfg_name = "aaa"
+    else:
+        cfg_name = args.cfg_name
 
     rmc = RmcPotLog(cfg_name=cfg_name, logger=logger)
     rmc.clear(cfg_name=cfg_name)

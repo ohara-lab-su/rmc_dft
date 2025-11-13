@@ -8,7 +8,7 @@ RMC-VASP を構成する sample script
 import os
 import shutil
 
-from rmc_dft import Config, Vasp, VaspLog, RmcPot, RmcPotLog
+from rmc_dft import Config, Vasp, VaspLog, RmcPot, RmcPotLog, RmcPotDat
 from x_logger import XLogger
 
 
@@ -16,6 +16,12 @@ if __name__ == "__main__":
     logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
 
     config = Config("config.yml")
+
+    # 初期POSCAR 作成
+    shutil.copy(f"POSCAR0", "POSCAR")
+
+    # 初期CFG 作成 (POSCAR to CFG)
+    poscar2cfg(cfg_name=config.cfg_name)
 
     # POSCAR to CFG (rmc用のCFG変換)
     # cfg_name = "aaa"
@@ -42,7 +48,15 @@ if __name__ == "__main__":
     # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
     # rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
 
-    rmc = RmcPot(config=config, logger=logger)
+    rmc_dat = RmcPotDat(config=config, logger=logger)
+    rmc_dat.set_comment("comment FeSiB")
+    rmc_dat.set_density(0.0915)
+    rmc_dat.set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
+    rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
+    rmc_dat.set_r_spacing(0.025)
+    rmc_dat.set_data_flags([0, 0, 1, 0])
+
+    rmc = RmcPot(rmc_dat=rmc_dat, config=config, logger=logger)
 
     # require
     # INCAR, KPOINTS, POTCAR,
@@ -69,7 +83,7 @@ if __name__ == "__main__":
         if not os.path.exists(_vasp_dir):
             os.mkdir(_vasp_dir)
 
-        logger.info("== rmc" + str(i))
+        logger.info(f"== rmc {i}")
 
         rmc.postprocess()
         # rmc.run(cfg_name=cfg_name)
@@ -84,7 +98,7 @@ if __name__ == "__main__":
 
         shutil.copy(f"{cfg_name}.vasp", "POSCAR")
 
-        logger.info("== vasp" + str(i))
+        logger.info(f"== vasp {i}")
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
         vasp.run(mode="mpi")
@@ -93,5 +107,7 @@ if __name__ == "__main__":
         #     log_dir=log_vasp_dir,
         #     cfg_name=cfg_name,
         # )
-        vasp.postprocess(log_dir=_vasp_dir)  # BACKUP(loop番号き),
+        vasp.postprocess(
+            log_dir=_vasp_dir
+        )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
         logger.info("loop end " + str(i))

@@ -8,7 +8,16 @@ RMC-VASP を構成する sample script
 import os
 import shutil
 
-from rmc_dft import Config, Vasp, VaspLog, RmcPot, RmcPotLog
+from rmc_dft import (
+    Config,
+    Vasp,
+    VaspIncar,
+    VaspKpoints,
+    VaspLog,
+    RmcPot,
+    RmcPotLog,
+    RmcPotDat,
+)
 from x_logger import XLogger
 
 
@@ -16,6 +25,9 @@ if __name__ == "__main__":
     logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
 
     config = Config("config.yml")
+
+    # 初期POSCAR 作成
+    shutil.copy(f"POSCAR0", "POSCAR")
 
     # POSCAR to CFG (rmc用のCFG変換)
     # cfg_name = "aaa"
@@ -31,6 +43,12 @@ if __name__ == "__main__":
     #     logger=logger,
     # )
     vasp = Vasp(config=config, logger=logger)
+
+    vasp.set_tag("NSW", 1)
+    vasp.set_tag("EDIFF", 1e-04)
+    vasp.get_tag("EDIFF")
+    ret = vasp.get_tag("EDIFFG")
+    print(ret)
 
     # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
     # vasp.poscar2cfg(cfg_name)

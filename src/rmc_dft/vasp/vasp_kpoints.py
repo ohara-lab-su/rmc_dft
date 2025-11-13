@@ -74,13 +74,14 @@ class VaspKpoints:
         if os.path.exists(self.kpoints_name):
             self.load()
         else:
-            # 既定値（ファイルはまだ書かない）
+            # 既定値
             self._mode = "Monkhorst-Pack"
             self._grid = (1, 1, 1)
             self._shift = (0, 0, 0)
             self._comment = "K-Points"
             # 既定値から Kpoints を初期生成（引数なしのビルド）
             self._kpts_obj = self._build_kpoints()
+            self.write()
 
     def load(self):
         """
@@ -116,6 +117,64 @@ class VaspKpoints:
             self.logger.info(
                 f"Loaded KPOINTS from {self.kpoints_name} (mode={self._mode}, grid={self._grid}, shift={self._shift})"
             )
+
+    def write(self) -> None:
+        """現在の内部状態を KPOINTS ファイルへ書き出す。"""
+        self._kpts_obj = self._build_kpoints()
+        if self.logger:
+            self.logger.info(
+                f"Write KPOINTS: mode={self._mode}, grid={self._grid}, shift={self._shift} -> {self.kpoints_name}"
+            )
+        self._kpts_obj.write_file(self.kpoints_name)
+
+    def export_dict(self) -> dict:
+        """現在の内部状態を辞書で返す（ロギング/デバッグ用）。"""
+        return {
+            "mode": self._mode,
+            "grid": self._grid,
+            "shift": self._shift,
+            "comment": self._comment,
+            "path": self.kpoints_name,
+        }
+
+    def update(
+        self,
+        mode: Optional[str] = None,
+        grid: Optional[Tuple[int, int, int]] = None,
+        shift: Optional[Tuple[int, int, int]] = None,
+        comment: Optional[str] = None,
+    ) -> None:
+        """
+        複数項目をまとめて更新する。指定されたもののみ反映。
+        auto_write=True のときは更新後に書き出し。
+        """
+        changed = False
+
+        if mode is not None:
+            self.set_mode(mode)
+            changed = True
+
+        if grid is not None:
+            if len(grid) != 3:
+                raise ValueError("grid must be a tuple of length 3")
+            kx, ky, kz = grid
+            self.set_grid(int(kx), int(ky), int(kz))
+            changed = True
+
+        if shift is not None:
+            if len(shift) != 3:
+                raise ValueError("shift must be a tuple of length 3")
+            sx, sy, sz = shift
+            self.set_shift(int(sx), int(sy), int(sz))
+            changed = True
+
+        if comment is not None:
+            self.set_comment(comment)
+            changed = True
+
+        if changed and (not self.auto_write):
+            # auto_write=False の場合は、内部状態の再構築のみ行われる
+            pass
 
     # ----------------------------
     # 内部: Kpoints 構築（引数なし）
@@ -206,64 +265,3 @@ class VaspKpoints:
         self._kpts_obj = self._build_kpoints()
         if self.auto_write:
             self.write()
-
-    # ----------------------------
-    # ユーティリティ
-    # ----------------------------
-    def update(
-        self,
-        mode: Optional[str] = None,
-        grid: Optional[Tuple[int, int, int]] = None,
-        shift: Optional[Tuple[int, int, int]] = None,
-        comment: Optional[str] = None,
-    ) -> None:
-        """
-        複数項目をまとめて更新する。指定されたもののみ反映。
-        auto_write=True のときは更新後に書き出し。
-        """
-        changed = False
-
-        if mode is not None:
-            self.set_mode(mode)
-            changed = True
-
-        if grid is not None:
-            if len(grid) != 3:
-                raise ValueError("grid must be a tuple of length 3")
-            kx, ky, kz = grid
-            self.set_grid(int(kx), int(ky), int(kz))
-            changed = True
-
-        if shift is not None:
-            if len(shift) != 3:
-                raise ValueError("shift must be a tuple of length 3")
-            sx, sy, sz = shift
-            self.set_shift(int(sx), int(sy), int(sz))
-            changed = True
-
-        if comment is not None:
-            self.set_comment(comment)
-            changed = True
-
-        if changed and (not self.auto_write):
-            # auto_write=False の場合は、内部状態の再構築のみ行われる
-            pass
-
-    def export_dict(self) -> dict:
-        """現在の内部状態を辞書で返す（ロギング/デバッグ用）。"""
-        return {
-            "mode": self._mode,
-            "grid": self._grid,
-            "shift": self._shift,
-            "comment": self._comment,
-            "path": self.kpoints_name,
-        }
-
-    def write(self) -> None:
-        """現在の内部状態を KPOINTS ファイルへ書き出す。"""
-        self._kpts_obj = self._build_kpoints()
-        if self.logger:
-            self.logger.info(
-                f"Write KPOINTS: mode={self._mode}, grid={self._grid}, shift={self._shift} -> {self.kpoints_name}"
-            )
-        self._kpts_obj.write_file(self.kpoints_name)

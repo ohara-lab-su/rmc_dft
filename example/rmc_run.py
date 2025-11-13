@@ -8,7 +8,16 @@ import os
 import sys
 import argparse
 
-from rmc_dft import Config, Vasp, VaspLog, RmcPot, RmcPotLog, RmcPotDat
+from rmc_dft import (
+    Config,
+    Vasp,
+    VaspIncar,
+    VaspKpoints,
+    VaspLog,
+    RmcPot,
+    RmcPotLog,
+    RmcPotDat,
+)
 from rmc_dft.util import poscar2cfg
 from x_logger import XLogger
 
@@ -18,7 +27,10 @@ if __name__ == "__main__":
 
     config = Config("config.yml")
 
-    # POSCAR to CFG
+    # 初期POSCAR 作成
+    shutil.copy(f"POSCAR0", "POSCAR")
+
+    # 初期CFG 作成 (POSCAR to CFG)
     poscar2cfg(cfg_name=config.cfg_name)
 
     # rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
