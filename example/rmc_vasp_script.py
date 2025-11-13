@@ -15,8 +15,7 @@ from x_logger import XLogger
 if __name__ == "__main__":
     logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
 
-    config = Config()
-    config.load_yaml("config.yml")
+    config = Config("config.yml")
 
     # POSCAR to CFG (rmc用のCFG変換)
     # cfg_name = "aaa"

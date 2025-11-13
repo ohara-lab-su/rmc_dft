@@ -90,7 +90,10 @@ class RmcPotDat:
         self._lines: list[_Line] = []
         self._auto_write: bool = auto_write
 
-        self._load()
+        # 既存の dat を読む
+        p = Path(f"{self.cfg_name}.dat")
+        if p.exists():
+            self.load()
 
     # --------------------
     # 静的フォーマット関数群（クラス内に集約）
@@ -145,15 +148,19 @@ class RmcPotDat:
     # --------------------
     # 基本 I/O
     # --------------------
-    def _load(self) -> None:
+    def load(self) -> bool:
         """ファイルを読み込んで内部行リストを構築。"""
         self._logger.info(f"== load({self.cfg_name}.dat)")
 
         p = Path(f"{self.cfg_name}.dat")
         if not p.exists():
-            raise FileNotFoundError(
-                f".dat ファイルが見つかりません: {p} (.dat は自動付加されます)"
+            # raise FileNotFoundError(
+            #     f".dat ファイルが見つかりません: {p} (.dat は自動付加されます)"
+            # )
+            self._logger.info(
+                ".dat ファイルが見つかりません: {p} (.dat は自動付加されます)"
             )
+            return False
 
         self._lines.clear()
         with p.open("r", encoding="utf-8") as f:
@@ -168,6 +175,7 @@ class RmcPotDat:
                     self._lines.append(
                         _Line(value=raw.strip(), comment="", had_bang=False)
                     )
+        return True
 
     def write(
         self,
@@ -284,9 +292,10 @@ class RmcPotDat:
         self,
         comment: str,
         *,
-        auto_write: Optional[bool] = None,
+        auto_write: Optional[bool] = True,
     ) -> None:
         """1 行目 comment を更新。"""
+        self._logger.info(f"set_comment = {comment}")
         self.set_line(1, comment, auto_write=auto_write)
 
     def get_density(self) -> float:
@@ -306,9 +315,10 @@ class RmcPotDat:
         self,
         rho: Union[int, float],
         *,
-        auto_write: Optional[bool] = None,
+        auto_write: Optional[bool] = True,
     ) -> None:
         """2 行目 density を更新。"""
+        self._logger.info(f"set_density = {rho}")
         self.set_line(2, rho, auto_write=auto_write)
 
     def get_cutoffs(self) -> List[Union[int, float]]:
@@ -334,7 +344,7 @@ class RmcPotDat:
         self,
         values: Sequence[Union[int, float]],
         *,
-        auto_write: Optional[bool] = None,
+        auto_write: Optional[bool] = True,
     ) -> None:
         """
         3 行目 cut offs を更新。可変長対応。
@@ -346,6 +356,7 @@ class RmcPotDat:
             auto_write (bool | None, optional):
         """
         seq = list(values)
+        self._logger.info(f"set_cutoffs = {seq}")
         for v in seq:
             if not isinstance(v, (int, float)):
                 raise TypeError(f"cut offs には数値のみを指定してください: {v!r}")
@@ -370,14 +381,17 @@ class RmcPotDat:
             raise ValueError(f"maximum moves 行の要素数が不足: {toks!r}")
         return float(toks[0]), float(toks[1])
 
-    def set_max_moves(
+    def set_maximu_moves(
         self,
         values: Sequence[Union[int, float]],
         *,
-        auto_write: Optional[bool] = None,
+        auto_write: Optional[bool] = True,
     ) -> None:
-        """4 行目 maximum moves を更新。"""
+        """
+        4 行目 maximum moves を更新。
+        """
         seq = list(values)
+        self._logger.info(f"set_maximu_moves = {seq}")
         if len(seq) != 2:
             raise ValueError(f"maximum moves は 2 要素が必要です: {values!r}")
         self.set_line(4, seq, auto_write=auto_write)
@@ -385,11 +399,11 @@ class RmcPotDat:
     def get_r_spacing(self) -> float:
         """
         5 行目 r spacing を float で返す。i
+        近接分布関数 g(r) のビン幅（r の刻み幅）。単位は Å。
 
         例)
         0.025        ! r spacing
 
-        - 説明: 近接分布関数 g(r) のビン幅（r の刻み幅）。単位は Å。
         - 備考: 小さいほど解像度は上がるが計算負荷が増える
         """
         toks = self.get_line(5).split()
@@ -401,9 +415,10 @@ class RmcPotDat:
         self,
         dr: Union[int, float],
         *,
-        auto_write: Optional[bool] = None,
+        auto_write: Optional[bool] = True,
     ) -> None:
         """5 行目 r spacing を更新。"""
+        self._logger.info(f"set_r_spacing = {dr}")
         self.set_line(5, dr, auto_write=auto_write)
 
     def get_moveout_option(self) -> bool:
@@ -445,7 +460,7 @@ class RmcPotDat:
         self,
         use_moveout: bool,
         *,
-        auto_write: Optional[bool] = None,
+        auto_write: Optional[bool] = True,
     ) -> None:
         """
         6 行目（whether to use moveout option）を更新する。
@@ -472,6 +487,7 @@ class RmcPotDat:
                 True なら即時保存、None の場合はインスタンス既定に従う。
         """
         token = self._to_bool_token(use_moveout)
+        self._logger.info(f"set_moveout_option = {token}")
         self.set_line(6, token, auto_write=auto_write)
 
     def get_num_config_to_collect(self) -> int:
@@ -518,7 +534,7 @@ class RmcPotDat:
         self,
         num_config: int,
         *,
-        auto_write: Optional[bool] = None,
+        auto_write: Optional[bool] = True,
     ) -> None:
         """
         7 行目（number of configuration to collect）を更新する。
@@ -589,7 +605,7 @@ class RmcPotDat:
         self,
         interval_step: int,
         *,
-        auto_write: Optional[bool] = None,
+        auto_write: Optional[bool] = True,
     ) -> None:
         """
         8 行目（step for printing）を更新する。
@@ -656,7 +672,7 @@ class RmcPotDat:
         time_limit_min: float,
         save_interval_step: int,
         *,
-        auto_write: Optional[bool] = None,
+        auto_write: Optional[bool] = True,
     ) -> None:
         """
         9 行目（time limit, step for saving）を更新する。
@@ -727,9 +743,9 @@ class RmcPotDat:
 
     def set_data_flags(
         self,
-        flags: Tuple[int, int, int, int],
+        flags: Sequence[int],
         *,
-        auto_write: Optional[bool] = None,
+        auto_write: Optional[bool] = True,
     ) -> None:
         """
         10 行目（g(r), neutron, x-ray, EXAFS の出力フラグ）を更新する。
@@ -747,23 +763,28 @@ class RmcPotDat:
 
         【例】
             (0, 0, 1, 0)
+            [0, 0, 1, 0]
             → g(r)=off, neutron=off, X-ray=on, EXAFS=off
               → X線 F(Q) のみを比較対象に設定。
 
         Args:
-            flags (tuple[int, int, int, int]):
-                (gr_flag, neutron_flag, xray_flag, exafs_flag)
+            flags (Sequence[int]):
+                (gr_flag, neutron_flag, xray_flag, exafs_flag) を表す長さ 4 の列。
+                tuple でも list でもよい。
             auto_write (bool | None):
                 True なら即時保存。None の場合はインスタンス既定に従う。
         """
-        if len(flags) != 4:
-            raise ValueError(
-                f"flags は 4 要素 (g(r), neutron, x-ray, EXAFS) が必要です: {flags!r}"
-            )
-        if not all(isinstance(v, int) and v in (0, 1) for v in flags):
-            raise ValueError(f"flags には 0 または 1 のみ指定可能です: {flags!r}")
+        values = list(flags)
 
-        self.set_line(10, [str(v) for v in flags], auto_write=auto_write)
+        if len(values) != 4:
+            raise ValueError(
+                f"flags は 4 要素 (g(r), neutron, x-ray, EXAFS) が必要です: {values!r}"
+            )
+        if not all(isinstance(v, int) and v in (0, 1) for v in values):
+            raise ValueError(f"flags には 0 または 1 のみ指定可能です: {values!r}")
+
+        self._logger.info(f"flags: {values!r}")
+        self.set_line(10, [str(v) for v in values], auto_write=auto_write)
 
     def get_exp_filename(self) -> str:
         """
