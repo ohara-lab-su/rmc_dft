@@ -94,25 +94,8 @@ https://www.szfki.hu/~nphys/rmc++/RMC_POT_user_guide.pdf
 # .hstファイル — Χの値。フィッティングの進み具合
 ```text
 This file contains History data produced by History::save 
-4-threaded RMC++ with 1 moved atom(s)
-
-_USE_INT32 option is OFF: 8 byte integers will be used for longint variables!
- Running to 2 minutes
-Fraction of swaps: 0
-Number of swap pair types: 0
-Type of atoms in allowed swap pairs: 
-Old format *.out file will not be created.
-Oridinary ppcf's will be saved into .ppcf file.
-The .cfg and .bcf files were not consistent!
-The cooordinates from the text type .cfg file were used!
-
-Potential will not be used.
-Number of used data points:
-                        F(Q) set #1	290
-Total number of used data points: (Total number of g(r), S(Q), F(Q), F(g), E(k), Cosine distribution constraint, Coord. subconstraints, Average coord. const.): 	290
-Leading series for the simulation: 1. series, which is the 1. X-ray data set
-Sigma values for F(Q) data sets:
-	1. data set	0.005
+:
+:
 For F(Q) data set 1	F(Q) fitting was used
 
 generated       	tried           	accepted        	time      	tried/gen       	acc/tried       	chi2_tot/data_point;       	chi2/F(Q)_set#1;           
@@ -136,6 +119,12 @@ The calculation method for the chi_square/data sets
 
    1 F(Q) data series :   normal
 ```
+RMCのステップが進むにつれて、フィッティングがどう改善しているかを示すものである。
+重要なのは7列目である。
+Χの値が示されている。
+Χは　実験S(Q)とRMCによる構造のS(Qとの、差の二乗の総和である。（さらにシグマで重み付けなどあるけれど）
+プロットしてみると、ステップが進むにつれ、減少している事がわかる。つまり、フィッティングはよくなっている様子が見れる。
+これが、じゅうぶん小さくなるとか、S(Q)を実際プロットとしたり、gij(r)をみたりしながら、収束を判定する。
 
 ```text
   160 +--------------------------------------------------------------------+   
