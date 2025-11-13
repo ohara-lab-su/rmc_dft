@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.3.9 nakada
+## v0.3.9 nakada,kobayashi
 
 - mpi job 関係の動作モード実装・確認
   - run_vasp.py などを丸ごと job スクリプトに書いて
@@ -8,7 +8,8 @@
     - mpirun vasp_std
   - などを動かすような形でにして、job スクリプト自体を長い RMC-DFT
   - として動作させる
-
+- docs の充実(RMCチュートリアル)
+ 
 ## v0.3.8 nakada
 
 - bugfix
