@@ -55,6 +55,7 @@ class Vasp:
         mpi_flag: str = None,
         num_procs: int = None,
         job_cmd: str = None,
+        make_default_input: bool = False,
     ) -> None:
         """
         config インスタンを与えると終わり
@@ -74,6 +75,7 @@ class Vasp:
             mpi_flag (str): 例 "-np" (configがあればいらない)
             num_procs (int): 並列数 (configがあればいらない)
             job_cmd (str): ジョブ投入コマンド（None ならローカル実行）
+            make_default_input (bool): インプットファイルを自動作成(既存があるときはそっちを優先)
         """
         self._logger = logger
         self._logger.debug("== create Vasp()")
@@ -125,11 +127,6 @@ class Vasp:
             auto_write=self.auto_write,
             logger=self._logger,
         )
-        # INCAR が存在すれば読み込み、なければデフォルトで新規作成
-        if not os.path.exists(self.incar_name):
-            for key, val in self._incar_defaults.items():
-                self._logger.debug(f"set {key} = {val}")
-                self._incar.set(key, val)
 
         # --- KPOINTS ---
         self._kpoints = VaspKpoints(
@@ -137,13 +134,21 @@ class Vasp:
             auto_write=self.auto_write,
             logger=self._logger,
         )
-        # KPOINTS: 既存があれば読み取り優先。
-        # 無ければデフォルトで生成（Monkhorst-Pack 1 1 1, shift 0 0 0）
-        if not os.path.exists(self.kpoints_name):
-            self.kpoints.set_mode("Monkhorst-Pack")
-            self.kpoints.set_grid(1, 1, 1)
-            self.kpoints.set_shift(0, 0, 0)
-            self.kpoints.write()
+
+        if make_default_input:
+            # INCAR が存在すれば読み込み、なければデフォルトで新規作成
+            if not os.path.exists(self.incar_name):
+                for key, val in self._incar_defaults.items():
+                    self._logger.debug(f"set {key} = {val}")
+                    self._incar.set(key, val)
+
+            # KPOINTS: 既存があれば読み取り優先。
+            # 無ければデフォルトで生成（Monkhorst-Pack 1 1 1, shift 0 0 0）
+            if not os.path.exists(self.kpoints_name):
+                self._kpoints.set_mode("Monkhorst-Pack")
+                self._kpoints.set_grid(1, 1, 1)
+                self._kpoints.set_shift(0, 0, 0)
+                self._kpoints.write()
 
     # --- 委譲メソッド群 (INCAR) ---
     def get_tag(self, key: str):
@@ -254,7 +259,7 @@ class Vasp:
         それは入力が常に VASP であることを仮定していて、
         相手のプログラム側の postprocess or convert してから動かすことを全手とする
 
-        xxx.vasp (VASP4) --> xxx.vasp (VASP5)
+        *) 構造変換関係は Vasp() では自動で preprocess に入れない。誤解が生じやすい
 
         Args:
             vasp_name (str): xxx.vasp 名前における xxxに相当する名前

@@ -47,7 +47,7 @@ class VaspKpoints:
     def __init__(
         self,
         kpoints_name: str = "KPOINTS",
-        logger: Optional[XLogger] = None,
+        logger: Optional[XLogger] = XLogger(),
         *,
         auto_write: bool = True,
     ) -> None:
@@ -72,36 +72,7 @@ class VaspKpoints:
         self._kpts_obj: Optional[Kpoints] = None
 
         if os.path.exists(self.kpoints_name):
-            # 既存 KPOINTS を読み取り
-            self._kpts_obj = Kpoints.from_file(self.kpoints_name)
-            # コメント
-            self._comment = self._kpts_obj.comment or "K-Points"
-            # モード推定（Gamma か Monkhorst-Pack で分岐）
-            if getattr(self._kpts_obj, "style", None) == Kpoints.supported_modes.Gamma:
-                self._mode = "Gamma"
-            else:
-                # デフォルトは Monkhorst 扱い
-                self._mode = "Monkhorst-Pack"
-
-            # グリッド（長さ3保証）
-            if self._kpts_obj.kpts and len(self._kpts_obj.kpts[0]) == 3:
-                kx, ky, kz = self._kpts_obj.kpts[0]
-                self._grid = (int(kx), int(ky), int(kz))
-            else:
-                # 安全側
-                self._grid = (1, 1, 1)
-
-            # シフト（長さ3保証）
-            if self._kpts_obj.kpts_shift and len(self._kpts_obj.kpts_shift) == 3:
-                sx, sy, sz = self._kpts_obj.kpts_shift
-                self._shift = (int(sx), int(sy), int(sz))
-            else:
-                self._shift = (0, 0, 0)
-
-            if self.logger:
-                self.logger.info(
-                    f"Loaded KPOINTS from {self.kpoints_name} (mode={self._mode}, grid={self._grid}, shift={self._shift})"
-                )
+            self.load()
         else:
             # 既定値（ファイルはまだ書かない）
             self._mode = "Monkhorst-Pack"
@@ -110,10 +81,41 @@ class VaspKpoints:
             self._comment = "K-Points"
             # 既定値から Kpoints を初期生成（引数なしのビルド）
             self._kpts_obj = self._build_kpoints()
-            if self.logger:
-                self.logger.info(
-                    f"Initialized default KPOINTS (mode={self._mode}, grid={self._grid}, shift={self._shift})"
-                )
+
+    def load(self):
+        """
+        既存の KPOINTS を読み込む
+        """
+        # 既存 KPOINTS を読み取り
+        self._kpts_obj = Kpoints.from_file(self.kpoints_name)
+        # コメント
+        self._comment = self._kpts_obj.comment or "K-Points"
+        # モード推定（Gamma か Monkhorst-Pack で分岐）
+        if getattr(self._kpts_obj, "style", None) == Kpoints.supported_modes.Gamma:
+            self._mode = "Gamma"
+        else:
+            # デフォルトは Monkhorst 扱い
+            self._mode = "Monkhorst-Pack"
+
+        # グリッド（長さ3保証）
+        if self._kpts_obj.kpts and len(self._kpts_obj.kpts[0]) == 3:
+            kx, ky, kz = self._kpts_obj.kpts[0]
+            self._grid = (int(kx), int(ky), int(kz))
+        else:
+            # 安全側
+            self._grid = (1, 1, 1)
+
+        # シフト（長さ3保証）
+        if self._kpts_obj.kpts_shift and len(self._kpts_obj.kpts_shift) == 3:
+            sx, sy, sz = self._kpts_obj.kpts_shift
+            self._shift = (int(sx), int(sy), int(sz))
+        else:
+            self._shift = (0, 0, 0)
+
+        if self.logger:
+            self.logger.info(
+                f"Loaded KPOINTS from {self.kpoints_name} (mode={self._mode}, grid={self._grid}, shift={self._shift})"
+            )
 
     # ----------------------------
     # 内部: Kpoints 構築（引数なし）
