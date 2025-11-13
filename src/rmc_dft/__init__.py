@@ -6,9 +6,12 @@ from rmc_dft.rmc_dft import RmcDft
 
 from rmc_dft.vasp.vasp import Vasp
 from rmc_dft.vasp.vasp_log import VaspLog
+from rmc_dft.vasp.vasp_incar import VaspIncar
+from rmc_dft.vasp.vasp_kpoints import VaspKpoints
+from rmc_dft.vasp.vasp_potcar import VaspPotcarBuilder
 from rmc_dft.rmc_pot.rmc_pot import RmcPot
-from rmc_dft.rmc_pot.rmc_pot_dat import RmcPotDat
 from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
+from rmc_dft.rmc_pot.rmc_pot_dat import RmcPotDat
 
 from rmc_dft.config import Config
 from rmc_dft.util import poscar2cfg
