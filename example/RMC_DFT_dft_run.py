@@ -47,7 +47,7 @@ if __name__ == "__main__":
     )
 
     # RMCの初期構造をPOSCAR から作る
-    shutil.copyfile("input/POSCAR", "POSCAR")
+    shutil.copyfile("POSCAR0", "POSCAR")
     poscar2cfg(cfg_name=cfg_name)
 
     # rmc_dft.run(mode="local", cfg_name=cfg_name)
