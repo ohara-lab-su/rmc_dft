@@ -16,5 +16,6 @@ from x_logger import XLogger
 if __name__ == "__main__":
 
     logger = XLogger(log_level="debug", logger_name="dft")
+
     vasp_log = VaspLog(logger=logger)
     vasp_log.clean()

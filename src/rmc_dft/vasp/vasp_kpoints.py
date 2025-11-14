@@ -74,13 +74,14 @@ class VaspKpoints:
         if os.path.exists(self.kpoints_name):
             self.load()
         else:
-            # 既定値（ファイルはまだ書かない）
+            # 既定値
             self._mode = "Monkhorst-Pack"
             self._grid = (1, 1, 1)
             self._shift = (0, 0, 0)
             self._comment = "K-Points"
             # 既定値から Kpoints を初期生成（引数なしのビルド）
             self._kpts_obj = self._build_kpoints()
+            self.write()
 
     def load(self):
         """
@@ -117,99 +118,25 @@ class VaspKpoints:
                 f"Loaded KPOINTS from {self.kpoints_name} (mode={self._mode}, grid={self._grid}, shift={self._shift})"
             )
 
-    # ----------------------------
-    # 内部: Kpoints 構築（引数なし）
-    # ----------------------------
-    def _build_kpoints(self) -> Kpoints:
-        """
-        内部状態（mode/grid/shift/comment）に基づき Kpoints を構築する。
-        現行 pymatgen I/F に合わせ、automatic は使用せず gamma_automatic / monkhorst_automatic を利用。
-        """
-        comment = self._comment or "K-Points"
-
-        if self._mode == "Gamma":
-            kpt = Kpoints.gamma_automatic(kpts=self._grid, comment=comment)
-        else:
-            # 既定は Monkhorst-Pack
-            kpt = Kpoints.monkhorst_automatic(kpts=self._grid, comment=comment)
-
-        # シフトは生成後に適用
-        kpt.kpts_shift = list(self._shift)
-        return kpt
-
-    # ----------------------------
-    # アクセサ
-    # ----------------------------
-    def get_mode(self) -> str:
-        """現在のモード（"Gamma" or "Monkhorst-Pack"）を返す。"""
-        return self._mode
-
-    def set_mode(
-        self,
-        mode: str,
-    ) -> None:
-        """
-        モードを設定する。大文字小文字はそのまま保存するが、想定は "Gamma" / "Monkhorst-Pack"。
-
-        Args:
-            mode:
-
-        Returns:
-
-        """
-        if mode not in ("Gamma", "Monkhorst-Pack"):
-            raise ValueError('mode must be "Gamma" or "Monkhorst-Pack"')
-        self._mode = mode
+    def write(self) -> None:
+        """現在の内部状態を KPOINTS ファイルへ書き出す。"""
         self._kpts_obj = self._build_kpoints()
-        if self.auto_write:
-            self.write()
+        if self.logger:
+            self.logger.info(
+                f"Write KPOINTS: mode={self._mode}, grid={self._grid}, shift={self._shift} -> {self.kpoints_name}"
+            )
+        self._kpts_obj.write_file(self.kpoints_name)
 
-    def get_grid(self) -> Tuple[int, int, int]:
-        """k-point グリッド (kx, ky, kz) を返す。"""
-        return self._grid
+    def export_dict(self) -> dict:
+        """現在の内部状態を辞書で返す（ロギング/デバッグ用）。"""
+        return {
+            "mode": self._mode,
+            "grid": self._grid,
+            "shift": self._shift,
+            "comment": self._comment,
+            "path": self.kpoints_name,
+        }
 
-    def set_grid(
-        self,
-        kx: int,
-        ky: int,
-        kz: int,
-    ) -> None:
-        """k-point グリッド (kx, ky, kz) を設定する。"""
-        self._grid = (int(kx), int(ky), int(kz))
-        self._kpts_obj = self._build_kpoints()
-        if self.auto_write:
-            self.write()
-
-    def get_shift(self) -> Tuple[int, int, int]:
-        """シフト (sx, sy, sz) を返す。"""
-        return self._shift
-
-    def set_shift(
-        self,
-        sx: int,
-        sy: int,
-        sz: int,
-    ) -> None:
-        """シフト (sx, sy, sz) を設定する。"""
-        self._shift = (int(sx), int(sy), int(sz))
-        self._kpts_obj = self._build_kpoints()
-        if self.auto_write:
-            self.write()
-
-    def get_comment(self) -> str:
-        """先頭コメントを返す。"""
-        return self._comment
-
-    def set_comment(self, s: str) -> None:
-        """先頭コメントを設定する。"""
-        self._comment = s or "K-Points"
-        self._kpts_obj = self._build_kpoints()
-        if self.auto_write:
-            self.write()
-
-    # ----------------------------
-    # ユーティリティ
-    # ----------------------------
     def update(
         self,
         mode: Optional[str] = None,
@@ -249,21 +176,141 @@ class VaspKpoints:
             # auto_write=False の場合は、内部状態の再構築のみ行われる
             pass
 
-    def export_dict(self) -> dict:
-        """現在の内部状態を辞書で返す（ロギング/デバッグ用）。"""
-        return {
-            "mode": self._mode,
-            "grid": self._grid,
-            "shift": self._shift,
-            "comment": self._comment,
-            "path": self.kpoints_name,
-        }
+    def _build_kpoints(self) -> Kpoints:
+        """
+        内部状態（mode/grid/shift/comment）に基づき Kpoints を構築する。
+        現行 pymatgen I/F に合わせ、automatic は使用せず gamma_automatic / monkhorst_automatic を利用。
+        """
+        comment = self._comment or "K-Points"
 
-    def write(self) -> None:
-        """現在の内部状態を KPOINTS ファイルへ書き出す。"""
+        if self._mode == "Gamma":
+            kpt = Kpoints.gamma_automatic(kpts=self._grid, comment=comment)
+        else:
+            # 既定は Monkhorst-Pack
+            kpt = Kpoints.monkhorst_automatic(kpts=self._grid, comment=comment)
+
+        # シフトは生成後に適用
+        kpt.kpts_shift = list(self._shift)
+        return kpt
+
+    # ----------------------------
+    #
+    # ----------------------------
+    def get_mode(self) -> str:
+        """現在のモード（"Gamma" or "Monkhorst-Pack"）を返す。"""
+        return self._mode
+
+    def set_mode(
+        self,
+        mode: str,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """
+        モードを設定する。大文字小文字はそのまま保存するが、想定は "Gamma" / "Monkhorst-Pack"。
+
+        Args:
+            mode (str):
+            auto_write (bool):
+
+        Returns:
+
+        """
+        if mode not in ("Gamma", "Monkhorst-Pack"):
+            raise ValueError('mode must be "Gamma" or "Monkhorst-Pack"')
+        self._mode = mode
         self._kpts_obj = self._build_kpoints()
-        if self.logger:
-            self.logger.info(
-                f"Write KPOINTS: mode={self._mode}, grid={self._grid}, shift={self._shift} -> {self.kpoints_name}"
-            )
-        self._kpts_obj.write_file(self.kpoints_name)
+
+        if auto_write is None:
+            auto_write = self.auto_write
+
+        if auto_write:
+            self.write()
+
+    def get_grid(self) -> Tuple[int, int, int]:
+        """k-point グリッド (kx, ky, kz) を返す。"""
+        return self._grid
+
+    def set_grid(
+        self,
+        kx: int,
+        ky: int,
+        kz: int,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """
+        k-point グリッド (kx, ky, kz) を設定する。
+
+        Args:
+            kx:
+            ky:
+            kz:
+            auto_write (bool):
+
+        Returns:
+        """
+        self._grid = (int(kx), int(ky), int(kz))
+        self._kpts_obj = self._build_kpoints()
+
+        if auto_write is None:
+            auto_write = self.auto_write
+
+        if auto_write:
+            self.write()
+
+    def get_shift(self) -> Tuple[int, int, int]:
+        """シフト (sx, sy, sz) を返す。"""
+        return self._shift
+
+    def set_shift(
+        self,
+        sx: int,
+        sy: int,
+        sz: int,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """
+        シフト (sx, sy, sz) を設定する。
+
+        Args:
+            sx:
+            sy:
+            sz:
+            auto_write (bool):
+
+        Returns:
+        """
+        self._shift = (int(sx), int(sy), int(sz))
+        self._kpts_obj = self._build_kpoints()
+
+        if auto_write is None:
+            auto_write = self.auto_write
+
+        if auto_write:
+            self.write()
+
+    def get_comment(self) -> str:
+        """先頭コメントを返す。"""
+        return self._comment
+
+    def set_comment(
+        self,
+        s: str,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """
+        先頭コメントを設定する。
+
+        Args:
+            s (str):
+            auto_write (bool):
+
+        Returns:
+        """
+        self._comment = s or "K-Points"
+        self._kpts_obj = self._build_kpoints()
+
+        if auto_write is None:
+            auto_write = self.auto_write
+
+        if auto_write:
+            self.write()

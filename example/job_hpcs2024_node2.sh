@@ -15,4 +15,5 @@ cd $PBS_O_WORKDIR
 # Calc
 # mpirun vasp_std
 # mpirun vasp_gam
-$HOME/.pyenv/shims/python ./rmc_vasp.py
+# $HOME/.pyenv/shims/python ./rmc_vasp.py
+$HOME/.pyenv/shims/python ./rmc_vasp_script.py

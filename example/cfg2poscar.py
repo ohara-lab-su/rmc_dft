@@ -8,7 +8,16 @@ import os
 import sys
 import argparse
 
-from rmc_dft import Vasp, VaspLog, RmcPot, RmcPotLog
+from rmc_dft import (
+    Config,
+    Vasp,
+    VaspIncar,
+    VaspKpoints,
+    VaspLog,
+    RmcPot,
+    RmcPotLog,
+    RmcPotDat,
+)
 from rmc_dft.util import poscar2cfg
 from x_logger import XLogger
 

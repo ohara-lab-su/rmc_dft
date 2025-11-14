@@ -111,6 +111,9 @@ class VaspIncar:
         """
         return self.incar.get(tag, default)
 
+    def get_tag(self, tag: str, default: Any = None) -> Any:
+        return self.get(tag, default)
+
     def set(
         self,
         tag: str,
@@ -141,6 +144,9 @@ class VaspIncar:
         self.incar[tag] = value
         if self.auto_write:
             self.write()
+
+    def set_tag(self, tag: str, value: Any) -> None:
+        self.set(tag, value)
 
     def remove(self, tag: str) -> None:
         """指定タグを削除"""

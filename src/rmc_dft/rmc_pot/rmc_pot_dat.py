@@ -14,7 +14,7 @@ RmcPotDat: RMC_POT の .dat 入力ファイル編集クラス
 - 真偽値は .true. / .false. に正規化して出力
 - 任意行の直接取得/更新用に get_line()/set_line() も提供
 """
-
+import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 from pathlib import Path
@@ -23,29 +23,43 @@ from rmc_dft.config import Config
 from x_logger import XLogger
 
 
-@dataclass
-class _Line:
-    """
-    内部表現: 1 行ぶんの値とコメント。
+from pathlib import Path
+from typing import List
 
-    Attributes:
-        value: '!' より左側の文字列（前後空白は内部では保持しない）
-        comment: '!' 以降のコメント文字列（先頭の '!' は保持しない）
-        had_bang: コメントが存在したか
-    """
-
-    value: str
-    comment: str = ""
-    had_bang: bool = False
-
-    def render(self) -> str:
-        """現在の値とコメントから 1 行のテキストを生成する。"""
-        if self.had_bang:
-            # 値 + 1 つ以上の空白 + "! " + コメント
-            value_part = self.value.rstrip()
-            return f"{value_part} ! {self.comment.strip()}\n"
-        # コメントがなかった行は値のみ
-        return f"{self.value.rstrip()}\n"
+DAT_TEMPLATE: str = """FeSiB
+0.0915 ! number density
+2.3 2.1 2 2.3 2.1 2 ! cut offs (FeSiB)
+0.1 0.1 0.1 ! maximum moves
+0.025 ! r spacing
+.false. ! whether to use moveout option
+0 ! number of configurration to collect
+5000 ! step for printing
+0.2 0 ! time limit, step for saving
+0 0 1 0 ! g(r), neutron, x-ray, EXAFS
+ascast.xsq
+1 290
+1.0
+5E-3
+.false.
+.true.
+.false.
+.false.
+0 ! number of cos. distr of bond angles constraint, dcos_theta (spacing in cos(theta) space
+0 1 1 4 1 ! no of coord. constr.
+0 ! no of av. coord. contsr.
+0 ! potential
+0 ! FNC switch
+0 ! initial bin shift;
+1 ! xmax used in the run.
+1 ! number of atoms moved in a single move
+200 ! size of the history buffer
+10 ! number of display update beteen each history buffering
+0 ! indicator of custom move
+0 ! whether to load the histgram form file, if posible [0:no 1:yes]
+5 ! maximum number of atoms in a gridcell
+0 0 ! frction of swaps, ntypes*(ntypes-1)/2 0 not allowded or 1 allowed for the possible mixed part
+4 ! total number of threads to use
+"""
 
 
 class RmcPotDat:
@@ -93,11 +107,31 @@ class RmcPotDat:
         # 既存の dat を読む
         p = Path(f"{self.cfg_name}.dat")
         if p.exists():
+            self._logger.info(f"load {self.cfg_name}.dat")
+            self.load()
+        else:
+            self._logger.info(f"{self.cfg_name}.dat file not found.")
+            self._logger.info(f"create defaut dat file")
+            self.create_dat_file(self.cfg_name)
             self.load()
 
-    # --------------------
-    # 静的フォーマット関数群（クラス内に集約）
-    # --------------------
+    def create_dat_file(self, basename: str) -> bool:
+        """
+        与えられたベース名から <basename>.dat を作成し、
+        デフォルトの RMC_POT 用 dat 内容を書き込む。
+        """
+        filename: str = f"{basename}.dat"
+        path: Path = Path(filename)
+
+        if path.exists():
+            # raise FileExistsError(f'"{filename}" はすでに存在します')
+            self._logger.error(f'"{filename}" はすでに存在します')
+            return False
+
+        path.write_text(DAT_TEMPLATE, encoding="utf-8")
+        self._logger.info(f"Base cfg file を作成しました: {filename}")
+        return True
+
     @staticmethod
     def _to_bool_token(v: Union[bool, str]) -> str:
         """
@@ -1432,3 +1466,28 @@ class RmcPotDat:
     ) -> None:
         """33 行目（スレッド数）を設定する。"""
         self.set_line(33, str(int(value)), auto_write=auto_write)
+
+
+@dataclass
+class _Line:
+    """
+    内部表現: 1 行ぶんの値とコメント。
+
+    Attributes:
+        value: '!' より左側の文字列（前後空白は内部では保持しない）
+        comment: '!' 以降のコメント文字列（先頭の '!' は保持しない）
+        had_bang: コメントが存在したか
+    """
+
+    value: str
+    comment: str = ""
+    had_bang: bool = False
+
+    def render(self) -> str:
+        """現在の値とコメントから 1 行のテキストを生成する。"""
+        if self.had_bang:
+            # 値 + 1 つ以上の空白 + "! " + コメント
+            value_part = self.value.rstrip()
+            return f"{value_part} ! {self.comment.strip()}\n"
+        # コメントがなかった行は値のみ
+        return f"{self.value.rstrip()}\n"
