@@ -10,7 +10,7 @@ cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/RMC_DFT_dft_run.py ./
 #
-cp ~/zaiene_dev/rmc_dft/example/vasp2cfg.py ./
+cp ~/zaiene_dev/rmc_dft/example/poscar2cfg.py ./
 cp ~/zaiene_dev/rmc_dft/example/cfg2poscar.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/job_hpcs2024_node1.sh ./

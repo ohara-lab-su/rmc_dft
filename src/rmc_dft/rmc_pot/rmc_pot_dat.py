@@ -14,7 +14,7 @@ RmcPotDat: RMC_POT の .dat 入力ファイル編集クラス
 - 真偽値は .true. / .false. に正規化して出力
 - 任意行の直接取得/更新用に get_line()/set_line() も提供
 """
-
+import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 from pathlib import Path
@@ -107,6 +107,12 @@ class RmcPotDat:
         # 既存の dat を読む
         p = Path(f"{self.cfg_name}.dat")
         if p.exists():
+            self._logger.info(f"load {self.cfg_name}.dat")
+            self.load()
+        else:
+            self._logger.info(f"{self.cfg_name}.dat file not found.")
+            self._logger.info(f"create defaut dat file")
+            self.create_dat_file(self.cfg_name)
             self.load()
 
     def create_dat_file(self, basename: str) -> bool:

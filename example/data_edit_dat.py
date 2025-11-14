@@ -30,10 +30,7 @@ if __name__ == "__main__":
     config = Config("config.yml")
     rmc_dat = RmcPotDat(config=config, logger=logger)
 
-    if os.path.exists(f"{config.cfg_name}.dat"):
-        rmc_dat.create_dat_file(config.cfg_name)
-
-    rmc_dat.set_comment("comment FeSiB")
+    rmc_dat.set_comment("FeSiB")
     rmc_dat.set_density(0.0915)
     rmc_dat.set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
     rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
