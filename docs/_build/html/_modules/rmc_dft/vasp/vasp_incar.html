@@ -82,6 +82,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
 </ul>
@@ -161,25 +162,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">:</span> <span class="n">Incar</span> <span class="o">=</span> <span class="n">Incar</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;[VaspIncarUnified] INCAR not found, new one will be created: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 
     <span class="c1"># ==============================</span>
     <span class="c1"># 基本入出力</span>
     <span class="c1"># ==============================</span>
-<div class="viewcode-block" id="VaspIncar._load">
-<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar._load">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルを読み込み、pymatgen.Incarとテキスト行を両方保持&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="VaspIncar.load">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar.load">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ファイルを読み込み、pymatgen.Incarとテキスト行を両方保持</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
 
         <span class="c1"># pymatgen Incar()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">incar</span> <span class="o">=</span> <span class="n">Incar</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[VaspIncarUnified] Loaded INCAR: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[VaspIncar] Loaded INCAR: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="VaspIncar.write">
@@ -188,7 +188,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;内部linesを書き戻し&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[VaspIncarUnified] Wrote INCAR: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[VaspIncar] Wrote INCAR: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
     <span class="c1"># ==============================</span>
@@ -244,6 +244,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="VaspIncar.get_tag">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar.get_tag">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="VaspIncar.set">
 <a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar.set">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span>
@@ -266,16 +272,22 @@
 
         <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_line</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[VaspIncarUnified] Updated tag: </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[VaspIncar] Updated tag: </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># 新規タグは末尾に追記</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_line</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[VaspIncarUnified] Added tag: </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[VaspIncar] Added tag: </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># pymatgen側更新</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="VaspIncar.set_tag">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar.set_tag">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="VaspIncar.remove">
@@ -286,7 +298,7 @@
         <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[VaspIncarUnified] Removed tag: </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[VaspIncar] Removed tag: </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">:</span>
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">:</span>
@@ -297,7 +309,7 @@
 <a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_incar.VaspIncar.reload">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;再読込（外部修正反映）&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="VaspIncar.export_dict">

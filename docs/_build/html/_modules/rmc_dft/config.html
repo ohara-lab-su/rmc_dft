@@ -82,6 +82,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
 </ul>
@@ -118,8 +119,11 @@
 <span class="sd">K.KOBAYASHI (2nd version)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">x_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">XLogger</span>
 
 
 <div class="viewcode-block" id="Config">
@@ -153,22 +157,35 @@
     <span class="c1"># dft_bin = f&quot;/home/hpc/vasp/bin/vasp-gamma&quot;</span>
     <span class="c1"># dft_bin = f&quot;/home/k/Downloads/vasp.6.4.2/bin/vasp_gam&quot;</span>
     <span class="c1"># dft_bin = &quot;/home/hpc/vasp/bin/vasp&quot;</span>
-    <span class="n">dft_bin</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;vasp_gam&quot;</span>
+    <span class="n">dft_bin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;vasp_gam&quot;</span>
 
-    <span class="n">num_procs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">num_procs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-    <span class="n">mpi_cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mpirun&quot;</span>
+    <span class="n">mpi_cmd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mpirun&quot;</span>
     <span class="c1"># mpi = f&quot;mpirun -np {num_procs} {os.path.expanduser(&#39;/home/hpc/vasp/bin/vasp&#39;)}&quot;</span>
 
-    <span class="n">mpi_flag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;-np&quot;</span>
+    <span class="n">mpi_flag</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;-np&quot;</span>
 
     <span class="c1"># default job_name</span>
-    <span class="n">job_cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;qsub job_hpcs2024_node2.sh&quot;</span>
+    <span class="n">job_cmd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;qsub job_hpcs2024_node2.sh&quot;</span>
 
     <span class="c1"># 自動セーブ</span>
     <span class="n">auto_write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yaml_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">yaml_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">XLogger</span><span class="p">]</span> <span class="o">=</span> <span class="n">XLogger</span><span class="p">(),</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            yaml_path (str):</span>
+<span class="sd">            logger (XLogger):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
+
         <span class="c1"># インスタンスで使いたいときだけ、ここで個別設定</span>
         <span class="k">if</span> <span class="n">yaml_path</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_load_yaml</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">)</span>
@@ -194,19 +211,25 @@
 <a class="viewcode-back" href="../../api/rmc_dft.html#rmc_dft.config.Config._load_yaml">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yaml_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># インスタンス用：インスタンスdictにのみ上書き</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;load_yaml:&quot;</span><span class="p">,</span> <span class="n">yaml_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;load_yaml: </span><span class="si">{</span><span class="n">yaml_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">yaml_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">yaml_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;RMC_DFT_CONFIG_YAML&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">yaml_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span>
         <span class="n">yaml_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;abspath:&quot;</span><span class="p">,</span> <span class="n">yaml_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;abspath: </span><span class="si">{</span><span class="n">yaml_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
 </div>
 
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="s2">&quot;config.yml&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">num_procs</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">num_procs</span><span class="p">))</span>
 </pre></div>
 
            </div>

@@ -85,6 +85,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
 </ul>
@@ -164,7 +165,7 @@
 K.KOBAYASHI (2nd version)</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Vasp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">incar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INCAR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kpoints_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'KPOINTS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Config()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpi_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpi_flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Vasp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">incar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INCAR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kpoints_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'KPOINTS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_incar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_kpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Config()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpi_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpi_flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_default_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp" title="Link to this definition"></a></dt>
 <dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>RMD-DFT  のため VASP構造作成 / VASPパラメータ入力 / 実行 /解析用のクラス</p>
 <dl class="field-list simple">
@@ -173,6 +174,8 @@ K.KOBAYASHI (2nd version)</p>
 <li><p><strong>incar_name</strong> (<em>str</em>)</p></li>
 <li><p><strong>kpoints_name</strong> (<em>str</em>)</p></li>
 <li><p><strong>vasp_log</strong> (<a class="reference internal" href="#rmc_dft.vasp.vasp_log.VaspLog" title="rmc_dft.vasp.vasp_log.VaspLog"><em>VaspLog</em></a>)</p></li>
+<li><p><strong>vasp_incar</strong> (<a class="reference internal" href="#rmc_dft.vasp.vasp_incar.VaspIncar" title="rmc_dft.vasp.vasp_incar.VaspIncar"><em>VaspIncar</em></a>)</p></li>
+<li><p><strong>vasp_kpoints</strong> (<a class="reference internal" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints" title="rmc_dft.vasp.vasp_kpoints.VaspKpoints"><em>VaspKpoints</em></a>)</p></li>
 <li><p><strong>config</strong> (<a class="reference internal" href="rmc_dft.html#rmc_dft.config.Config" title="rmc_dft.config.Config"><em>Config</em></a>)</p></li>
 <li><p><strong>logger</strong> (<em>x_logger.XLogger</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>auto_write</strong> (<em>bool</em>)</p></li>
@@ -182,6 +185,7 @@ K.KOBAYASHI (2nd version)</p>
 <li><p><strong>mpi_flag</strong> (<em>str</em>)</p></li>
 <li><p><strong>num_procs</strong> (<em>int</em>)</p></li>
 <li><p><strong>job_cmd</strong> (<em>str</em>)</p></li>
+<li><p><strong>make_default_input</strong> (<em>bool</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -363,7 +367,7 @@ K.KOBAYASHI (2nd version)</p>
 <p>基本的に Vasp Class は相手がなんであれ動くようにする
 それは入力が常に VASP であることを仮定していて、
 相手のプログラム側の postprocess or convert してから動かすことを全手とする</p>
-<p>xxx.vasp (VASP4) --&gt; xxx.vasp (VASP5)</p>
+<p><a href="#id1"><span class="problematic" id="id2">*</span></a>) 構造変換関係は Vasp() では自動で preprocess に入れない。誤解が生じやすい</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -407,7 +411,7 @@ K.KOBAYASHI (2nd version)</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postprocess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.run"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.run" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.run"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.run" title="Link to this definition"></a></dt>
 <dd><p>VASP を実行する</p>
 <p>local 実行
 FI_PROVIDER=&quot;TCP&quot;
@@ -425,8 +429,6 @@ I_MPI_DEBUG=&quot;5&quot;</p>
 <div><p>instance(job_cmd=xxx)&lt; set_job_cmd(xxx) &lt; run(job_cmd=xxx)</p>
 </div></blockquote>
 </p></li>
-<li><p><strong>postprocess</strong> (<em>bool</em>) -- RMC-VASP 用の postprocess を run 中に行う</p></li>
-<li><p><strong>preprocess</strong> (<em>bool</em>) -- RMC-VASP 用の postprocess を run 中に行う</p></li>
 <li><p><strong>blocking</strong> (<em>bool</em>) -- subprocessをブロッキングで起動(default: True)</p></li>
 </ul>
 </dd>
@@ -578,17 +580,6 @@ pymatgen.Incar による値操作と、コメント保持を両立する。</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar._load">
-<span class="sig-name descname"><span class="pre">_load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar._load"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar._load" title="Link to this definition"></a></dt>
-<dd><p>ファイルを読み込み、pymatgen.Incarとテキスト行を両方保持</p>
-<dl class="field-list simple">
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.export_dict">
 <span class="sig-name descname"><span class="pre">export_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.export_dict"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.export_dict" title="Link to this definition"></a></dt>
 <dd><p>内部Incar辞書を返す</p>
@@ -612,6 +603,33 @@ pymatgen.Incar による値操作と、コメント保持を両立する。</p>
 </dd>
 <dt class="field-even">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-even"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.get_tag">
+<span class="sig-name descname"><span class="pre">get_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.get_tag"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.get_tag" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag</strong> (<em>str</em>)</p></li>
+<li><p><strong>default</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Any</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.load"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.load" title="Link to this definition"></a></dt>
+<dd><p>ファイルを読み込み、pymatgen.Incarとテキスト行を両方保持</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -659,6 +677,22 @@ pymatgen.Incar による値操作と、コメント保持を両立する。</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.set_tag">
+<span class="sig-name descname"><span class="pre">set_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.set_tag"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.set_tag" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag</strong> (<em>str</em>)</p></li>
+<li><p><strong>value</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.write">
 <span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.write"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.write" title="Link to this definition"></a></dt>
 <dd><p>内部linesを書き戻し</p>
@@ -691,7 +725,7 @@ pymatgen.Incar による値操作と、コメント保持を両立する。</p>
 </section>
 <dl class="py class">
 <dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VaspKpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kpoints_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'KPOINTS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VaspKpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kpoints_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'KPOINTS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints" title="Link to this definition"></a></dt>
 <dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>KPOINTS ファイルの読み書きと、モード/グリッド/シフト/コメントの管理を行う。</p>
 <p>既定動作
@@ -780,22 +814,32 @@ logger (XLogger): 任意のロガー（info/debug を想定）。None 可。</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.load"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.load" title="Link to this definition"></a></dt>
+<dd><p>既存の KPOINTS を読み込む</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_comment">
-<span class="sig-name descname"><span class="pre">set_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.set_comment"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_comment" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.set_comment"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_comment" title="Link to this definition"></a></dt>
 <dd><p>先頭コメントを設定する。</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>s</strong> (<em>str</em>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> (<em>str</em>)</p></li>
+<li><p><strong>auto_write</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 <dt class="field-even">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
+<p>Returns:</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_grid">
-<span class="sig-name descname"><span class="pre">set_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.set_grid"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_grid" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.set_grid"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_grid" title="Link to this definition"></a></dt>
 <dd><p>k-point グリッド (kx, ky, kz) を設定する。</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
@@ -803,21 +847,26 @@ logger (XLogger): 任意のロガー（info/debug を想定）。None 可。</p>
 <li><p><strong>kx</strong> (<em>int</em>)</p></li>
 <li><p><strong>ky</strong> (<em>int</em>)</p></li>
 <li><p><strong>kz</strong> (<em>int</em>)</p></li>
+<li><p><strong>auto_write</strong> (<em>bool</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
+<p>Returns:</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_mode">
-<span class="sig-name descname"><span class="pre">set_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.set_mode"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_mode" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.set_mode"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_mode" title="Link to this definition"></a></dt>
 <dd><p>モードを設定する。大文字小文字はそのまま保存するが、想定は &quot;Gamma&quot; / &quot;Monkhorst-Pack&quot;。</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>mode</strong> (<em>str</em>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>str</em>)</p></li>
+<li><p><strong>auto_write</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 <dt class="field-even">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -828,7 +877,7 @@ logger (XLogger): 任意のロガー（info/debug を想定）。None 可。</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_shift">
-<span class="sig-name descname"><span class="pre">set_shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.set_shift"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_shift" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.set_shift"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_shift" title="Link to this definition"></a></dt>
 <dd><p>シフト (sx, sy, sz) を設定する。</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
@@ -836,12 +885,14 @@ logger (XLogger): 任意のロガー（info/debug を想定）。None 可。</p>
 <li><p><strong>sx</strong> (<em>int</em>)</p></li>
 <li><p><strong>sy</strong> (<em>int</em>)</p></li>
 <li><p><strong>sz</strong> (<em>int</em>)</p></li>
+<li><p><strong>auto_write</strong> (<em>bool</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
+<p>Returns:</p>
 </dd></dl>
 
 <dl class="py method">
