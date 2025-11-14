@@ -46,6 +46,8 @@ class Vasp:
         incar_name: str = "INCAR",
         kpoints_name: str = "KPOINTS",
         vasp_log: VaspLog = None,  # instance (データー解析用)
+        vasp_incar: VaspIncar = None,
+        vasp_kpoints: VaspKpoints = None,
         config: Config = Config(),  # instance
         logger: Optional[XLogger] = XLogger(),  # instance
         auto_write: bool = True,
@@ -66,6 +68,8 @@ class Vasp:
             incar_name (str): INCAR
             kpoints_name (str): KPOINTS
             vasp_log (VaspLog): VASP の log 解析管理 instance
+            vasp_incar (VaspIncar):
+            vasp_kpoints (VaspKpoints):
             config (Config): 全てのインスタンスが同じ Config
             logger (XLogger): ろがー、全てのインスタンスが同じ XLogger
             auto_write (bool):
@@ -130,18 +134,22 @@ class Vasp:
             "ISIF": 2,
             "LREAL": "auto",
         }
-        self._incar = VaspIncar(
-            incar_name=self.incar_name,
-            auto_write=self.auto_write,
-            logger=self._logger,
-        )
+        if vasp_incar is None:
+            vasp_incar = VaspIncar(
+                incar_name=self.incar_name,
+                auto_write=self.auto_write,
+                logger=self._logger,
+            )
+        self._incar: VaspIncar = vasp_incar
 
         # --- KPOINTS ---
-        self._kpoints = VaspKpoints(
-            kpoints_name=self.kpoints_name,
-            auto_write=self.auto_write,
-            logger=self._logger,
-        )
+        if vasp_kpoints is None:
+            vasp_kpoints = VaspKpoints(
+                kpoints_name=self.kpoints_name,
+                auto_write=self.auto_write,
+                logger=self._logger,
+            )
+        self._kpoints: VaspKpoints = vasp_kpoints
 
         if make_default_input:
             # INCAR が存在すれば読み込み、なければデフォルトで新規作成

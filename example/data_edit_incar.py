@@ -14,14 +14,15 @@ from rmc_dft import (
     Vasp,
     VaspIncar,
     VaspKpoints,
+    VaspPotcarBuilder,
     VaspLog,
     RmcPot,
     RmcPotLog,
     RmcPotDat,
 )
+from rmc_dft.vasp import VaspIncar
 from x_logger import XLogger
 
-from rmc_dft.vasp import VaspIncar
 
 if __name__ == "__main__":
     """"""
@@ -34,6 +35,17 @@ if __name__ == "__main__":
     # vasp.set_tag("EDIFF", 1e-04)
     # vasp.get_tag("EDIFF")
 
+    # INCAR が存在すれば勝手に追加・更新/無ければ勝手に新規
+
     vasp_incar = VaspIncar(logger=logger)
     vasp_incar.set_tag("NSW", 1)
     vasp_incar.set_tag("EDIFF", 1e-04)
+    vasp_incar.set_tag("EDIFFG", 1e-05)
+    vasp_incar.set_tag("ISTART", 0)
+    vasp_incar.set_tag("ISMEAR", 0)
+    vasp_incar.set_tag("SIGMA", 0.1)
+    vasp_incar.set_tag("NSW", 2)
+    vasp_incar.set_tag("NELM", 30)
+    vasp_incar.set_tag("IBRION", 2)
+    vasp_incar.set_tag("ISIF", 2)
+    vasp_incar.set_tag("LREAL", "auto")

@@ -14,14 +14,15 @@ from rmc_dft import (
     Vasp,
     VaspIncar,
     VaspKpoints,
+    VaspPotcarBuilder,
     VaspLog,
     RmcPot,
     RmcPotLog,
     RmcPotDat,
 )
+from rmc_dft.vasp import VaspIncar
 from x_logger import XLogger
 
-from rmc_dft.vasp import VaspIncar
 
 if __name__ == "__main__":
     """"""
@@ -29,6 +30,12 @@ if __name__ == "__main__":
 
     config = Config("config.yml")
 
+    if os.path.exists("KPOINTS"):
+        logger.error("KPOINTS is already exists.")
+        sys.exit(-1)
+
+    # KPOINTS が存在すればそれを使う
     vasp_kpoints = VaspKpoints(logger=logger)
-    # vasp_incar.set_tag("NSW", 1)
-    # vasp_incar.set_tag("EDIFF", 1e-04)
+    vasp_kpoints.set_mode("Monkhorst-Pack")
+    vasp_kpoints.set_grid(1, 1, 1)
+    vasp_kpoints.set_shift(0, 0, 0)

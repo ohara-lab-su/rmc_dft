@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## v0.3.10 nakada,kobayashi
+
+- VaspPoscarBuilder()
+- VaspIncar()
+- VaspKpoints()
+
+を見直し、実行の example スクリプトを個別に用意
+
+- data_edit_dat.py (RMC_POT)
+- data_edit_incar.py (RMC_POT)
+- data_edit_kpoints.py (RMC_POT)
+- data_edit_potcar.py (RMC_POT)
+
+計算の example スクリプト rmc_vasp.py にこれらを組み込む
+
+- rmc_vasp.py
+
+RMC-DFT の example スクリプト rmc_vasp_script.py に組み込み
+
+- rmc_vasp_script.py
+
+「作る・動かす系」の python 化は、RMC/DFT でできているかな。
+とは思うが、ここまで書いて、VASP 周りはもっと pymatgen/ase 活用した方が良かった。
+と後悔。途中で本心を変えたので、クラスが大きくなってしまった。
+
 ## v0.3.9 nakada,kobayashi
 
 - mpi job 関係の動作モード実装・確認

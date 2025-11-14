@@ -176,9 +176,6 @@ class VaspKpoints:
             # auto_write=False の場合は、内部状態の再構築のみ行われる
             pass
 
-    # ----------------------------
-    # 内部: Kpoints 構築（引数なし）
-    # ----------------------------
     def _build_kpoints(self) -> Kpoints:
         """
         内部状態（mode/grid/shift/comment）に基づき Kpoints を構築する。
@@ -197,7 +194,7 @@ class VaspKpoints:
         return kpt
 
     # ----------------------------
-    # アクセサ
+    #
     # ----------------------------
     def get_mode(self) -> str:
         """現在のモード（"Gamma" or "Monkhorst-Pack"）を返す。"""
@@ -206,12 +203,14 @@ class VaspKpoints:
     def set_mode(
         self,
         mode: str,
+        auto_write: Optional[bool] = None,
     ) -> None:
         """
         モードを設定する。大文字小文字はそのまま保存するが、想定は "Gamma" / "Monkhorst-Pack"。
 
         Args:
-            mode:
+            mode (str):
+            auto_write (bool):
 
         Returns:
 
@@ -220,7 +219,11 @@ class VaspKpoints:
             raise ValueError('mode must be "Gamma" or "Monkhorst-Pack"')
         self._mode = mode
         self._kpts_obj = self._build_kpoints()
-        if self.auto_write:
+
+        if auto_write is None:
+            auto_write = self.auto_write
+
+        if auto_write:
             self.write()
 
     def get_grid(self) -> Tuple[int, int, int]:
@@ -232,11 +235,26 @@ class VaspKpoints:
         kx: int,
         ky: int,
         kz: int,
+        auto_write: Optional[bool] = None,
     ) -> None:
-        """k-point グリッド (kx, ky, kz) を設定する。"""
+        """
+        k-point グリッド (kx, ky, kz) を設定する。
+
+        Args:
+            kx:
+            ky:
+            kz:
+            auto_write (bool):
+
+        Returns:
+        """
         self._grid = (int(kx), int(ky), int(kz))
         self._kpts_obj = self._build_kpoints()
-        if self.auto_write:
+
+        if auto_write is None:
+            auto_write = self.auto_write
+
+        if auto_write:
             self.write()
 
     def get_shift(self) -> Tuple[int, int, int]:
@@ -248,20 +266,51 @@ class VaspKpoints:
         sx: int,
         sy: int,
         sz: int,
+        auto_write: Optional[bool] = None,
     ) -> None:
-        """シフト (sx, sy, sz) を設定する。"""
+        """
+        シフト (sx, sy, sz) を設定する。
+
+        Args:
+            sx:
+            sy:
+            sz:
+            auto_write (bool):
+
+        Returns:
+        """
         self._shift = (int(sx), int(sy), int(sz))
         self._kpts_obj = self._build_kpoints()
-        if self.auto_write:
+
+        if auto_write is None:
+            auto_write = self.auto_write
+
+        if auto_write:
             self.write()
 
     def get_comment(self) -> str:
         """先頭コメントを返す。"""
         return self._comment
 
-    def set_comment(self, s: str) -> None:
-        """先頭コメントを設定する。"""
+    def set_comment(
+        self,
+        s: str,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """
+        先頭コメントを設定する。
+
+        Args:
+            s (str):
+            auto_write (bool):
+
+        Returns:
+        """
         self._comment = s or "K-Points"
         self._kpts_obj = self._build_kpoints()
-        if self.auto_write:
+
+        if auto_write is None:
+            auto_write = self.auto_write
+
+        if auto_write:
             self.write()

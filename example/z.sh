@@ -13,12 +13,9 @@ cp ~/zaiene_dev/rmc_dft/example/RMC_DFT_dft_run.py ./
 cp ~/zaiene_dev/rmc_dft/example/vasp2cfg.py ./
 cp ~/zaiene_dev/rmc_dft/example/cfg2poscar.py ./
 #
-cp ~/zaiene_dev/rmc_dft/example/make_dat.py ./
-cp ~/zaiene_dev/rmc_dft/example/make_incar.py ./
-#
 cp ~/zaiene_dev/rmc_dft/example/job_hpcs2024_node1.sh ./
 cp ~/zaiene_dev/rmc_dft/example/job_hpcs2024_node2.sh ./
 #
-cp ~/zaiene_dev/rmc_dft/example/data_edit_cfg.py ./
+cp ~/zaiene_dev/rmc_dft/example/data_edit_dat.py ./
 cp ~/zaiene_dev/rmc_dft/example/data_edit_incar.py ./
 cp ~/zaiene_dev/rmc_dft/example/data_edit_kpoints.py ./
