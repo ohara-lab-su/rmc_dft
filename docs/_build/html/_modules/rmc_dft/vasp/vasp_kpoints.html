@@ -82,6 +82,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
 </ul>
@@ -164,7 +165,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">kpoints_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;KPOINTS&quot;</span><span class="p">,</span>
-        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">XLogger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">XLogger</span><span class="p">]</span> <span class="o">=</span> <span class="n">XLogger</span><span class="p">(),</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">auto_write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -189,169 +190,80 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Kpoints</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">):</span>
-            <span class="c1"># 既存 KPOINTS を読み取り</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span> <span class="o">=</span> <span class="n">Kpoints</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">)</span>
-            <span class="c1"># コメント</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">comment</span> <span class="ow">or</span> <span class="s2">&quot;K-Points&quot;</span>
-            <span class="c1"># モード推定（Gamma か Monkhorst-Pack で分岐）</span>
-            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="p">,</span> <span class="s2">&quot;style&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">Kpoints</span><span class="o">.</span><span class="n">supported_modes</span><span class="o">.</span><span class="n">Gamma</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="s2">&quot;Gamma&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># デフォルトは Monkhorst 扱い</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="s2">&quot;Monkhorst-Pack&quot;</span>
-
-            <span class="c1"># グリッド（長さ3保証）</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">kpts</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">kpts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="n">kx</span><span class="p">,</span> <span class="n">ky</span><span class="p">,</span> <span class="n">kz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">kpts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">kx</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">ky</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">kz</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># 安全側</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-            <span class="c1"># シフト（長さ3保証）</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">kpts_shift</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">kpts_shift</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">kpts_shift</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sx</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sy</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sz</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Loaded KPOINTS from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="si">}</span><span class="s2"> (mode=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="si">}</span><span class="s2">, grid=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="si">}</span><span class="s2">, shift=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_shift</span><span class="si">}</span><span class="s2">)&quot;</span>
-                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># 既定値（ファイルはまだ書かない）</span>
+            <span class="c1"># 既定値</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="s2">&quot;Monkhorst-Pack&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span> <span class="o">=</span> <span class="s2">&quot;K-Points&quot;</span>
             <span class="c1"># 既定値から Kpoints を初期生成（引数なしのビルド）</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_kpoints</span><span class="p">()</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Initialized default KPOINTS (mode=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="si">}</span><span class="s2">, grid=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="si">}</span><span class="s2">, shift=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_shift</span><span class="si">}</span><span class="s2">)&quot;</span>
-                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
 
-    <span class="c1"># ----------------------------</span>
-    <span class="c1"># 内部: Kpoints 構築（引数なし）</span>
-    <span class="c1"># ----------------------------</span>
-<div class="viewcode-block" id="VaspKpoints._build_kpoints">
-<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints._build_kpoints">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_build_kpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Kpoints</span><span class="p">:</span>
+<div class="viewcode-block" id="VaspKpoints.load">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.load">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        内部状態（mode/grid/shift/comment）に基づき Kpoints を構築する。</span>
-<span class="sd">        現行 pymatgen I/F に合わせ、automatic は使用せず gamma_automatic / monkhorst_automatic を利用。</span>
+<span class="sd">        既存の KPOINTS を読み込む</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">comment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span> <span class="ow">or</span> <span class="s2">&quot;K-Points&quot;</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">==</span> <span class="s2">&quot;Gamma&quot;</span><span class="p">:</span>
-            <span class="n">kpt</span> <span class="o">=</span> <span class="n">Kpoints</span><span class="o">.</span><span class="n">gamma_automatic</span><span class="p">(</span><span class="n">kpts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">)</span>
+        <span class="c1"># 既存 KPOINTS を読み取り</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span> <span class="o">=</span> <span class="n">Kpoints</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">)</span>
+        <span class="c1"># コメント</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">comment</span> <span class="ow">or</span> <span class="s2">&quot;K-Points&quot;</span>
+        <span class="c1"># モード推定（Gamma か Monkhorst-Pack で分岐）</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="p">,</span> <span class="s2">&quot;style&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">Kpoints</span><span class="o">.</span><span class="n">supported_modes</span><span class="o">.</span><span class="n">Gamma</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="s2">&quot;Gamma&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># 既定は Monkhorst-Pack</span>
-            <span class="n">kpt</span> <span class="o">=</span> <span class="n">Kpoints</span><span class="o">.</span><span class="n">monkhorst_automatic</span><span class="p">(</span><span class="n">kpts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">)</span>
+            <span class="c1"># デフォルトは Monkhorst 扱い</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="s2">&quot;Monkhorst-Pack&quot;</span>
 
-        <span class="c1"># シフトは生成後に適用</span>
-        <span class="n">kpt</span><span class="o">.</span><span class="n">kpts_shift</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shift</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">kpt</span></div>
+        <span class="c1"># グリッド（長さ3保証）</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">kpts</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">kpts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">kx</span><span class="p">,</span> <span class="n">ky</span><span class="p">,</span> <span class="n">kz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">kpts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">kx</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">ky</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">kz</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 安全側</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># シフト（長さ3保証）</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">kpts_shift</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">kpts_shift</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">kpts_shift</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sx</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sy</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sz</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Loaded KPOINTS from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="si">}</span><span class="s2"> (mode=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="si">}</span><span class="s2">, grid=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="si">}</span><span class="s2">, shift=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_shift</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span></div>
 
 
-    <span class="c1"># ----------------------------</span>
-    <span class="c1"># アクセサ</span>
-    <span class="c1"># ----------------------------</span>
-<div class="viewcode-block" id="VaspKpoints.get_mode">
-<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_mode">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在のモード（&quot;Gamma&quot; or &quot;Monkhorst-Pack&quot;）を返す。&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span></div>
-
-
-<div class="viewcode-block" id="VaspKpoints.set_mode">
-<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_mode">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">set_mode</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        モードを設定する。大文字小文字はそのまま保存するが、想定は &quot;Gamma&quot; / &quot;Monkhorst-Pack&quot;。</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            mode:</span>
-
-<span class="sd">        Returns:</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;Gamma&quot;</span><span class="p">,</span> <span class="s2">&quot;Monkhorst-Pack&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mode must be &quot;Gamma&quot; or &quot;Monkhorst-Pack&quot;&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="n">mode</span>
+<div class="viewcode-block" id="VaspKpoints.write">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.write">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在の内部状態を KPOINTS ファイルへ書き出す。&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_kpoints</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Write KPOINTS: mode=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="si">}</span><span class="s2">, grid=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="si">}</span><span class="s2">, shift=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_shift</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="VaspKpoints.get_grid">
-<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_grid">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;k-point グリッド (kx, ky, kz) を返す。&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span></div>
+<div class="viewcode-block" id="VaspKpoints.export_dict">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.export_dict">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在の内部状態を辞書で返す（ロギング/デバッグ用）。&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="p">,</span>
+            <span class="s2">&quot;grid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span>
+            <span class="s2">&quot;shift&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span><span class="p">,</span>
+            <span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span><span class="p">,</span>
+            <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">,</span>
+        <span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="VaspKpoints.set_grid">
-<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_grid">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">set_grid</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">kx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">ky</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">kz</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;k-point グリッド (kx, ky, kz) を設定する。&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">kx</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">ky</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">kz</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_kpoints</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="VaspKpoints.get_shift">
-<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_shift">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;シフト (sx, sy, sz) を返す。&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span></div>
-
-
-<div class="viewcode-block" id="VaspKpoints.set_shift">
-<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_shift">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">set_shift</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">sx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">sy</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">sz</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;シフト (sx, sy, sz) を設定する。&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sx</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sy</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sz</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_kpoints</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="VaspKpoints.get_comment">
-<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_comment">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;先頭コメントを返す。&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span></div>
-
-
-<div class="viewcode-block" id="VaspKpoints.set_comment">
-<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_comment">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">set_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;先頭コメントを設定する。&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span> <span class="o">=</span> <span class="n">s</span> <span class="ow">or</span> <span class="s2">&quot;K-Points&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_kpoints</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">()</span></div>
-
-
-    <span class="c1"># ----------------------------</span>
-    <span class="c1"># ユーティリティ</span>
-    <span class="c1"># ----------------------------</span>
 <div class="viewcode-block" id="VaspKpoints.update">
 <a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.update">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
@@ -394,29 +306,170 @@
             <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="VaspKpoints.export_dict">
-<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.export_dict">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">export_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在の内部状態を辞書で返す（ロギング/デバッグ用）。&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="p">,</span>
-            <span class="s2">&quot;grid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span>
-            <span class="s2">&quot;shift&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span><span class="p">,</span>
-            <span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span><span class="p">,</span>
-            <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">,</span>
-        <span class="p">}</span></div>
+<div class="viewcode-block" id="VaspKpoints._build_kpoints">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints._build_kpoints">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_kpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Kpoints</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        内部状態（mode/grid/shift/comment）に基づき Kpoints を構築する。</span>
+<span class="sd">        現行 pymatgen I/F に合わせ、automatic は使用せず gamma_automatic / monkhorst_automatic を利用。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">comment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span> <span class="ow">or</span> <span class="s2">&quot;K-Points&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">==</span> <span class="s2">&quot;Gamma&quot;</span><span class="p">:</span>
+            <span class="n">kpt</span> <span class="o">=</span> <span class="n">Kpoints</span><span class="o">.</span><span class="n">gamma_automatic</span><span class="p">(</span><span class="n">kpts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 既定は Monkhorst-Pack</span>
+            <span class="n">kpt</span> <span class="o">=</span> <span class="n">Kpoints</span><span class="o">.</span><span class="n">monkhorst_automatic</span><span class="p">(</span><span class="n">kpts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">)</span>
+
+        <span class="c1"># シフトは生成後に適用</span>
+        <span class="n">kpt</span><span class="o">.</span><span class="n">kpts_shift</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shift</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">kpt</span></div>
 
 
-<div class="viewcode-block" id="VaspKpoints.write">
-<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.write">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在の内部状態を KPOINTS ファイルへ書き出す。&quot;&quot;&quot;</span>
+    <span class="c1"># ----------------------------</span>
+    <span class="c1">#</span>
+    <span class="c1"># ----------------------------</span>
+<div class="viewcode-block" id="VaspKpoints.get_mode">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_mode">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在のモード（&quot;Gamma&quot; or &quot;Monkhorst-Pack&quot;）を返す。&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span></div>
+
+
+<div class="viewcode-block" id="VaspKpoints.set_mode">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_mode">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_mode</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        モードを設定する。大文字小文字はそのまま保存するが、想定は &quot;Gamma&quot; / &quot;Monkhorst-Pack&quot;。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mode (str):</span>
+<span class="sd">            auto_write (bool):</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;Gamma&quot;</span><span class="p">,</span> <span class="s2">&quot;Monkhorst-Pack&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mode must be &quot;Gamma&quot; or &quot;Monkhorst-Pack&quot;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="n">mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_kpoints</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Write KPOINTS: mode=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="si">}</span><span class="s2">, grid=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="si">}</span><span class="s2">, shift=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_shift</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">)</span></div>
+
+        <span class="k">if</span> <span class="n">auto_write</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">auto_write</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span>
+
+        <span class="k">if</span> <span class="n">auto_write</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="VaspKpoints.get_grid">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_grid">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;k-point グリッド (kx, ky, kz) を返す。&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span></div>
+
+
+<div class="viewcode-block" id="VaspKpoints.set_grid">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_grid">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_grid</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">kx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">ky</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">kz</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        k-point グリッド (kx, ky, kz) を設定する。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            kx:</span>
+<span class="sd">            ky:</span>
+<span class="sd">            kz:</span>
+<span class="sd">            auto_write (bool):</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">kx</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">ky</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">kz</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_kpoints</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">auto_write</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">auto_write</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span>
+
+        <span class="k">if</span> <span class="n">auto_write</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="VaspKpoints.get_shift">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_shift">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;シフト (sx, sy, sz) を返す。&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span></div>
+
+
+<div class="viewcode-block" id="VaspKpoints.set_shift">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_shift">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_shift</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">sy</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">sz</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        シフト (sx, sy, sz) を設定する。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sx:</span>
+<span class="sd">            sy:</span>
+<span class="sd">            sz:</span>
+<span class="sd">            auto_write (bool):</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sx</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sy</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sz</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_kpoints</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">auto_write</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">auto_write</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span>
+
+        <span class="k">if</span> <span class="n">auto_write</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="VaspKpoints.get_comment">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_comment">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;先頭コメントを返す。&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span></div>
+
+
+<div class="viewcode-block" id="VaspKpoints.set_comment">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_comment">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_comment</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        先頭コメントを設定する。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            s (str):</span>
+<span class="sd">            auto_write (bool):</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span> <span class="o">=</span> <span class="n">s</span> <span class="ow">or</span> <span class="s2">&quot;K-Points&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kpts_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_kpoints</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">auto_write</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">auto_write</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span>
+
+        <span class="k">if</span> <span class="n">auto_write</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">()</span></div>
 </div>
 
 </pre></div>

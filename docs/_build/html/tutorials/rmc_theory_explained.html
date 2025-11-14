@@ -85,6 +85,7 @@
 <li class="toctree-l3"><a class="reference internal" href="rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
 </ul>
@@ -133,7 +134,7 @@
 これは、探索がより局所的になるのかどうか・・・よくわからない。いずれにしても、アニーリングの温度パラメーター
 σ^2 を指定することができる。</p>
 <p>ここで、Eは、新しい試行がアクセプトされる確率Pとボルツマン因子を通した関係:</p>
-<div class="highlight-math notranslate"><div class="highlight"><pre><span></span>P=\min[\exp(-E/\sigma),1]
+<div class="highlight-math notranslate"><div class="highlight"><pre><span></span>P=\min[\exp(-E/\sigma^2),1]
 </pre></div>
 </div>
 <p>にある量である。</p>

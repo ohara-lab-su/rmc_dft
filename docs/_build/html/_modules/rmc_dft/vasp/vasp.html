@@ -82,6 +82,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
 </ul>
@@ -163,6 +164,8 @@
         <span class="n">incar_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;INCAR&quot;</span><span class="p">,</span>
         <span class="n">kpoints_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;KPOINTS&quot;</span><span class="p">,</span>
         <span class="n">vasp_log</span><span class="p">:</span> <span class="n">VaspLog</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># instance (データー解析用)</span>
+        <span class="n">vasp_incar</span><span class="p">:</span> <span class="n">VaspIncar</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vasp_kpoints</span><span class="p">:</span> <span class="n">VaspKpoints</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">Config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(),</span>  <span class="c1"># instance</span>
         <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">XLogger</span><span class="p">]</span> <span class="o">=</span> <span class="n">XLogger</span><span class="p">(),</span>  <span class="c1"># instance</span>
         <span class="n">auto_write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -172,6 +175,7 @@
         <span class="n">mpi_flag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_procs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">job_cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">make_default_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        config インスタンを与えると終わり</span>
@@ -182,6 +186,8 @@
 <span class="sd">            incar_name (str): INCAR</span>
 <span class="sd">            kpoints_name (str): KPOINTS</span>
 <span class="sd">            vasp_log (VaspLog): VASP の log 解析管理 instance</span>
+<span class="sd">            vasp_incar (VaspIncar):</span>
+<span class="sd">            vasp_kpoints (VaspKpoints):</span>
 <span class="sd">            config (Config): 全てのインスタンスが同じ Config</span>
 <span class="sd">            logger (XLogger): ろがー、全てのインスタンスが同じ XLogger</span>
 <span class="sd">            auto_write (bool):</span>
@@ -191,6 +197,7 @@
 <span class="sd">            mpi_flag (str): 例 &quot;-np&quot; (configがあればいらない)</span>
 <span class="sd">            num_procs (int): 並列数 (configがあればいらない)</span>
 <span class="sd">            job_cmd (str): ジョブ投入コマンド（None ならローカル実行）</span>
+<span class="sd">            make_default_input (bool): インプットファイルを自動作成(既存があるときはそっちを優先)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;== create Vasp()&quot;</span><span class="p">)</span>
@@ -212,11 +219,19 @@
 
         <span class="c1"># VASP 実行系設定</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">dft_bin</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">dft_bin</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">mpi_cmd</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">mpi_cmd</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">mpi_flag</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">mpi_flag</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">num_procs</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">num_procs</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">job_cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">job_cmd</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">job_cmd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpi_cmd</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">mpi_cmd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpi_flag</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">mpi_flag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_procs</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">num_procs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">job_cmd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">job_cmd</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">job_cmd</span>
         <span class="c1"># self.job_cmd = job_cmd</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dft_bin=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mpi_cmd=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mpi_flag=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_procs=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;job_cmd=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">job_cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
         <span class="c1"># --- VaspLog() instance ---</span>
         <span class="k">if</span> <span class="n">vasp_log</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -237,30 +252,37 @@
             <span class="s2">&quot;ISIF&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
             <span class="s2">&quot;LREAL&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_incar</span> <span class="o">=</span> <span class="n">VaspIncar</span><span class="p">(</span>
-            <span class="n">incar_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="p">,</span>
-            <span class="n">auto_write</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="c1"># INCAR が存在すれば読み込み、なければデフォルトで新規作成</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_incar_defaults</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;set </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_incar</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vasp_incar</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vasp_incar</span> <span class="o">=</span> <span class="n">VaspIncar</span><span class="p">(</span>
+                <span class="n">incar_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="p">,</span>
+                <span class="n">auto_write</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_incar</span><span class="p">:</span> <span class="n">VaspIncar</span> <span class="o">=</span> <span class="n">vasp_incar</span>
 
         <span class="c1"># --- KPOINTS ---</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span> <span class="o">=</span> <span class="n">VaspKpoints</span><span class="p">(</span>
-            <span class="n">kpoints_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">,</span>
-            <span class="n">auto_write</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="c1"># KPOINTS: 既存があれば読み取り優先。</span>
-        <span class="c1"># 無ければデフォルトで生成（Monkhorst-Pack 1 1 1, shift 0 0 0）</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="s2">&quot;Monkhorst-Pack&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span><span class="o">.</span><span class="n">set_grid</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span><span class="o">.</span><span class="n">set_shift</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">vasp_kpoints</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vasp_kpoints</span> <span class="o">=</span> <span class="n">VaspKpoints</span><span class="p">(</span>
+                <span class="n">kpoints_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">,</span>
+                <span class="n">auto_write</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="p">:</span> <span class="n">VaspKpoints</span> <span class="o">=</span> <span class="n">vasp_kpoints</span>
+
+        <span class="k">if</span> <span class="n">make_default_input</span><span class="p">:</span>
+            <span class="c1"># INCAR が存在すれば読み込み、なければデフォルトで新規作成</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_incar_defaults</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;set </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_incar</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+            <span class="c1"># KPOINTS: 既存があれば読み取り優先。</span>
+            <span class="c1"># 無ければデフォルトで生成（Monkhorst-Pack 1 1 1, shift 0 0 0）</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="s2">&quot;Monkhorst-Pack&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="o">.</span><span class="n">set_grid</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="o">.</span><span class="n">set_shift</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
 
     <span class="c1"># --- 委譲メソッド群 (INCAR) ---</span>
 <div class="viewcode-block" id="Vasp.get_tag">
@@ -406,7 +428,7 @@
 <span class="sd">        それは入力が常に VASP であることを仮定していて、</span>
 <span class="sd">        相手のプログラム側の postprocess or convert してから動かすことを全手とする</span>
 
-<span class="sd">        xxx.vasp (VASP4) --&gt; xxx.vasp (VASP5)</span>
+<span class="sd">        *) 構造変換関係は Vasp() では自動で preprocess に入れない。誤解が生じやすい</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            vasp_name (str): xxx.vasp 名前における xxxに相当する名前</span>
@@ -494,8 +516,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">job_cmd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">postprocess</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">preprocess</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">blocking</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -513,8 +533,6 @@
 <span class="sd">            job_cmd (str): ジョブコマンド(mode=job時に使う)</span>
 <span class="sd">                        　　優先順番</span>
 <span class="sd">                           instance(job_cmd=xxx)&lt; set_job_cmd(xxx) &lt; run(job_cmd=xxx)</span>
-<span class="sd">            postprocess (bool): RMC-VASP 用の postprocess を run 中に行う</span>
-<span class="sd">            preprocess (bool): RMC-VASP 用の postprocess を run 中に行う</span>
 <span class="sd">            blocking (bool):  subprocessをブロッキングで起動(default: True)</span>
 
 <span class="sd">        Returns:</span>
@@ -525,15 +543,11 @@
         <span class="c1"># すべてのモードで共通の環境変数を定義</span>
         <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-        <span class="c1">########################</span>
-        <span class="k">if</span> <span class="n">preprocess</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_input_name</span><span class="p">)</span>
-        <span class="c1">########################</span>
-
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">run_mode</span>
 
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== local mpi mode&quot;</span><span class="p">)</span>
             <span class="c1"># MPI build された vasp を local で動かすためのもの (infinibandを使わない)</span>
             <span class="n">env</span><span class="p">[</span><span class="s2">&quot;FI_PROVIDER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;tcp&quot;</span>
             <span class="n">env</span><span class="p">[</span><span class="s2">&quot;I_MPI_FABRICS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;shm:tcp&quot;</span>
@@ -541,13 +555,28 @@
             <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mpirun&quot;</span><span class="p">,</span> <span class="s2">&quot;-np&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
             <span class="c1"># cmd = [self.dft_bin]</span>
 
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mpi&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== mpi mode&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mpi_cmd = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mpi_flag = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dft_bin = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_procs = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span><span class="p">))</span>
+
+            <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;job&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== job mode&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">job_cmd</span><span class="p">:</span>
                 <span class="n">job_cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">job_cmd</span>
             <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">job_cmd</span><span class="p">]</span>
-
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mpi&quot;</span><span class="p">:</span>
-            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="p">]</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**Error**: 未知の mode: </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -561,7 +590,7 @@
                 <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;move = </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;env = </span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">env</span><span class="p">,</span><span class="w"> </span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># self._logger.info(f&quot;env = {json.dumps(env, indent=2)}&quot;)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cmd = </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -569,11 +598,6 @@
         <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**Error**: VASP実行中にエラーが発生しました: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="c1">########################</span>
-        <span class="k">if</span> <span class="n">postprocess</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">postprocess</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_input_name</span><span class="p">)</span>
-        <span class="c1">########################</span>
 
         <span class="k">return</span> <span class="kc">True</span>
 
