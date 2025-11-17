@@ -18,6 +18,8 @@ from rmc_dft.rmc_pot.rmc_pot_fit import RmcPotFit
 from rmc_dft.rmc_pot.rmc_pot_hst import RmcPotHst
 from rmc_dft.rmc_pot.rmc_pot_ppcf import RmcPotPpcf
 
+from rmc_dft.packmol.packmol import Packmol
+
 from rmc_dft.config import Config
 from rmc_dft.util import poscar2cfg
 from rmc_dft.util import ensure_vasp5_format

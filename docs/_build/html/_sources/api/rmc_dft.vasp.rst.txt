@@ -49,6 +49,14 @@ rmc\_dft.vasp.vasp\_log module
    :show-inheritance:
    :undoc-members:
 
+rmc\_dft.vasp.vasp\_outcar module
+---------------------------------
+
+.. automodule:: rmc_dft.vasp.vasp_outcar
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 rmc\_dft.vasp.vasp\_potcar module
 ---------------------------------
 

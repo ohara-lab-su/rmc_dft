@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import numpy as np
 import matplotlib.pyplot as plt
 from rmc_dft import VaspOutcar

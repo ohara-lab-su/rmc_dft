@@ -4,6 +4,7 @@ K.NAKADA, kengo.nakada@gmail.com
 
 RMC の出力を消す
 """
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 import sys
 import argparse

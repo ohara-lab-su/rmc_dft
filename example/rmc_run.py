@@ -4,6 +4,7 @@ K.NAKADA, kengo.nakada@gmail.com
 
 RMC を動かすだけ
 """
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 import sys
 import argparse

@@ -88,6 +88,13 @@
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/util/packmol.html">Packmol</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#id1">公式サイト</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#linux">linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#for-mac">for Mac</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -161,8 +168,8 @@
 </section>
 <section id="module-rmc_dft.vasp.vasp">
 <span id="rmc-dft-vasp-vasp-module"></span><h2>rmc_dft.vasp.vasp module<a class="headerlink" href="#module-rmc_dft.vasp.vasp" title="Link to this heading"></a></h2>
-<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a> (1st, 3rd varsion)
-K.KOBAYASHI (2nd version)</p>
+<p>K.KOBAYASHI
+K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Vasp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">incar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INCAR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kpoints_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'KPOINTS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_incar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_kpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Config()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpi_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpi_flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_default_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp" title="Link to this definition"></a></dt>
@@ -931,8 +938,8 @@ auto_write=True のときは更新後に書き出し。</p>
 </section>
 <section id="module-rmc_dft.vasp.vasp_log">
 <span id="rmc-dft-vasp-vasp-log-module"></span><h2>rmc_dft.vasp.vasp_log module<a class="headerlink" href="#module-rmc_dft.vasp.vasp_log" title="Link to this heading"></a></h2>
-<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a> (2nd version)
-K.KOBAYASHI (1st version)</p>
+<p>K.KOBAYASHI
+K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rmc_dft.vasp.vasp_log.VaspLog">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VaspLog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_log.html#VaspLog"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_log.VaspLog" title="Link to this definition"></a></dt>
@@ -1078,6 +1085,263 @@ This function is used to grep energy from OUTCAR file.</p>
 </dd>
 <dt class="field-even">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rmc_dft.vasp.vasp_outcar">
+<span id="rmc-dft-vasp-vasp-outcar-module"></span><h2>rmc_dft.vasp.vasp_outcar module<a class="headerlink" href="#module-rmc_dft.vasp.vasp_outcar" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VaspOutcar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="simple">
+<dt>VASP OUTCAR から</dt><dd><ul class="simple">
+<li><p>エネルギー (free, without entropy, sigma-&gt;0)</p></li>
+<li><p>原子位置</p></li>
+<li><p>力</p></li>
+<li><p>原子ごとの磁気モーメント (s, p, d, total)</p></li>
+<li><p>全体の磁気モーメント (total)</p></li>
+</ul>
+</dd>
+</dl>
+<p>を取り出して保持するクラス。</p>
+<dl class="simple">
+<dt>イオンステップの配列長は (NSW + 1) とする:</dt><dd><p>NSW = 0 -&gt; ステップ 0 のみ (要素数 1)
+NSW = 1 -&gt; ステップ 0,1    (要素数 2)
+一般に -&gt; ステップ 0..NSW (要素数 NSW+1)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar._guess_nions">
+<span class="sig-name descname"><span class="pre">_guess_nions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar._guess_nions"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar._guess_nions" title="Link to this definition"></a></dt>
+<dd><p>NIONS 行が見つからない場合のフォールバック: 最初の
+POSITION TOTAL-FORCE ブロックから原子数を推定する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar._parse_energy">
+<span class="sig-name descname"><span class="pre">_parse_energy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar._parse_energy"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar._parse_energy" title="Link to this definition"></a></dt>
+<dd><p>&quot;FREE ENERGIE OF THE ION-ELECTRON SYSTEM&quot; ブロックから
+free energy (TOTEN), without entropy, sigma-&gt;0 を取り出す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar._parse_magmom">
+<span class="sig-name descname"><span class="pre">_parse_magmom</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar._parse_magmom"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar._parse_magmom" title="Link to this definition"></a></dt>
+<dd><p>&quot;magnetization (x)&quot; ブロックから
+原子ごとの (s, p, d, total) と
+total magnetization を取り出す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar._parse_pos_force">
+<span class="sig-name descname"><span class="pre">_parse_pos_force</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar._parse_pos_force"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar._parse_pos_force" title="Link to this definition"></a></dt>
+<dd><p>&quot;POSITION&quot; &quot;TOTAL-FORCE&quot; ブロックから
+位置と力を取り出す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar._read_int">
+<span class="sig-name descname"><span class="pre">_read_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar._read_int"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar._read_int" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>default</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar._shrink_ion_steps">
+<span class="sig-name descname"><span class="pre">_shrink_ion_steps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar._shrink_ion_steps"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar._shrink_ion_steps" title="Link to this definition"></a></dt>
+<dd><p>実際に検出できたイオンステップ数まで配列を切り詰める。
+NSW=0 の場合も最低 1 にする。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy">
+<span class="sig-name descname"><span class="pre">get_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ionstep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterstep</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'e0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_energy"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy" title="Link to this definition"></a></dt>
+<dd><p>指定イオンステップ・指定 iter のエネルギーを返す。</p>
+<dl class="simple">
+<dt>mode:</dt><dd><p>&quot;e0&quot;     : energy without entropy
+&quot;toten&quot;  : free energy TOTEN
+&quot;sigma0&quot; : energy(sigma-&gt;0)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ionstep</strong> (<em>int</em>)</p></li>
+<li><p><strong>iterstep</strong> (<em>int</em>)</p></li>
+<li><p><strong>mode</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy_flat">
+<span class="sig-name descname"><span class="pre">get_energy_flat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'e0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_energy_flat"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy_flat" title="Link to this definition"></a></dt>
+<dd><p>イオンステップと iter をすべてまとめた 1 次元配列を返す。
+NaN は除く。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy_ionstep">
+<span class="sig-name descname"><span class="pre">get_energy_ionstep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'e0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_energy_ionstep"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy_ionstep" title="Link to this definition"></a></dt>
+<dd><p>各イオンステップごとの「最後の iter のエネルギー」を
+1 次元配列で返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy_matrix">
+<span class="sig-name descname"><span class="pre">get_energy_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'e0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_energy_matrix"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy_matrix" title="Link to this definition"></a></dt>
+<dd><p>イオンステップ × iter のエネルギー配列を返す。
+未使用部分は NaN を含む。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_forces">
+<span class="sig-name descname"><span class="pre">get_forces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ionstep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_forces"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_forces" title="Link to this definition"></a></dt>
+<dd><p>指定イオンステップの力 (nions, 3) を返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ionstep</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_ionstep_count">
+<span class="sig-name descname"><span class="pre">get_ionstep_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_ionstep_count"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_ionstep_count" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_iter_count">
+<span class="sig-name descname"><span class="pre">get_iter_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ionstep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_iter_count"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_iter_count" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ionstep</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_magmom_atom">
+<span class="sig-name descname"><span class="pre">get_magmom_atom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ionstep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_magmom_atom"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_magmom_atom" title="Link to this definition"></a></dt>
+<dd><p>指定イオンステップの原子ごとの磁気モーメント
+(nions, 4) を返す。列順は (s, p, d, total)。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ionstep</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_magmom_total">
+<span class="sig-name descname"><span class="pre">get_magmom_total</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ionstep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_magmom_total"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_magmom_total" title="Link to this definition"></a></dt>
+<dd><p>指定イオンステップの全体磁気モーメント total を返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ionstep</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_positions">
+<span class="sig-name descname"><span class="pre">get_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ionstep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_positions"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_positions" title="Link to this definition"></a></dt>
+<dd><p>指定イオンステップの原子位置 (nions, 3) を返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ionstep</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
 </dd>
 </dl>
 </dd></dl>
