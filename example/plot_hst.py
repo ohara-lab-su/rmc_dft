@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
+import os
 import matplotlib.pyplot as plt
 
 from rmc_dft import RmcPotHst
