@@ -3,16 +3,16 @@ filetype xyz
 output FeSiB_amorphous.xyz
 
 structure Fe.xyz
-  number 160
-  inside box 0.0 0.0 0.0  12.979482 12.979482 12.979482
+  number 400
+  inside box 0.0 0.0 0.0  17.615867 17.615867 17.615867
 end structure
 
 structure Si.xyz
-  number 18
-  inside box 0.0 0.0 0.0  12.979482 12.979482 12.979482
+  number 45
+  inside box 0.0 0.0 0.0  17.615867 17.615867 17.615867
 end structure
 
 structure B.xyz
-  number 22
-  inside box 0.0 0.0 0.0  12.979482 12.979482 12.979482
+  number 55
+  inside box 0.0 0.0 0.0  17.615867 17.615867 17.615867
 end structure

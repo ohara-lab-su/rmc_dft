@@ -4,6 +4,11 @@
 
 - docstring 修正(sphihxでのエラー対策)
   - 修正し切れてない・軽減
+
+アモルファス作成
+
+- make_amarphous.py
+- rmc_dft/packmol.py
  
 ## v0.3.13 nakada
 
