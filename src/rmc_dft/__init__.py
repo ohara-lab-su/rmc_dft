@@ -9,6 +9,7 @@ from rmc_dft.vasp.vasp_log import VaspLog
 from rmc_dft.vasp.vasp_incar import VaspIncar
 from rmc_dft.vasp.vasp_kpoints import VaspKpoints
 from rmc_dft.vasp.vasp_potcar import VaspPotcarBuilder
+from rmc_dft.vasp.vasp_outcar import VaspOutcar
 
 from rmc_dft.rmc_pot.rmc_pot import RmcPot
 from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
