@@ -30,20 +30,6 @@ if __name__ == "__main__":
     # 初期POSCAR 作成
     shutil.copy(f"POSCAR0", "POSCAR")
 
-    # POSCAR to CFG (rmc用のCFG変換)
-    # cfg_name = "aaa"
-    # vasp_name = "aaa"
-    cfg_name = config.cfg_name
-    vasp_name = config.vasp_name
-    log_vasp_dir = config.dft_log_dir
-
-    # vasp_log = VaspLog(logger=logger)
-    # vasp = Vasp(
-    #     vasp_log=vasp_log,
-    #     config=config,
-    #     logger=logger,
-    # )
-
     if not os.path.exists("KPOINTS"):
         vasp_kpoints = VaspKpoints(logger=logger)
         vasp_kpoints.set_mode("Monkhorst-Pack")
@@ -71,17 +57,17 @@ if __name__ == "__main__":
     vasp = Vasp(vasp_incar=vasp_incar, config=config, logger=logger)
 
     # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
-    # vasp.poscar2cfg(cfg_name)
+    # vasp.poscar2cfg(config.cfg_name)
 
     # run_mode = "local"
 
-    if not os.path.exists(log_vasp_dir):
-        os.mkdir(log_vasp_dir)
+    if not os.path.exists(config.log_vasp_dir):
+        os.mkdir(config.log_vasp_dir)
 
     vasp.run(mode="mpi")
     # vasp.run(mode=run_mode)
     # vasp.postprocess(
-    #     log_dir=log_vasp_dir,
-    #     cfg_name=cfg_name,
+    #     log_dir=config.log_vasp_dir,
+    #     cfg_name=config.cfg_name,
     # )
     vasp.postprocess()  ## backup, contcar to poscar, poscar2cfg(xxx,cfg)

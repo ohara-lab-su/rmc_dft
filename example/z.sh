@@ -19,3 +19,6 @@ cp ~/zaiene_dev/rmc_dft/example/job_hpcs2024_node2.sh ./
 cp ~/zaiene_dev/rmc_dft/example/data_edit_dat.py ./
 cp ~/zaiene_dev/rmc_dft/example/data_edit_incar.py ./
 cp ~/zaiene_dev/rmc_dft/example/data_edit_kpoints.py ./
+#
+cp ~/zaiene_dev/rmc_dft/example/plot_fit.py ./
+cp ~/zaiene_dev/rmc_dft/example/plot_hst.py ./

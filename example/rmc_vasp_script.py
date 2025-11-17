@@ -31,16 +31,8 @@ if __name__ == "__main__":
     # 初期POSCAR 作成
     shutil.copy(f"POSCAR0", "POSCAR")
 
-    cfg_name = config.cfg_name
-    vasp_name = config.vasp_name
-    run_mode = config.run_mode
-    element_info = config.element_info
-    max_rmc_dft_loop = config.max_rmc_dft_loop
-    log_vasp_dir = config.dft_log_dir
-    log_rmc_dir = config.rmc_log_dir
-
     # rmc_log = RmcPotLog(config=config, logger=logger)
-    rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
+    rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
     rmc_dat = RmcPotDat(config=config, logger=logger)
 
     rmc_dat.set_comment("comment FeSiB")
@@ -50,12 +42,12 @@ if __name__ == "__main__":
     rmc_dat.set_r_spacing(0.025)
     rmc_dat.set_data_flags([0, 0, 1, 0])
 
-    # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, logger=logger)
+    # rmc = RmcPot(rmc_log=rmc_log, cfg_name=config.cfg_name, logger=logger)
     # rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
 
     rmc = RmcPot(
-        rmc_dat=rmc_dat,
-        rmc_log=rmc_log,
+        rmc_dat=rmc_dat,  # instance
+        rmc_log=rmc_log,  # instance
         config=config,
         logger=logger,
     )
@@ -86,22 +78,22 @@ if __name__ == "__main__":
     vasp_log = VaspLog(logger=logger)
 
     vasp = Vasp(
-        vasp_log=vasp_log,
-        vasp_incar=vasp_incar,
-        config=config,
-        logger=logger,
+        vasp_log=vasp_log,  # instance
+        vasp_incar=vasp_incar,  # instance
+        config=config,  # instance
+        logger=logger,  # instance
     )
 
     # CFG の 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
-    vasp.poscar2cfg(cfg_name)
+    vasp.poscar2cfg(config.cfg_name)
 
     digits = len(str(max_rmc_dft_loop - 1))
 
     i = 0
     for i in range(0, max_rmc_dft_loop):
 
-        rmc_dir = f"{log_rmc_dir}{str(i).zfill(digits)}"
-        vasp_dir = f"{log_vasp_dir}{str(i).zfill(digits)}"
+        rmc_dir = f"{config.log_rmc_dir}{str(i).zfill(digits)}"
+        vasp_dir = f"{config.log_vasp_dir}{str(i).zfill(digits)}"
 
         if not os.path.exists(rmc_dir):
             os.mkdir(rmc_dir)
@@ -111,24 +103,24 @@ if __name__ == "__main__":
         ## RMC ###########################################
         logger.info(f"== RMC {i}")
         rmc.postprocess()
-        # rmc.run(cfg_name=cfg_name)
+        # rmc.run(cfg_name=config.cfg_name)
         rmc.run()
         rmc.postprocess(
             log_dir=rmc_dir,
-            # cfg_name=cfg_name,
+            # cfg_name=config.cfg_name,
             # element_info="label.txt",
         )  # backup(loop番号つき), cfg --> xxx.vasp
 
-        shutil.copy(f"{cfg_name}.vasp", "POSCAR")
+        shutil.copy(f"{config.cfg_name}.vasp", "POSCAR")
 
         ## DFT ###########################################
         logger.info(f"== DFT(vasp) {i}")
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
-        # vasp.run(mode=run_mode)
+        # vasp.run(mode=config.run_mode)
         vasp.run(mode="mpi")
         vasp.postprocess(
             log_dir=vasp_dir,
-            # cfg_name=cfg_name,
+            # cfg_name=config.cfg_name,
         )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
         logger.info("loop end " + str(i))

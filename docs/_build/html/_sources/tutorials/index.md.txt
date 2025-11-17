@@ -4,10 +4,12 @@
 :maxdepth: 4
 :caption: Contents:
 
-rmc_theory_explained
-rmcpot_cfg_explained
-rmcpot_input_explained
-rmcpot_output_explained
+rmc/rmc_theory_explained
+rmc/rmcpot_cfg_explained
+rmc/rmcpot_input_explained
+rmc/rmcpot_output_explained
+dft/dft_theory_explained
+rmc_dft/quick_start
 ```
 
 このセクションでは RMC-DFT の使い方を段階的に説明します。
