@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.3.14 nakada
+
+- docstring 修正(sphihxでのエラー対策)
+  - 修正し切れてない・軽減
+ 
 ## v0.3.13 nakada
 
 DFT 関係のプロットのためのクラス

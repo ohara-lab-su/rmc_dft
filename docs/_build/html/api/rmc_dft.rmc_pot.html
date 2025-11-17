@@ -88,6 +88,13 @@
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/util/packmol.html">Packmol</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#id1">公式サイト</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#linux">linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#for-mac">for Mac</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -141,8 +148,8 @@
 </section>
 <section id="module-rmc_dft.rmc_pot.rmc_pot">
 <span id="rmc-dft-rmc-pot-rmc-pot-module"></span><h2>rmc_dft.rmc_pot.rmc_pot module<a class="headerlink" href="#module-rmc_dft.rmc_pot.rmc_pot" title="Link to this heading"></a></h2>
-<p>K.NAKADA, <a class="reference external" href="mailto:Kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">Kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a> (1st, 3rd version)
-K.KOBAYASHI (2nd version)</p>
+<p>K.KOBAYASHI
+K.NAKADA, <a class="reference external" href="mailto:Kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">Kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot.RmcPot">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RmcPot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">rmc_log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rmc_dat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Config()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot.html#RmcPot"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot.RmcPot" title="Link to this definition"></a></dt>
@@ -476,11 +483,11 @@ dat.write()  # 明示保存も可能</p>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_angle_constraint_count">
 <span class="sig-name descname"><span class="pre">get_angle_constraint_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_angle_constraint_count"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_angle_constraint_count" title="Link to this definition"></a></dt>
 <dd><p>19 行目（number of cos. distr of bond angles constraint）を取得する。</p>
-<p>【内容】
-- ボンド角度分布に基づく制約数。</p>
-<blockquote>
-<div><p>0 の場合、角度分布制約を適用しない。</p>
-</div></blockquote>
+<p class="rubric">メモ</p>
+<ul class="simple">
+<li><p>ボンド角度分布に基づく制約数。
+0 の場合、角度分布制約を適用しない。</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>角度制約数。</p>
@@ -495,11 +502,13 @@ dat.write()  # 明示保存も可能</p>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_avg_coord_constraint_count">
 <span class="sig-name descname"><span class="pre">get_avg_coord_constraint_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_avg_coord_constraint_count"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_avg_coord_constraint_count" title="Link to this definition"></a></dt>
 <dd><p>21 行目（number of average coordination constraints）を取得する。</p>
-<p>【内容】
-- 平均配位数に関する制約数。</p>
-<blockquote>
-<div><p>0 の場合は制約なし。</p>
-</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<ul class="simple">
+<li><p>平均配位数に関する制約数。
+0 の場合は制約なし。</p></li>
+</ul>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>平均配位数制約の数。</p>
@@ -525,11 +534,13 @@ dat.write()  # 明示保存も可能</p>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_coord_constraint_count">
 <span class="sig-name descname"><span class="pre">get_coord_constraint_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_coord_constraint_count"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_coord_constraint_count" title="Link to this definition"></a></dt>
 <dd><p>20 行目（number of coordination constraints）を取得する。</p>
-<p>【内容】
-- 配位数に基づく制約の数。</p>
-<blockquote>
-<div><p>0 の場合は適用しない。</p>
-</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<ul class="simple">
+<li><p>配位数に基づく制約の数。
+0 の場合は適用しない。</p></li>
+</ul>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>配位数制約の数。</p>
@@ -581,10 +592,9 @@ dat.write()  # 明示保存も可能</p>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_data_flags">
 <span class="sig-name descname"><span class="pre">get_data_flags</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_data_flags"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_data_flags" title="Link to this definition"></a></dt>
 <dd><p>10 行目（g(r), neutron, x-ray, EXAFS の出力フラグ）を取得する。</p>
-<p>【内容】
-- 各整数は、その物理量の計算・出力を行うかどうかを指定する。</p>
-<blockquote>
-<div><dl class="simple">
+<p class="rubric">メモ</p>
+<p>各整数は、その物理量の計算・出力を行うかどうかを指定する。</p>
+<dl class="simple">
 <dt>順序は常に以下で固定される（RMC_POT マニュアル II.E 節より）:</dt><dd><ol class="arabic simple">
 <li><p>g(r) の計算フラグ</p></li>
 <li><p>neutron S(Q) の計算フラグ</p></li>
@@ -592,17 +602,14 @@ dat.write()  # 明示保存も可能</p>
 <li><p>EXAFS χ(k) の計算フラグ</p></li>
 </ol>
 </dd>
-</dl>
-</div></blockquote>
-<p>【仕様】
-- 0: 無効（そのデータ種を出力・比較しない）
-- 1: 有効（そのデータ種を出力・比較する）</p>
-<dl>
-<dt>【例】</dt><dd><p>0 0 1 0  ! g(r), neutron, x-ray, EXAFS
-→ g(r)=0, neutron=0, x-ray=1, EXAFS=0</p>
-<blockquote>
-<div><p>→ X線データのみ出力・比較対象とする設定。</p>
-</div></blockquote>
+<dt>仕様:</dt><dd><ul class="simple">
+<li><p>0: 無効（そのデータ種を出力・比較しない）</p></li>
+<li><p>1: 有効（そのデータ種を出力・比較する）</p></li>
+</ul>
+</dd>
+<dt>例:</dt><dd><p>0 0 1 0  ! g(r), neutron, x-ray, EXAFS
+→ g(r)=0, neutron=0, x-ray=1, EXAFS=0
+→ X線データのみ出力・比較対象とする設定。</p>
 </dd>
 </dl>
 <dl class="field-list simple">
@@ -619,6 +626,7 @@ dat.write()  # 明示保存も可能</p>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_density">
 <span class="sig-name descname"><span class="pre">get_density</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_density"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_density" title="Link to this definition"></a></dt>
 <dd><p>2 行目 density を float で返す。</p>
+<p class="rubric">メモ</p>
 <p>例)
 0.0842566414       ! number densit</p>
 <ul class="simple">
@@ -651,47 +659,60 @@ dat.write()  # 明示保存も可能</p>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_exp_filename">
 <span class="sig-name descname"><span class="pre">get_exp_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_exp_filename"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_exp_filename" title="Link to this definition"></a></dt>
 <dd><p>11 行目（実験データファイル名）を返す（旧来固定フォーマット）。</p>
-<p>【.dat 側の決まり（旧来固定）】
-- 10 行目は 4 つの整数をこの順で持つ:</p>
-<blockquote>
-<div><blockquote>
-<div><p>g(r), neutron S(Q), X-ray F(Q), EXAFS χ(k)</p>
-</div></blockquote>
-<p>これらは各データ種の「ブロック数」を表す（0 ならブロック無し）。</p>
-</div></blockquote>
-<ul class="simple">
-<li><p>11 行目以降には、上記順序で「有効なデータ種のブロック」が連続。
-各ブロックの先頭行が「実験データファイル名」、直後の行が「点範囲（開始・終了の2整数）」。</p></li>
-<li><p>本メソッドは「11 行目のファイル名」をそのまま返す（例: 10 行目が <cite>0 0 1 0</cite> なら
-11 行目は X-ray F(Q) ブロックのファイル名）。</p></li>
-</ul>
-<p>【実験データファイルの中身（旧来固定フォーマット, あいまいさ無し）】
-- 1 行目: データ点数 N（整数）
-- 2 行目: タイトル（任意文字列。数値としては読まれない）
-- 3 行目以降: 各データ点の行。種別ごとに列は厳密に以下となる。</p>
+<p class="rubric">メモ</p>
+<p>dat ファイルの中身の説明:</p>
 <blockquote>
 <div><ul>
-<li><p>g(r)        : r, g(r)                                         （2 列）</p></li>
-<li><p>neutron S(Q): Q, S(Q)                                         （2 列）</p></li>
-<li><dl>
-<dt>X-ray F(Q)<span class="classifier">Q, F(Q), c_αβ を RMC 順で M 本                  （2+M 列）</span></dt><dd><p>M = ntypes*(ntypes+1)/2
-RMC 順 = 11, 12, 13, …, 22, 23, …, 33
-例: 2 元系 → 5 列（Q, F(Q), c11, c12, c22）</p>
+<li><p>.dat ファイルの 10 行目には、以下の 4 つの整数が並びます。
+g(r), neutron S(Q), X-ray F(Q), EXAFS χ(k) の順で、各データ種の
+ブロック数を表します（0 はブロック無し）。</p></li>
+<li><p>11 行目以降には、上記の順序に従って「ブロックがあるデータ種」
+だけが連続して並びます。各ブロックは次の 2 行で構成されます。</p>
 <blockquote>
-<div><p>3 元系 → 8 列（Q, F(Q), c11, c12, c13, c22, c23, c33）</p>
+<div><ul class="simple">
+<li><p>1 行目: 実験データファイル名</p></li>
+<li><p>2 行目: 使用点範囲（開始・終了の 2 整数）</p></li>
+</ul>
 </div></blockquote>
+</li>
+<li><p>本メソッドは、そのうち最初のブロック（= 11 行目）の
+実験データファイル名を返します。
+例: 10 行目が <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">0</span> <span class="pre">1</span> <span class="pre">0</span></code> の場合、11 行目は X-ray F(Q) ブロック。</p></li>
+<li><dl class="simple">
+<dt>実験データファイル（外部ファイル）の固定フォーマットは次の通りです。</dt><dd><ul class="simple">
+<li><p>1 行目: データ点数 N（整数）</p></li>
+<li><p>2 行目: タイトル行（任意文字列）</p></li>
+<li><p>3 行目以降: データ点列</p></li>
+</ul>
 </dd>
 </dl>
 </li>
-<li><p>EXAFS χ(k)  : k, χ(k)                                         （2 列）</p></li>
+<li><dl class="simple">
+<dt>種別ごとの列構成:</dt><dd><ul class="simple">
+<li><p>g(r): r, g(r)（2 列）</p></li>
+<li><p>neutron S(Q): Q, S(Q)（2 列）</p></li>
+<li><p>X-ray F(Q): Q, F(Q), c_αβ を RMC 順で M 本（2+M 列）</p></li>
+<li><p>EXAFS χ(k): k, χ(k)（2 列）</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>X-ray F(Q) の c_αβ の本数 M は次式で決まります。
+<code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">=</span> <span class="pre">ntypes</span> <span class="pre">*</span> <span class="pre">(ntypes</span> <span class="pre">+</span> <span class="pre">1)</span> <span class="pre">/</span> <span class="pre">2</span></code>
+RMC 順は 11, 12, 13, …, 22, 23, …, 33。</p></li>
 </ul>
 </div></blockquote>
-<p>例（あなたの貼付データ）:
-- 10 行目 <cite>0 0 1 0</cite> → X-ray F(Q) にフィット。</p>
-<blockquote>
-<div><p>5 列ファイルは 2 元系（Q, F(Q), c11, c12, c22）、
-8 列ファイルは 3 元系（Q, F(Q), c11, c12, c13, c22, c23, c33）。</p>
-</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>例（あなたの貼付データ）:</dt><dd><ul>
+<li><p>10 行目 <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">0</span> <span class="pre">1</span> <span class="pre">0</span></code> → X-ray F(Q) のみ有効</p></li>
+<li><p>5 列構成 → 2 元系（Q, F(Q), c11, c12, c22）</p></li>
+<li><p>8 列構成 → 3 元系（Q, F(Q), c11, c12, c13, c22, c23, c33）</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -703,23 +724,24 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_exp_range">
 <span class="sig-name descname"><span class="pre">get_exp_range</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_exp_range"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_exp_range" title="Link to this definition"></a></dt>
 <dd><p>12 行目（実験データの読み込み範囲）を取得する。</p>
-<p>【定義（旧来固定フォーマット）】
-- 11 行目: 実験データファイル名
-- 12 行目: 「開始インデックス」「終了インデックス」の <a href="#id3"><span class="problematic" id="id4">**</span></a>2 整数**のみ</p>
-<blockquote>
-<div><p>・いずれも 1 始まり（inclusive）
-・対象は実験データファイルの「データ本体行」（1 行目: 点数N、2 行目: タイトル、の次の行から数える）</p>
-</div></blockquote>
+<p class="rubric">メモ</p>
 <dl class="simple">
-<dt>【例】</dt><dd><p>1 290   → データ本体の 1〜290 行を利用
+<dt>定義（旧来固定フォーマット）:</dt><dd><ul class="simple">
+<li><p>11 行目: 実験データファイル名</p></li>
+<li><p>12 行目: 「開始インデックス」「終了インデックス」の <a href="#id3"><span class="problematic" id="id4">**</span></a>2 整数**のみ
+・いずれも 1 始まり（inclusive）
+・対象は実験データファイルの「データ本体行」（1 行目: 点数N、2 行目: タイトル、の次の行から数える）</p></li>
+</ul>
+</dd>
+<dt>例:</dt><dd><p>1 290   → データ本体の 1〜290 行を利用
 1 991   → データ本体の 1〜991 行を利用（実データ点数 N を超える指定は推奨しない）</p>
 </dd>
+<dt>注意:</dt><dd><ul class="simple">
+<li><p>終了インデックスが実データ点数 N を超えたときの挙動は版依存の可能性があるため、
+実行前に N 以内へ収めることを推奨（本メソッドは読み取りのみを行う）。</p></li>
+</ul>
+</dd>
 </dl>
-<p>【注意】
-- 終了インデックスが実データ点数 N を超えたときの挙動は版依存の可能性があるため、</p>
-<blockquote>
-<div><p>実行前に N 以内へ収めることを推奨（本メソッドは読み取りのみを行う）。</p>
-</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>Tuple</em>[int, int]</p>
@@ -731,11 +753,11 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_flag_15">
 <span class="sig-name descname"><span class="pre">get_flag_15</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_flag_15"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_flag_15" title="Link to this definition"></a></dt>
 <dd><p>15 行目（boolean flag 1）を取得する。</p>
-<p>【内容】
-- ブール値 (.true./.false.)。</p>
-<blockquote>
-<div><p>通常は S(Q) のバックグラウンド補正や平滑化の有無を指定する。</p>
-</div></blockquote>
+<p class="rubric">メモ</p>
+<ul class="simple">
+<li><p>ブール値 (.true./.false.)。
+通常は S(Q) のバックグラウンド補正や平滑化の有無を指定する。</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>True の場合は有効化。</p>
@@ -750,11 +772,11 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_flag_16">
 <span class="sig-name descname"><span class="pre">get_flag_16</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_flag_16"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_flag_16" title="Link to this definition"></a></dt>
 <dd><p>16 行目（boolean flag 2）を取得する。</p>
-<p>【内容】
-- ブール値 (.true./.false.)。</p>
-<blockquote>
-<div><p>データ重み付けを行うかどうかを示すことが多い。</p>
-</div></blockquote>
+<p class="rubric">メモ</p>
+<ul class="simple">
+<li><p>ブール値 (.true./.false.)。
+データ重み付けを行うかどうかを示すことが多い。</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>True の場合は有効化。</p>
@@ -769,11 +791,11 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_flag_17">
 <span class="sig-name descname"><span class="pre">get_flag_17</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_flag_17"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_flag_17" title="Link to this definition"></a></dt>
 <dd><p>17 行目（boolean flag 3）を取得する。</p>
-<p>【内容】
-- ブール値 (.true./.false.)。</p>
-<blockquote>
-<div><p>追加オプション（誤差正規化・スムージングなど）を制御する場合がある。</p>
-</div></blockquote>
+<p class="rubric">メモ</p>
+<ul class="simple">
+<li><p>ブール値 (.true./.false.)。
+追加オプション（誤差正規化・スムージングなど）を制御する場合がある。</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>True の場合は有効化。</p>
@@ -788,11 +810,11 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_flag_18">
 <span class="sig-name descname"><span class="pre">get_flag_18</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_flag_18"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_flag_18" title="Link to this definition"></a></dt>
 <dd><p>18 行目（boolean flag 4）を取得する。</p>
-<p>【内容】
-- ブール値 (.true./.false.)。</p>
-<blockquote>
-<div><p>一般的に、データ処理や誤差解析の補助機能をオン/オフする。</p>
-</div></blockquote>
+<p class="rubric">メモ</p>
+<ul class="simple">
+<li><p>ブール値 (.true./.false.)。
+一般的に、データ処理や誤差解析の補助機能をオン/オフする。</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>True の場合は有効化。</p>
@@ -807,11 +829,13 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_fnc_switch">
 <span class="sig-name descname"><span class="pre">get_fnc_switch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_fnc_switch"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_fnc_switch" title="Link to this definition"></a></dt>
 <dd><p>23 行目（FNC switch）を取得する。</p>
-<p>【内容】
-- Fixed Neighbour Constraints (FNC) のオン/オフ。</p>
-<blockquote>
-<div><p>0 の場合は無効、1 の場合は有効。</p>
-</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<ul class="simple">
+<li><p>Fixed Neighbour Constraints (FNC) のオン/オフ。
+0 の場合は無効、1 の場合は有効。</p></li>
+</ul>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>FNCスイッチ（0または1）。</p>
@@ -826,11 +850,13 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_history_buffer_size">
 <span class="sig-name descname"><span class="pre">get_history_buffer_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_history_buffer_size"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_history_buffer_size" title="Link to this definition"></a></dt>
 <dd><p>27 行目（size of the history buffer）を取得する。</p>
-<p>【内容】
-- 受理率など過去情報を保持する履歴バッファサイズ。</p>
-<blockquote>
-<div><p>統計の平滑化に使用される。</p>
-</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<ul class="simple">
+<li><p>受理率など過去情報を保持する履歴バッファサイズ。
+統計の平滑化に使用される。</p></li>
+</ul>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>バッファサイズ。</p>
@@ -845,11 +871,13 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_initial_bin_shift">
 <span class="sig-name descname"><span class="pre">get_initial_bin_shift</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_initial_bin_shift"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_initial_bin_shift" title="Link to this definition"></a></dt>
 <dd><p>24 行目（initial bin shift）を取得する。</p>
-<p>【内容】
-- g(r) 等のヒストグラム初期シフト値。</p>
-<blockquote>
-<div><p>0 はシフトなし。</p>
-</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<ul class="simple">
+<li><p>g(r) 等のヒストグラム初期シフト値。
+0 はシフトなし。</p></li>
+</ul>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>初期ビンシフト。</p>
@@ -910,6 +938,7 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_max_moves">
 <span class="sig-name descname"><span class="pre">get_max_moves</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_max_moves"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_max_moves" title="Link to this definition"></a></dt>
 <dd><p>4 行目 maximum moves を (m1, m2) で返す。</p>
+<p class="rubric">メモ</p>
 <p>例)
 0.01 0.01 0.01   ! maximum moves</p>
 <ul class="simple">
@@ -935,18 +964,19 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_moveout_option">
 <span class="sig-name descname"><span class="pre">get_moveout_option</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_moveout_option"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_moveout_option" title="Link to this definition"></a></dt>
 <dd><p>6 行目（whether to use moveout option）を取得する。</p>
-<p>【内容】
-- RMC 計算において「moveout オプション」を使用するかどうかを指定するブール値。</p>
-<blockquote>
-<div><p>moveout オプションは、原子のランダム移動試行時に追加的な処理を行う機能であり、
-一般的には「移動後の局所最適化」や「過大な変位の制限」を目的とする</p>
-</div></blockquote>
-<p>【マニュアル定義】
-- ラベル: “whether to use moveout option”
-- 型: 論理値（.true. / .false.）
-- 意味:</p>
-<blockquote>
-<div><ul class="simple">
+<p class="rubric">メモ</p>
+<dl class="simple">
+<dt>内容:</dt><dd><ul class="simple">
+<li><p>RMC 計算において「moveout オプション」を使用するかどうかを指定するブール値。
+moveout オプションは、原子のランダム移動試行時に追加的な処理を行う機能であり、
+一般的には「移動後の局所最適化」や「過大な変位の制限」を目的とする</p></li>
+</ul>
+</dd>
+<dt>マニュアル定義:</dt><dd><ul class="simple">
+<li><p>ラベル: “whether to use moveout option”</p></li>
+<li><p>型: 論理値（.true. / .false.）</p></li>
+<li><dl class="simple">
+<dt>意味:</dt><dd><ul>
 <li><dl class="simple">
 <dt>.true.<span class="classifier">moveout 処理を有効化。</span></dt><dd><p>→ 原子移動試行のたびに補助的な判定・制約が加わる。</p>
 </dd>
@@ -958,12 +988,13 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 </dl>
 </li>
 </ul>
-</div></blockquote>
-<ul class="simple">
+</dd>
+</dl>
+</li>
 <li><p>挙動の詳細は実装依存（例: moveout モジュール内で距離閾値チェックを行うなど）。</p></li>
 </ul>
-<dl class="simple">
-<dt>【例】</dt><dd><dl class="simple">
+</dd>
+<dt>例:</dt><dd><dl class="simple">
 <dt>.true.   ! whether to use moveout option</dt><dd><p>→ moveout 処理を有効化（制約付き移動を実施）。</p>
 </dd>
 <dt>.false.  ! whether to use moveout option</dt><dd><p>→ 通常のランダム移動。</p>
@@ -985,11 +1016,13 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_num_atoms_per_move">
 <span class="sig-name descname"><span class="pre">get_num_atoms_per_move</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_num_atoms_per_move"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_num_atoms_per_move" title="Link to this definition"></a></dt>
 <dd><p>26 行目（number of atoms moved in a single move）を取得する。</p>
-<p>【内容】
-- 1 回の move 操作で同時に動かす原子の数。</p>
-<blockquote>
-<div><p>通常は 1。</p>
-</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<ul class="simple">
+<li><p>1 回の move 操作で同時に動かす原子の数。
+通常は 1。</p></li>
+</ul>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>移動させる原子数。</p>
@@ -1004,23 +1037,27 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_num_config_to_collect">
 <span class="sig-name descname"><span class="pre">get_num_config_to_collect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_num_config_to_collect"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_num_config_to_collect" title="Link to this definition"></a></dt>
 <dd><p>7 行目（number of configuration to collect）を取得する。</p>
-<p>【内容】
-- RMC 実行中に「構成（configuration）」をどの程度の頻度で収集するかを指定する。</p>
-<blockquote>
-<div><p>ここでいう configuration とは、特定ステップ時点の原子配置を指す。
-解析や平均化、統計処理に利用するため、指定回数ぶんを記録できる。</p>
-</div></blockquote>
-<p>【マニュアル定義】
-- ラベル: “number of configuration to collect”
-- 単位: 個数（整数）
-- 意味:</p>
-<blockquote>
-<div><p>RMC 計算中に「収集用構成」を保存する数。
+<p class="rubric">メモ</p>
+<dl class="simple">
+<dt>内容:</dt><dd><ul class="simple">
+<li><p>RMC 実行中に「構成（configuration）」をどの程度の頻度で収集するかを指定する。
+ここでいう configuration とは、特定ステップ時点の原子配置を指す。
+解析や平均化、統計処理に利用するため、指定回数ぶんを記録できる。</p></li>
+</ul>
+</dd>
+<dt>マニュアル定義:</dt><dd><ul class="simple">
+<li><p>ラベル: “number of configuration to collect”</p></li>
+<li><p>単位: 個数（整数）</p></li>
+<li><dl class="simple">
+<dt>意味:</dt><dd><p>RMC 計算中に「収集用構成」を保存する数。
 この値が 0 の場合、多くの実装では「構成を収集しない」または
 「最終構成のみを保存」として扱われる。</p>
-</div></blockquote>
-<dl class="simple">
-<dt>【典型的な設定例】</dt><dd><dl class="simple">
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>典型的な設定例:</dt><dd><dl class="simple">
 <dt>0     ! number of configuration to collect</dt><dd><p>→ 構成を収集せず、最終結果のみを出力。</p>
 </dd>
 <dt>10    ! number of configuration to collect</dt><dd><p>→ 全実行中に 10 構成を等間隔で保存。</p>
@@ -1029,10 +1066,12 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 </dd>
 </dl>
 </dd>
+<dt>備考:</dt><dd><ul class="simple">
+<li><p>保存間隔は RMC_POT 内部で自動的に均等分配される。</p></li>
+<li><p>このパラメータは出力用ヒストグラムや g(r) 平均化などに影響を与える。</p></li>
+</ul>
+</dd>
 </dl>
-<p>【備考】
-- 保存間隔は RMC_POT 内部で自動的に均等分配される。
-- このパラメータは出力用ヒストグラムや g(r) 平均化などに影響を与える。</p>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>収集する構成数。</p>
@@ -1047,11 +1086,13 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_potential_flag">
 <span class="sig-name descname"><span class="pre">get_potential_flag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_potential_flag"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_potential_flag" title="Link to this definition"></a></dt>
 <dd><p>22 行目（potential flag）を取得する。</p>
-<p>【内容】
-- ポテンシャル使用のフラグまたは選択番号。</p>
-<blockquote>
-<div><p>0 の場合はポテンシャル未使用。</p>
-</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<ul class="simple">
+<li><p>ポテンシャル使用のフラグまたは選択番号。
+0 の場合はポテンシャル未使用。</p></li>
+</ul>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>ポテンシャルフラグ。</p>
@@ -1066,24 +1107,26 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_print_interval">
 <span class="sig-name descname"><span class="pre">get_print_interval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_print_interval"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_print_interval" title="Link to this definition"></a></dt>
 <dd><p>8 行目（step for printing）を取得する。</p>
-<p>【内容】
-- RMC_POT の計算進行中、標準出力やログファイルに</p>
-<blockquote>
-<div><p>エネルギー・受理率・コスト関数などの経過情報を
-どの間隔で出力するかを指定するステップ数。</p>
-</div></blockquote>
-<p>【マニュアル定義】
-- ラベル: “step for printing”
-- 意味: RMC の実行ループ中で何ステップごとに</p>
-<blockquote>
-<div><p>計算状況（χ²値、受理率、平均変位など）を表示するか。</p>
-</div></blockquote>
-<ul class="simple">
+<p class="rubric">メモ</p>
+<dl class="simple">
+<dt>内容:</dt><dd><ul class="simple">
+<li><p>RMC_POT の計算進行中、標準出力やログファイルに
+エネルギー・受理率・コスト関数などの経過情報を
+どの間隔で出力するかを指定するステップ数。</p></li>
+</ul>
+</dd>
+<dt>マニュアル定義:</dt><dd><ul class="simple">
+<li><p>ラベル: “step for printing”</p></li>
+<li><dl class="simple">
+<dt>意味: RMC の実行ループ中で何ステップごとに</dt><dd><p>計算状況（χ²値、受理率、平均変位など）を表示するか。</p>
+</dd>
+</dl>
+</li>
 <li><p>値の単位: ステップ数（整数）</p></li>
 <li><p>0 または負値: 無効（出力を行わない、もしくは既定間隔を使用）</p></li>
 </ul>
-<dl class="simple">
-<dt>【例】</dt><dd><p>5000  ! step for printing
+</dd>
+<dt>例:</dt><dd><p>5000  ! step for printing
 → 5000 ステップごとに進行情報を出力。
 100   ! step for printing
 → 100 ステップごとに頻繁に出力。
@@ -1106,11 +1149,14 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <span class="sig-name descname"><span class="pre">get_r_spacing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_r_spacing"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_r_spacing" title="Link to this definition"></a></dt>
 <dd><p>5 行目 r spacing を float で返す。i
 近接分布関数 g(r) のビン幅（r の刻み幅）。単位は Å。</p>
-<p>例)
-0.025        ! r spacing</p>
+<p class="rubric">メモ</p>
+<dl class="simple">
+<dt>例:</dt><dd><p>0.025        ! r spacing</p>
 <ul class="simple">
 <li><p>備考: 小さいほど解像度は上がるが計算負荷が増える</p></li>
 </ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
@@ -1122,12 +1168,10 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_scale_factor">
 <span class="sig-name descname"><span class="pre">get_scale_factor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_scale_factor"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_scale_factor" title="Link to this definition"></a></dt>
 <dd><p>13 行目（scale factor）を取得する。</p>
-<p>【内容】
-- 実験 S(Q) や F(Q) に対してスケールを合わせるための係数。</p>
-<blockquote>
-<div><p>シミュレーション出力を実験データと正規化するために使用される。</p>
-</div></blockquote>
+<p class="rubric">メモ</p>
 <ul class="simple">
+<li><p>実験 S(Q) や F(Q) に対してスケールを合わせるための係数。
+シミュレーション出力を実験データと正規化するために使用される。</p></li>
 <li><p>一般的な初期値は 1.0。</p></li>
 </ul>
 <dl class="field-list simple">
@@ -1144,13 +1188,13 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_sigma_factor">
 <span class="sig-name descname"><span class="pre">get_sigma_factor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_sigma_factor"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_sigma_factor" title="Link to this definition"></a></dt>
 <dd><p>14 行目（standard deviation / temperature factor）を取得する。</p>
-<p>【内容】
-- メトロポリス法で使用する標準偏差 σ（温度因子）を表す。
-- マニュアルでは “standard deviation” と記載されており、</p>
-<blockquote>
-<div><p>サンプルでは「5E-3 0」や「5E-3 1」のように 2 つの値を取る場合がある。
-ここでは先頭値 σ のみを返す。</p>
-</div></blockquote>
+<p class="rubric">メモ</p>
+<ul class="simple">
+<li><p>メトロポリス法で使用する標準偏差 σ（温度因子）を表す。</p></li>
+<li><p>マニュアルでは “standard deviation” と記載されており、
+サンプルでは「5E-3 0」や「5E-3 1」のように 2 つの値を取る場合がある。
+ここでは先頭値 σ のみを返す。</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>標準偏差（σ）。</p>
@@ -1193,10 +1237,11 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_time_and_save">
 <span class="sig-name descname"><span class="pre">get_time_and_save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_time_and_save"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_time_and_save" title="Link to this definition"></a></dt>
 <dd><p>9 行目（time limit, step for saving）を取得する。</p>
-<p>【内容】
-- 9 行目は、計算の停止条件と出力間隔を設定する 2 つの値からなる。</p>
-<blockquote>
-<div><p>RMC_POT マニュアルでは「time limit, step for saving」と定義されている。</p>
+<p class="rubric">メモ</p>
+<dl class="simple">
+<dt>内容:</dt><dd><ul class="simple">
+<li><p>9 行目は、計算の停止条件と出力間隔を設定する 2 つの値からなる。
+RMC_POT マニュアルでは「time limit, step for saving」と定義されている。</p>
 <ol class="arabic simple">
 <li><p>time limit:
 - 計算の最大実行時間（単位: 分）
@@ -1207,9 +1252,10 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 - ステップ数単位で指定（例: 5000 → 5000 ステップごとに保存）
 - 0 の場合は無効（または既定間隔に従う）</p></li>
 </ol>
-</div></blockquote>
-<dl class="simple">
-<dt>【例】</dt><dd><p>0.2 0   ! time limit, step for saving
+</li>
+</ul>
+</dd>
+<dt>例:</dt><dd><p>0.2 0   ! time limit, step for saving
 → 最大 0.2 分（12 秒）で終了、保存間隔は無効
 60 500  ! time limit, step for saving
 → 60 分で停止、500 ステップごとに保存</p>
@@ -1229,11 +1275,13 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_xmax_used">
 <span class="sig-name descname"><span class="pre">get_xmax_used</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_xmax_used"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_xmax_used" title="Link to this definition"></a></dt>
 <dd><p>25 行目（xmax used in the run）を取得する。</p>
-<p>【内容】
-- g(r) 等の計算に用いる最大 r 値。</p>
-<blockquote>
-<div><p>スケール因子的に使われることもある。</p>
-</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<ul class="simple">
+<li><p>g(r) 等の計算に用いる最大 r 値。
+スケール因子的に使われることもある。</p></li>
+</ul>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>xmax の値。</p>
@@ -1344,6 +1392,7 @@ RMC 順 = 11, 12, 13, …, 22, 23, …, 33
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_cutoffs">
 <span class="sig-name descname"><span class="pre">set_cutoffs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.set_cutoffs"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_cutoffs" title="Link to this definition"></a></dt>
 <dd><p>3 行目 cut offs を更新。可変長対応。</p>
+<p class="rubric">メモ</p>
 <p>Fe Si B の３つのときは 6つのパターンが生まれる</p>
 <p>Fe–Fe
 Fe–Si
@@ -1352,8 +1401,9 @@ Si–Si
 Si–B
 B–B</p>
 <p>6つが必要</p>
-<p>【cutoff の与え方（固定フォーマット版 RMC_POT の厳密仕様）】</p>
-<p>cutoff は「原子種の組み合わせごと」に 1 つずつ値を並べる。
+<p>cutoff の与え方（固定フォーマット版 RMC_POT の厳密仕様）:</p>
+<blockquote>
+<div><p>cutoff は「原子種の組み合わせごと」に 1 つずつ値を並べる。
 原子種数を ntypes とすると、必要となる cutoff の数は</p>
 <blockquote>
 <div><p>ntypes * (ntypes + 1) / 2</p>
@@ -1361,9 +1411,10 @@ B–B</p>
 <p>である。</p>
 <p>並べる順序は RMC_POT 固定フォーマットの既定順で、以下のように
 “11, 12, 13, …, 22, 23, …, 33, …” のような三角行列形式で並べる。</p>
-<p>例）3 元系（Fe, Si, B）の場合（ntypes = 3）</p>
-<blockquote>
-<div><dl class="simple">
+</div></blockquote>
+<dl>
+<dt>例1:</dt><dd><p>3 元系（Fe, Si, B）の場合（ntypes = 3）</p>
+<dl class="simple">
 <dt>必要な cutoff は 6 個：</dt><dd><p>11, 12, 13, 22, 23, 33</p>
 </dd>
 </dl>
@@ -1375,25 +1426,23 @@ B–B</p>
 <blockquote>
 <div><p>set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])</p>
 </div></blockquote>
-</div></blockquote>
-<p>例）2 元系（A, B）の場合（ntypes = 2）</p>
-<blockquote>
-<div><dl class="simple">
+</dd>
+<dt>例2:</dt><dd><p>2 元系（A, B）の場合（ntypes = 2）</p>
+<dl class="simple">
 <dt>必要な cutoff は 3 個：</dt><dd><p>11, 12, 22</p>
 </dd>
 </dl>
 <p>set_cutoffs([c11, c12, c22])</p>
-</div></blockquote>
-<p>【注意】
-- cutoff の個数は必ず ntypes*(ntypes+1)/2 と一致させること。
-- 固定フォーマット版 RMC_POT ではこの並びと個数が崩れると、</p>
-<blockquote>
-<div><p>直後の行（maximum moves 等）の読み込み位置がずれ、実行時エラーになる。</p>
-</div></blockquote>
-<ul class="simple">
+</dd>
+<dt>注意:</dt><dd><ul class="simple">
+<li><p>cutoff の個数は必ず ntypes*(ntypes+1)/2 と一致させること。</p></li>
+<li><p>固定フォーマット版 RMC_POT ではこの並びと個数が崩れると、
+直後の行（maximum moves 等）の読み込み位置がずれ、実行時エラーになる。</p></li>
 <li><p>可変長の free-format (#003) ではこの限りではないが、
 本クラスは固定フォーマット互換を前提としている。</p></li>
 </ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1413,20 +1462,20 @@ B–B</p>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_data_flags">
 <span class="sig-name descname"><span class="pre">set_data_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flags</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.set_data_flags"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_data_flags" title="Link to this definition"></a></dt>
 <dd><p>10 行目（g(r), neutron, x-ray, EXAFS の出力フラグ）を更新する。</p>
-<p>【内容】
-- 10 行目は、4 つの整数値で各データ種の出力可否を指定する。</p>
+<p class="rubric">メモ</p>
+<dl>
+<dt>内容:</dt><dd><ul>
+<li><p>10 行目は、4 つの整数値で各データ種の出力可否を指定する。
+順序は固定:</p>
 <blockquote>
-<div><dl class="simple">
-<dt>順序は固定:</dt><dd><ol class="arabic simple">
+<div><ol class="arabic simple">
 <li><p>g(r)</p></li>
 <li><p>neutron S(Q)</p></li>
 <li><p>X-ray F(Q)</p></li>
 <li><p>EXAFS χ(k)</p></li>
 </ol>
-</dd>
-</dl>
 </div></blockquote>
-<ul class="simple">
+</li>
 <li><dl class="simple">
 <dt>各値の意味:</dt><dd><p>0: 無効（出力・比較を行わない）
 1: 有効（出力・比較を行う）</p>
@@ -1434,8 +1483,8 @@ B–B</p>
 </dl>
 </li>
 </ul>
-<dl>
-<dt>【例】</dt><dd><p>(0, 0, 1, 0)
+</dd>
+<dt>例:</dt><dd><p>(0, 0, 1, 0)
 [0, 0, 1, 0]
 → g(r)=off, neutron=off, X-ray=on, EXAFS=off</p>
 <blockquote>
@@ -1495,28 +1544,30 @@ tuple でも list でもよい。</p></li>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_exp_filename">
 <span class="sig-name descname"><span class="pre">set_exp_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.set_exp_filename"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_exp_filename" title="Link to this definition"></a></dt>
 <dd><p>11 行目（実験データファイル名）を更新する（旧来固定フォーマット）。</p>
-<p>【.dat 側の決まり（旧来固定）】
-- 10 行目の順序は常に:</p>
-<blockquote>
-<div><p>g(r), neutron S(Q), X-ray F(Q), EXAFS χ(k)</p>
-</div></blockquote>
-<ul class="simple">
+<p class="rubric">メモ</p>
+<dl class="simple">
+<dt>.dat 側の決まり（旧来固定）:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>10 行目の順序は常に:</dt><dd><p>g(r), neutron S(Q), X-ray F(Q), EXAFS χ(k)</p>
+</dd>
+</dl>
+</li>
 <li><p>11 行目は、上記で有効な最初のブロックが X-ray の場合には
 その「ファイル名行」となる（例: <cite>0 0 1 0</cite>）。
 本メソッドは <strong>11 行目のみ</strong> を対象として文字列を書き換える。</p></li>
 </ul>
-<p>【実験データファイルの中身（確認用の定義）】
-- 1 行目: N（整数）
-- 2 行目: タイトル（任意。数値としては読まれない）
-- 3 行目以降（厳密定義）:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>g(r)        : r, g(r)                                         （2 列）</p></li>
-<li><p>neutron S(Q): Q, S(Q)                                         （2 列）</p></li>
-<li><p>X-ray F(Q)  : Q, F(Q), c_αβ × M（RMC 順, M = ntypes*(ntypes+1)/2）</p></li>
-<li><p>EXAFS χ(k)  : k, χ(k)                                         （2 列）</p></li>
+</dd>
+<dt>実験データファイルの中身（確認用の定義）</dt><dd><ul class="simple">
+<li><p>1 行目: N（整数）</p></li>
+<li><p>2 行目: タイトル（任意。数値としては読まれない）</p></li>
+<li><p>3 行目以降（厳密定義）:
+- g(r)        : r, g(r)                                         （2 列）
+- neutron S(Q): Q, S(Q)                                         （2 列）
+- X-ray F(Q)  : Q, F(Q), c_αβ × M（RMC 順, M = ntypes*(ntypes+1)/2）
+- EXAFS χ(k)  : k, χ(k)                                         （2 列）</p></li>
 </ul>
-</div></blockquote>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1534,6 +1585,7 @@ tuple でも list でもよい。</p></li>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_exp_range">
 <span class="sig-name descname"><span class="pre">set_exp_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.set_exp_range"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_exp_range" title="Link to this definition"></a></dt>
 <dd><p>12 行目（実験データの読み込み範囲）を更新する。</p>
+<p class="rubric">メモ</p>
 <p>【書式（旧来固定フォーマット）】
 - 2 整数のみ（1 始まり・inclusive）</p>
 <blockquote>
@@ -1754,17 +1806,20 @@ tuple でも list でもよい。</p></li>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_moveout_option">
 <span class="sig-name descname"><span class="pre">set_moveout_option</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_moveout</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.set_moveout_option"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_moveout_option" title="Link to this definition"></a></dt>
 <dd><p>6 行目（whether to use moveout option）を更新する。</p>
-<p>【内容】
-- moveout オプションを有効化するかどうかを設定する。</p>
-<blockquote>
-<div><p>moveout は RMC における原子移動の特殊処理オプションであり、
-一般には「移動後の拘束条件」「局所最適化ステップ」「排他領域判定」などを伴う。</p>
-</div></blockquote>
-<p>【指定方法】
-- True  → .true. を書き込み、有効化。
-- False → .false. を書き込み、無効化。</p>
+<p class="rubric">メモ</p>
 <dl class="simple">
-<dt>【例】</dt><dd><dl class="simple">
+<dt>内容:</dt><dd><ul class="simple">
+<li><p>moveout オプションを有効化するかどうかを設定する。
+moveout は RMC における原子移動の特殊処理オプションであり、
+一般には「移動後の拘束条件」「局所最適化ステップ」「排他領域判定」などを伴う。</p></li>
+</ul>
+</dd>
+<dt>指定方法:</dt><dd><ul class="simple">
+<li><p>True  → .true. を書き込み、有効化。</p></li>
+<li><p>False → .false. を書き込み、無効化。</p></li>
+</ul>
+</dd>
+<dt>例:</dt><dd><dl class="simple">
 <dt>set_moveout_option(True)</dt><dd><p>→ moveout 処理を有効にする。</p>
 </dd>
 <dt>set_moveout_option(False)</dt><dd><p>→ moveout 処理を無効にする。</p>
@@ -1806,17 +1861,19 @@ tuple でも list でもよい。</p></li>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_num_config_to_collect">
 <span class="sig-name descname"><span class="pre">set_num_config_to_collect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_config</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.set_num_config_to_collect"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_num_config_to_collect" title="Link to this definition"></a></dt>
 <dd><p>7 行目（number of configuration to collect）を更新する。</p>
-<p>【内容】
-- RMC 実行中にどのくらいの頻度で「構成（configuration）」を保存するかを指定する。</p>
-<blockquote>
-<div><p>これは構造平均化や g(r) 平均などの統計解析に使う複数構成を得るための設定。</p>
-</div></blockquote>
-<p>【指定方法】
-- 0 の場合:</p>
-<blockquote>
-<div><p>→ 構成を収集しないか、最終構成のみを保存。</p>
-</div></blockquote>
-<ul class="simple">
+<p class="rubric">メモ</p>
+<dl class="simple">
+<dt>内容:</dt><dd><ul class="simple">
+<li><p>RMC 実行中にどのくらいの頻度で「構成（configuration）」を保存するかを指定する。
+これは構造平均化や g(r) 平均などの統計解析に使う複数構成を得るための設定。</p></li>
+</ul>
+</dd>
+<dt>指定方法:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>0 の場合:</dt><dd><p>→ 構成を収集しないか、最終構成のみを保存。</p>
+</dd>
+</dl>
+</li>
 <li><dl class="simple">
 <dt>正の整数値:</dt><dd><dl class="simple">
 <dt>→ 指定数の構成を収集。</dt><dd><p>RMC_POT はシミュレーション全体を等間隔に分割して収集ステップを決定する。</p>
@@ -1826,8 +1883,8 @@ tuple でも list でもよい。</p></li>
 </dl>
 </li>
 </ul>
-<dl class="simple">
-<dt>【例】</dt><dd><dl class="simple">
+</dd>
+<dt>例:</dt><dd><dl class="simple">
 <dt>set_num_config_to_collect(0)</dt><dd><p>→ 収集しない（最終構成のみ）。</p>
 </dd>
 <dt>set_num_config_to_collect(20)</dt><dd><p>→ 全体で 20 構成を等間隔で保存。</p>
@@ -1869,13 +1926,14 @@ tuple でも list でもよい。</p></li>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_print_interval">
 <span class="sig-name descname"><span class="pre">set_print_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interval_step</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.set_print_interval"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_print_interval" title="Link to this definition"></a></dt>
 <dd><p>8 行目（step for printing）を更新する。</p>
-<p>【内容】
-- 計算経過を標準出力やログに記録する間隔を指定する。</p>
-<blockquote>
-<div><p>値は「ステップ数」で指定し、0 の場合は無効または既定値使用。</p>
-</div></blockquote>
+<p class="rubric">メモ</p>
 <dl class="simple">
-<dt>【例】</dt><dd><p>5000 → 5000 ステップごとに出力。
+<dt>内容:</dt><dd><ul class="simple">
+<li><p>計算経過を標準出力やログに記録する間隔を指定する。
+値は「ステップ数」で指定し、0 の場合は無効または既定値使用。</p></li>
+</ul>
+</dd>
+<dt>例:</dt><dd><p>5000 → 5000 ステップごとに出力。
 100  → 100 ステップごとに出力。
 0    → 出力を抑止。</p>
 </dd>
@@ -1983,13 +2041,15 @@ tuple でも list でもよい。</p></li>
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_time_and_save">
 <span class="sig-name descname"><span class="pre">set_time_and_save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_limit_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_interval_step</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.set_time_and_save"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_time_and_save" title="Link to this definition"></a></dt>
 <dd><p>9 行目（time limit, step for saving）を更新する。</p>
-<p>【内容】
-- time limit:</p>
-<blockquote>
-<div><p>計算の最大実行時間（分単位, float）。
+<p class="rubric">メモ</p>
+<dl class="simple">
+<dt>内容:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>time limit:</dt><dd><p>計算の最大実行時間（分単位, float）。
 0 の場合は時間制限なし。</p>
-</div></blockquote>
-<ul class="simple">
+</dd>
+</dl>
+</li>
 <li><dl class="simple">
 <dt>step for saving:</dt><dd><p>結果ファイルを出力するステップ間隔（整数ステップ）。
 0 の場合は自動保存を無効化。</p>
@@ -1997,8 +2057,8 @@ tuple でも list でもよい。</p></li>
 </dl>
 </li>
 </ul>
-<dl class="simple">
-<dt>【例】</dt><dd><p>(60, 1000)
+</dd>
+<dt>例:</dt><dd><p>(60, 1000)
 → 最大 60 分で停止、1000 ステップごとに結果保存。
 (0, 0)
 → 両方無効化（時間制限も保存間隔も設定しない）。</p>
@@ -2127,10 +2187,124 @@ tuple でも list でもよい。</p></li>
 </dd></dl>
 
 </section>
+<section id="module-rmc_dft.rmc_pot.rmc_pot_fit">
+<span id="rmc-dft-rmc-pot-rmc-pot-fit-module"></span><h2>rmc_dft.rmc_pot.rmc_pot_fit module<a class="headerlink" href="#module-rmc_dft.rmc_pot.rmc_pot_fit" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RmcPotFit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Config()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_fit.html#RmcPotFit"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>RMC_POT の .fit ファイルを読み取って、
+Q, F(Q)、renormalized F(Q)_exp などを保持するクラス。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cfg_name</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="rmc_dft.html#rmc_dft.config.Config" title="rmc_dft.config.Config"><em>Config</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>x_logger.XLogger</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_fit.html#RmcPotFit.as_dict"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.as_dict" title="Link to this definition"></a></dt>
+<dd><p>辞書形式で返したい場合に使用</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Dict</em>[str, <em>List</em>[float]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.get_S_calc">
+<span class="sig-name descname"><span class="pre">get_S_calc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_fit.html#RmcPotFit.get_S_calc"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.get_S_calc" title="Link to this definition"></a></dt>
+<dd><p>S_calc(Q) = F_calc + 1</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>List</em>[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.get_S_exp">
+<span class="sig-name descname"><span class="pre">get_S_exp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_fit.html#RmcPotFit.get_S_exp"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.get_S_exp" title="Link to this definition"></a></dt>
+<dd><p>S_exp(Q) = renormalized F_exp + 1</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>List</em>[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.get_S_exp_original">
+<span class="sig-name descname"><span class="pre">get_S_exp_original</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_fit.html#RmcPotFit.get_S_exp_original"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.get_S_exp_original" title="Link to this definition"></a></dt>
+<dd><p>S_exp_original(Q) = original F_exp + 1</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>List</em>[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.read_fit">
+<span class="sig-name descname"><span class="pre">read_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_fit.html#RmcPotFit.read_fit"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.read_fit" title="Link to this definition"></a></dt>
+<dd><p>.fit ファイルを読み取り、主要データ列を格納する。</p>
+<p>self.filename: fullname</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em> | </em><em>None</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rmc_dft.rmc_pot.rmc_pot_hst">
+<span id="rmc-dft-rmc-pot-rmc-pot-hst-module"></span><h2>rmc_dft.rmc_pot.rmc_pot_hst module<a class="headerlink" href="#module-rmc_dft.rmc_pot.rmc_pot_hst" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_hst.RmcPotHst">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RmcPotHst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Config()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_hst.html#RmcPotHst"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_hst.RmcPotHst" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>RMC_POT の .hst ファイルを読み取り、
+各ステップごとの χ2_tot/data_point（7列目）を取得するクラス。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hst_path</strong> (<em>str</em>)</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="rmc_dft.html#rmc_dft.config.Config" title="rmc_dft.config.Config"><em>Config</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>x_logger.XLogger</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_hst.RmcPotHst.read_chi2">
+<span class="sig-name descname"><span class="pre">read_chi2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_hst.html#RmcPotHst.read_chi2"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_hst.RmcPotHst.read_chi2" title="Link to this definition"></a></dt>
+<dd><p>hst ファイルから step と chi2_tot/data_point のリストを返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>step 数
+chi2  (List[float]): χ2_tot/data_point</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>steps (List[int])</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-rmc_dft.rmc_pot.rmc_pot_log">
 <span id="rmc-dft-rmc-pot-rmc-pot-log-module"></span><h2>rmc_dft.rmc_pot.rmc_pot_log module<a class="headerlink" href="#module-rmc_dft.rmc_pot.rmc_pot_log" title="Link to this heading"></a></h2>
-<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a> (2nd version)
-K.KOBAYASHI (1st version)</p>
+<p>K.KOBAYASHI
+K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RmcPotLog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Config()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_log.html#RmcPotLog"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog" title="Link to this definition"></a></dt>
@@ -2211,6 +2385,68 @@ K.KOBAYASHI (1st version)</p>
 </dd>
 <dt class="field-even">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rmc_dft.rmc_pot.rmc_pot_ppcf">
+<span id="rmc-dft-rmc-pot-rmc-pot-ppcf-module"></span><h2>rmc_dft.rmc_pot.rmc_pot_ppcf module<a class="headerlink" href="#module-rmc_dft.rmc_pot.rmc_pot_ppcf" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_ppcf.RmcPotPpcf">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RmcPotPpcf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Config()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_ppcf.html#RmcPotPpcf"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_ppcf.RmcPotPpcf" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cfg_name</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="rmc_dft.html#rmc_dft.config.Config" title="rmc_dft.config.Config"><em>Config</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>x_logger.XLogger</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_ppcf.RmcPotPpcf.get_gij">
+<span class="sig-name descname"><span class="pre">get_gij</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_ppcf.html#RmcPotPpcf.get_gij"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_ppcf.RmcPotPpcf.get_gij" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_ppcf.RmcPotPpcf.get_r">
+<span class="sig-name descname"><span class="pre">get_r</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_ppcf.html#RmcPotPpcf.get_r"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_ppcf.RmcPotPpcf.get_r" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_ppcf.RmcPotPpcf.get_single">
+<span class="sig-name descname"><span class="pre">get_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_ppcf.html#RmcPotPpcf.get_single"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_ppcf.RmcPotPpcf.get_single" title="Link to this definition"></a></dt>
+<dd><p>index : 0=g11, 1=g12, 2=g13, 3=g22, 4=g23, 5=g33</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_ppcf.RmcPotPpcf.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_ppcf.html#RmcPotPpcf.load"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_ppcf.RmcPotPpcf.load" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
