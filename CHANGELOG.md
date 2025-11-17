@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.3.13 nakada
+
+DFT 関係のプロットのためのクラス
+
+- VaspOutcar.py 作成
+- plot_energy.py
+- plot_multi_energy.py
+- plot_mulit_converge.py
+
 ## v0.3.12 nakada
 
 RMC
