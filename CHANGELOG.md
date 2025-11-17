@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## v0.3.11 nakada,kobayashi
+
+プロット/解析 関係の基本クラス
+
+- rmc_pot_fit.py
+- rmc_pot_hst.py
+- rmc_pot_ppcf.py
+
+プロットプログラム例
+
+- plot_fit.py
+- plot_hst.py
+- plot_ppcf.py
+
+
 ## v0.3.10 nakada,kobayashi
 
 - VaspPoscarBuilder()

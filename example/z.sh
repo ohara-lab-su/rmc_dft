@@ -21,3 +21,4 @@ cp ~/zaiene_dev/rmc_dft/example/data_edit_incar.py ./
 cp ~/zaiene_dev/rmc_dft/example/data_edit_kpoints.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/plot_fit.py ./
+cp ~/zaiene_dev/rmc_dft/example/plot_hst.py ./

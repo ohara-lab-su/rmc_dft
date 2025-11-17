@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import os
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
+import matplotlib.pyplot as plt
+
+from rmc_dft import RmcPotHst
+
+
+def plot_chi(
+    cfg_or_hst: str,
+    target_dir: Optional[str] = None,
+) -> None:
+    hst_file = f"{cfg_or_hst}.hst"
+
+    # フォルダ指定がある場合は一時的に移動
+    original_cwd: str = os.getcwd()
+    try:
+        if target_dir is not None:
+            os.chdir(target_dir)
+
+        reader = RmcPotHst(hst_file)
+        steps, chi2 = reader.read_chi2()
+
+        plt.figure(figsize=(8, 5))
+        plt.plot(steps, chi2)
+        plt.xlabel("Step")
+        plt.ylabel("Chi^2 (total/data_point)")
+        plt.title("RMC-POT Fitting Progress")
+        plt.grid(True)
+
+        # 表示のみ（保存はしない）
+        plt.show()
+    finally:
+        # 元のディレクトリに戻す
+        os.chdir(original_cwd)
+
+
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) == 2:
+        # カレントフォルダで cfg_or_fit を指定
+        cfg_or_fit_arg: str = sys.argv[1]
+        plot_chi(cfg_or_fit_arg, target_dir=None)
+
+    elif len(sys.argv) == 3:
+        # 第1引数でフォルダ、第2引数で cfg_or_fit
+        dir_arg: str = sys.argv[1]
+        cfg_or_fit_arg: str = sys.argv[2]
+        plot_chi(cfg_or_fit_arg, target_dir=dir_arg)
+
+    else:
+        print("Usage:")
+        print("  python plot_hst.py <cfg_or_hst>")
+        print("  python plot_hst.py <dir> <cfg_or_hst>")
+        sys.exit(1)
