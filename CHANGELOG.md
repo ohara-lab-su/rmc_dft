@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.3.11 nakada,kobayashi
+## v0.3.11 nakada
 
 プロット/解析 関係の基本クラス
 
@@ -15,7 +15,7 @@
 - plot_ppcf.py
 
 
-## v0.3.10 nakada,kobayashi
+## v0.3.10 nakada
 
 - VaspPoscarBuilder()
 - VaspIncar()

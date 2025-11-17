@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-K.NAKADA, Kengo.nakada@gmail.com (1st, 3rd version)
-K.KOBAYASHI (2nd version)
+K.KOBAYASHI
+K.NAKADA, Kengo.nakada@gmail.com
 """
 import os
 import sys
