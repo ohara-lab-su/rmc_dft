@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.3.15 nakada
+
+- example (bugfix)
+ 
 ## v0.3.14 nakada
 
 - docstring 修正(sphihxでのエラー対策)

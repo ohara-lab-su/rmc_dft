@@ -30,6 +30,7 @@ if __name__ == "__main__":
     logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
 
     config = Config("config.yml")
+    max_rmc_dft_loop = config.max_rmc_dft_loop
 
     # 初期POSCAR 作成
     shutil.copy(f"POSCAR0", "POSCAR")
@@ -95,8 +96,8 @@ if __name__ == "__main__":
     i = 0
     for i in range(0, max_rmc_dft_loop):
 
-        rmc_dir = f"{config.log_rmc_dir}{str(i).zfill(digits)}"
-        vasp_dir = f"{config.log_vasp_dir}{str(i).zfill(digits)}"
+        rmc_dir = f"{config.rmc_log_dir}{str(i).zfill(digits)}"
+        vasp_dir = f"{config.dft_log_dir}{str(i).zfill(digits)}"
 
         if not os.path.exists(rmc_dir):
             os.mkdir(rmc_dir)
