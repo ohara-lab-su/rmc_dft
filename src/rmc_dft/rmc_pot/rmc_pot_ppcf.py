@@ -25,7 +25,8 @@ class RmcPotPpcf:
         if cfg_name is None:
             cfg_name = config.cfg_name
 
-        self.logger = logger or XLogger(logger_name="RmcPotFit")
+        self._logger = logger or XLogger(logger_name="RmcPotFit")
+        self._cfg_name = cfg_name
         self.filename: str = f"{cfg_name}.ppcf"
 
         self.r: np.ndarray = np.array([])

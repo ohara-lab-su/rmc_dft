@@ -18,6 +18,8 @@ from rmc_dft import (
     RmcPot,
     RmcPotLog,
     RmcPotDat,
+    RmcPotFit,
+    RmcPotPpcf,
 )
 from x_logger import XLogger
 

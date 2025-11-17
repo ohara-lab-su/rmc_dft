@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
+import re
 
-from typing import List, Tuple
+from rmc_dft.config import Config
+from x_logger import XLogger
 
 
 class RmcPotHst:
@@ -10,8 +13,24 @@ class RmcPotHst:
     各ステップごとの χ2_tot/data_point（7列目）を取得するクラス。
     """
 
-    def __init__(self, hst_path: str) -> None:
-        self.hst_path: str = hst_path
+    def __init__(
+        self,
+        hst_path: str,
+        config: Config = Config(),
+        logger: Optional[XLogger] = None,
+    ) -> None:
+        """
+
+        Args:
+            hst_path (str):  cfg_name
+            config (Config):
+            logger (XLogger):
+        """
+        if hst_path is None:
+            hst_path = config.cfg_name
+
+        self._logger = logger or XLogger(logger_name="RmcPotFit")
+        self._hst_path: str = hst_path
 
     def read_chi2(self) -> Tuple[List[int], List[float]]:
         """
@@ -24,7 +43,7 @@ class RmcPotHst:
         steps: List[int] = []
         chi2: List[float] = []
 
-        with open(self.hst_path, "r") as f:
+        with open(self._hst_path, "r") as f:
             for line in f:
                 items = line.strip().split()
                 # 数値行は 8 列以上あり、先頭が整数（step）

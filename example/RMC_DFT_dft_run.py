@@ -20,6 +20,8 @@ from rmc_dft import (
     RmcPot,
     RmcPotLog,
     RmcPotDat,
+    RmcPotFit,
+    RmcPotPpcf,
 )
 from rmc_dft.util import poscar2cfg
 

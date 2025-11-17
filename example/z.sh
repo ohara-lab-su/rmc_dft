@@ -22,3 +22,7 @@ cp ~/zaiene_dev/rmc_dft/example/data_edit_kpoints.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/plot_fit.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_hst.py ./
+cp ~/zaiene_dev/rmc_dft/example/plot_ppcf.py ./
+#
+cp ~/zaiene_dev/rmc_dft/example/plot_multi_fit.py ./
+cp ~/zaiene_dev/rmc_dft/example/plot_multi_hst.py ./

@@ -14,11 +14,12 @@ from rmc_dft import (
     Vasp,
     VaspIncar,
     VaspKpoints,
-    VaspPotcarBuilder,
     VaspLog,
     RmcPot,
     RmcPotLog,
     RmcPotDat,
+    RmcPotFit,
+    RmcPotPpcf,
 )
 from x_logger import XLogger
 

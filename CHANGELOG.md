@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.3.12 nakada
+
+RMC
+
+- multi_plot
+- bugfix
+ 
 ## v0.3.11 nakada
 
 プロット/解析 関係の基本クラス
@@ -133,6 +140,8 @@ RMC-DFT の example スクリプト rmc_vasp_script.py に組み込み
 
 - rmc_vasp 大整理
   - クラスと関数構造を全面的に変更
+    - 個別メソッドのクラス化
+    - util のみメソッドのまま
     - log 関係を独立クラス化(のちにファイル出力ではなくてクラス中でハンドリング)
 
 ## v0.1.x kabayashi

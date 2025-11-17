@@ -1,0 +1,177 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os
+from typing import List, Tuple
+import matplotlib.pyplot as plt
+
+from rmc_dft import RmcPotFit
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os
+from typing import List, Tuple
+import matplotlib.pyplot as plt
+
+from rmc_dft import RmcPotFit
+
+
+def read_sq_from_fit(dir_name: str, cfg_name: str) -> Tuple[list, list, list]:
+    """
+    dir_name に一時的に移動し、cfg_name.fit から
+    Q, S_calc, S_exp を読み取る。
+    単体版 plot_sq.py と同じロジック。
+    """
+    original_cwd: str = os.getcwd()
+    try:
+        os.chdir(dir_name)
+        fit = RmcPotFit(cfg_name)
+
+        Q = fit.Q
+        S_calc = fit.get_S_calc()
+        S_exp = fit.get_S_exp()
+        return Q, S_calc, S_exp
+    finally:
+        os.chdir(original_cwd)
+
+
+def plot_multi_fit(
+    dir_list: List[str],
+    cfg_name: str,
+    ncols: int = 4,
+) -> None:
+    """
+    dir_list に列挙されたフォルダごとに <cfg_name>.fit を読み込み、
+    S(Q) を多段サブプロットで表示する。
+    """
+
+    all_data: List[Tuple[str, list, list, list]] = []
+    ymin: float = float("inf")
+    ymax: float = float("-inf")
+    xmin: float = float("inf")
+    xmax: float = float("-inf")
+
+    # 全データを読み込み、軸レンジを決める
+    for d in dir_list:
+        Q, S_calc, S_exp = read_sq_from_fit(d, cfg_name)
+        all_data.append((d, Q, S_calc, S_exp))
+
+        if len(Q) > 0:
+            xmin = min(xmin, min(Q))
+            xmax = max(xmax, max(Q))
+        if len(S_calc) > 0:
+            ymin = min(ymin, min(S_calc))
+            ymax = max(ymax, max(S_calc))
+        if len(S_exp) > 0:
+            ymin = min(ymin, min(S_exp), ymin)
+            ymax = max(ymax, max(S_exp), ymax)
+
+    if xmin == float("inf"):
+        print("有効な FIT データがありません。")
+        return
+
+    n: int = len(dir_list)
+    nrows: int = (n + ncols - 1) // ncols
+
+    fig, axes = plt.subplots(
+        nrows=nrows,
+        ncols=ncols,
+        figsize=(4 * ncols, 3 * nrows),
+        sharex=True,
+        sharey=True,
+    )
+
+    axes = axes.flatten()
+
+    for ax, (d, Q, S_calc, S_exp) in zip(axes, all_data):
+        ax.plot(Q, S_calc, label="S_calc")
+        ax.plot(Q, S_exp, label="S_exp")
+        ax.set_title(d)
+        ax.set_xlim(xmin, xmax)
+        ax.set_ylim(ymin, ymax)
+        ax.grid(True)
+        ax.legend(fontsize=6)
+
+    # 余った subplot を消す
+    for ax in axes[len(all_data) :]:
+        ax.axis("off")
+
+    # 軸ラベル
+    for ax in axes[-ncols:]:
+        ax.set_xlabel("Q")
+    axes[0].set_ylabel("S(Q)")
+
+    plt.tight_layout()
+    plt.show()
+
+
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) != 2:
+        print("Usage:  plot_multi_fit.py <cfg_name>")
+        print("例:     plot_multi_fit.py aaa")
+        sys.exit(1)
+
+    cfg_name_arg: str = sys.argv[1]
+
+    dir_list = [
+        "log01",
+        "log02",
+        "log03",
+        "log04",
+        "log05",
+        "log06",
+        "log07",
+        "log08",
+        "log09",
+        "log10",
+        "log11",
+        "log12",
+        "log13",
+        "log14",
+        "log15",
+        "log16",
+        "log17",
+        "log18",
+        "log19",
+    ]
+
+    plot_multi_fit(dir_list, cfg_name_arg, ncols=4)
+
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) != 2:
+        print("Usage:  plot_multi_fit.py <cfg_name>")
+        print("例:     plot_multi_fit.py aaa")
+        sys.exit(1)
+
+    cfg_name_arg = sys.argv[1]
+
+    # 手で並べる log 一覧
+    dir_list = [
+        "log01",
+        "log02",
+        "log03",
+        "log04",
+        "log05",
+        "log06",
+        "log07",
+        "log08",
+        "log09",
+        "log10",
+        "log11",
+        "log12",
+        "log13",
+        "log14",
+        "log15",
+        "log16",
+        "log17",
+        "log18",
+        "log19",
+    ]
+
+    # ncols=4 (4×? の段組) にしてある
+    plot_multi_fit(dir_list, cfg_name_arg, ncols=4)

@@ -28,8 +28,9 @@ class RmcPotFit:
         if cfg_name is None:
             cfg_name = config.cfg_name
 
-        self.logger = logger or XLogger(logger_name="RmcPotFit")
+        self._logger = logger or XLogger(logger_name="RmcPotFit")
         # self._logger = logger
+        self._cfg_name = cfg_name
         self.filename: str = f"{cfg_name}.fit"
 
         # データ格納
@@ -42,16 +43,19 @@ class RmcPotFit:
         # 読み取り
         self.read_fit()
 
-    def read_fit(self, filename: Optional[str] = None) -> None:
+    def read_fit(
+        self,
+        filename: Optional[str] = None,
+    ) -> None:
         """
         .fit ファイルを読み取り、主要データ列を格納する。
 
         self.filename: fullname
         """
-        self._logger.info(f"== read_fit({filename})")
-
         if filename is None:
             filename = self.filename
+
+        self._logger.info(f"== read_fit({filename})")
 
         with open(self.filename, "r") as f:
             lines = f.readlines()
