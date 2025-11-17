@@ -65,25 +65,26 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/index.html">チュートリアル</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc_theory_explained.html">RMCとは</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc_theory_explained.html#id1">シミュレーティッド・アニーリング(焼きなまし法)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_cfg_explained.html">RMC POTのcfgファイルの説明</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmcpot_cfg_explained.html#aaa-cfg">例：aaa.cfg の一部</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmcpot_cfg_explained.html#id1">各セクションの説明（順に）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmcpot_cfg_explained.html#id2">実務メモ / チェックリスト</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmc_theory_explained.html">RMCとは</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmc_theory_explained.html#id1">シミュレーティッド・アニーリング(焼きなまし法)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html">RMC POTのcfgファイルの説明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html#aaa-cfg">例：aaa.cfg の一部</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html#id1">各セクションの説明（順に）</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html#id2">実務メモ / チェックリスト</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_input_explained.html">RMCPOT のインプットファイル解説</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_input_explained.html#cfg">cfgファイル</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_input_explained.html#sq">sqファイル</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_input_explained.html#dat">datファイル</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html">RMC POT のアウトプットファイル（解説）</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#id1">共通の注意点</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html">RMCPOT のインプットファイル解説</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html#cfg">cfgファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html#sq">sqファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html#dat">datファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html">RMC POT のアウトプットファイル（解説）</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#id1">共通の注意点</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
 </ul>
 </li>
 </ul>
@@ -129,7 +130,7 @@
 <span class="sd">- 真偽値は .true. / .false. に正規化して出力</span>
 <span class="sd">- 任意行の直接取得/更新用に get_line()/set_line() も提供</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -138,35 +139,43 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">x_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">XLogger</span>
 
 
-<div class="viewcode-block" id="_Line">
-<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat._Line">[ドキュメント]</a>
-<span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">_Line</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    内部表現: 1 行ぶんの値とコメント。</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        value: &#39;!&#39; より左側の文字列（前後空白は内部では保持しない）</span>
-<span class="sd">        comment: &#39;!&#39; 以降のコメント文字列（先頭の &#39;!&#39; は保持しない）</span>
-<span class="sd">        had_bang: コメントが存在したか</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">comment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">had_bang</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-
-<div class="viewcode-block" id="_Line.render">
-<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat._Line.render">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在の値とコメントから 1 行のテキストを生成する。&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">had_bang</span><span class="p">:</span>
-            <span class="c1"># 値 + 1 つ以上の空白 + &quot;! &quot; + コメント</span>
-            <span class="n">value_part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value_part</span><span class="si">}</span><span class="s2"> ! </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="c1"># コメントがなかった行は値のみ</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span></div>
-</div>
-
+<span class="n">DAT_TEMPLATE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;FeSiB</span>
+<span class="s2">0.0915 ! number density</span>
+<span class="s2">2.3 2.1 2 2.3 2.1 2 ! cut offs (FeSiB)</span>
+<span class="s2">0.1 0.1 0.1 ! maximum moves</span>
+<span class="s2">0.025 ! r spacing</span>
+<span class="s2">.false. ! whether to use moveout option</span>
+<span class="s2">0 ! number of configurration to collect</span>
+<span class="s2">5000 ! step for printing</span>
+<span class="s2">0.2 0 ! time limit, step for saving</span>
+<span class="s2">0 0 1 0 ! g(r), neutron, x-ray, EXAFS</span>
+<span class="s2">ascast.xsq</span>
+<span class="s2">1 290</span>
+<span class="s2">1.0</span>
+<span class="s2">5E-3</span>
+<span class="s2">.false.</span>
+<span class="s2">.true.</span>
+<span class="s2">.false.</span>
+<span class="s2">.false.</span>
+<span class="s2">0 ! number of cos. distr of bond angles constraint, dcos_theta (spacing in cos(theta) space</span>
+<span class="s2">0 1 1 4 1 ! no of coord. constr.</span>
+<span class="s2">0 ! no of av. coord. contsr.</span>
+<span class="s2">0 ! potential</span>
+<span class="s2">0 ! FNC switch</span>
+<span class="s2">0 ! initial bin shift;</span>
+<span class="s2">1 ! xmax used in the run.</span>
+<span class="s2">1 ! number of atoms moved in a single move</span>
+<span class="s2">200 ! size of the history buffer</span>
+<span class="s2">10 ! number of display update beteen each history buffering</span>
+<span class="s2">0 ! indicator of custom move</span>
+<span class="s2">0 ! whether to load the histgram form file, if posible [0:no 1:yes]</span>
+<span class="s2">5 ! maximum number of atoms in a gridcell</span>
+<span class="s2">0 0 ! frction of swaps, ntypes*(ntypes-1)/2 0 not allowded or 1 allowed for the possible mixed part</span>
+<span class="s2">4 ! total number of threads to use</span>
+<span class="s2">&quot;&quot;&quot;</span>
 
 
 <div class="viewcode-block" id="RmcPotDat">
@@ -213,11 +222,37 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">_Line</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_auto_write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">auto_write</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()</span>
+        <span class="c1"># 既存の dat を読む</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg_name</span><span class="si">}</span><span class="s2">.dat&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;load </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg_name</span><span class="si">}</span><span class="s2">.dat&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg_name</span><span class="si">}</span><span class="s2">.dat file not found.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;create defaut dat file&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_dat_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 
-    <span class="c1"># --------------------</span>
-    <span class="c1"># 静的フォーマット関数群（クラス内に集約）</span>
-    <span class="c1"># --------------------</span>
+<div class="viewcode-block" id="RmcPotDat.create_dat_file">
+<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.create_dat_file">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_dat_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        与えられたベース名から &lt;basename&gt;.dat を作成し、</span>
+<span class="sd">        デフォルトの RMC_POT 用 dat 内容を書き込む。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">basename</span><span class="si">}</span><span class="s2">.dat&quot;</span>
+        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="c1"># raise FileExistsError(f&#39;&quot;{filename}&quot; はすでに存在します&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&quot; はすでに存在します&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">DAT_TEMPLATE</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Base cfg file を作成しました: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
 <div class="viewcode-block" id="RmcPotDat._to_bool_token">
 <a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat._to_bool_token">[ドキュメント]</a>
     <span class="nd">@staticmethod</span>
@@ -277,17 +312,21 @@
     <span class="c1"># --------------------</span>
     <span class="c1"># 基本 I/O</span>
     <span class="c1"># --------------------</span>
-<div class="viewcode-block" id="RmcPotDat._load">
-<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat._load">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="RmcPotDat.load">
+<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.load">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルを読み込んで内部行リストを構築。&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== load(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg_name</span><span class="si">}</span><span class="s2">.dat)&quot;</span><span class="p">)</span>
 
         <span class="n">p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg_name</span><span class="si">}</span><span class="s2">.dat&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;.dat ファイルが見つかりません: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> (.dat は自動付加されます)&quot;</span>
+            <span class="c1"># raise FileNotFoundError(</span>
+            <span class="c1">#     f&quot;.dat ファイルが見つかりません: {p} (.dat は自動付加されます)&quot;</span>
+            <span class="c1"># )</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;.dat ファイルが見つかりません: </span><span class="si">{p}</span><span class="s2"> (.dat は自動付加されます)&quot;</span>
             <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="k">with</span> <span class="n">p</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -301,7 +340,8 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="n">_Line</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">raw</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">had_bang</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-                    <span class="p">)</span></div>
+                    <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
 
 <div class="viewcode-block" id="RmcPotDat.write">
@@ -439,9 +479,10 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">comment</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;1 行目 comment を更新。&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;set_comment = </span><span class="si">{</span><span class="n">comment</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">comment</span><span class="p">,</span> <span class="n">auto_write</span><span class="o">=</span><span class="n">auto_write</span><span class="p">)</span></div>
 
 
@@ -467,9 +508,10 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">rho</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;2 行目 density を更新。&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;set_density = </span><span class="si">{</span><span class="n">rho</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">auto_write</span><span class="o">=</span><span class="n">auto_write</span><span class="p">)</span></div>
 
 
@@ -501,18 +543,72 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        3 行目 cut offs を更新。可変長対応。</span>
 
+<span class="sd">        Fe Si B の３つのときは 6つのパターンが生まれる</span>
+
+<span class="sd">        Fe–Fe</span>
+<span class="sd">        Fe–Si</span>
+<span class="sd">        Fe–B</span>
+<span class="sd">        Si–Si</span>
+<span class="sd">        Si–B</span>
+<span class="sd">        B–B</span>
+
+<span class="sd">        6つが必要</span>
+
+<span class="sd">        【cutoff の与え方（固定フォーマット版 RMC_POT の厳密仕様）】</span>
+
+<span class="sd">        cutoff は「原子種の組み合わせごと」に 1 つずつ値を並べる。</span>
+<span class="sd">        原子種数を ntypes とすると、必要となる cutoff の数は</span>
+
+<span class="sd">            ntypes * (ntypes + 1) / 2</span>
+
+<span class="sd">        である。</span>
+
+<span class="sd">        並べる順序は RMC_POT 固定フォーマットの既定順で、以下のように</span>
+<span class="sd">        “11, 12, 13, …, 22, 23, …, 33, …” のような三角行列形式で並べる。</span>
+
+<span class="sd">        例）3 元系（Fe, Si, B）の場合（ntypes = 3）</span>
+
+<span class="sd">            必要な cutoff は 6 個：</span>
+<span class="sd">                11, 12, 13, 22, 23, 33</span>
+
+<span class="sd">            set_cutoffs へ渡すリストは次のように 6 要素で指定する：</span>
+
+<span class="sd">                set_cutoffs([c11, c12, c13, c22, c23, c33])</span>
+
+<span class="sd">            実際の実行例：</span>
+
+<span class="sd">                set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])</span>
+
+<span class="sd">        例）2 元系（A, B）の場合（ntypes = 2）</span>
+
+<span class="sd">            必要な cutoff は 3 個：</span>
+<span class="sd">                11, 12, 22</span>
+
+<span class="sd">            set_cutoffs([c11, c12, c22])</span>
+
+<span class="sd">        【注意】</span>
+<span class="sd">        - cutoff の個数は必ず ntypes*(ntypes+1)/2 と一致させること。</span>
+<span class="sd">        - 固定フォーマット版 RMC_POT ではこの並びと個数が崩れると、</span>
+<span class="sd">          直後の行（maximum moves 等）の読み込み位置がずれ、実行時エラーになる。</span>
+<span class="sd">        - 可変長の free-format (#003) ではこの限りではないが、</span>
+<span class="sd">          本クラスは固定フォーマット互換を前提としている。</span>
+
 <span class="sd">        Args:</span>
-<span class="sd">            values (Sequence[Union[int, float]]):</span>
-<span class="sd">                 原子種ごとのカットオフ距離リストを指定する。</span>
-<span class="sd">                 要素数は ntypes に応じて可変（3 要素に限定しない）</span>
-<span class="sd">            auto_write (bool | None, optional):</span>
+<span class="sd">            values (Sequence[Union[int|float]]):</span>
+<span class="sd">                上記の定義に従い、原子種組み合わせごとの cutoff を並べたリスト。</span>
+<span class="sd">                原子種ごとのカットオフ距離リストを指定する。</span>
+<span class="sd">                要素数は ntypes に応じて可変（3 要素に限定しない）</span>
+
+<span class="sd">            auto_write (bool | None):</span>
+<span class="sd">                True の場合は即時書き出し。None はインスタンス既定値に従う。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">seq</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;set_cutoffs = </span><span class="si">{</span><span class="n">seq</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cut offs には数値のみを指定してください: </span><span class="si">{</span><span class="n">v</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -541,18 +637,34 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">toks</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">toks</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="RmcPotDat.set_max_moves">
-<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_max_moves">[ドキュメント]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">set_max_moves</span><span class="p">(</span>
+<div class="viewcode-block" id="RmcPotDat.set_maximu_moves">
+<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_maximu_moves">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_maximu_moves</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;4 行目 maximum moves を更新。&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        4 行目 maximum moves を可変長で更新する。</span>
+
+
+<span class="sd">        Args:</span>
+<span class="sd">            values (Sequence[Union[int, float]]):</span>
+<span class="sd">                任意個数の maximum move 値。順序はそのまま書き込み。</span>
+
+<span class="sd">            auto_write (bool | None):</span>
+<span class="sd">                True の場合即時保存。None の場合はインスタンス既定に従う。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">seq</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;maximum moves は 2 要素が必要です: </span><span class="si">{</span><span class="n">values</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;set_maximu_moves = </span><span class="si">{</span><span class="n">seq</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 各要素が数値であることのみ検査する</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;maximum moves には数値のみ指定してください: </span><span class="si">{</span><span class="n">v</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 4 行目へそのまま書き込む</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">auto_write</span><span class="o">=</span><span class="n">auto_write</span><span class="p">)</span></div>
 
 
@@ -561,11 +673,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">get_r_spacing</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        5 行目 r spacing を float で返す。i</span>
+<span class="sd">        近接分布関数 g(r) のビン幅（r の刻み幅）。単位は Å。</span>
 
 <span class="sd">        例)</span>
 <span class="sd">        0.025        ! r spacing</span>
 
-<span class="sd">        - 説明: 近接分布関数 g(r) のビン幅（r の刻み幅）。単位は Å。</span>
 <span class="sd">        - 備考: 小さいほど解像度は上がるが計算負荷が増える</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">toks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_line</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
@@ -580,9 +692,10 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dr</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;5 行目 r spacing を更新。&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;set_r_spacing = </span><span class="si">{</span><span class="n">dr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dr</span><span class="p">,</span> <span class="n">auto_write</span><span class="o">=</span><span class="n">auto_write</span><span class="p">)</span></div>
 
 
@@ -630,7 +743,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">use_moveout</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        6 行目（whether to use moveout option）を更新する。</span>
@@ -657,6 +770,7 @@
 <span class="sd">                True なら即時保存、None の場合はインスタンス既定に従う。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_bool_token</span><span class="p">(</span><span class="n">use_moveout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;set_moveout_option = </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">auto_write</span><span class="o">=</span><span class="n">auto_write</span><span class="p">)</span></div>
 
 
@@ -709,7 +823,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">num_config</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        7 行目（number of configuration to collect）を更新する。</span>
@@ -786,7 +900,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">interval_step</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        8 行目（step for printing）を更新する。</span>
@@ -859,7 +973,7 @@
         <span class="n">time_limit_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">save_interval_step</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        9 行目（time limit, step for saving）を更新する。</span>
@@ -936,9 +1050,9 @@
 <a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_data_flags">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_data_flags</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">flags</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">flags</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        10 行目（g(r), neutron, x-ray, EXAFS の出力フラグ）を更新する。</span>
@@ -956,23 +1070,28 @@
 
 <span class="sd">        【例】</span>
 <span class="sd">            (0, 0, 1, 0)</span>
+<span class="sd">            [0, 0, 1, 0]</span>
 <span class="sd">            → g(r)=off, neutron=off, X-ray=on, EXAFS=off</span>
 <span class="sd">              → X線 F(Q) のみを比較対象に設定。</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            flags (tuple[int, int, int, int]):</span>
-<span class="sd">                (gr_flag, neutron_flag, xray_flag, exafs_flag)</span>
+<span class="sd">            flags (Sequence[int]):</span>
+<span class="sd">                (gr_flag, neutron_flag, xray_flag, exafs_flag) を表す長さ 4 の列。</span>
+<span class="sd">                tuple でも list でもよい。</span>
 <span class="sd">            auto_write (bool | None):</span>
 <span class="sd">                True なら即時保存。None の場合はインスタンス既定に従う。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;flags は 4 要素 (g(r), neutron, x-ray, EXAFS) が必要です: </span><span class="si">{</span><span class="n">flags</span><span class="si">!r}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;flags には 0 または 1 のみ指定可能です: </span><span class="si">{</span><span class="n">flags</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">],</span> <span class="n">auto_write</span><span class="o">=</span><span class="n">auto_write</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;flags は 4 要素 (g(r), neutron, x-ray, EXAFS) が必要です: </span><span class="si">{</span><span class="n">values</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;flags には 0 または 1 のみ指定可能です: </span><span class="si">{</span><span class="n">values</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;flags: </span><span class="si">{</span><span class="n">values</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">],</span> <span class="n">auto_write</span><span class="o">=</span><span class="n">auto_write</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RmcPotDat.get_exp_filename">
@@ -1692,6 +1811,37 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;33 行目（スレッド数）を設定する。&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)),</span> <span class="n">auto_write</span><span class="o">=</span><span class="n">auto_write</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="_Line">
+<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat._Line">[ドキュメント]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Line</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    内部表現: 1 行ぶんの値とコメント。</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        value: &#39;!&#39; より左側の文字列（前後空白は内部では保持しない）</span>
+<span class="sd">        comment: &#39;!&#39; 以降のコメント文字列（先頭の &#39;!&#39; は保持しない）</span>
+<span class="sd">        had_bang: コメントが存在したか</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">comment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">had_bang</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="_Line.render">
+<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_dat._Line.render">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在の値とコメントから 1 行のテキストを生成する。&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">had_bang</span><span class="p">:</span>
+            <span class="c1"># 値 + 1 つ以上の空白 + &quot;! &quot; + コメント</span>
+            <span class="n">value_part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value_part</span><span class="si">}</span><span class="s2"> ! </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="c1"># コメントがなかった行は値のみ</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span></div>
 </div>
 
 </pre></div>
