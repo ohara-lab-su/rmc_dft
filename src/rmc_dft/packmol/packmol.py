@@ -71,14 +71,15 @@ class Packmol:
 
         Args:
             M_avg (float):
-            n_per_A3 (float): 数密度 n [1/Å^3]。
+                平均原子量 [g/mol]。
+            n_per_A3 (float):
+                数密度 n [1/Å^3]。
 
         Returns:
             float:
-                密度 ρ [g/cm^3]。
+                質量密度 ρ [g/cm^3]。
         """
-        # M_avg = average_atomic_weight()
-        return n_per_A3 * M_avg * A3_TO_CM3 / NA
+        return n_per_A3 * M_avg / (NA * A3_TO_CM3)
 
     @staticmethod
     def cell_length_from_number_density(
