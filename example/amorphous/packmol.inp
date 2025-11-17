@@ -1,0 +1,18 @@
+tolerance 2.0
+filetype xyz
+output FeSiB_amorphous.xyz
+
+structure Fe.xyz
+  number 160
+  inside box 0.0 0.0 0.0  0.000000 0.000000 0.000000
+end structure
+
+structure Si.xyz
+  number 18
+  inside box 0.0 0.0 0.0  0.000000 0.000000 0.000000
+end structure
+
+structure B.xyz
+  number 22
+  inside box 0.0 0.0 0.0  0.000000 0.000000 0.000000
+end structure
