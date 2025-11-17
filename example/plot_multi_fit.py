@@ -1,15 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-import os
-from typing import List, Tuple
-import matplotlib.pyplot as plt
-
-from rmc_dft import RmcPotFit
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import os
 from typing import List, Tuple
 import matplotlib.pyplot as plt
