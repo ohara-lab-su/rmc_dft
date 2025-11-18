@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## v0.3.16 nakada
+
+注意)
+
+- None のときのデフォルト分岐をシンプルにした（バグが起きる可能性がないわけじゃない）
+
+主な改変
+
+- config.yml / config.py のデフォルト設定に s(q) ファイル名を入れる
+- rmc_vasp_script スクリプトのバグ修正 rmc (preprosess)
+- rmc_vasp_script スクリプトのRMC関係のファイルチェック
+
+クラス
+
+- dft_dft 関連 rmc_vasp.run() での例外処理を方針転換(例外を出してもそのまま RMC に流す)
+ 
+## v0.3.15 nakada
+
+- example (bugfix)
+ 
 ## v0.3.14 nakada
 
 - docstring 修正(sphihxでのエラー対策)
@@ -74,7 +94,8 @@ RMC-DFT の example スクリプト rmc_vasp_script.py に組み込み
     - mpirun vasp_std
   - などを動かすような形でにして、job スクリプト自体を長い RMC-DFT
   - として動作させる
-- docs の充実(RMCチュートリアル)
+- docs の充実(RMCチュートリアル), 主に小林
+- DFT 関係のdocsの作成予定のスケルトン作成
  
 ## v0.3.8 nakada
 

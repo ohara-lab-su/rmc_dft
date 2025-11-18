@@ -1,22 +1,25 @@
 # K.NAKADA, kengo.nakada@gmail.com
 
-cfg_name: "aaa" # input_file: RMC: aaa.cfg
-vasp_name: "aaa" # input_file: VASP: aaa.vasp (for VASP)
-max_rmc_dft_loop: 2
+max_rmc_dft_loop: 20
 
+# ---------- RMC -----------
 rmc_code: "RmcPot" # RMC code ClassNames
-# rmc_log_dir: "rmc_log" # LOG 保存
 rmc_log_dir: "log" # LOG 保存
+# rmc_log_dir: "rmc_log" # LOG 保存
+# -------------------------
+cfg_name: "aaa" # input_file: RMC: aaa.cfg
+element_info: "label.txt" # VASP4(Rmc.cfg) type --> VASP5 type
+rmc_exp_filename: "ascast.xsq"
 
+# ------- DFT (VASP) --------
 dft_code: "Vasp" # VASP code ClassNames
-# dft_log_dir: "vasp_log" # LOG 保存 (for VASP)
 dft_log_dir: "log" # LOG 保存 (for VASP)
-
-# VASP4(Rmc.cfg) type --> VASP5 type
-element_info: "label.txt"
-
+# dft_log_dir: "vasp_log" # LOG 保存 (for VASP)
+# -------------------------
+vasp_name: "aaa" # input_file: VASP: aaa.vasp (for VASP)
 # run_mode: "local"
 run_mode: "mpi"
+
 
 # RMCPOT path (パスが通ってなければフルパスで書く)
 # rmc_bin: "/home/k/Downloads/Source_RMC_POT_lin_2023.1/rmcp.exe"

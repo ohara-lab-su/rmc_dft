@@ -437,8 +437,15 @@ class Vasp:
         try:
             subprocess.run(cmd, check=True, env=env)
         except subprocess.CalledProcessError as e:
-            self._logger.error(f"**Error**: VASP実行中にエラーが発生しました: {e}")
-            sys.exit(1)
+            self._logger.error(f"**Error**: {e}")
+            self._logger.error("  VASP実行中にエラーが発生")
+            self._logger.error("  --> 距離が近すぎることで電子密度がおかい>")
+            self._logger.error("  --> 行列問題の解法で転けたとか")
+            # sys.exit(1)
+            # return False
+            self._logger.error(
+                f"強制STOP ではなくて、そのままRMC側に戻して、RMCで違う位置を作成する"
+            )
 
         return True
 

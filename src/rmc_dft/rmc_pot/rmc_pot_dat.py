@@ -36,7 +36,7 @@ DAT_TEMPLATE: str = """FeSiB
 5000 ! step for printing
 0.2 0 ! time limit, step for saving
 0 0 1 0 ! g(r), neutron, x-ray, EXAFS
-ascast.xsq
+test.xsq
 1 290
 1.0
 5E-3
@@ -86,7 +86,7 @@ class RmcPotDat:
         auto_write: bool = True,
     ) -> None:
         """
-        config インスタンスを与えると、cfg_name はいらない
+        config インスタンスを与えると、_cfg_name はいらない
 
         Args:
             config (Config): 全てのインスタンが同じ Config()
@@ -96,23 +96,22 @@ class RmcPotDat:
         """
         self._logger = logger
         self._config = config
-
-        if cfg_name is None:
-            cfg_name = config.cfg_name
-        self.cfg_name: str = cfg_name
+        self._cfg_name: Optional[str] = cfg_name or config.cfg_name
+        self._logger.info("== Create RmcPotDat()")
 
         self._lines: list[_Line] = []
         self._auto_write: bool = auto_write
 
         # 既存の dat を読む
-        p = Path(f"{self.cfg_name}.dat")
+        p = Path(f"{self._cfg_name}.dat")
         if p.exists():
-            self._logger.info(f"load {self.cfg_name}.dat")
+            self._logger.info(f"load {self._cfg_name}.dat")
             self.load()
         else:
-            self._logger.info(f"{self.cfg_name}.dat file not found.")
+            self._logger.info(f"== create *.dat")
+            self._logger.info(f"{self._cfg_name}.dat file not found.")
             self._logger.info(f"create defaut dat file")
-            self.create_dat_file(self.cfg_name)
+            self.create_dat_file(self._cfg_name)
             self.load()
 
     def create_dat_file(self, basename: str) -> bool:
@@ -184,9 +183,9 @@ class RmcPotDat:
     # --------------------
     def load(self) -> bool:
         """ファイルを読み込んで内部行リストを構築。"""
-        self._logger.info(f"== load({self.cfg_name}.dat)")
+        self._logger.info(f"== load({self._cfg_name}.dat)")
 
-        p = Path(f"{self.cfg_name}.dat")
+        p = Path(f"{self._cfg_name}.dat")
         if not p.exists():
             # raise FileNotFoundError(
             #     f".dat ファイルが見つかりません: {p} (.dat は自動付加されます)"
@@ -219,9 +218,9 @@ class RmcPotDat:
         現在の内容を書き出す (.dat は自動付加される)
 
         Args:
-            out_name (str): 出力先。未指定なら self.cfg_name に上書き保存。
+            out_name (str): 出力先。未指定なら self._cfg_name に上書き保存。
         """
-        target = Path(f"{self.cfg_name if out_name is None else out_name}.dat")
+        target = Path(f"{self._cfg_name if out_name is None else out_name}.dat")
         with target.open("w", encoding="utf-8") as f:
             for ln in self._lines:
                 f.write(ln.render())

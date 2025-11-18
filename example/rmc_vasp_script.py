@@ -30,6 +30,7 @@ if __name__ == "__main__":
     logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
 
     config = Config("config.yml")
+    max_rmc_dft_loop = config.max_rmc_dft_loop
 
     # 初期POSCAR 作成
     shutil.copy(f"POSCAR0", "POSCAR")
@@ -38,12 +39,15 @@ if __name__ == "__main__":
     rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
     rmc_dat = RmcPotDat(config=config, logger=logger)
 
+    ######################################
+    rmc_dat.set_exp_filename("ascast.xsq")
     rmc_dat.set_comment("comment FeSiB")
     rmc_dat.set_density(0.0915)
     rmc_dat.set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
     rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
     rmc_dat.set_r_spacing(0.025)
     rmc_dat.set_data_flags([0, 0, 1, 0])
+    ######################################
 
     # rmc = RmcPot(rmc_log=rmc_log, cfg_name=config.cfg_name, logger=logger)
     # rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
@@ -95,8 +99,8 @@ if __name__ == "__main__":
     i = 0
     for i in range(0, max_rmc_dft_loop):
 
-        rmc_dir = f"{config.log_rmc_dir}{str(i).zfill(digits)}"
-        vasp_dir = f"{config.log_vasp_dir}{str(i).zfill(digits)}"
+        rmc_dir = f"{config.rmc_log_dir}{str(i).zfill(digits)}"
+        vasp_dir = f"{config.dft_log_dir}{str(i).zfill(digits)}"
 
         if not os.path.exists(rmc_dir):
             os.mkdir(rmc_dir)
@@ -105,7 +109,7 @@ if __name__ == "__main__":
 
         ## RMC ###########################################
         logger.info(f"== RMC {i}")
-        rmc.postprocess()
+        rmc.preprocess()
         # rmc.run(cfg_name=config.cfg_name)
         rmc.run()
         rmc.postprocess(

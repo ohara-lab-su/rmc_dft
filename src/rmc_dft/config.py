@@ -12,18 +12,19 @@ from x_logger import XLogger
 
 class Config:
 
-    rmc_code: str = "RmcPot"
-    dft_code: str = "Vasp"
-
-    cfg_name: str = "aaa"  # aaa.cfg
-    vasp_name: str = "aaa"  # aaa.vasp
-    element_info: str = "label.txt"
-
-    dft_log_dir: str = "vasp_log"
-    rmc_log_dir: str = "rmc_log"
-
     max_rmc_dft_loop: int = 10
 
+    # ---------- RMC -----------
+    rmc_code: str = "RmcPot"
+    rmc_log_dir: str = "rmc_log"
+    cfg_name: str = "aaa"  # aaa.cfg
+    element_info: str = "label.txt"
+    rmc_exp_filename: str = "ascast.xsq"
+
+    # ------- DFT (VASP) --------
+    dft_code: str = "Vasp"
+    dft_log_dir: str = "vasp_log"
+    vasp_name: str = "aaa"  # aaa.vasp
     run_mode: str = "local"
 
     #
