@@ -147,7 +147,7 @@ if __name__ == "__main__":
     cfg_name_arg = sys.argv[1]
 
     # 手で並べる log 一覧
-    dir_list = [
+    _dir_list = [
         "log01",
         "log02",
         "log03",
@@ -170,4 +170,4 @@ if __name__ == "__main__":
     ]
 
     # ncols=4 (4×? の段組) にしてある
-    plot_multi_fit(dir_list, cfg_name_arg, ncols=4)
+    plot_multi_fit(_dir_list, cfg_name_arg, ncols=4)

@@ -86,7 +86,7 @@ if __name__ == "__main__":
     cfg_name_arg: str = sys.argv[1]
 
     # ここでフォルダ名を手で並べる
-    dir_list: List[str] = [
+    _dir_list: List[str] = [
         "log01",
         "log02",
         "log03",
@@ -108,4 +108,4 @@ if __name__ == "__main__":
         "log19",
     ]
 
-    plot_multi_chi(dir_list, cfg_name_arg)
+    plot_multi_chi(_dir_list, cfg_name_arg)
