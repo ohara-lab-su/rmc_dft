@@ -45,6 +45,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">rmc_dft</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/rmc_dft.html">rmc_dft package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.packmol.html">rmc_dft.packmol package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.util.html">rmc_dft.util package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.vasp.html">rmc_dft.vasp package</a></li>
@@ -85,13 +86,15 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/util/packmol.html">Packmol</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/util/packmol.html#id1">公式サイト</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/util/packmol.html#linux">linux</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/util/packmol.html#for-mac">for Mac</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/util/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/packmol/packmol.html">pypackmol (in RMC_DFT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#pacmol">pacmol公式サイト</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#linux">linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#for-mac">for Mac</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html">quickstart</a></li>
 </ul>
 </li>
 </ul>
@@ -603,8 +606,15 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**Error**: VASP実行中にエラーが発生しました: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**Error**: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;  VASP実行中にエラーが発生&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;  --&gt; 距離が近すぎることで電子密度がおかい&gt;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;  --&gt; 行列問題の解法で転けたとか&quot;</span><span class="p">)</span>
+            <span class="c1"># sys.exit(1)</span>
+            <span class="c1"># return False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;強制STOP ではなくて、そのままRMC側に戻して、RMCで違う位置を作成する&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">True</span>
 

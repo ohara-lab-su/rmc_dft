@@ -212,6 +212,7 @@ def main() -> None:
         "FeSiB_amorphous.xyz",
         "POSCAR",
         comment=comment,
+        elements=["Fe", "Si", "B"],
     )
 
 

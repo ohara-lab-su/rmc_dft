@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v0.3.17 nakada
+
+Packmol 利用の簡便化のための python パッケージ(nakada)
+
+- make_amorphous 関係の一般化
+  - pkmol クラスに機能の大半を押し込む
+
+docs
+
+- エラーをだいぶ潰した
+ 
 ## v0.3.16 nakada
 
 注意)
