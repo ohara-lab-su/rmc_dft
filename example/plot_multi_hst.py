@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 import matplotlib.pyplot as plt
@@ -66,6 +69,9 @@ def plot_multi_chi(dir_list: List[str], cfg_name: str) -> None:
 
     plt.tight_layout()
     plt.show()
+
+    fig.savefig("plot_multi_hst.png", dpi=300)
+    print("Saved: plot_multi_hst.png")
 
 
 if __name__ == "__main__":

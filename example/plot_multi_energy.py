@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 import numpy as np
@@ -68,6 +71,9 @@ def plot_multi_energy(dir_list: List[str]) -> None:
 
     plt.tight_layout()
     plt.show()
+
+    fig.savefig("plot_multi_energy.png", dpi=300)
+    print("Saved: plot_multi_energy.png")
 
 
 if __name__ == "__main__":

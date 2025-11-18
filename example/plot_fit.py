@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 import matplotlib.pyplot as plt

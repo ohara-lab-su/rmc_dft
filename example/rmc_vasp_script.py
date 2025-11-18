@@ -39,12 +39,15 @@ if __name__ == "__main__":
     rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
     rmc_dat = RmcPotDat(config=config, logger=logger)
 
+    ######################################
+    rmc_dat.set_exp_filename("ascast.xsq")
     rmc_dat.set_comment("comment FeSiB")
     rmc_dat.set_density(0.0915)
     rmc_dat.set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
     rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
     rmc_dat.set_r_spacing(0.025)
     rmc_dat.set_data_flags([0, 0, 1, 0])
+    ######################################
 
     # rmc = RmcPot(rmc_log=rmc_log, cfg_name=config.cfg_name, logger=logger)
     # rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
@@ -106,7 +109,7 @@ if __name__ == "__main__":
 
         ## RMC ###########################################
         logger.info(f"== RMC {i}")
-        rmc.postprocess()
+        rmc.preprocess()
         # rmc.run(cfg_name=config.cfg_name)
         rmc.run()
         rmc.postprocess(

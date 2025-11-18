@@ -313,6 +313,7 @@ class RmcPot:
         cfg2poscar(cfg_name=cfg_name, vasp_name=vasp_name)
 
         # POSCAR を後に上書きしちゃうので保存しておく
+        # 繰り返し作業するとそれも上書きされるのでほぼ意味はないが
         if os.path.exists("POSCAR"):
             shutil.copy("POSCAR", "POSCAR.bak")
 

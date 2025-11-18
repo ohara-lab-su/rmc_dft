@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+K.NAKADA, kengo.nakada@gmail.com
 make_amorphous.py
 
 Fe–Si–B アモルファス初期構造を Packmol により生成するための
@@ -185,7 +186,7 @@ def main() -> None:
     PACKMOL = "/Users/nakada/packmol/bin/packmol"
 
     ##########################
-    N_tot = 500  # セルの原子数
+    N_tot = 200  # セルの原子数
     rho = 7.35  # 質量密度
     ##########################
 

@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 

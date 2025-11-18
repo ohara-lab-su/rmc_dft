@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import re
 
@@ -25,12 +28,8 @@ class RmcPotFit:
             config (Config):
             logger (XLogger):
         """
-        if cfg_name is None:
-            cfg_name = config.cfg_name
-
         self._logger = logger or XLogger(logger_name="RmcPotFit")
-        # self._logger = logger
-        self._cfg_name = cfg_name
+        self._cfg_name: Optional[str] = cfg_name or config.cfg_name
         self.filename: str = f"{cfg_name}.fit"
 
         # データ格納

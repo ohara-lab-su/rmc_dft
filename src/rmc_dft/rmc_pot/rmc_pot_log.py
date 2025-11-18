@@ -29,13 +29,9 @@ class RmcPotLog:
             logger (XLogger): 全てのインスタンスが同じ XLogger()
             cfg_name (str):
         """
-        self._logger = logger
-
-        if cfg_name is None:
-            cfg_name: str = config.cfg_name
-
-        # default name
-        self._cfg_name: str = cfg_name
+        self._logger: Optional[XLogger] = logger
+        self._config: Config = config
+        self._cfg_name: Optional[str] = cfg_name or config.cfg_name
 
     def set_cfg_name(
         self,
@@ -115,8 +111,8 @@ class RmcPotLog:
 
     def backup_result(
         self,
-        log_dir: str = "log",
-        cfg_name: str = "aaa",
+        log_dir: Optional[str] = None,
+        cfg_name: Optional[str] = None,
     ):
         """
         Copy RMC log files to the specified directory.
@@ -129,6 +125,9 @@ class RmcPotLog:
 
         if not cfg_name:
             cfg_name = self.cfg_name
+
+        if not log_dir:
+            log_dir = self._config.rmc_log_dir
 
         if not os.path.exists(log_dir):
             self._logger.info(f"mkdir {log_dir}")

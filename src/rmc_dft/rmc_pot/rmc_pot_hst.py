@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import re
 
@@ -26,11 +29,9 @@ class RmcPotHst:
             config (Config):
             logger (XLogger):
         """
-        if hst_path is None:
-            hst_path = config.cfg_name
-
-        self._logger = logger or XLogger(logger_name="RmcPotFit")
-        self._hst_path: str = hst_path
+        self._logger: Optional[XLogger] = logger or XLogger(logger_name="RmcPotFit")
+        self._config: Config = config
+        self._hst_path: Optional[str] = hst_path or config.cfg_name
 
     def read_chi2(self) -> Tuple[List[int], List[float]]:
         """
