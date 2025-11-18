@@ -86,7 +86,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # ここでフォルダ名を手で並べる（plot_multi_hst と同じ方式）
-    dir_list: List[str] = [
+    _dir_list: List[str] = [
         "log01",
         "log02",
         "log03",
@@ -108,4 +108,4 @@ if __name__ == "__main__":
         "log19",
     ]
 
-    plot_multi_energy(dir_list)
+    plot_multi_energy(_dir_list)

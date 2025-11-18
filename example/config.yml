@@ -8,7 +8,8 @@ rmc_log_dir: "log" # LOG 保存
 # rmc_log_dir: "rmc_log" # LOG 保存
 # -------------------------
 cfg_name: "aaa" # input_file: RMC: aaa.cfg
-element_info: "label.txt" # VASP4(Rmc.cfg) type --> VASP5 type
+# element_info: "label.txt" # VASP4(Rmc.cfg) type --> VASP5 type
+element_info: ["Fe", "Si", "B"]
 rmc_exp_filename: "ascast.xsq"
 
 # ------- DFT (VASP) --------
