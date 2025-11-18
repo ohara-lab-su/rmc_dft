@@ -420,7 +420,9 @@ class Vasp:
             cmd = [job_cmd]
 
         else:
-            raise ValueError(f"**Error**: 未知の mode: {mode}")
+            # raise ValueError(f"**Error**: 未知の mode: {mode}")
+            self._logger.error(f"**Error**: 未知の mode: {mode}")
+            return False
 
         # dft_bin がパス上に存在するか確認
         if mode != "job":
@@ -441,11 +443,11 @@ class Vasp:
             self._logger.error("  VASP実行中にエラーが発生")
             self._logger.error("  --> 距離が近すぎることで電子密度がおかい>")
             self._logger.error("  --> 行列問題の解法で転けたとか")
-            # sys.exit(1)
-            # return False
             self._logger.error(
-                f"強制STOP ではなくて、そのままRMC側に戻して、RMCで違う位置を作成する"
+                f"強制STOP ではなくて、そのままRMC側に戻して、ハンドリングする"
             )
+            # sys.exit(1)
+            return False
 
         return True
 

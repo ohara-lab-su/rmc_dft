@@ -7,6 +7,7 @@ RMC-VASP を構成する sample script
 """
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
+import sys
 import shutil
 
 from rmc_dft import (
@@ -40,7 +41,8 @@ if __name__ == "__main__":
     rmc_dat = RmcPotDat(config=config, logger=logger)
 
     ######################################
-    rmc_dat.set_exp_filename("ascast.xsq")
+    # rmc_dat.set_exp_filename("ascast.xsq")
+    rmc_dat.set_exp_filename(config.rmc_exp_filename)
     rmc_dat.set_comment("comment FeSiB")
     rmc_dat.set_density(0.0915)
     rmc_dat.set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
@@ -68,6 +70,7 @@ if __name__ == "__main__":
     if not os.path.exists("POTCAR"):
         vasp_potcar = VaspPotcarBuilder("~/potpaw_PBE.64", logger=logger)
         elements = ["Fe", "Si", "B"]
+        # elements = config.element_info
         vasp_potcar.build(elements, poscar_name="POTCAR")
 
     vasp_incar = VaspIncar(logger=logger)
@@ -75,10 +78,12 @@ if __name__ == "__main__":
     vasp_incar.set_tag("EDIFF", 1e-04)
     vasp_incar.set_tag("EDIFFG", 1e-05)
     vasp_incar.set_tag("ISTART", 0)
-    vasp_incar.set_tag("ISMEAR", 0)
+    vasp_incar.set_tag("ISMEAR", 0)  # Gussian
     vasp_incar.set_tag("SIGMA", 0.1)
     vasp_incar.set_tag("NELM", 30)
-    vasp_incar.set_tag("IBRION", 2)
+    vasp_incar.set_tag("IBRION", 2)  # CG
+    # vasp_incar.set_tag("IBRION", 3)  # Dampd
+    # vasp_incar.set_tag("POTIM", 0.05)  # Dampd scaling
     vasp_incar.set_tag("ISIF", 2)
     vasp_incar.set_tag("LREAL", "auto")
 
@@ -107,8 +112,10 @@ if __name__ == "__main__":
         if not os.path.exists(vasp_dir):
             os.mkdir(vasp_dir)
 
-        ## RMC ###########################################
+        # ------------------- RMC ------------------------
         logger.info(f"== RMC {i}")
+        logger.info(f"element_info = {config.element_info}")
+
         rmc.preprocess()
         # rmc.run(cfg_name=config.cfg_name)
         rmc.run()
@@ -120,12 +127,16 @@ if __name__ == "__main__":
 
         shutil.copy(f"{config.cfg_name}.vasp", "POSCAR")
 
-        ## DFT ###########################################
+        # ------------------- DFT ------------------------
         logger.info(f"== DFT(vasp) {i}")
         # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
         # vasp.run(mode="test")
         # vasp.run(mode=config.run_mode)
-        vasp.run(mode="mpi")
+        ret = vasp.run(mode="mpi")
+        if not ret:
+            logger.error("**Error**: vasp execution failed")
+            sys.exit(-1)
+
         vasp.postprocess(
             log_dir=vasp_dir,
             cfg_name=config.cfg_name,

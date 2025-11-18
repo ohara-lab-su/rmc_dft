@@ -322,7 +322,7 @@ class Packmol:
     ) -> Dict[str, int]:
         """化学量論比と N_tot から各元素の原子数を決める。
 
-        数値的な意味:
+        数値的な意味
 
         1. 各元素の「理想的な原子数」を
                N_tot * ratio_i / sum(ratios)
@@ -332,14 +332,21 @@ class Packmol:
         4. 理想値の小数部分が大きい元素から順に +1 ずつ配っていく。
 
         これにより、
+
         - 合計は必ず N_tot になる
         - 各元素の原子数は「理想値」に最も近い整数に近づく
+
         という性質を持つ。
 
         Args:
-            symbols (Sequence[str]): 元素記号の列（例: ("Fe", "Si", "B")）。
-            ratios (Sequence[int]): symbols と同じ順番の化学量論比（例: (80, 9, 11)）。
-            N_tot (int): セル内の総原子数。
+            symbols (Sequence[str]):
+                元素記号の列（例: ("Fe", "Si", "B")）。
+
+            ratios (Sequence[int]):
+                symbols と同じ順番の化学量論比（例: (80, 9, 11)）。
+
+            N_tot (int):
+                セル内の総原子数。
 
         Returns:
             Dict[str, int]: {元素記号: 原子数} の辞書。

@@ -94,7 +94,10 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc_dft/quick_start.html">quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc_dft/quick_start.html">quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/rmc_dft/quick_start.html#install">install</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -146,7 +149,7 @@
     <span class="n">rmc_code</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;RmcPot&quot;</span>
     <span class="n">rmc_log_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rmc_log&quot;</span>
     <span class="n">cfg_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;aaa&quot;</span>  <span class="c1"># aaa.cfg</span>
-    <span class="n">element_info</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;label.txt&quot;</span>
+    <span class="n">element_info</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;label.txt&quot;</span>
     <span class="n">rmc_exp_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ascast.xsq&quot;</span>
 
     <span class="c1"># ------- DFT (VASP) --------</span>
