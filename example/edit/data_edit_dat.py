@@ -29,7 +29,7 @@ if __name__ == "__main__":
     """"""
     logger = XLogger(log_level="debug", logger_name="dft")
 
-    config = Config("config.yml")
+    config = Config("../config.yml")
     rmc_dat = RmcPotDat(config=config, logger=logger)
 
     rmc_dat.set_comment("FeSiB")

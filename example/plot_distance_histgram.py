@@ -30,7 +30,7 @@ def collect_all_pair_distances(
     n_sites: int = poscar.get_num_atoms()
     distances: list[float] = []
 
-    # idx は 0 始まりで正しい（あなたの VaspPoscarAnalyzer がそうなっている）
+    # idx は 0 始まり
     for i in range(n_sites):
         for j in range(i + 1, n_sites):
             d_ij = analyzer.get_interatomic_distance(i, j, pbc=pbc)

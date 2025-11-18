@@ -61,6 +61,8 @@ def main() -> None:
         f.write("tolerance 2.3\n")  # 最小距離
         f.write("filetype xyz\n")
         f.write(f"output {result_xyz_file}\n\n")
+        # f.write("seed 987654321\n\n")
+        # f.write("seed 1234567\n")  # 乱数のシード（デフォルト値)
 
         # Fe
         f.write(f"structure {Fe_xyz_file}\n")

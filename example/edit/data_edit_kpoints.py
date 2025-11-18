@@ -31,7 +31,7 @@ if __name__ == "__main__":
     """"""
     logger = XLogger(log_level="debug", logger_name="dft")
 
-    config = Config("config.yml")
+    config = Config("../config.yml")
 
     if os.path.exists("KPOINTS"):
         logger.error("KPOINTS is already exists.")
