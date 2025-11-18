@@ -9,7 +9,7 @@ from x_logger import XLogger
 
 def ensure_vasp5_format(
     poscar_name: str,
-    element_info: Optional[str] = None,
+    element_info: Optional[Union[str, Sequence[str]]] = None,
     logger: Optional[XLogger] = XLogger(),
 ) -> bool:
     """
@@ -22,7 +22,7 @@ def ensure_vasp5_format(
 
     Args:
         poscar_name (str): POSCAR
-        element_info (str): element 情報があるファイル名
+        element_info (str): element 情報があるファイル名 or element のリスト
         logger (XLogger):
 
     Returns:
@@ -32,6 +32,23 @@ def ensure_vasp5_format(
         element_info = "label.txt"
 
     logger.info(f"element_info: {element_info}")
+
+    # ラベル行の決定
+    if isinstance(element_info, str):
+        # ファイル名として扱う
+        try:
+            with open(element_info, "r", encoding="utf-8") as file:
+                label_line: str = file.readline().strip()
+        except FileNotFoundError:
+            logger.error("element info file not found.")
+            return False
+    else:
+        # Sequence[str] として扱う
+        # すべて str であることを軽く確認
+        if not all(isinstance(e, str) for e in element_info):
+            logger.error("element_info must be a sequence of str.")
+            return False
+        label_line = " ".join(element_info)
 
     # element 情報があるファイルを開く
     try:

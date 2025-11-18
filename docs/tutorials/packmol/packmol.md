@@ -67,7 +67,7 @@ def main() -> None:
     N_Si = counts["Si"]
     N_B = counts["B"]
     L = pm.cell_length_from_number_density(N_tot, n_per_A3)
-    
+
     logger.info(f'{counts}')
     logger.info(f'L = {L:.6f}')
 
@@ -100,7 +100,7 @@ def main() -> None:
     pm.write_single_atom_xyz("B.xyz", "B")
 
     # Packmol を自動実行
-    pm.run_packmol(packmol_path=PACKMOL)
+    pm.run_packmol(packmol_bin=PACKMOL)
 
     # POSCAR
     pm.xyz_to_poscar(

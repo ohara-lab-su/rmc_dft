@@ -18,7 +18,7 @@ class Config:
     rmc_code: str = "RmcPot"
     rmc_log_dir: str = "rmc_log"
     cfg_name: str = "aaa"  # aaa.cfg
-    element_info: str = "label.txt"
+    element_info: Union[str, Sequence[str]] = "label.txt"
     rmc_exp_filename: str = "ascast.xsq"
 
     # ------- DFT (VASP) --------

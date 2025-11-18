@@ -205,7 +205,7 @@ def main() -> None:
     mol.write_single_atom_xyz("B.xyz", "B")
 
     # Packmol を自動実行
-    mol.run_packmol(packmol_path=PACKMOL)
+    mol.run_packmol(packmol_bin=PACKMOL)
 
     # POSCAR
     mol.xyz_to_poscar(

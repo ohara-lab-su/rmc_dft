@@ -114,8 +114,8 @@ if __name__ == "__main__":
         rmc.run()
         rmc.postprocess(
             log_dir=rmc_dir,
-            # cfg_name=config.cfg_name,
-            # element_info="label.txt",
+            cfg_name=config.cfg_name,
+            element_info=config.element_info,
         )  # backup(loop番号つき), cfg --> xxx.vasp
 
         shutil.copy(f"{config.cfg_name}.vasp", "POSCAR")
@@ -128,6 +128,6 @@ if __name__ == "__main__":
         vasp.run(mode="mpi")
         vasp.postprocess(
             log_dir=vasp_dir,
-            # cfg_name=config.cfg_name,
+            cfg_name=config.cfg_name,
         )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
         logger.info("loop end " + str(i))

@@ -2,6 +2,12 @@
 
 ## v0.3.17 nakada
 
+label 更新
+
+- bugfix
+- label.txt の代わり ["Fe", "Si", "B"] などを与えても機能するように
+- label.txt ファイルの自動チェックを停止(代わりに引数チェックを加える)
+ 
 Packmol 利用の簡便化のための python パッケージ(nakada)
 
 - make_amorphous 関係の一般化

@@ -184,7 +184,7 @@ class RmcPot:
         self,
         log_dir: Optional[str] = None,
         cfg_name: Optional[str] = None,
-        element_info: Union[str, list, None] = None,
+        element_info: Optional[Union[str, Sequence[str]]] = None,
     ) -> bool:
         """
         後処理
@@ -221,6 +221,8 @@ class RmcPot:
             # element_info = "label.txt"
             element_info = self._config.element_info
 
+        self._logger.info(f"element_info = {element_info}")
+
         # DATA-collect
         self._rmc_log.collect_result()
 
@@ -239,7 +241,7 @@ class RmcPot:
         self._logger.info(f"== ensure vasp5 format ({cfg_name}.vasp)")
         self.ensure_vasp5_format(
             poscar_name=f"{cfg_name}.vasp",
-            element_info="label.txt",
+            element_info=element_info,
         )
 
         # ここで POSCAR にすると入力の元になった POSCAR があると
