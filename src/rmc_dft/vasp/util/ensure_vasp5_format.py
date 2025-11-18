@@ -33,7 +33,7 @@ def ensure_vasp5_format(
 
     logger.info(f"element_info: {element_info}")
 
-    # ラベル行の決定
+    # ラベル行の内容の決定
     if isinstance(element_info, str):
         # ファイル名として扱う
         try:
@@ -50,17 +50,12 @@ def ensure_vasp5_format(
             return False
         label_line = " ".join(element_info)
 
-    # element 情報があるファイルを開く
-    try:
-        with open(element_info, "r") as file:
-            label_line = file.readline().strip()
-    except FileNotFoundError:
-        logger.error(f"element info file not found.")
-        return False
-
+    # VASP の POSCAR 読み込み
     with open(poscar_name, "r") as file:
         lines = file.readlines()
         label_place = 6
+
+    #  VASP の POSCAR 更新(VASP4 -> VASP5)
     if 1 <= label_place <= len(lines):
         lines[label_place - 1] = label_line + "\n"  # 改行を付けて置換
 
