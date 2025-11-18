@@ -149,12 +149,14 @@ class RmcPot:
         """
         self._logger.info("== preprocess()")
 
-        # aaa.cfg が存在しないときは止める
+        ##################################################
+        # aaa.cfg が存在しないときは止める(構造情報)
         if not os.path.exists(f"{self._cfg_name}.cfg"):
             self._logger.error(f"**Error**: {self._cfg_name}.cfg が見つかりません。")
             sys.exit(-1)
 
-        # aaa.dat が存在しないときは止める
+        ##################################################
+        # aaa.dat が存在しないときは止める(INPUT)
         if not os.path.exists(f"{self._cfg_name}.dat"):
             self._logger.error(f"**Error**: {self._cfg_name}.dat が見つかりません。")
             sys.exit(-1)
@@ -163,22 +165,30 @@ class RmcPot:
         work_dir = os.getcwd()
         self._logger.info(f"work_dir   = {work_dir}")
 
+        ##################################################
         # Config から elemento_info を取得
         label_name = self._config.element_info
 
-        # RmcPotDat から実験データのファイル名を取得
-        filename = self._rmc_dat.get_exp_filename()
-
-        for name in [label_name, filename]:
-            name_path = os.path.join(work_dir, name)
-            self._logger.info(f"filename = {name}")
-            self._logger.info(f"target_filename_path = {name_path}")
-            self._logger.info(f".")
-
-            # ファイルの存在チェック
-            if not os.path.exists(name_path):
-                self._logger.error(f"**Error**: {name_path} が見つかりません。")
+        if isinstance(label_name, str):
+            # ファイル名として扱う
+            exp_name_path = os.path.join(work_dir, label_name)
+            if not os.path.exists(exp_name_path):
+                self._logger.error(f"**Error**: {exp_name_path} が見つかりません。")
                 sys.exit(-1)
+
+        ##################################################
+        # RmcPotDat から実験データのファイル名を取得(実験データ)
+        exp_name = self._rmc_dat.get_exp_filename()
+
+        self._logger.info(f"== get_exp_name: {exp_name}")
+        exp_name_path = os.path.join(work_dir, exp_name)
+        self._logger.info(f"target_exp_name_path = {exp_name_path}")
+        self._logger.info(f".")
+
+        # ファイルの存在チェック
+        if not os.path.exists(exp_name_path):
+            self._logger.error(f"**Error**: {exp_name_path} が見つかりません。")
+            sys.exit(-1)
 
     def postprocess(
         self,
