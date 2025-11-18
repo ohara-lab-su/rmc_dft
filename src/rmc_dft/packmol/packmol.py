@@ -18,6 +18,7 @@ Packmol は密度・化学量論比の概念を持たないため、本スクリ
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import subprocess
 
+from x_logger import XLogger
 
 NA: float = 6.02214076e23  # アボガドロ数 [1/mol]
 A3_TO_CM3: float = 1e-24  # 1 Å³ = 1e-24 cm³
@@ -122,14 +123,27 @@ class Packmol:
         output_xyz: Optional[str] = None,  # "amorphous.xyz",
         output_log: Optional[str] = None,
         packmol_path: Optional[str] = None,  # "/Users/nakada/packmol/bin/packmol",
+        logger: Optional[XLogger] = None,
     ) -> None:
+        """
+
+        Args:
+            input_file:
+            output_xyz:
+            output_log:
+            packmol_path:
+            logger:
+        """
+        self._logger: XLogger = logger or XLogger()
         self.input_file: str = input_file or "packmol.inp"
         self.output_xyz: str = output_xyz or "amorphous.xyz"
         self.output_log: str = output_log or "packmol.log"
         self.packmol_path = packmol_path or "/Users/nakada/packmol/bin/packmol"
 
     @staticmethod
-    def get_atomic_weight(element: str) -> float:
+    def get_atomic_weight(
+        element: str,
+    ) -> float:
         """元素記号から原子量を取得する。
 
         Args:
@@ -146,8 +160,8 @@ class Packmol:
         """
         return ATOMIC_WEIGHTS[element]
 
-    @staticmethod
     def average_atomic_weight(
+        self,
         symbols: Sequence[str],
         ratios: Sequence[int],
     ) -> float:
@@ -168,6 +182,7 @@ class Packmol:
             float:
                 平均原子量 [g/mol]。
         """
+        self._logger.info("== average_atomic_weight()")
         if len(symbols) != len(ratios):
             raise ValueError("symbols と ratios の長さが一致していません。")
 
@@ -177,7 +192,7 @@ class Packmol:
 
         total_mass: float = 0.0
         for symbol, ratio in zip(symbols, ratios):
-            atomic_weight: float = get_atomic_weight(symbol)
+            atomic_weight: float = self.get_atomic_weight(symbol)
             total_mass += atomic_weight * float(ratio)
 
         return total_mass / float(total_atoms)
@@ -200,8 +215,8 @@ class Packmol:
     #     """
     #     return rho_g_cm3 * NA * A3_TO_CM3 / M_avg
 
-    @staticmethod
     def number_density_from_rho(
+        self,
         symbols: Sequence[str],
         ratios: Sequence[int],
         rho_g_cm3: float,
@@ -220,6 +235,7 @@ class Packmol:
             float:
                 数密度 n [1/Å^3]。
         """
+        self._logger.info("== number_density_from_rho()")
         M_avg: float = self.average_atomic_weight(symbols, ratios)
         # n = rho * NA / M * (cm^3→Å^3 の変換係数)
         return rho_g_cm3 * NA * A3_TO_CM3 / M_avg
@@ -239,8 +255,8 @@ class Packmol:
     #     """
     #     return n_per_A3 * M_avg / (NA * A3_TO_CM3)
 
-    @staticmethod
     def rho_from_number_density(
+        self,
         symbols: Sequence[str],
         ratios: Sequence[int],
         n_per_A3: float,
@@ -259,12 +275,13 @@ class Packmol:
         Returns:
             float: 質量密度 ρ [g/cm^3]。
         """
+        self._logger.info("== rho_from_number_density()")
         M_avg: float = self.average_atomic_weight(symbols, ratios)
         # ρ = n * M / (NA * A3_TO_CM3)
         return n_per_A3 * M_avg / (NA * A3_TO_CM3)
 
-    @staticmethod
     def cell_length_from_number_density(
+        self,
         N_tot: int,
         n_per_A3: float,
     ) -> float:
@@ -282,6 +299,7 @@ class Packmol:
         Returns:
             float: 立方体セルの一辺の長さ L [Å]。
         """
+        self._logger.info("== cell_length_from_number_density()")
         if N_tot <= 0:
             raise ValueError("N_tot は正の整数である必要があります。")
         if n_per_A3 <= 0.0:
@@ -291,11 +309,87 @@ class Packmol:
         L: float = volume_A3 ** (1.0 / 3.0)
         return L
 
+    def compute_element_counts(
+        self,
+        symbols: Sequence[str],
+        ratios: Sequence[int],
+        N_tot: int,
+    ) -> Dict[str, int]:
+        """化学量論比と N_tot から各元素の原子数を決める。
+
+        数値的な意味:
+
+        1. 各元素の「理想的な原子数」を
+               N_tot * ratio_i / sum(ratios)
+           として実数で計算する。
+        2. その整数部分を「最低限その元素に入れるべき原子数」とみなす。
+        3. まだ入っていない原子（remainder = N_tot - sum(floor)）を数える。
+        4. 理想値の小数部分が大きい元素から順に +1 ずつ配っていく。
+
+        これにより、
+        - 合計は必ず N_tot になる
+        - 各元素の原子数は「理想値」に最も近い整数に近づく
+        という性質を持つ。
+
+        Args:
+            symbols (Sequence[str]): 元素記号の列（例: ("Fe", "Si", "B")）。
+            ratios (Sequence[int]): symbols と同じ順番の化学量論比（例: (80, 9, 11)）。
+            N_tot (int): セル内の総原子数。
+
+        Returns:
+            Dict[str, int]: {元素記号: 原子数} の辞書。
+        """
+        self._logger.info(f"== compute_element_counts()")
+        # 「リストの長さ」ではなく、「元素種類数と比率の個数」が一致しているかを確認
+        if len(symbols) != len(ratios):
+            raise ValueError(
+                "元素記号の種類数と、それに対応する化学量論比の個数が一致していません。"
+            )
+
+        if N_tot <= 0:
+            raise ValueError("N_tot は正の整数で指定してください。")
+
+        ratio_sum: int = sum(ratios)
+        if ratio_sum <= 0:
+            raise ValueError("化学量論比の総和が 0 以下です。")
+
+        # 1. 理想的な原子数（実数）を計算する
+        ideal_counts: List[float] = []
+        for ratio in ratios:
+            ideal = N_tot * float(ratio) / float(ratio_sum)
+            ideal_counts.append(ideal)
+
+        # 2. 整数部分を「最低限確保される個数」とみなす
+        int_counts: List[int] = [int(x) for x in ideal_counts]
+
+        # 3. まだ割り当てられていない原子数を数える
+        used: int = sum(int_counts)
+        remainder: int = N_tot - used
+
+        # 4. 小数部分が大きい元素から順に +1 ずつ配る
+        if remainder > 0:
+            frac_list: List[Tuple[int, float]] = []
+            for i, ideal in enumerate(ideal_counts):
+                fractional = ideal - float(int_counts[i])
+                frac_list.append((i, fractional))
+
+            frac_list.sort(key=lambda x: x[1], reverse=True)
+
+            for k in range(remainder):
+                idx: int = frac_list[k][0]
+                int_counts[idx] += 1
+
+        result: Dict[str, int] = {}
+        for sym, cnt in zip(symbols, int_counts):
+            result[sym] = cnt
+
+        return result
+
     # ------------------------------------
     # packmol 用
     # ------------------------------------
-    @staticmethod
     def write_single_atom_xyz(
+        self,
         filename: str,
         element: str,
     ) -> None:
@@ -312,6 +406,7 @@ class Packmol:
             element (str):
                 化学記号（Fe, Si, B など）。
         """
+        self._logger.info(f"== write_single_atom_xyz()")
         with open(filename, "w") as f:
             f.write("1\n")
             f.write(f"{element} atom template\n")
@@ -341,6 +436,7 @@ class Packmol:
             packmol_path (str):
                 Packmol 実行ファイルの絶対パス。
         """
+        self._logger.info(f"== run_packmol()")
         if input_file is None:
             input_file = self.input_file
 
@@ -367,8 +463,8 @@ class Packmol:
             )
             print(f"詳細はログ {output_log} を確認してください。")
 
-    @staticmethod
     def xyz_to_poscar(
+        self,
         xyz_file: str,
         poscar_file: str = "POSCAR",
         packmol_inp: str = "packmol.inp",
@@ -393,6 +489,7 @@ class Packmol:
             comment (str): POSCAR の中のコメント
             elements (List[str]): 元素の並び順（POSCAR の行順）, None ならば書かない(VASP4)
         """
+        self._logger.info(f"== xyz_to_poscar()")
         # --- XYZ 読み込み ---
         with open(xyz_file, "r") as f:
             lines = f.readlines()

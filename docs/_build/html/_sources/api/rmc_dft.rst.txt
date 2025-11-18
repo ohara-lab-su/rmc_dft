@@ -12,6 +12,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   rmc_dft.packmol
    rmc_dft.rmc_pot
    rmc_dft.util
    rmc_dft.vasp

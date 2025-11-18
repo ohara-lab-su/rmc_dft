@@ -20,7 +20,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../genindex.html" />
     <link rel="search" title="検索" href="../search.html" />
-    <link rel="next" title="rmc_dft.rmc_pot package" href="rmc_dft.rmc_pot.html" />
+    <link rel="next" title="rmc_dft.packmol package" href="rmc_dft.packmol.html" />
     <link rel="prev" title="rmc_dft" href="modules.html" /> 
 </head>
 
@@ -48,6 +48,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">rmc_dft</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">rmc_dft package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.packmol.html">rmc_dft.packmol package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rmc_dft.util.html">rmc_dft.util package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html">rmc_dft.vasp package</a></li>
@@ -88,13 +89,15 @@
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/util/packmol.html">Packmol</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#id1">公式サイト</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#linux">linux</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#for-mac">for Mac</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/packmol/packmol.html">pypackmol (in RMC_DFT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#pacmol">pacmol公式サイト</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#linux">linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#for-mac">for Mac</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc_dft/quick_start.html">quickstart</a></li>
 </ul>
 </li>
 </ul>
@@ -131,6 +134,25 @@
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="rmc_dft.packmol.html">rmc_dft.packmol package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.packmol.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.packmol.html#module-rmc_dft.packmol.packmol">rmc_dft.packmol.packmol module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol"><code class="docutils literal notranslate"><span class="pre">Packmol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.average_atomic_weight"><code class="docutils literal notranslate"><span class="pre">Packmol.average_atomic_weight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.cell_length_from_number_density"><code class="docutils literal notranslate"><span class="pre">Packmol.cell_length_from_number_density()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.compute_element_counts"><code class="docutils literal notranslate"><span class="pre">Packmol.compute_element_counts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.get_atomic_weight"><code class="docutils literal notranslate"><span class="pre">Packmol.get_atomic_weight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.number_density_from_rho"><code class="docutils literal notranslate"><span class="pre">Packmol.number_density_from_rho()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.rho_from_number_density"><code class="docutils literal notranslate"><span class="pre">Packmol.rho_from_number_density()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.run_packmol"><code class="docutils literal notranslate"><span class="pre">Packmol.run_packmol()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.write_single_atom_xyz"><code class="docutils literal notranslate"><span class="pre">Packmol.write_single_atom_xyz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.xyz_to_poscar"><code class="docutils literal notranslate"><span class="pre">Packmol.xyz_to_poscar()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="rmc_dft.rmc_pot.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="rmc_dft.rmc_pot.util.html">rmc_dft.rmc_pot.util package</a><ul>
@@ -519,6 +541,11 @@ K.KOBAYASHI (2nd version)</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="rmc_dft.config.Config.rmc_exp_filename">
+<span class="sig-name descname"><span class="pre">rmc_exp_filename</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ascast.xsq'</span></em><a class="headerlink" href="#rmc_dft.config.Config.rmc_exp_filename" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="rmc_dft.config.Config.rmc_log_dir">
 <span class="sig-name descname"><span class="pre">rmc_log_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rmc_log'</span></em><a class="headerlink" href="#rmc_dft.config.Config.rmc_log_dir" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -640,7 +667,7 @@ K.KOBAYASHI (2nd version)</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="modules.html" class="btn btn-neutral float-left" title="rmc_dft" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="rmc_dft.rmc_pot.html" class="btn btn-neutral float-right" title="rmc_dft.rmc_pot package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rmc_dft.packmol.html" class="btn btn-neutral float-right" title="rmc_dft.packmol package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

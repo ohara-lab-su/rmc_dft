@@ -21,7 +21,7 @@
     <link rel="index" title="索引" href="../genindex.html" />
     <link rel="search" title="検索" href="../search.html" />
     <link rel="next" title="rmc_dft.rmc_pot.util package" href="rmc_dft.rmc_pot.util.html" />
-    <link rel="prev" title="rmc_dft package" href="rmc_dft.html" /> 
+    <link rel="prev" title="rmc_dft.packmol package" href="rmc_dft.packmol.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -48,6 +48,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">rmc_dft</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="rmc_dft.html">rmc_dft package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="rmc_dft.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.packmol.html">rmc_dft.packmol package</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">rmc_dft.rmc_pot package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rmc_dft.util.html">rmc_dft.util package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rmc_dft.vasp.html">rmc_dft.vasp package</a></li>
@@ -88,13 +89,15 @@
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/util/packmol.html">Packmol</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#id1">公式サイト</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#linux">linux</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#for-mac">for Mac</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/util/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/packmol/packmol.html">pypackmol (in RMC_DFT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#pacmol">pacmol公式サイト</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#linux">linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#for-mac">for Mac</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc_dft/quick_start.html">quickstart</a></li>
 </ul>
 </li>
 </ul>
@@ -2082,7 +2085,7 @@ moveout は RMC における原子移動の特殊処理オプションであり�
 <dd><p>現在の内容を書き出す (.dat は自動付加される)</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>out_name</strong> (<em>str</em>) -- 出力先。未指定なら self.cfg_name に上書き保存。</p>
+<dd class="field-odd"><p><strong>out_name</strong> (<em>str</em>) -- 出力先。未指定なら self._cfg_name に上書き保存。</p>
 </dd>
 <dt class="field-even">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -2170,6 +2173,7 @@ moveout は RMC における原子移動の特殊処理オプションであり�
 </section>
 <section id="module-rmc_dft.rmc_pot.rmc_pot_fit">
 <span id="rmc-dft-rmc-pot-rmc-pot-fit-module"></span><h2>rmc_dft.rmc_pot.rmc_pot_fit module<a class="headerlink" href="#module-rmc_dft.rmc_pot.rmc_pot_fit" title="Link to this heading"></a></h2>
+<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RmcPotFit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Config()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_fit.html#RmcPotFit"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit" title="Link to this definition"></a></dt>
@@ -2249,6 +2253,7 @@ Q, F(Q)、renormalized F(Q)_exp などを保持するクラス。</p>
 </section>
 <section id="module-rmc_dft.rmc_pot.rmc_pot_hst">
 <span id="rmc-dft-rmc-pot-rmc-pot-hst-module"></span><h2>rmc_dft.rmc_pot.rmc_pot_hst module<a class="headerlink" href="#module-rmc_dft.rmc_pot.rmc_pot_hst" title="Link to this heading"></a></h2>
+<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_hst.RmcPotHst">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RmcPotHst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Config()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_hst.html#RmcPotHst"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_hst.RmcPotHst" title="Link to this definition"></a></dt>
@@ -2301,7 +2306,7 @@ K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog.backup_result">
-<span class="sig-name descname"><span class="pre">backup_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aaa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_log.html#RmcPotLog.backup_result"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog.backup_result" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">backup_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_log.html#RmcPotLog.backup_result"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog.backup_result" title="Link to this definition"></a></dt>
 <dd><p>Copy RMC log files to the specified directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
@@ -2441,7 +2446,7 @@ K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="rmc_dft.html" class="btn btn-neutral float-left" title="rmc_dft package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rmc_dft.packmol.html" class="btn btn-neutral float-left" title="rmc_dft.packmol package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="rmc_dft.rmc_pot.util.html" class="btn btn-neutral float-right" title="rmc_dft.rmc_pot.util package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

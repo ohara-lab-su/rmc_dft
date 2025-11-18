@@ -45,6 +45,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">rmc_dft</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/rmc_dft.html">rmc_dft package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.packmol.html">rmc_dft.packmol package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.util.html">rmc_dft.util package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.vasp.html">rmc_dft.vasp package</a></li>
@@ -85,13 +86,15 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/util/packmol.html">Packmol</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/util/packmol.html#id1">公式サイト</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/util/packmol.html#linux">linux</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/util/packmol.html#for-mac">for Mac</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/util/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/packmol/packmol.html">pypackmol (in RMC_DFT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#pacmol">pacmol公式サイト</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#linux">linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#for-mac">for Mac</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html">quickstart</a></li>
 </ul>
 </li>
 </ul>
@@ -154,13 +157,9 @@
 <span class="sd">            logger (XLogger): 全てのインスタンスが同じ XLogger()</span>
 <span class="sd">            cfg_name (str):</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
-
-        <span class="k">if</span> <span class="n">cfg_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cfg_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">cfg_name</span>
-
-        <span class="c1"># default name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cfg_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">cfg_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">XLogger</span><span class="p">]</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span> <span class="n">Config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cfg_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg_name</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">cfg_name</span>
 
 <div class="viewcode-block" id="RmcPotLog.set_cfg_name">
 <a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog.set_cfg_name">[ドキュメント]</a>
@@ -257,8 +256,8 @@
 <a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_log.RmcPotLog.backup_result">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">backup_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">log_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span>
-        <span class="n">cfg_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;aaa&quot;</span><span class="p">,</span>
+        <span class="n">log_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cfg_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Copy RMC log files to the specified directory.</span>
@@ -271,6 +270,9 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg_name</span><span class="p">:</span>
             <span class="n">cfg_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_name</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">log_dir</span><span class="p">:</span>
+            <span class="n">log_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">rmc_log_dir</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">log_dir</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mkdir </span><span class="si">{</span><span class="n">log_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
