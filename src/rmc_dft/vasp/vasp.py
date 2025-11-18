@@ -266,7 +266,7 @@ class Vasp:
     def preprocess(
         self,
         vasp_name: str = None,
-        element_info: str = "label.txt",
+        element_info: Optional[Union[str, Sequence[str]]] = None,
     ) -> bool:
         """
         vasp 前処理
@@ -488,9 +488,11 @@ class Vasp:
     @staticmethod
     def ensure_vasp5_format(
         poscar_name: str,
-        element_info: Optional[str] = None,
+        element_info: Optional[Union[str, Sequence[str]]] = None,
         logger: Optional[XLogger] = XLogger(),
     ) -> bool:
+        if element_info is None:
+            element_info = self._config.element_info
         return ensure_vasp5_format(poscar_name, element_info, logger=logger)
 
     @staticmethod

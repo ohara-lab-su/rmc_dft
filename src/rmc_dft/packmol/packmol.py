@@ -122,7 +122,7 @@ class Packmol:
         input_file: Optional[str] = None,  # "packmol.inp",
         output_xyz: Optional[str] = None,  # "amorphous.xyz",
         output_log: Optional[str] = None,
-        packmol_path: Optional[str] = None,  # "/Users/nakada/packmol/bin/packmol",
+        packmol_bin: Optional[str] = None,  # "/Users/nakada/packmol/bin/packmol",
         logger: Optional[XLogger] = None,
     ) -> None:
         """
@@ -131,14 +131,19 @@ class Packmol:
             input_file:
             output_xyz:
             output_log:
-            packmol_path:
+            packmol_bin (str): bin と言いながら path 指定
             logger:
         """
         self._logger: XLogger = logger or XLogger()
         self.input_file: str = input_file or "packmol.inp"
         self.output_xyz: str = output_xyz or "amorphous.xyz"
         self.output_log: str = output_log or "packmol.log"
-        self.packmol_path = packmol_path or "/Users/nakada/packmol/bin/packmol"
+        self.packmol_bin = packmol_bin or "/Users/nakada/packmol/bin/packmol"
+
+        self._logger.info(f"input_file: {self.input_file}")
+        self._logger.info(f"output_xyz: {self.output_xyz}")
+        self._logger.info(f"output_log: {self.output_log}")
+        self._logger.info(f"packmol_bin: {self.packmol_bin}")
 
     @staticmethod
     def get_atomic_weight(
@@ -416,7 +421,7 @@ class Packmol:
         self,
         input_file: Optional[str] = None,
         output_log: Optional[str] = None,
-        packmol_path: Optional[str] = None,
+        packmol_bin: Optional[str] = None,
     ) -> None:
         """Packmol を実行する。
 
@@ -433,7 +438,7 @@ class Packmol:
             output_log (str):
                 Packmol 実行ログを書き出すファイル名。
 
-            packmol_path (str):
+            packmol_bin (str):
                 Packmol 実行ファイルの絶対パス。
         """
         self._logger.info(f"== run_packmol()")
@@ -443,13 +448,13 @@ class Packmol:
         if output_log is None:
             output_log = self.output_log
 
-        if packmol_path is None:
-            packmol_path = self.packmol_path
+        if packmol_bin is None:
+            packmol_bin = self.packmol_bin
 
         # packmol.inp をそのまま stdin にする
         with open(input_file, "r") as fin, open(output_log, "w") as flog:
             result = subprocess.run(
-                [packmol_path],
+                [packmol_bin],
                 stdin=fin,  # ここが「packmol < input」の本体
                 stdout=flog,
                 stderr=subprocess.STDOUT,
