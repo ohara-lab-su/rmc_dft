@@ -2,6 +2,7 @@
 #cp ~/zaiene_dev/rmc_dft/src/rmc_vasp/main.py ./
 cp ~/zaiene_dev/rmc_dft/example/clean_rmc.py ./
 cp ~/zaiene_dev/rmc_dft/example/clean_dft.py ./
+cp ~/zaiene_dev/rmc_dft/example/clean.sh ./
 #
 cp ~/zaiene_dev/rmc_dft/example/rmc_run.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_vasp.py ./

@@ -23,6 +23,94 @@ NA: float = 6.02214076e23  # アボガドロ数 [1/mol]
 A3_TO_CM3: float = 1e-24  # 1 Å³ = 1e-24 cm³
 
 
+# -------------------------------------------------------------
+# 原子量 (g/mol)
+# -------------------------------------------------------------
+ATOMIC_WEIGHTS: Dict[str, float] = {
+    #   "H": 1.00794,
+    #   "He": 4.002602,
+    #   "Li": 6.941,
+    #   "Be": 9.012182,
+    "B": 10.811,
+    #   "C": 12.0107,
+    #   "N": 14.0067,
+    #   "O": 15.9994,
+    #   "F": 18.9984032,
+    #   "Ne": 20.1797,
+    #   "Na": 22.98976928,
+    #   "Mg": 24.3050,
+    #   "Al": 26.9815386,
+    "Si": 28.0855,
+    #   "P": 30.973762,
+    #   "S": 32.065,
+    #   "Cl": 35.453,
+    #   "Ar": 39.948,
+    #   "K": 39.0983,
+    #   "Ca": 40.078,
+    #   "Sc": 44.955912,
+    #   "Ti": 47.867,
+    #   "V": 50.9415,
+    #   "Cr": 51.9961,
+    #   "Mn": 54.938045,
+    "Fe": 55.845,
+    #   "Co": 58.933195,
+    #   "Ni": 58.6934,
+    #   "Cu": 63.546,
+    #   "Zn": 65.409,
+    #   "Ga": 69.723,
+    #   "Ge": 72.64,
+    #   "As": 74.92160,
+    #   "Se": 78.96,
+    #   "Br": 79.904,
+    #   "Kr": 83.798,
+    #   "Rb": 85.4678,
+    #   "Sr": 87.62,
+    #   "Y": 88.90585,
+    #   "Zr": 91.224,
+    #   "Nb": 92.90638,
+    #   "Mo": 95.96,
+    #   "Ru": 101.07,
+    #   "Rh": 102.90550,
+    #   "Pd": 106.42,
+    #   "Ag": 107.8682,
+    #   "Cd": 112.411,
+    #   "In": 114.818,
+    #   "Sn": 118.710,
+    #   "Sb": 121.760,
+    #   "Te": 127.60,
+    #   "I": 126.90447,
+    #   "Xe": 131.293,
+    #   "Cs": 132.9054519,
+    #   "Ba": 137.327,
+    #   "La": 138.90547,
+    #   "Ce": 140.116,
+    #   "Pr": 140.90765,
+    #   "Nd": 144.242,
+    #   "Sm": 150.36,
+    #   "Eu": 151.964,
+    #   "Gd": 157.25,
+    #   "Tb": 158.92535,
+    #   "Dy": 162.500,
+    #   "Ho": 164.93032,
+    #   "Er": 167.259,
+    #   "Tm": 168.93421,
+    #   "Yb": 173.04,
+    #   "Lu": 174.967,
+    #   "Hf": 178.49,
+    #   "Ta": 180.94788,
+    #   "W": 183.84,
+    #   "Re": 186.207,
+    #   "Os": 190.23,
+    #   "Ir": 192.217,
+    #   "Pt": 195.084,
+    #   "Au": 196.966569,
+    #   "Hg": 200.59,
+    #   "Tl": 204.3833,
+    #   "Pb": 207.2,
+    #   "Bi": 208.98040,
+}
+
+
 class Packmol:
     """
     amorphous構造を作成するのに助けになるメソッドなど
@@ -41,45 +129,138 @@ class Packmol:
         self.packmol_path = packmol_path or "/Users/nakada/packmol/bin/packmol"
 
     @staticmethod
-    def number_density_from_rho(
-        M_avg: float,
-        rho_g_cm3: float,
-    ) -> float:
-        """密度から数密度を計算する。
-
-        数密度 n [1/Å^3] は、平均原子量 M_avg を用いて次式で与えられる::
-
-            n = rho * NA / M_avg * A3_TO_CM3
+    def get_atomic_weight(element: str) -> float:
+        """元素記号から原子量を取得する。
 
         Args:
-            M_avg (float):
+            element (str):
+                元素記号（例: "Fe", "Si", "B"）。
+
+        Returns:
+            float:
+                原子量 [g/mol]。
+
+        Raises:
+            KeyError:
+                対応する元素記号がテーブルに存在しない場合。
+        """
+        return ATOMIC_WEIGHTS[element]
+
+    @staticmethod
+    def average_atomic_weight(
+        symbols: Sequence[str],
+        ratios: Sequence[int],
+    ) -> float:
+        """化学量論比から平均原子量を計算する。
+
+        たとえば Fe80Si9B11 の場合は::
+
+            symbols = ["Fe", "Si", "B"]
+            ratios  = [80, 9, 11]
+
+        のように与える。
+
+        Args:
+            symbols (Sequence[str]): 元素記号の並び。
+            ratios (Sequence[int]): 各元素の化学量論比に対応する整数比。
+
+        Returns:
+            float:
                 平均原子量 [g/mol]。
-            rho_g_cm3 (float):
-                質量密度 [g/cm^3]。
+        """
+        if len(symbols) != len(ratios):
+            raise ValueError("symbols と ratios の長さが一致していません。")
+
+        total_atoms: int = sum(ratios)
+        if total_atoms <= 0:
+            raise ValueError("ratios の合計が 0 以下です。")
+
+        total_mass: float = 0.0
+        for symbol, ratio in zip(symbols, ratios):
+            atomic_weight: float = get_atomic_weight(symbol)
+            total_mass += atomic_weight * float(ratio)
+
+        return total_mass / float(total_atoms)
+
+    # @staticmethod
+    # def number_density_from_rho(
+    #     M_avg: float,
+    #     rho_g_cm3: float,
+    # ) -> float:
+    #     """密度から数密度を計算する。
+    #     数密度 n [1/Å^3] は、平均原子量 M_avg を用いて次式で与えられる::
+    #     n = rho * NA / M_avg * A3_TO_CM3
+    #     Args:
+    #         M_avg (float): 平均原子量 [g/mol]。
+    #         rho_g_cm3 (float): 質量密度 [g/cm^3]。
+
+    #     Returns:
+    #         float:
+    #             数密度 n [1/Å^3]。
+    #     """
+    #     return rho_g_cm3 * NA * A3_TO_CM3 / M_avg
+
+    @staticmethod
+    def number_density_from_rho(
+        symbols: Sequence[str],
+        ratios: Sequence[int],
+        rho_g_cm3: float,
+    ) -> float:
+        """
+        質量密度から数密度 n [1/Å^3] を計算する。
+
+        *) 旧版と仕様変更したので注意
+
+        Args:
+            symbols (Sequence[str]): 元素記号の並び。
+            ratios (Sequence[int]): 各元素の化学量論比。
+            rho_g_cm3 (float): 質量密度 ρ [g/cm^3]。
 
         Returns:
             float:
                 数密度 n [1/Å^3]。
         """
+        M_avg: float = self.average_atomic_weight(symbols, ratios)
+        # n = rho * NA / M * (cm^3→Å^3 の変換係数)
         return rho_g_cm3 * NA * A3_TO_CM3 / M_avg
+
+    # @staticmethod
+    # def rho_from_number_density(
+    #     M_avg: float,
+    #     n_per_A3: float,
+    # ) -> float:
+    #     """
+    #     数密度から密度を計算する。
+    #     Args:
+    #         M_avg (float): 平均原子量 [g/mol]。
+    #         n_per_A3 (float): 数密度 n [1/Å^3]。
+    #     Returns:
+    #         float: 質量密度 ρ [g/cm^3]。
+    #     """
+    #     return n_per_A3 * M_avg / (NA * A3_TO_CM3)
 
     @staticmethod
     def rho_from_number_density(
-        M_avg: float,
+        symbols: Sequence[str],
+        ratios: Sequence[int],
         n_per_A3: float,
     ) -> float:
-        """数密度から密度を計算する。
+        """
+        数密度 n [1/Å^3] から質量密度 ρ [g/cm^3] を計算する。
 
         Args:
-            M_avg (float):
-                平均原子量 [g/mol]。
+            symbols (Sequence[str]):
+                元素記号の並び。
+            ratios (Sequence[int]):
+                各元素の化学量論比。
             n_per_A3 (float):
                 数密度 n [1/Å^3]。
 
         Returns:
-            float:
-                質量密度 ρ [g/cm^3]。
+            float: 質量密度 ρ [g/cm^3]。
         """
+        M_avg: float = self.average_atomic_weight(symbols, ratios)
+        # ρ = n * M / (NA * A3_TO_CM3)
         return n_per_A3 * M_avg / (NA * A3_TO_CM3)
 
     @staticmethod
@@ -87,28 +268,28 @@ class Packmol:
         N_tot: int,
         n_per_A3: float,
     ) -> float:
-        """数密度からセル一辺長 L を計算する。
+        """総原子数と数密度から立方体セル長 L [Å] を計算する。
 
-        立方体セルを仮定し、
+        数密度からセル一辺長 L を計算する。立方体セルを仮定し、
 
             V = N_tot / n
             L = V^(1/3)
 
-        により L を求める。
-
         Args:
-            N_tot (int):
-                セル内の総原子数。
-
-            n_per_A3 (float):
-                数密度 [1/Å^3]。
+            N_tot (int): セル内の総原子数。
+            n_per_A3 (float): 数密度 n [1/Å^3]。
 
         Returns:
-            float:
-                セル一辺長 L [Å]。
+            float: 立方体セルの一辺の長さ L [Å]。
         """
-        V_A3 = N_tot / n_per_A3
-        return V_A3 ** (1.0 / 3.0)
+        if N_tot <= 0:
+            raise ValueError("N_tot は正の整数である必要があります。")
+        if n_per_A3 <= 0.0:
+            raise ValueError("数密度 n_per_A3 は正の値である必要があります。")
+
+        volume_A3: float = float(N_tot) / n_per_A3
+        L: float = volume_A3 ** (1.0 / 3.0)
+        return L
 
     # ------------------------------------
     # packmol 用
@@ -192,7 +373,7 @@ class Packmol:
         poscar_file: str = "POSCAR",
         packmol_inp: str = "packmol.inp",
         comment: str = "packmol",
-        species_order=("Fe", "Si", "B"),
+        elements: Optional[List[str]] = None,  #  =["Fe", "Si", "B"],
     ) -> None:
         """Packmol が出力した XYZ を VASP POSCAR へ変換する。
 
@@ -210,8 +391,7 @@ class Packmol:
 
             packmol_inp (str):
             comment (str): POSCAR の中のコメント
-            species_order (Tuple[str]):
-                元素の並び順（POSCAR の行順）。
+            elements (List[str]): 元素の並び順（POSCAR の行順）, None ならば書かない(VASP4)
         """
         # --- XYZ 読み込み ---
         with open(xyz_file, "r") as f:
@@ -248,11 +428,11 @@ class Packmol:
         frac_atoms = [(sym, x / L, y / L, z / L) for sym, x, y, z in xyz_atoms]
 
         # --- 元素ごとに分類 ---
-        species_counts = {s: 0 for s in species_order}
-        species_positions = {s: [] for s in species_order}
+        species_counts = {s: 0 for s in elements}
+        species_positions = {s: [] for s in elements}
 
         for sym, fx, fy, fz in frac_atoms:
-            if sym in species_order:
+            if sym in elements:
                 species_counts[sym] += 1
                 species_positions[sym].append((fx, fy, fz))
             else:
@@ -269,14 +449,22 @@ class Packmol:
             f.write(f"0.0 0.0 {L:.10f}\n")
 
             # 元素名
-            f.write(" ".join(species_order) + "\n")
+            # f.write(" ".join(elements) + "\n")
+            if elements is not None:
+                # 元素行を書く
+                f.write(" ".join(elements) + "\n")
+                species_order: List[str] = elements
+            else:
+                # 元素行は書かない(VASP4)
+                # 個数行の並び順だけ別に決める（ここでは dict のキー順をそのまま使う）
+                species_order: List[str] = list(species_counts.keys())
 
             # 元素ごとの個数
-            f.write(" ".join(str(species_counts[s]) for s in species_order) + "\n")
+            f.write(" ".join(str(species_counts[s]) for s in elements) + "\n")
 
             f.write("Direct\n")
 
             # 元素順に Direct 座標を書き込む
-            for s in species_order:
+            for s in elements:
                 for fx, fy, fz in species_positions[s]:
                     f.write(f"{fx:.10f}  {fy:.10f}  {fz:.10f}\n")
