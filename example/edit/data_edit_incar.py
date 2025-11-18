@@ -31,7 +31,7 @@ if __name__ == "__main__":
     """"""
     logger = XLogger(log_level="debug", logger_name="dft")
 
-    config = Config("config.yml")
+    config = Config("../config.yml")
     # vasp = Vasp(config=config, logger=logger)
 
     # vasp.set_tag("NSW", 1)
