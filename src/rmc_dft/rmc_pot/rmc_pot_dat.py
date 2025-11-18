@@ -382,6 +382,7 @@ class RmcPotDat:
     ) -> None:
         """
         3 行目 cut offs を更新。可変長対応。
+        それ以上原子同士が近づかない距離
 
         Notes:
             Fe Si B の３つのときは 6つのパターンが生まれる
@@ -503,6 +504,8 @@ class RmcPotDat:
         """
         5 行目 r spacing を float で返す。i
         近接分布関数 g(r) のビン幅（r の刻み幅）。単位は Å。
+        RMC の g(r) や部分 g(r) を計算する際、距離 r の空間を等間隔に区切ってヒストグラムを作成します。
+        この ビン間隔（dr） を指定するのが R-SPACING
 
         Notes:
             例:

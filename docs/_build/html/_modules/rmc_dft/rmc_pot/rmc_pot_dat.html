@@ -94,7 +94,10 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html">quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html">quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html#install">install</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -557,6 +560,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        3 行目 cut offs を更新。可変長対応。</span>
+<span class="sd">        それ以上原子同士が近づかない距離</span>
 
 <span class="sd">        Notes:</span>
 <span class="sd">            Fe Si B の３つのときは 6つのパターンが生まれる</span>
@@ -687,6 +691,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        5 行目 r spacing を float で返す。i</span>
 <span class="sd">        近接分布関数 g(r) のビン幅（r の刻み幅）。単位は Å。</span>
+<span class="sd">        RMC の g(r) や部分 g(r) を計算する際、距離 r の空間を等間隔に区切ってヒストグラムを作成します。</span>
+<span class="sd">        この ビン間隔（dr） を指定するのが R-SPACING</span>
 
 <span class="sd">        Notes:</span>
 <span class="sd">            例:</span>

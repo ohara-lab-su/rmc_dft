@@ -97,7 +97,10 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc_dft/quick_start.html">quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc_dft/quick_start.html">quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmc_dft/quick_start.html#install">install</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1132,7 +1135,9 @@ moveout オプションは、原子のランダム移動試行時に追加的な
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_r_spacing">
 <span class="sig-name descname"><span class="pre">get_r_spacing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.get_r_spacing"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.get_r_spacing" title="Link to this definition"></a></dt>
 <dd><p>5 行目 r spacing を float で返す。i
-近接分布関数 g(r) のビン幅（r の刻み幅）。単位は Å。</p>
+近接分布関数 g(r) のビン幅（r の刻み幅）。単位は Å。
+RMC の g(r) や部分 g(r) を計算する際、距離 r の空間を等間隔に区切ってヒストグラムを作成します。
+この ビン間隔（dr） を指定するのが R-SPACING</p>
 <p class="rubric">メモ</p>
 <dl class="simple">
 <dt>例:</dt><dd><p>0.025        ! r spacing</p>
@@ -1375,7 +1380,8 @@ RMC_POT マニュアルでは「time limit, step for saving」と定義されて
 <dl class="py method">
 <dt class="sig sig-object py" id="rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_cutoffs">
 <span class="sig-name descname"><span class="pre">set_cutoffs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/rmc_pot/rmc_pot_dat.html#RmcPotDat.set_cutoffs"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.rmc_pot.rmc_pot_dat.RmcPotDat.set_cutoffs" title="Link to this definition"></a></dt>
-<dd><p>3 行目 cut offs を更新。可変長対応。</p>
+<dd><p>3 行目 cut offs を更新。可変長対応。
+それ以上原子同士が近づかない距離</p>
 <p class="rubric">メモ</p>
 <p>Fe Si B の３つのときは 6つのパターンが生まれる</p>
 <p>Fe–Fe

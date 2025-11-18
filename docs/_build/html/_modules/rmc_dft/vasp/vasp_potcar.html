@@ -94,7 +94,10 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html">quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html">quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html#install">install</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -292,7 +295,8 @@
 <a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp_potcar.VaspPotcarBuilder.build">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="c1"># elements: List[str],</span>
+        <span class="n">elements</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">poscar_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;POTCAR&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

@@ -97,7 +97,10 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc_dft/quick_start.html">quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc_dft/quick_start.html">quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmc_dft/quick_start.html#install">install</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -246,7 +249,7 @@ K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>poscar_name</strong> (<em>str</em>)</p></li>
-<li><p><strong>element_info</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>element_info</strong> (<em>str</em><em> | </em><em>Sequence</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
 <li><p><strong>logger</strong> (<em>x_logger.XLogger</em><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
@@ -372,7 +375,7 @@ K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.preprocess">
-<span class="sig-name descname"><span class="pre">preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vasp_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'label.txt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.preprocess"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.preprocess" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vasp_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.preprocess"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.preprocess" title="Link to this definition"></a></dt>
 <dd><p>vasp 前処理</p>
 <p>基本的に Vasp Class は相手がなんであれ動くようにする
 それは入力が常に VASP であることを仮定していて、

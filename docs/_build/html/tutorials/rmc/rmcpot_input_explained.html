@@ -1,0 +1,455 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RMCPOT のインプットファイル解説 &mdash; Project  ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c033477b"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="RMC POT のアウトプットファイル（解説）" href="rmcpot_output_explained.html" />
+    <link rel="prev" title="RMC POTのcfgファイルの説明" href="rmcpot_cfg_explained.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Project
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">rmc_dft</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/rmc_dft.html">rmc_dft package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rmc_dft.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rmc_dft.packmol.html">rmc_dft.packmol package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rmc_dft.util.html">rmc_dft.util package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rmc_dft.vasp.html">rmc_dft.vasp package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rmc_dft.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rmc_dft.html#module-rmc_dft.config">rmc_dft.config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rmc_dft.html#rmc_dft.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rmc_dft.html#module-rmc_dft.rmc_dft">rmc_dft.rmc_dft module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft"><code class="docutils literal notranslate"><span class="pre">RmcDft</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rmc_dft.html#module-rmc_dft.util">rmc_dft.util module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">チュートリアル</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="rmc_theory_explained.html">RMCとは</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_theory_explained.html#id1">シミュレーティッド・アニーリング(焼きなまし法)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmcpot_cfg_explained.html">RMC POTのcfgファイルの説明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmcpot_cfg_explained.html#aaa-cfg">例：aaa.cfg の一部</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rmcpot_cfg_explained.html#id1">各セクションの説明（順に）</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rmcpot_cfg_explained.html#id2">実務メモ / チェックリスト</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RMCPOT のインプットファイル解説</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cfg">cfgファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sq">sqファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dat">datファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmcpot_output_explained.html">RMC POT のアウトプットファイル（解説）</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmcpot_output_explained.html#id1">共通の注意点</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../packmol/packmol.html">pypackmol (in RMC_DFT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../packmol/packmol.html#pacmol">pacmol公式サイト</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../packmol/packmol.html#linux">linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../packmol/packmol.html#for-mac">for Mac</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../packmol/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../packmol/packmol.html#pypacmol">pypacmol</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../rmc_dft/quick_start.html">quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../rmc_dft/quick_start.html#install">install</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Project</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">チュートリアル</a></li>
+      <li class="breadcrumb-item active">RMCPOT のインプットファイル解説</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/rmc/rmcpot_input_explained.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rmcpot">
+<h1>RMCPOT のインプットファイル解説<a class="headerlink" href="#rmcpot" title="Link to this heading"></a></h1>
+</section>
+<section id="cfg">
+<h1>cfgファイル<a class="headerlink" href="#cfg" title="Link to this heading"></a></h1>
+<p>原子配置を指定するためのcfgファイルについては、以下のドキュメントで詳しく説明しています。
+(<a class="reference external" href="https://github.com/shimane-dev/rmc_dft/docs/tutorials/rmcpot_cfg_explained.md">https://github.com/shimane-dev/rmc_dft/docs/tutorials/rmcpot_cfg_explained.md</a>)</p>
+</section>
+<section id="sq">
+<h1>sqファイル<a class="headerlink" href="#sq" title="Link to this heading"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2832</span>
+<span class="n">Dataset</span> <span class="n">measured</span> <span class="n">at</span> <span class="n">BL04B2</span>
+<span class="mf">0.263585</span> <span class="mf">2.81259</span> <span class="mf">0.308196</span> <span class="mf">0.164155</span> <span class="mf">0.329761</span> <span class="mf">0.0218585</span> <span class="mf">0.0878205</span> <span class="mf">0.0882089</span> 
+<span class="mf">0.281276</span> <span class="mf">2.3427</span> <span class="mf">0.308147</span> <span class="mf">0.16408</span> <span class="mf">0.329845</span> <span class="mf">0.0218421</span> <span class="mf">0.087817</span> <span class="mf">0.0882679</span> 
+<span class="mf">0.298966</span> <span class="mf">1.91993</span> <span class="mf">0.308095</span> <span class="mf">0.164001</span> <span class="mf">0.329935</span> <span class="mf">0.0218247</span> <span class="mf">0.0878133</span> <span class="mf">0.0883307</span> 
+<span class="mf">0.316656</span> <span class="mf">1.57281</span> <span class="mf">0.30804</span> <span class="mf">0.163917</span> <span class="mf">0.33003</span> <span class="mf">0.0218063</span> <span class="mf">0.0878092</span> <span class="mf">0.0883972</span> 
+<span class="mf">0.334346</span> <span class="mf">1.29722</span> <span class="mf">0.307982</span> <span class="mf">0.163829</span> <span class="mf">0.33013</span> <span class="mf">0.0217868</span> <span class="mf">0.0878049</span> <span class="mf">0.0884676</span> 
+<span class="mf">0.352037</span> <span class="mf">1.06632</span> <span class="mf">0.307921</span> <span class="mf">0.163735</span> <span class="mf">0.330235</span> <span class="mf">0.0217663</span> <span class="mf">0.0878003</span> <span class="mf">0.0885417</span> 
+<span class="mf">0.369727</span> <span class="mf">0.88715</span> <span class="mf">0.307857</span> <span class="mf">0.163637</span> <span class="mf">0.330346</span> <span class="mf">0.0217447</span> <span class="mf">0.0877954</span> <span class="mf">0.0886195</span>
+   <span class="p">:</span>        <span class="p">:</span> 
+</pre></div>
+</div>
+<p>1列目はq[Å^-1]、
+2列目は実験で得られたS(q)値、
+3列目以降は重み因子を示しています。</p>
+<div class="highlight-math notranslate"><div class="highlight"><pre><span></span>coeff_{ii} = \frac{c_i^2 \overline{b_i}^2}{\sum_{i} \sum_{j} c_i c_j \overline{b_i b_j}} \qquad , \qquad 
+coeff_{ij} = \frac{c_i c_j \overline{b_i b_j}}{\sum_{i} \sum_{j} c_i c_j \overline{b_i b_j}}
+</pre></div>
+</div>
+<p>公式マニュアル　<a class="reference external" href="https://www.szfki.hu/~nphys/rmc++/RMC_POT_user_guide.pdf">https://www.szfki.hu/~nphys/rmc++/RMC_POT_user_guide.pdf</a>
+のE3を参照してください。
+Faber-Ziman型部分構造因子S_ij(q)を通して、全体のS(q)を構成するときに用いられる形式になります。
+T. E. Faber　&amp; J. M. Ziman, 1964, DOI: <a class="reference external" href="https://doi.org/10.1080/14786436508211931">https://doi.org/10.1080/14786436508211931</a></p>
+<p>SPring8のBL04B2の解析ソフト（IGORマクロ）によって、全散乱測定を解析しようとすると、そのアウトプットとして、重み因子も出してくれます。
+そのデータを持っていれば、計算はしなくてもいいです。
+<a class="reference external" href="http://rud.spring8.or.jp/member/0020758/distrbution.html">http://rud.spring8.or.jp/member/0020758/distrbution.html</a></p>
+</section>
+<section id="dat">
+<h1>datファイル<a class="headerlink" href="#dat" title="Link to this heading"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>comment
+0.0842566414       ! number density
+1 1 1 1 1 1 ! cut offs
+0.01 0.01 0.01   ! maximum moves
+0.025        ! r spacing
+.false.      ! whether to use moveout option
+0            ! number of configurration to collect
+5000         ! step for printing
+0 0          ! time limit, step for saving
+0 0 1 0      ! g(r), neutron, x-ray, EXAFS
+S_q_fqd_0.3_0.03_40.sq
+1 991
+1.0
+5E-3
+.false.
+.true.
+.false.
+.false.
+0         ! number of cos. distr of bond angles constraint, dcos_theta (spacing in cos(theta) space
+0  ! no of coord. constr.
+0         ! no of av. coord. contsr.
+0         ! potential
+0         ! FNC switch
+0         ! initial bin shift;
+1         ! xmax used in the run.
+1         ! number of atoms moved in a single move
+200       ! size of the history buffer
+10        ! number of display update beteen each history buffering
+0         ! indicator of custom move
+0         ! whether to load the histgram form file, if posible [0:no 1:yes]
+5        ! maximum number of atoms in a gridcell
+0 0       ! frction of swaps, ntypes*(ntypes-1)/2 0 not allowded or 1 allowed for the possible mixed part
+4         ! total number of threads to use
+</pre></div>
+</div>
+<p>以下、上から順に各行の説明です（サンプルの行番号を便宜上付けて説明します）。</p>
+<ol class="arabic simple">
+<li><p>comment</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: コメント行。ファイル全体に対する簡単な説明や試料名を入れます（任意）。</p></li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p>0.0842566414       ! number density</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 系の数密度（number density）。単位は原子数 / Å^3。</p></li>
+<li><p>備考: cfg ファイル中の原子数とシミュレーションボックス体積の関係で一致させる必要があります。（二重定義）</p></li>
+</ul>
+<ol class="arabic simple" start="3">
+<li><p>1 1 1 1 1 1 ! cut offs</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 原子種ごとのカットオフ距離（またはカットオフの有無フラグ）を指定するフィールド。サンプルは6要素になっていますが、これはシステム中のタイプ数やプログラムの内部フォーマットに依存します。</p></li>
+<li><p>実務上: 多くの実装では「最低許容距離（min separation）」や「ペアごとの距離カットオフ」を指定します。型の数 (ntypes) に応じた個数を並べる必要があります。</p></li>
+<li><p>並びは3元型の場合、11,12,13,22,23,33となっているはずです。</p></li>
+<li><p>n元型の場合、11,12,13,14, ... , 1n, 22, 23,...,2n, 33, 34, ..., 3n, ..., nn となるはずです。</p></li>
+</ul>
+<ol class="arabic simple" start="4">
+<li><p>0.01 0.01 0.01   ! maximum moves</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 原子移動の最大振幅（1 回の move での最大変位）を指定します。複数値が並んでいる場合はタイプごと、または移動タイプごとの設定になっていることがあります。単位は Å。</p></li>
+<li><p>備考: 値が小さいほど受理率が高くなるがサンプリング効率は落ちます。調整して受理率を 20–50% 程度に保つのが一般的です。</p></li>
+</ul>
+<ol class="arabic simple" start="5">
+<li><p>0.025        ! r spacing</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 近接分布関数 g(r) のビン幅（r の刻み幅）。単位は Å。</p></li>
+<li><p>備考: 小さいほど解像度は上がるが計算負荷が増えます。</p></li>
+</ul>
+<ol class="arabic simple" start="6">
+<li><p>.false.      ! whether to use moveout option</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: moveout オプションを使うか否かをブールで指定します（.true./.false.）。moveout は移動時の追加処理（例: 局所的最適化や移動先の制限）に関わる機能です。</p></li>
+<li><p>備考: 実装によって挙動が異なるため、マニュアルの該当項目を参照してください。</p></li>
+</ul>
+<ol class="arabic simple" start="7">
+<li><p>0            ! number of configuration to collect</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 収集する構成（configuration）数。0 の場合は特別扱い（例: 最終構成のみ）や収集しないことを意味する場合があります。</p></li>
+<li><p>備考: サンプルでは 0 なので構成保存を行わない設定になっています。</p></li>
+</ul>
+<ol class="arabic simple" start="8">
+<li><p>5000         ! step for printing</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 結果の経過出力（ログ出力）を行うステップ間隔。何ステップごとに情報をプリントするかを指定します。</p></li>
+</ul>
+<ol class="arabic simple" start="9">
+<li><p>0 0          ! time limit, step for saving</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 1つ目は時間制限（経過時間を使った停止条件、単位は分(minute)）、2つ目は保存のステップ間隔（何ステップごとにファイル保存するか）。</p></li>
+<li><p>備考: 両方 0 は無効/デフォルトを意味することが多いです。</p></li>
+</ul>
+<ol class="arabic simple" start="10">
+<li><p>0 0 1 0      ! g(r), neutron, x-ray, EXAFS</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 出力する物理量や計算フラグを並べたもの。順に g(r) の計算、中性子散乱、X線、EXAFS の計算フラグなどを意味します。</p></li>
+<li><p>例: 上記の例は「g(r) は出力しない、neutron は出力しない、x-ray を出力する、EXAFS は出力しない」（ただし順序・意味は実装依存なのでマニュアル参照）。</p></li>
+</ul>
+<ol class="arabic simple" start="11">
+<li><p>S_q_fqd_0.3_0.03_40.sq</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: sq データファイルのパス／ファイル名（先に出した S(q) データを読み込むファイル）。相対パスやフルパスで指定します。</p></li>
+</ul>
+<ol class="arabic simple" start="12">
+<li><p>1 991</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: sq ファイルの読み込みに関する範囲指定など（例えば読み込む行の開始/終了インデックス、q インデックスの最小/最大など）。</p></li>
+<li><p>備考: 具体的な意味は RMC_POT のバージョンと入出力フォーマットによるので、マニュアルを参照してください。</p></li>
+</ul>
+<ol class="arabic simple" start="13">
+<li><p>1.0</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: スケーリング因子（S(q) のスケール合わせに用いる係数）や正規化に関する値の可能性があります。上の sq データに対する正規化や重み付けで使われることが多いです。</p></li>
+</ul>
+<ol class="arabic simple" start="14">
+<li><p>5E-3</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: S(q) の許容誤差（tolerance）や最小変化量の許容値などを表す数値。例えばフィッティングの収束条件や S(q) での最小分解能を指定することがあります。</p></li>
+<li><p>いや、たぶんこれが温度因子じゃないかな。メトロポリス法の。で、マニュアルでstatndard deviationとして示されているものじゃないかな。そうだとしたら(温度)^0.5 になる。</p></li>
+<li><p>マニュアルによると、「5E-3 0」、「5E-3 1」、など書き分けができて、前者ではΧ、後者ではRwを用いることになるらしい。</p></li>
+</ul>
+<ol class="arabic simple" start="15">
+<li><p>.false.</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: ブール値フラグ。例えば S(q) のバックグラウンド補正を行うか、平滑化をするかなどのフラグが入ります（正確な割当はマニュアル参照）。</p></li>
+</ul>
+<ol class="arabic simple" start="16">
+<li><p>.true.</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 別のブールフラグ。例: データの重みを有効にする、誤差バーベースの重み付けを行う、など。</p></li>
+</ul>
+<ol class="arabic simple" start="17">
+<li><p>.false.</p></li>
+<li><p>.false.</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 追加のブールフラグ（計4つ並ぶことで複数のオン/オフ設定を行っている）。それぞれの意味はソフトの仕様に従います。</p></li>
+</ul>
+<ol class="arabic simple" start="19">
+<li><p>0         ! number of cos. distr of bond angles constraint, dcos_theta (spacing in cos(theta) space</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 角度制約（bond angle distribution）の数。0 は角度分布による制約を適用しないことを意味します。カンマ以降は cos(theta) 空間での刻み幅 dcos_theta の指定に関する注記です。</p></li>
+</ul>
+<ol class="arabic simple" start="20">
+<li><p>0  ! no of coord. constr.</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 配位数（coordination）に基づく制約の数。0 は配位数制約を適用しないことを意味します。</p></li>
+</ul>
+<ol class="arabic simple" start="21">
+<li><p>0         ! no of av. coord. contsr.</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 平均配位数に関する制約数（平均的な配位数を固定/制限する制約）。0 で使用しない設定。</p></li>
+</ul>
+<ol class="arabic simple" start="22">
+<li><p>0         ! potential</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: ポテンシャル関係のフラグか選択番号（ポテンシャルを使う/使わない、あるいはどのポテンシャルを使うかを指定）。0 はポテンシャル未使用を意味する場合が多いです。</p></li>
+</ul>
+<ol class="arabic simple" start="23">
+<li><p>0         ! FNC switch</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: FNC（Fixed Neighbour Constraints など）スイッチ。0 はオフ。実装により異なるためマニュアル参照。</p></li>
+</ul>
+<ol class="arabic simple" start="24">
+<li><p>0         ! initial bin shift;</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: g(r) 等の初期ビンシフト（ヒストグラムのオフセット）を指定する値。0 はシフトなし。</p></li>
+</ul>
+<ol class="arabic simple" start="25">
+<li><p>1         ! xmax used in the run.</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: g(r) 等の計算に用いる最大 r 値（xmax）のスケーリングやフラグ。サンプルでは 1（意味は実装に依存）。</p></li>
+</ul>
+<ol class="arabic simple" start="26">
+<li><p>1         ! number of atoms moved in a single move</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 1 回の move で同時に移動させる原子の数。通常は 1（1 原子移動）だが、複数移動を許すことも可能。</p></li>
+</ul>
+<ol class="arabic simple" start="27">
+<li><p>200       ! size of the history buffer</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 履歴バッファのサイズ（過去の move 情報や受理率などを格納するバッファ）。解析用の統計に使われます。</p></li>
+</ul>
+<ol class="arabic simple" start="28">
+<li><p>10        ! number of display update beteen each history buffering</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 履歴バッファ更新間の表示更新回数。どの程度の頻度で進捗表示を更新するか。</p></li>
+</ul>
+<ol class="arabic simple" start="29">
+<li><p>0         ! indicator of custom move</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: カスタムムーブ（ユーザー定義の移動アルゴリズム）を使うかどうかのインジケータ。0 で無効。</p></li>
+</ul>
+<ol class="arabic simple" start="30">
+<li><p>0         ! whether to load the histgram form file, if posible [0:no 1:yes]</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 既存のヒストグラムを外部ファイルからロードするか（0: ロードしない、1: ロードする）。</p></li>
+</ul>
+<ol class="arabic simple" start="31">
+<li><p>5        ! maximum number of atoms in a gridcell</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 空間分割（グリッドセル）あたりに許容する最大原子数。近接探索や近傍リスト作成時のパラメータ。</p></li>
+</ul>
+<ol class="arabic simple" start="32">
+<li><p>0 0       ! frction of swaps, ntypes*(ntypes-1)/2 0 not allowded or 1 allowed for the possible mixed part</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 交換（swap）に関する設定。最初の数値は交換の比率や制御値、2 番目の数値は swap を許可するか否か（0: 許可しない、1: 許可する）を示します。ntypes*(ntypes-1)/2 は可能な混合部分（タイプ間交換）の数に対応するという注釈です。</p></li>
+</ul>
+<ol class="arabic simple" start="33">
+<li><p>4         ! total number of threads to use</p></li>
+</ol>
+<ul class="simple">
+<li><p>説明: 使用するスレッド数（並列度）。マシンスペックに合わせて設定してください。たぶんこれは変えたとしても、1スレッドになってしまう気がする。</p></li>
+</ul>
+<hr class="docutils" />
+<p>補足と注意点</p>
+<ul class="simple">
+<li><p>上記の各行の正確な順序・意味は RMC_POT（または RMC++）のバージョンや実装によって若干異なる場合があります。ここでの説明は一般的な役割と単位を示したもので、完全な仕様は公式マニュアル（<a class="reference external" href="https://www.szfki.hu/~nphys/rmc++/RMC_POT_user_guide.pdf%EF%BC%89%E3%82%92%E5%8F%82%E7%85%A7%E3%81%97%E3%81%A6%E3%81%8F%E3%81%A0%E3%81%95%E3%81%84%E3%80%82">https://www.szfki.hu/~nphys/rmc++/RMC_POT_user_guide.pdf）を参照してください。</a></p></li>
+<li><p>cfg ファイル内の原子種数（ntypes）と dat ファイル中で期待される数（例えばカットオフやタイプごとのパラメータ列の要素数）は一致させる必要があります。</p></li>
+<li><p>値を変更した場合は、ログ（プリント間隔）や受理率・ビン幅等を見て適宜調整してください。特に移動最大振幅は受理率に大きく影響します。</p></li>
+<li><p>sq データの重み（coeff）の計算や順序を間違えると S(q) の再現が不正確になるため、原子組成 c_i と散乱長（平均散乱長）を正しく扱ってください。</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rmcpot_cfg_explained.html" class="btn btn-neutral float-left" title="RMC POTのcfgファイルの説明" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rmcpot_output_explained.html" class="btn btn-neutral float-right" title="RMC POT のアウトプットファイル（解説）" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

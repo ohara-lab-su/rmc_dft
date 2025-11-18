@@ -7,6 +7,11 @@ sys.path.insert(0, os.path.abspath("../../x_logger/src"))
 project = "Project"
 language = "ja"
 
+# suppress_warnings = ["*"]
+# Sphinx 警告の抑制
+suppress_warnings = [
+    "docutils",
+]
 
 extensions = [
     "sphinx.ext.autodoc",  # autodoc: Pythonのdocstringから自動的にAPIドキュメントを生成

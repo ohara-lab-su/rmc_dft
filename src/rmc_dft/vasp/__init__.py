@@ -9,6 +9,9 @@ from rmc_dft.vasp.vasp_potcar import VaspPotcarBuilder
 from rmc_dft.vasp.vasp_log import VaspLog
 from rmc_dft.vasp.vasp_outcar import VaspOutcar
 
+from rmc_dft.vasp.vasp_poscar import VaspPoscar
+from rmc_dft.vasp.vasp_poscar_analyzer import VaspPoscarAnalyzer
+
 # from .vasp import Vasp
 # from .collect_result import VaspLog
 # from . import util

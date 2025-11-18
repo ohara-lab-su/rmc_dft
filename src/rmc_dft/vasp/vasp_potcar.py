@@ -159,7 +159,8 @@ class VaspPotcarBuilder:
 
     def build(
         self,
-        elements: List[str],
+        # elements: List[str],
+        elements: Sequence[str],
         poscar_name: str = "POTCAR",
     ) -> bool:
         """
