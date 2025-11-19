@@ -36,7 +36,7 @@ def main() -> None:
     B_xyz_file = "B.xyz"
 
     ##########################
-    N_tot = 200  # セルの原子数
+    N_tot = 400  # セルの原子数
     rho_g_cm3 = 7.35  # 質量密度
     ratios = [80, 9, 11]  # 化学量論比
     symbols = ["Fe", "Si", "B"]
@@ -58,11 +58,14 @@ def main() -> None:
     logger.info(f"L = {L:.6f}")
 
     with open(inp_file, "w") as f:
-        f.write("tolerance 2.3\n")  # 最小距離
+        # f.write("tolerance 2.3\n")  # 最小距離
+        f.write("tolerance 2.0\n")  # 最小距離
         f.write("filetype xyz\n")
-        f.write(f"output {result_xyz_file}\n\n")
+        f.write(f"output {result_xyz_file}\n")
         # f.write("seed 987654321\n\n")
         # f.write("seed 1234567\n")  # 乱数のシード（デフォルト値)
+        f.write(f"pbc {L:.6f} {L:.6f} {L:.6f}\n")
+        f.write(f"\n")
 
         # Fe
         f.write(f"structure {Fe_xyz_file}\n")

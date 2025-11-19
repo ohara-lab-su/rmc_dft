@@ -6,7 +6,8 @@ Packmol 利用の簡便化のための python パッケージ(nakada)
 
 - [公式サイト](https://m3g.iqm.unicamp.br/packmol/)
 - [公式 tar.gz (最新版)](https://m3g.iqm.unicamp.br/packmol/packmol.tar.gz)
-
+- [github](https://github.com/m3g/packmol)
+ 
 ## linux
 ```aiignore
 wget https://m3g.iqm.unicamp.br/packmol/packmol.tar.gz
@@ -26,12 +27,18 @@ make
 ```
 フォルダに対してパスを通すか、コピーして使う
 
+## 公式packmolモジュール
+
+使わない
+- https://github.com/m3g/Packmol.jl#packmol
+
+ただの packmol の実行のための(subprocess)するだけのラッパー
+
 ## 入力ファイル(packmol.inp)
 
+## rmc_dft.packmol.packmol.Packmol
 
-## pypacmol
-
-基本的な使い方
+基本的な使い方1
 
 ```python
 from x_logger import XLogger
@@ -113,4 +120,10 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+```
+
+## rmc_dft.packmol.PackmolInp
+
+input ファイル作成クラスを使った上記スクリプトの一般化
+```
 ```

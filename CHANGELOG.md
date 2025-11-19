@@ -2,7 +2,10 @@
 
 ## v0.3.19 nakada
 
--
+- packmol_inp.py (Packmol Inp 作成支援クラス)
+- 原子間距離の下位を表示スクリプト
+- packmol 20.15.0 からの周期境界オプション(PBC)のための修正
+  - テスト
 
 ## v0.3.18 nakada
 

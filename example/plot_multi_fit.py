@@ -135,39 +135,3 @@ if __name__ == "__main__":
     ]
 
     plot_multi_fit(dir_list, cfg_name_arg, ncols=4)
-
-if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) != 2:
-        print("Usage:  plot_multi_fit.py <cfg_name>")
-        print("例:     plot_multi_fit.py aaa")
-        sys.exit(1)
-
-    cfg_name_arg = sys.argv[1]
-
-    # 手で並べる log 一覧
-    _dir_list = [
-        "log01",
-        "log02",
-        "log03",
-        "log04",
-        "log05",
-        "log06",
-        "log07",
-        "log08",
-        "log09",
-        "log10",
-        "log11",
-        "log12",
-        "log13",
-        "log14",
-        "log15",
-        "log16",
-        "log17",
-        "log18",
-        "log19",
-    ]
-
-    # ncols=4 (4×? の段組) にしてある
-    plot_multi_fit(_dir_list, cfg_name_arg, ncols=4)
