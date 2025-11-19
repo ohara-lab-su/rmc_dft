@@ -36,10 +36,17 @@ def main() -> None:
     B_xyz_file = "B.xyz"
 
     ##########################
-    N_tot = 400  # セルの原子数
-    rho_g_cm3 = 7.35  # 質量密度
-    ratios = [80, 9, 11]  # 化学量論比
-    symbols = ["Fe", "Si", "B"]
+    if os.path.exists("config.yaml"):
+        config = Config(config_file)
+        N_tot = config.N_tot
+        rho_g_cm3 = config.rho_g_cm3
+        ratios = config.ratios
+        symbols = config.element_info
+    else:
+        N_tot = 400  # セルの原子数
+        rho_g_cm3 = 7.35  # 質量密度
+        ratios = [80, 9, 11]  # 化学量論比
+        symbols = ["Fe", "Si", "B"]
     ##########################
 
     pm = Packmol()

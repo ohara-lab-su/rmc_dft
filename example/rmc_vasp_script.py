@@ -44,7 +44,8 @@ if __name__ == "__main__":
     # rmc_dat.set_exp_filename("ascast.xsq")
     rmc_dat.set_exp_filename(config.rmc_exp_filename)
     rmc_dat.set_comment("comment FeSiB")
-    rmc_dat.set_density(0.0915)
+    # rmc_dat.set_density(0.0915)  # 数密度
+    rmc_dat.set_density(config.n_per_A3)
     rmc_dat.set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
     rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
     rmc_dat.set_r_spacing(0.025)
@@ -69,8 +70,11 @@ if __name__ == "__main__":
 
     if not os.path.exists("POTCAR"):
         vasp_potcar = VaspPotcarBuilder("~/potpaw_PBE.64", logger=logger)
-        elements = ["Fe", "Si", "B"]
-        # elements = config.element_info
+        # elements = ["Fe", "Si", "B"]
+        elements = config.element_info
+        if isinstance(elements, str):  # もし、label.txt とかの str ならば、
+            with open(elements) as f:
+                elements = f.readline().strip().split()
         vasp_potcar.build(elements, poscar_name="POTCAR")
 
     vasp_incar = VaspIncar(logger=logger)

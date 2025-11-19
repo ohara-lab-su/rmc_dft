@@ -1,6 +1,11 @@
 # K.NAKADA, kengo.nakada@gmail.com
 
 max_rmc_dft_loop: 20
+rho_g_cm3: 7.35  # 質量密度
+n_per_A3: 0.0915  # 数密度
+element_info: ["Fe", "Si", "B"]
+ratios: [80, 9, 11]  # 化学量論比
+rmc_exp_filename: "ascast.xsq"
 
 # ---------- RMC -----------
 rmc_code: "RmcPot" # RMC code ClassNames
@@ -9,8 +14,6 @@ rmc_log_dir: "log" # LOG 保存
 # -------------------------
 cfg_name: "aaa" # input_file: RMC: aaa.cfg
 # element_info: "label.txt" # VASP4(Rmc.cfg) type --> VASP5 type
-element_info: ["Fe", "Si", "B"]
-rmc_exp_filename: "ascast.xsq"
 
 # ------- DFT (VASP) --------
 dft_code: "Vasp" # VASP code ClassNames
