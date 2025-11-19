@@ -14,11 +14,16 @@ class Config:
 
     max_rmc_dft_loop: int = 10
 
+    rho_g_cm3: float = 7.35  # 質量密度
+    n_per_A3: float = 0.0915  # 数密度
+    # element_info: Union[str, Sequence[str]] = "label.txt"
+    element_info: Union[str, Sequence[str]] = ["Fe", "Si", "B"]
+    ratios: Sequence[int] = [80, 9, 11]
+
     # ---------- RMC -----------
     rmc_code: str = "RmcPot"
     rmc_log_dir: str = "rmc_log"
     cfg_name: str = "aaa"  # aaa.cfg
-    element_info: Union[str, Sequence[str]] = "label.txt"
     rmc_exp_filename: str = "ascast.xsq"
 
     # ------- DFT (VASP) --------
