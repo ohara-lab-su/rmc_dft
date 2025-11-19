@@ -4,6 +4,8 @@ K.NAKADA, kengo.nakada@gmail.com
 
 POSCAR から全原子ペアの距離分布（ヒストグラム）を描くスクリプト。
 
+packmol (make_amorphous) で作った初期構造の検証用
+
 前提:
     - 同じディレクトリに poscar.py, poscar_analyzer.py がある
     - POSCAR ファイルがカレントディレクトリにある

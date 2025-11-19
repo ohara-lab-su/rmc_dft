@@ -1,11 +1,17 @@
 # CHANGELOG
 
+## v0.3.19 nakada
+
+-
+
 ## v0.3.18 nakada
 
 - 0.3.17 の　bugfix
 - vasp.run() のエラーハンドリングを修正
 - poscar 関係を、x_poscar リポジトリから移行
 - plot_distance_histgram.py
+  - (原子間距離でのヒストグラム作成)
+  - packmol での初期構造作成のときの検証用
 
 ## v0.3.17 nakada
 
