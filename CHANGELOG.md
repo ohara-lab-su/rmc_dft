@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.3.20 nakada
+
+- config に項目をいくつか追加
+- スクリプト側の変数のいくつかを config に押し込み(make_amarphous.py)
+
 ## v0.3.19 nakada
 
 - packmol_inp.py (Packmol Inp 作成支援クラス)
