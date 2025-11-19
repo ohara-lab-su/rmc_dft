@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 """
+K.NAKADA, kengo.nakada@gmail.com
+
 POSCAR の全原子ペアについて周期境界条件込みで距離を計算し、
 短い順に上位10件を表示する。
 """
@@ -27,7 +28,8 @@ from x_logger import XLogger
 
 
 def get_all_distances(
-    analyzer: VaspPoscarAnalyzer, use_pbc: bool = True
+    analyzer: VaspPoscarAnalyzer,
+    use_pbc: bool = True,
 ) -> List[Tuple[float, int, int]]:
     """
     全原子ペアの距離一覧を返す。
