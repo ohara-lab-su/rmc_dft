@@ -36,7 +36,7 @@ if __name__ == "__main__":
     # 初期POSCAR 作成
     shutil.copy(f"POSCAR0", "POSCAR")
 
-    # rmc_log = RmcPotLog(config=config, logger=logger)
+    # rmc_log = RmcPotLog(config=config, _logger=_logger)
     rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
     rmc_dat = RmcPotDat(config=config, logger=logger)
 
@@ -52,8 +52,8 @@ if __name__ == "__main__":
     rmc_dat.set_data_flags([0, 0, 1, 0])
     ######################################
 
-    # rmc = RmcPot(rmc_log=rmc_log, cfg_name=config.cfg_name, logger=logger)
-    # rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
+    # rmc = RmcPot(rmc_log=rmc_log, cfg_name=config.cfg_name, _logger=_logger)
+    # rmc = RmcPot(rmc_log=rmc_log, config=config, _logger=_logger)
 
     rmc = RmcPot(
         rmc_dat=rmc_dat,  # instance

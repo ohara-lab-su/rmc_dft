@@ -62,7 +62,7 @@ class RmcDft:
 
         # self._rmc_log = rmc_log_class(
         #     config=self._config,
-        #     logger=logger,
+        #     _logger=_logger,
         # )
         self._rmc = rmc_class(
             config=self._config,
@@ -78,7 +78,7 @@ class RmcDft:
 
         # self._dft_log = dft_log_class(
         #     self._config,
-        #     logger=logger,
+        #     _logger=_logger,
         # )
         self._dft = dft_class(
             config=config,
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     #     dft_code="Vasp",
     #     cfg_name="aaa",
     #     max_rmc_dft_loop=5,
-    #     logger=_logger,
+    #     _logger=_logger,
     # )
 
     rmc_dft = RmcDft(

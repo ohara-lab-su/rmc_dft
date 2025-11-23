@@ -40,7 +40,7 @@ class VaspKpoints:
     Aargs:
         kpoints_name (str): KPOINTS ファイル名（絶対パス推奨）。
         auto_write (bool): True の場合、set_* 呼び出しで都度ファイルへ保存。
-        logger (XLogger): 任意のロガー（info/debug を想定）。None 可。
+        _logger (XLogger): 任意のロガー（info/debug を想定）。None 可。
 
     """
 

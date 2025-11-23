@@ -192,18 +192,18 @@ def convert_to_cfg(
     ###############################################
     ## Read Atoms
     ##
-    # lines = 17
+    # _lines = 17
     # type = np.zeros((int(ntype) + 1))
     # for i in range(int(ntype)):
-    #    lines += 1
-    #    n = datlines[lines].split()
+    #    _lines += 1
+    #    n = datlines[_lines].split()
     #    type[i] = n[0]
-    #    lines += 1
-    #    tmp = datlines[lines]
-    #    lines += 1
-    #    tmp = datlines[lines]
-    #    lines += 1
-    #    tmp = datlines[lines]
+    #    _lines += 1
+    #    tmp = datlines[_lines]
+    #    _lines += 1
+    #    tmp = datlines[_lines]
+    #    _lines += 1
+    #    tmp = datlines[_lines]
     type = list(
         map(int, datlines[6].split())
     )  # length is different from original deffinition

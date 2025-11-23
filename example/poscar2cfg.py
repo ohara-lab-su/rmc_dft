@@ -34,7 +34,7 @@ if __name__ == "__main__":
     vasp_name = config.vasp_name
 
     vasp = Vasp(config=config, logger=logger)
-    # rmc = RmcPot(config=config, logger=logger)
+    # rmc = RmcPot(config=config, _logger=_logger)
 
     # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
     vasp.poscar2cfg(cfg_name)
