@@ -33,7 +33,7 @@ class RmcPotHst:
         self._config: Config = config
         self._hst_path: Optional[str] = hst_path or config.cfg_name
 
-    def read_chi2(self) -> Tuple[List[int], List[float]]:
+    def read_chi2(self) -> Union[Tuple[List[int], List[float]], bool]:
         """
         hst ファイルから step と chi2_tot/data_point のリストを返す。
 
@@ -44,14 +44,19 @@ class RmcPotHst:
         steps: List[int] = []
         chi2: List[float] = []
 
-        with open(self._hst_path, "r") as f:
-            for line in f:
-                items = line.strip().split()
-                # 数値行は 8 列以上あり、先頭が整数（step）
-                if len(items) >= 8 and items[0].isdigit():
-                    step_val = int(items[0])
-                    chi_val = float(items[6])  # 7列目
-                    steps.append(step_val)
-                    chi2.append(chi_val)
+        try:
+            with open(self._hst_path, "r") as f:
+                for line in f:
+                    items = line.strip().split()
+                    # 数値行は 8 列以上あり、先頭が整数（step）
+                    if len(items) >= 8 and items[0].isdigit():
+                        step_val = int(items[0])
+                        chi_val = float(items[6])  # 7列目
+                        steps.append(step_val)
+                        chi2.append(chi_val)
+        except FileNotFoundError:
+            # HST がない、からデーターとして扱う
+            self._logger.warning(f"HST file not found: {self._hst_path}")
+            return False
 
         return steps, chi2

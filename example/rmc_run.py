@@ -37,10 +37,10 @@ if __name__ == "__main__":
     # 初期CFG 作成 (POSCAR to CFG)
     poscar2cfg(cfg_name=config.cfg_name)
 
-    # rmc_log = RmcPotLog(cfg_name=cfg_name, logger=logger)
-    # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, config=config, logger=logger)
-    # rmc_log = RmcPotLog(config=config, logger=logger)
-    # rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
+    # rmc_log = RmcPotLog(cfg_name=cfg_name, _logger=_logger)
+    # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, config=config, _logger=_logger)
+    # rmc_log = RmcPotLog(config=config, _logger=_logger)
+    # rmc = RmcPot(rmc_log=rmc_log, config=config, _logger=_logger)
 
     rmc_dat = RmcPotDat(config=config, logger=logger)
     rmc_dat.set_comment("comment FeSiB")

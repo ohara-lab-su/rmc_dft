@@ -37,11 +37,11 @@ class VaspIncar:
 
         # それぞれの tag 操作で自動的に書き換え
         self.auto_write: bool = auto_write
-        self.logger: XLogger = logger or XLogger()
-        self.lines: list[str] = []
+        self._logger: XLogger = logger or XLogger()
+        self._lines: list[str] = []
 
         # pymatgen Incar()
-        self.incar: Incar = Incar()
+        self._incar: Incar = Incar()
 
         if os.path.exists(self.incar_name):
             self.load()
@@ -55,17 +55,17 @@ class VaspIncar:
         ファイルを読み込み、pymatgen.Incarとテキスト行を両方保持
         """
         with open(self.incar_name, "r") as f:
-            self.lines = f.readlines()
+            self._lines = f.readlines()
 
         # pymatgen Incar()
-        self.incar = Incar.from_file(self.incar_name)
-        self.logger.info(f"[VaspIncar] Loaded INCAR: {self.incar_name}")
+        self._incar = Incar.from_file(self.incar_name)
+        self._logger.info(f"[VaspIncar] Loaded INCAR: {self.incar_name}")
 
     def write(self) -> None:
         """内部linesを書き戻し"""
         with open(self.incar_name, "w") as f:
-            f.writelines(self.lines)
-        self.logger.info(f"[VaspIncar] Wrote INCAR: {self.incar_name}")
+            f.writelines(self._lines)
+        self._logger.info(f"[VaspIncar] Wrote INCAR: {self.incar_name}")
 
     # ==============================
     # 行操作
@@ -79,7 +79,7 @@ class VaspIncar:
         実際の INCAR に、指定のタグがどの行にあるのか？を調べる
         """
         tag_upper = tag.upper()
-        for i, line in enumerate(self.lines):
+        for i, line in enumerate(self._lines):
             if "=" in line and not line.strip().startswith("#"):
                 key = line.split("=")[0].strip().upper()
                 if key == tag_upper:
@@ -109,7 +109,7 @@ class VaspIncar:
         Returns:
             Any:
         """
-        return self.incar.get(tag, default)
+        return self._incar.get(tag, default)
 
     def get_tag(self, tag: str, default: Any = None) -> Any:
         return self.get(tag, default)
@@ -133,15 +133,15 @@ class VaspIncar:
         new_line = self._format_line(tag, value)
 
         if idx is not None:
-            self.lines[idx] = new_line
-            self.logger.info(f"[VaspIncar] Updated tag: {tag} -> {value}")
+            self._lines[idx] = new_line
+            self._logger.info(f"[VaspIncar] Updated tag: {tag} -> {value}")
         else:
             # 新規タグは末尾に追記
-            self.lines.append(new_line)
-            self.logger.info(f"[VaspIncar] Added tag: {tag} = {value}")
+            self._lines.append(new_line)
+            self._logger.info(f"[VaspIncar] Added tag: {tag} = {value}")
 
         # pymatgen側更新
-        self.incar[tag] = value
+        self._incar[tag] = value
         if self.auto_write:
             self.write()
 
@@ -152,11 +152,11 @@ class VaspIncar:
         """指定タグを削除"""
         idx = self._find_line_index(tag)
         if idx is not None:
-            del self.lines[idx]
+            del self._lines[idx]
 
-            self.logger.info(f"[VaspIncar] Removed tag: {tag}")
-            if tag in self.incar:
-                del self.incar[tag]
+            self._logger.info(f"[VaspIncar] Removed tag: {tag}")
+            if tag in self._incar:
+                del self._incar[tag]
             if self.auto_write:
                 self.write()
 
@@ -166,7 +166,37 @@ class VaspIncar:
 
     def export_dict(self) -> Dict[str, Any]:
         """内部Incar辞書を返す"""
-        return dict(self.incar)
+        return dict(self._incar)
+
+    def diff_with(self, other: "VaspIncar") -> Dict[str, Tuple[Any, Any]]:
+        """
+        2つの VaspIncar インスタンスを比較し、値が異なるタグのみを返す。
+
+        コメント行や元の行順序は比較対象に含めず、
+        内部で保持している ``pymatgen.Incar`` 辞書
+        （``self._incar`` と ``other._incar``）の値だけで比較を行う。
+
+        Args:
+            other (VaspIncar):
+                比較対象となる VaspIncar インスタンス。
+
+        Returns:
+            Dict[str, Tuple[Any, Any]]:
+                値が異なるタグだけを含む辞書。
+                キーがタグ名、値は ``(self 側の値, other 側の値)`` のタプル。
+        """
+        diff: Dict[str, Tuple[Any, Any]] = {}
+
+        keys = set(self._incar.keys()) | set(other._incar.keys())
+
+        for key in sorted(keys):
+            v1 = self._incar.get(key, None)
+            v2 = other._incar.get(key, None)
+
+            if v1 != v2:
+                diff[key] = (v1, v2)
+
+        return diff
 
 
 if __name__ == "__main__":

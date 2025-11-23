@@ -66,10 +66,10 @@ def xdatcar2poscar(
     ###############################################
     ## Read Header
     ##
-    num_header = 7  # Number of header lines in XDATCAR.
+    num_header = 7  # Number of header _lines in XDATCAR.
 
     natom = sum(list(map(int, datlines[6].split())))
-    header = datlines[:num_header]  # First 6 lines are the header
+    header = datlines[:num_header]  # First 6 _lines are the header
     NSW = (len(datlines) - num_header) // (1 + natom)  # NSW >= 1.
     skip_lines = num_header + (NSW - 1) * (1 + natom)
     configuration = datlines[skip_lines : (skip_lines + (1 + natom))]

@@ -27,11 +27,27 @@ class VaspOutcar:
       一般に -> ステップ 0..NSW (要素数 NSW+1)
     """
 
-    def __init__(self, filename: str) -> None:
+    def __init__(
+        self,
+        filename: str,
+    ) -> None:
+        """
+
+        Args:
+            filename (str):  OUTCAR (パス指定OK)
+        """
         self.filename: str = filename
 
         with open(filename, "r", encoding="utf-8", errors="ignore") as f:
             self.lines = f.readlines()
+
+        # OUTCAR の終了判定
+        # インスタンス生成にこけるようにしている。
+        # インスタンスを作ってしまって、メソッドで判定し、
+        # 再読み込み機能を入れるのも一つの手段ではあるが。
+        self.finished: bool = self._detect_finished()
+        if not self.finished:
+            raise RuntimeError(f"OUTCAR seems not finished: {self.filename}")
 
         self.nsw: int = self._read_int("NSW", default=0)
         self.nelm: int = self._read_int("NELM", default=60)
@@ -429,3 +445,21 @@ class VaspOutcar:
         if np.isnan(val):
             return None
         return float(val)
+
+    def _detect_finished(self) -> bool:
+        """
+        OUTCAR が「正常終了」しているかどうかの簡易判定を行う。
+
+        以下のような行の存在で判定する:
+          - "General timing and accounting informations for this job"
+          - "Voluntary context switches"
+
+        これらが末尾付近に無い場合は、未完了とみなす。
+        """
+        for line in reversed(self.lines):
+            if "General timing and accounting informations for this job" in line:
+                return True
+            if "Voluntary context switches" in line:
+                return True
+
+        return False

@@ -32,7 +32,7 @@ if __name__ == "__main__":
     logger = XLogger(log_level="debug", logger_name="dft")
 
     config = Config("../config.yml")
-    # vasp = Vasp(config=config, logger=logger)
+    # vasp = Vasp(config=config, _logger=_logger)
 
     # vasp.set_tag("NSW", 1)
     # vasp.set_tag("EDIFF", 1e-04)

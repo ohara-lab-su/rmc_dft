@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.3.21 nakada
+
+- プログラムが途中の時に multi plot で止まる問題
+- VaspOutcar に終了は判定メソッドを加える
+
 ## v0.3.20 nakada
 
 - config に項目をいくつか追加

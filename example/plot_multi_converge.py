@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 """
 K.NAKADA, kengo.nakada@gmail.com
+未完:
+読み込んだファイルが全て正しければ、きちんと動作するが
+エラーや計算途中のファイルがあるとちょっとまだ意図しない動作をする
+
 """
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
@@ -12,16 +16,29 @@ import matplotlib.pyplot as plt
 from rmc_dft import RmcPotHst, VaspOutcar
 
 
-def read_chi2_from_dir(dir_name: str, cfg_name: str) -> Tuple[list, list]:
+def read_chi2_from_dir(
+    dir_name: str,
+    cfg_name: str,
+) -> Union[Tuple[list, list], bool]:
+    """あるディレクトリのあるファイルの chi を読んで返す"""
     hst_path: str = os.path.join(dir_name, f"{cfg_name}.hst")
-    reader = RmcPotHst(hst_path)
-    steps, chi2 = reader.read_chi2()
+    try:
+        reader = RmcPotHst(hst_path)
+        steps, chi2 = reader.read_chi2()
+    except (RuntimeError, FileNotFoundError):
+        return False
     return steps, chi2
 
 
-def read_energy_from_dir(dir_name: str) -> np.ndarray:
+def read_energy_from_dir(
+    dir_name: str,
+) -> Union[np.ndarray, bool]:
+    """あるディレクトリのあるファイルの energy を読んで返す"""
     outcar_path: str = os.path.join(dir_name, "OUTCAR")
-    out = VaspOutcar(outcar_path)
+    try:
+        out = VaspOutcar(outcar_path)
+    except (RuntimeError, FileNotFoundError):
+        return False
     energies: np.ndarray = out.get_energy_flat()
     return energies
 
@@ -46,15 +63,24 @@ def plot_multi_converge(dir_list: List[str], cfg_name: str) -> None:
 
     for d in dir_list:
         # HST
-        steps, chi2 = read_chi2_from_dir(d, cfg_name)
+        h = read_chi2_from_dir(d, cfg_name)
+        if h is False:
+            continue
+
+        steps, chi2 = h
         hst_data.append((d, steps, chi2))
         if len(chi2) > 0:
             hst_ymin = min(hst_ymin, min(chi2))
             hst_ymax = max(hst_ymax, max(chi2))
 
         # Energy
-        energies = read_energy_from_dir(d)
+        e = read_energy_from_dir(d)
+        if e is False:
+            continue
+
+        energies = e
         en_data.append((d, energies))
+
         if energies.size > 0:
             en_ymin = min(en_ymin, float(np.min(energies)))
             en_ymax = max(en_ymax, float(np.max(energies)))
