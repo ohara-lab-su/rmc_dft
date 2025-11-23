@@ -4,6 +4,8 @@
 
 - プログラムが途中の時に multi plot で止まる問題
 - VaspOutcar に終了は判定メソッドを加える
+- VaspIncar での INCAR 比較メソッドを追加
+  - RMC_DFT が DFT と RMC それぞれに便利ツールを集約する
 
 ## v0.3.20 nakada
 
