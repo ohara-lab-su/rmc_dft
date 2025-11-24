@@ -62,12 +62,14 @@ if __name__ == "__main__":
         logger=logger,
     )
 
+    # make KPOINTS
     if not os.path.exists("KPOINTS"):
         vasp_kpoints = VaspKpoints(logger=logger)
         vasp_kpoints.set_mode("Monkhorst-Pack")
         vasp_kpoints.set_grid(1, 1, 1)
         vasp_kpoints.set_shift(0, 0, 0)
 
+    # make POTCAR
     if not os.path.exists("POTCAR"):
         vasp_potcar = VaspPotcarBuilder("~/potpaw_PBE.64", logger=logger)
         # elements = ["Fe", "Si", "B"]
@@ -77,19 +79,26 @@ if __name__ == "__main__":
                 elements = f.readline().strip().split()
         vasp_potcar.build(elements, poscar_name="POTCAR")
 
+    # make INCAR
     vasp_incar = VaspIncar(logger=logger)
-    vasp_incar.set_tag("NSW", 10)
     vasp_incar.set_tag("EDIFF", 1e-04)
     vasp_incar.set_tag("EDIFFG", 1e-05)
     vasp_incar.set_tag("ISTART", 0)
+    #
     vasp_incar.set_tag("ISMEAR", 0)  # Gussian
     vasp_incar.set_tag("SIGMA", 0.1)
     vasp_incar.set_tag("NELM", 30)
+    #
+    vasp_incar.set_tag("NSW", 10)
+    vasp_incar.set_tag("ISIF", 2)
     vasp_incar.set_tag("IBRION", 2)  # CG
     # vasp_incar.set_tag("IBRION", 3)  # Dampd
     # vasp_incar.set_tag("POTIM", 0.05)  # Dampd scaling
-    vasp_incar.set_tag("ISIF", 2)
     vasp_incar.set_tag("LREAL", "auto")
+    # extra
+    vasp_incar.set_tag("ISPIN", 1)
+    vasp_incar.set_tag("LORBIT", 11)
+    vasp_incar.set_tag("NEDOS", 1500)
 
     vasp_log = VaspLog(logger=logger)
 
@@ -108,6 +117,7 @@ if __name__ == "__main__":
     i = 0
     for i in range(0, max_rmc_dft_loop):
 
+        # ログファイルの保存先
         rmc_dir = f"{config.rmc_log_dir}{str(i).zfill(digits)}"
         vasp_dir = f"{config.dft_log_dir}{str(i).zfill(digits)}"
 
@@ -145,4 +155,4 @@ if __name__ == "__main__":
             log_dir=vasp_dir,
             cfg_name=config.cfg_name,
         )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
-        logger.info("loop end " + str(i))
+        logger.info(f"loop end {i}")
