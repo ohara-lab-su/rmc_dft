@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 # ppcf_reader.py
 # PPCF (g_ij(r))
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
