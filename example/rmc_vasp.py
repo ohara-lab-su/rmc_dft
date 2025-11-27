@@ -27,6 +27,11 @@ from x_logger import XLogger
 if __name__ == "__main__":
     """"""
     config = Config("config.yml")
+
+    #######################
+    log_dir = "log25"
+    #######################
+
     logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
     vasp = Vasp(vasp_incar=vasp_incar, config=config, logger=logger)
 
@@ -64,7 +69,6 @@ if __name__ == "__main__":
         logger.error("**Error**: vasp execution failed")
         sys.exit(-1)
 
-    log_dir = "log25"
     # vasp.postprocess(
     #     log_dir=vasp_dir,
     #     cfg_name=config.cfg_name,

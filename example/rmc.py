@@ -35,7 +35,10 @@ if __name__ == "__main__":
     config = Config("config.yml")
     rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
     rmc_dat = RmcPotDat(config=config, logger=logger)
+
+    ##################
     rmc_dir = "log20"
+    ##################
 
     # 初期POSCAR 作成
     # shutil.copy(f"POSCAR0", "POSCAR")

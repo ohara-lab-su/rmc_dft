@@ -195,7 +195,7 @@ class VaspLog:
     def backup_result(
         self,
         log_dir: str = "log",
-    ):
+    ) -> bool:
         """
         Copy VASP log files to the specified directory.
 
@@ -225,6 +225,8 @@ class VaspLog:
                 self._logger.info(f"Copied {file_name} to {log_dir}")
             else:
                 self._logger.info(f"{file_name} does not exist, skipping.")
+
+        return True
 
     def remove_file(self, filename: str) -> None:
         """存在するファイルを削除"""

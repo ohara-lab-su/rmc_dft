@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.3.22 nakada
+
+- bugfix
+ 
 ## v0.3.21 nakada
 
 - プログラムが途中の時に multi plot で止まる問題
