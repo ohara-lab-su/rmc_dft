@@ -150,7 +150,7 @@ def plot_multi_converge(dir_list: List[str], cfg_name: str) -> None:
     # left=0.11 で左側だけ大きな余白を固定し、tight_layout と両立
     # plt.tight_layout(rect=[0.11, 0.03, 1.0, 0.96],)
     plt.tight_layout(
-        rect=[0.05, 0.03, 1.0, 0.96],
+        rect=(0.05, 0.03, 1.0, 0.96),
     )
 
     plt.show()
@@ -168,9 +168,9 @@ if __name__ == "__main__":
         print("  plot_multi_converge.py <cfg_name_prefix>")
         sys.exit(1)
 
-    cfg_name_arg = sys.argv[1]
+    cfg_name_ = sys.argv[1]
 
-    _dir_list = [
+    dir_list_ = [
         "log01",
         "log02",
         "log03",
@@ -192,4 +192,4 @@ if __name__ == "__main__":
         "log19",
     ]
 
-    plot_multi_converge(_dir_list, cfg_name_arg)
+    plot_multi_converge(dir_list_, cfg_name_)

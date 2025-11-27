@@ -11,7 +11,9 @@ import matplotlib.pyplot as plt
 from rmc_dft import VaspOutcar
 
 
-def read_energy_from_dir(dir_name: str) -> np.ndarray:
+def read_energy_from_dir(
+    dir_name: str,
+) -> np.ndarray:
     """
     指定フォルダ dir_name 内の OUTCAR から
     flatten energy sequence（全 SCF のエネルギー列）を返す。
@@ -22,7 +24,9 @@ def read_energy_from_dir(dir_name: str) -> np.ndarray:
     return energies
 
 
-def plot_multi_energy(dir_list: List[str]) -> None:
+def plot_multi_energy(
+    dir_list: List[str],
+) -> None:
     """
     dir_list に列挙されたフォルダごとに OUTCAR を読み込み、
     flatten energy を横一列のサブプロットにして表示する。
