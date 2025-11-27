@@ -1,6 +1,7 @@
 # K.NAKADA, kengo.nakada@gmail.com
 
 max_rmc_dft_loop: 20
+N_tot: 400  # セルサイズ(for packmol)
 rho_g_cm3: 7.35  # 質量密度
 n_per_A3: 0.0915  # 数密度
 element_info: ["Fe", "Si", "B"]

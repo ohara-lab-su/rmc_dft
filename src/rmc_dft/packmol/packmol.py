@@ -357,19 +357,26 @@ class Packmol:
             raise ValueError(
                 "元素記号の種類数と、それに対応する化学量論比の個数が一致していません。"
             )
+        self._logger.info(f"symbols: {symbols}")
 
         if N_tot <= 0:
             raise ValueError("N_tot は正の整数で指定してください。")
+        self._logger.info(f"N_tot: {N_tot}")
 
+        # ['Fe', 'Si', 'B']
+        # [80, 9, 11]
         ratio_sum: int = sum(ratios)
         if ratio_sum <= 0:
             raise ValueError("化学量論比の総和が 0 以下です。")
+        self._logger.info(f"ratios: {ratios}")
+        self._logger.info(f"ratio_sum: {ratio_sum}")
 
         # 1. 理想的な原子数（実数）を計算する
         ideal_counts: List[float] = []
         for ratio in ratios:
             ideal = N_tot * float(ratio) / float(ratio_sum)
             ideal_counts.append(ideal)
+        self._logger.info(f"ideal_counts: {ideal_counts}")
 
         # 2. 整数部分を「最低限確保される個数」とみなす
         int_counts: List[int] = [int(x) for x in ideal_counts]

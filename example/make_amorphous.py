@@ -19,7 +19,9 @@ import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import shutil
 
-from rmc_dft.packmol.packmol import Packmol
+from rmc_dft import Config, Packmol
+
+# from rmc_dft.packmol.packmol import Packmol
 from x_logger import XLogger
 
 
@@ -37,18 +39,27 @@ def main() -> None:
     B_xyz_file = "B.xyz"
 
     ##########################
-    if os.path.exists("config.yaml"):
-        config = Config(config_file)
+    if os.path.exists("config.yml"):
+        logger.info("config.yaml is found.")
+        config = Config("config.yml")
         N_tot = config.N_tot
         rho_g_cm3 = config.rho_g_cm3
         ratios = config.ratios
         symbols = config.element_info
     else:
+        logger.info("config.yaml is not found.")
+        logger.info("set default parameters")
         N_tot = 400  # セルの原子数
         rho_g_cm3 = 7.35  # 質量密度
         ratios = [80, 9, 11]  # 化学量論比
         symbols = ["Fe", "Si", "B"]
     ##########################
+    logger.info(f"== config parameters ==")
+    logger.info(f"{N_tot}")
+    logger.info(f"{rho_g_cm3}")
+    logger.info(f"{ratios}")
+    logger.info(f"{symbols}")
+    logger.info(f"")
 
     pm = Packmol()
 
