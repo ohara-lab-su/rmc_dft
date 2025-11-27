@@ -11,7 +11,7 @@ from rmc_dft import RmcPotPpcf
 
 
 def plot_ppcf(
-    cfg_or_ppcf: str,
+    cfg_name: str,
     target_dir: Optional[str] = None,
 ) -> None:
 
@@ -24,7 +24,7 @@ def plot_ppcf(
         indices = [0, 1, 2]
         labels = ["g11(r)", "g12(r)", "g13(r)"]
 
-        reader = RmcPotPpcf(cfg_or_ppcf)
+        reader = RmcPotPpcf(cfg_name)
         reader.load()
 
         r = reader.get_r()
@@ -48,18 +48,18 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) == 2:
-        # カレントフォルダで cfg_or_fit を指定
-        cfg_or_ppcf_arg: str = sys.argv[1]
-        plot_ppcf(cfg_or_ppcf_arg, target_dir=None)
+        # カレントフォルダで cfg_name を指定
+        cfg_name_: str = sys.argv[1]
+        plot_ppcf(cfg_name_, target_dir=None)
 
     elif len(sys.argv) == 3:
-        # 第1引数でフォルダ、第2引数で cfg_or_fit
+        # 第1引数でフォルダ、第2引数で cfg_name
         dir_arg: str = sys.argv[1]
-        cfg_or_ppcf_arg: str = sys.argv[2]
-        plot_ppcf(cfg_or_ppcf_arg, target_dir=dir_arg)
+        cfg_name_: str = sys.argv[2]
+        plot_ppcf(cfg_name_, target_dir=dir_arg)
 
     else:
         print("Usage:")
-        print("  python plot_ppcf.py <cfg_or_hst>")
-        print("  python plot_ppcf.py <dir> <cfg_or_hst>")
+        print("  python plot_ppcf.py <cfg_name>")
+        print("  python plot_ppcf.py <dir> <cfg_name>")
         sys.exit(1)

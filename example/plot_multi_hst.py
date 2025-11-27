@@ -10,7 +10,10 @@ import matplotlib.pyplot as plt
 from rmc_dft import RmcPotHst
 
 
-def read_chi2_from_dir(dir_name: str, cfg_name: str) -> Tuple[list, list]:
+def read_chi2_from_dir(
+    dir_name: str,
+    cfg_name: str,
+) -> Tuple[list, list]:
     """
     指定フォルダ dir_name 内の <cfg_name>.hst から (steps, chi2) を読み取る
     """
@@ -20,7 +23,10 @@ def read_chi2_from_dir(dir_name: str, cfg_name: str) -> Tuple[list, list]:
     return steps, chi2
 
 
-def plot_multi_chi(dir_list: List[str], cfg_name: str) -> None:
+def plot_multi_chi(
+    dir_list: List[str],
+    cfg_name: str,
+) -> None:
     """
     dir_list に列挙されたフォルダごとに <cfg_name>.hst を読み込み、
     一枚の図の中に横一列で並べてプロットする。
@@ -83,10 +89,10 @@ if __name__ == "__main__":
         print("例: plot_multi_chi.py aaa")
         sys.exit(1)
 
-    cfg_name_arg: str = sys.argv[1]
+    cfg_name_: str = sys.argv[1]
 
     # ここでフォルダ名を手で並べる
-    _dir_list: List[str] = [
+    dir_list_: List[str] = [
         "log01",
         "log02",
         "log03",
@@ -108,4 +114,4 @@ if __name__ == "__main__":
         "log19",
     ]
 
-    plot_multi_chi(_dir_list, cfg_name_arg)
+    plot_multi_chi(dir_list_, cfg_name_)

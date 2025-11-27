@@ -11,10 +11,10 @@ from rmc_dft import RmcPotHst
 
 
 def plot_chi(
-    cfg_or_hst: str,
+    cfg_name: str,
     target_dir: Optional[str] = None,
 ) -> None:
-    hst_file = f"{cfg_or_hst}.hst"
+    hst_file = f"{cfg_name}.hst"
 
     # フォルダ指定がある場合は一時的に移動
     original_cwd: str = os.getcwd()
@@ -43,18 +43,18 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) == 2:
-        # カレントフォルダで cfg_or_fit を指定
-        cfg_or_fit_arg: str = sys.argv[1]
-        plot_chi(cfg_or_fit_arg, target_dir=None)
+        # カレントフォルダで cfg_name を指定
+        cfg_name_: str = sys.argv[1]
+        plot_chi(cfg_name_, target_dir=None)
 
     elif len(sys.argv) == 3:
-        # 第1引数でフォルダ、第2引数で cfg_or_fit
+        # 第1引数でフォルダ、第2引数で cfg_name
         dir_arg: str = sys.argv[1]
-        cfg_or_fit_arg: str = sys.argv[2]
-        plot_chi(cfg_or_fit_arg, target_dir=dir_arg)
+        cfg_name_: str = sys.argv[2]
+        plot_chi(cfg_name_, target_dir=dir_arg)
 
     else:
         print("Usage:")
-        print("  python plot_hst.py <cfg_or_hst>")
-        print("  python plot_hst.py <dir> <cfg_or_hst>")
+        print("  python plot_hst.py <cfg_name>")
+        print("  python plot_hst.py <dir> <cfg_name>")
         sys.exit(1)
