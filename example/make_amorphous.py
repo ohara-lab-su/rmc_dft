@@ -15,6 +15,7 @@ Fe–Si–B アモルファス初期構造を Packmol により生成するた�
 Packmol は密度・化学量論比の概念を持たないため、本スクリプト側で
 原子数とセル一辺長 L を計算し、Packmol 形式の inside box 指定に変換する。
 """
+import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import shutil
 
