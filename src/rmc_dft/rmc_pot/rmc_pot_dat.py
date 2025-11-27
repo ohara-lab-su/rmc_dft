@@ -79,10 +79,10 @@ class RmcPotDat:
 
     def __init__(
         self,
-        config: Config = Config(),  # instance
-        logger: Optional[XLogger] = XLogger(),  # instance
+        config: Optional[Config] = None,  # Config(),  # instance
+        logger: Optional[XLogger] = None,  # XLogger(),  # instance
         *,
-        cfg_name: str = None,
+        cfg_name: Optional[str] = None,
         auto_write: bool = True,
     ) -> None:
         """
@@ -94,9 +94,9 @@ class RmcPotDat:
             cfg_name (str): xxxx.dat の絶対パス、基本名前（拡張子は付けない）
             auto_write (bool): True の場合 set_* / set_line で即時書き出し
         """
-        self._logger = logger
-        self._config = config
-        self._cfg_name: Optional[str] = cfg_name or config.cfg_name
+        self._logger = logger or XLogger()
+        self._config = config or Config()
+        self._cfg_name: Optional[str] = cfg_name or self._config.cfg_name
         self._logger.info("== Create RmcPotDat()")
 
         self._lines: list[_Line] = []

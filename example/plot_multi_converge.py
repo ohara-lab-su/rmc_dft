@@ -22,11 +22,18 @@ def read_chi2_from_dir(
 ) -> Union[Tuple[list, list], bool]:
     """あるディレクトリのあるファイルの chi を読んで返す"""
     hst_path: str = os.path.join(dir_name, f"{cfg_name}.hst")
+
     try:
         reader = RmcPotHst(hst_path)
-        steps, chi2 = reader.read_chi2()
+        result = reader.read_chi2()
     except (RuntimeError, FileNotFoundError):
         return False
+
+    if not reader:
+        # HST が無い / 読めない場合は False を返して呼び元で処理
+        return False
+
+    steps, chi2 = result
     return steps, chi2
 
 
@@ -65,7 +72,9 @@ def plot_multi_converge(dir_list: List[str], cfg_name: str) -> None:
         # HST
         h = read_chi2_from_dir(d, cfg_name)
         if h is False:
-            continue
+            # continue
+            # ここで以降のディレクトリも存在しない前提で止める
+            break
 
         steps, chi2 = h
         hst_data.append((d, steps, chi2))
@@ -76,7 +85,9 @@ def plot_multi_converge(dir_list: List[str], cfg_name: str) -> None:
         # Energy
         e = read_energy_from_dir(d)
         if e is False:
-            continue
+            # continue
+            # エネルギーも読めなくなったら打ち切り
+            break
 
         energies = e
         en_data.append((d, energies))
@@ -85,7 +96,16 @@ def plot_multi_converge(dir_list: List[str], cfg_name: str) -> None:
             en_ymin = min(en_ymin, float(np.min(energies)))
             en_ymax = max(en_ymax, float(np.max(energies)))
 
-    n = len(dir_list)
+    # 1つもデータが無ければ何もしない
+    if len(hst_data) == 0 or len(en_data) == 0:
+        self._logger.error("有効なデータが見つかりませんでした。")
+        return
+
+    # 両方揃っている列数だけを使う
+    n = min(len(hst_data), len(en_data))
+    hst_data = hst_data[:n]
+    en_data = en_data[:n]
+    # n = len(dir_list)
 
     # -------------------- Figure 準備 --------------------
     fig, axes = plt.subplots(

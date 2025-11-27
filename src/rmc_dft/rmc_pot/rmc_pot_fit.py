@@ -18,7 +18,7 @@ class RmcPotFit:
     def __init__(
         self,
         cfg_name: Optional[str] = None,
-        config: Config = Config(),
+        config: Optional[Config] = None,  # Config(),
         logger: Optional[XLogger] = None,
     ):
         """
@@ -29,7 +29,8 @@ class RmcPotFit:
             logger (XLogger):
         """
         self._logger = logger or XLogger(logger_name="RmcPotFit")
-        self._cfg_name: Optional[str] = cfg_name or config.cfg_name
+        self._config = config or Config()
+        self._cfg_name: Optional[str] = cfg_name or self._config.cfg_name
         self.filename: str = f"{cfg_name}.fit"
 
         # データ格納

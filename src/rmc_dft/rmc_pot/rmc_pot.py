@@ -30,9 +30,9 @@ class RmcPot:
         *,
         rmc_log: RmcPotLog = None,  # instance
         rmc_dat: RmcPotDat = None,  # instance
-        config: Config = Config(),  # instance
-        logger: Optional[XLogger] = XLogger(),  # instance
-        cfg_name: str = None,
+        config: Optional[Config] = None,  # Config(),  # instance
+        logger: Optional[XLogger] = None,  # XLogger(),  # instance
+        cfg_name: Optional[str] = None,
     ) -> None:
         """
         config インスタンスを与えると、cfg_name はいらない
@@ -44,8 +44,8 @@ class RmcPot:
             logger (XLogger): 全てインスタンスが同じ XLogger()
             cfg_name (str): cfg-filename
         """
-        self._logger = logger
-        self._config = config
+        self._logger = logger or XLogger()
+        self._config = config or Config()
 
         if cfg_name is None:
             cfg_name: str = config.cfg_name
