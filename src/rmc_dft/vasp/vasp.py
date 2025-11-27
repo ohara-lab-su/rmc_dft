@@ -358,6 +358,7 @@ class Vasp:
 
         # BACKUP-DATA
         self._vasp_log.backup_result(log_dir=log_dir)
+        return True
 
     #
     # VASP run
