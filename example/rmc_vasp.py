@@ -64,8 +64,10 @@ if __name__ == "__main__":
         logger.error("**Error**: vasp execution failed")
         sys.exit(-1)
 
+    log_dir = "log25"
     # vasp.postprocess(
     #     log_dir=vasp_dir,
     #     cfg_name=config.cfg_name,
     # )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
+    vasp.backup(log_dir=log_dir)
     logger.info(f"loop end")

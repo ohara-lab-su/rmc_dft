@@ -349,6 +349,16 @@ class Vasp:
 
         return True
 
+    def backup(
+        self,
+        log_dir: Optional[str] = None,
+    ) -> bool:
+        if log_dir is None:
+            log_dir = self._config.dft_log_dir
+
+        # BACKUP-DATA
+        self._vasp_log.backup_result(log_dir=log_dir)
+
     #
     # VASP run
     #
