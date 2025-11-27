@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.3.23 nakada
+
+- セルサイズの便利？ツール追加
+ 
 ## v0.3.22 nakada
 
 - bugfix

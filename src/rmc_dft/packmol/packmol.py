@@ -145,11 +145,33 @@ class Packmol:
         self._logger.info(f"output_log: {self.output_log}")
         self._logger.info(f"packmol_bin: {self.packmol_bin}")
 
+    def get_unit_atom_count(
+        self,
+        ratios: Sequence[int],
+    ) -> int:
+        """
+        化学量論比1ユニットあたりの原子数を返す。
+        例: [80, 9, 11] -> 100
+
+        Args:
+            ratios:
+
+        Returns:
+
+        """
+        self._logger.info(f"== get_unit_atom_count()")
+        total = 0
+        for value in ratios:
+            total = total + value
+        return total
+
     @staticmethod
     def get_atomic_weight(
         element: str,
     ) -> float:
-        """元素記号から原子量を取得する。
+        """汎用
+
+        元素記号から原子量を取得する。
 
         Args:
             element (str):
@@ -170,7 +192,9 @@ class Packmol:
         symbols: Sequence[str],
         ratios: Sequence[int],
     ) -> float:
-        """化学量論比から平均原子量を計算する。
+        """汎用
+
+        化学量論比から平均原子量を計算する。
 
         たとえば Fe80Si9B11 の場合は::
 
@@ -226,7 +250,8 @@ class Packmol:
         ratios: Sequence[int],
         rho_g_cm3: float,
     ) -> float:
-        """
+        """汎用
+
         質量密度から数密度 n [1/Å^3] を計算する。
 
         *) 旧版と仕様変更したので注意
@@ -266,7 +291,8 @@ class Packmol:
         ratios: Sequence[int],
         n_per_A3: float,
     ) -> float:
-        """
+        """汎用
+
         数密度 n [1/Å^3] から質量密度 ρ [g/cm^3] を計算する。
 
         Args:
@@ -290,7 +316,9 @@ class Packmol:
         N_tot: int,
         n_per_A3: float,
     ) -> float:
-        """総原子数と数密度から立方体セル長 L [Å] を計算する。
+        """汎用
+
+        総原子数と数密度から立方体セル長 L [Å] を計算する。
 
         数密度からセル一辺長 L を計算する。立方体セルを仮定し、
 
@@ -320,7 +348,9 @@ class Packmol:
         ratios: Sequence[int],
         N_tot: int,
     ) -> Dict[str, int]:
-        """化学量論比と N_tot から各元素の原子数を決める。
+        """汎用
+
+        化学量論比と N_tot から各元素の原子数を決める。
 
         数値的な意味
 
@@ -403,6 +433,47 @@ class Packmol:
             result[sym] = cnt
 
         return result
+
+    def compute_cell_sizes(
+        self,
+        ratios: Sequence[int],
+        max_atom_count: int,
+    ) -> List[int]:
+        """汎用
+
+        化学量論比を厳密に保つセル原子数を列挙する。
+        ユニット原子数と使用可能なセル原子数を出力する。
+
+        条件:
+            N = unit_atom_count * k (kは正の整数)
+            N <= max_atom_count
+
+        Args:
+            ratios:
+            max_atom_count:
+
+        Returns:
+
+        """
+        self._logger.info(f"== generate_cell_sizes()")
+        unit_atom_count = self.get_unit_atom_count(ratios)
+        cell_sizes: List[int] = []
+
+        multiplier = 1
+        current_size = unit_atom_count * multiplier
+
+        while current_size <= max_atom_count:
+            cell_sizes.append(current_size)
+            multiplier = multiplier + 1
+            current_size = unit_atom_count * multiplier
+
+        self._logger.info(f"化学量論比 = {ratios}")
+        self._logger.info(f"1ユニット原子数 = {unit_atom_count}")
+        self._logger.info("生成可能なセル原子数:")
+        for size in cell_sizes:
+            self._logger.info(size)
+
+        return cell_sizes
 
     # ------------------------------------
     # packmol 用
