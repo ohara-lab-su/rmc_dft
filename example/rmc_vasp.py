@@ -2,8 +2,7 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 
-RMC-DFT のUIクラスを使わずに直接 rmc_pot, vasp 関係のクラスを起動して
-RMC-VASP を構成する sample script
+既存の入力ファイルを使って計算する
 """
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
@@ -26,51 +25,47 @@ from x_logger import XLogger
 
 
 if __name__ == "__main__":
-    logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
-
+    """"""
     config = Config("config.yml")
-
-    # 初期POSCAR 作成
-    shutil.copy(f"POSCAR0", "POSCAR")
-
-    if not os.path.exists("KPOINTS"):
-        vasp_kpoints = VaspKpoints(logger=logger)
-        vasp_kpoints.set_mode("Monkhorst-Pack")
-        vasp_kpoints.set_grid(1, 1, 1)
-        vasp_kpoints.set_shift(0, 0, 0)
-
-    if not os.path.exists("POTCAR"):
-        vasp_potcar = VaspPotcarBuilder("~/potpaw_PBE.64", logger=logger)
-        elements = ["Fe", "Si", "B"]
-        vasp_potcar.build(elements, poscar_name="POTCAR")
-
-    vasp_incar = VaspIncar(logger=logger)
-    vasp_incar.set_tag("NSW", 1)
-    vasp_incar.set_tag("EDIFF", 1e-04)
-    vasp_incar.set_tag("EDIFFG", 1e-05)
-    vasp_incar.set_tag("ISTART", 0)
-    vasp_incar.set_tag("ISMEAR", 0)
-    vasp_incar.set_tag("SIGMA", 0.1)
-    vasp_incar.set_tag("NSW", 2)
-    vasp_incar.set_tag("NELM", 30)
-    vasp_incar.set_tag("IBRION", 2)
-    vasp_incar.set_tag("ISIF", 2)
-    vasp_incar.set_tag("LREAL", "auto")
-
+    logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
     vasp = Vasp(vasp_incar=vasp_incar, config=config, logger=logger)
 
     # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
     # vasp.poscar2cfg(config.cfg_name)
 
-    # run_mode = "local"
+    # make INCAR
+    # vasp_incar = VaspIncar(logger=logger)
+    # vasp_incar.set_tag("EDIFF", 1e-04)
+    # vasp_incar.set_tag("EDIFFG", 1e-05)
+    # vasp_incar.set_tag("ISTART", 0)
+    # #
+    # vasp_incar.set_tag("ISMEAR", 0)  # Gussian
+    # vasp_incar.set_tag("SIGMA", 0.1)
+    # vasp_incar.set_tag("NELM", 30)
+    # #
+    # vasp_incar.set_tag("NSW", 10)
+    # vasp_incar.set_tag("ISIF", 2)
+    # vasp_incar.set_tag("IBRION", 2)  # CG
+    # # vasp_incar.set_tag("IBRION", 3)  # Dampd
+    # # vasp_incar.set_tag("POTIM", 0.05)  # Dampd scaling
+    # vasp_incar.set_tag("LREAL", "auto")
+    # # extra
+    # vasp_incar.set_tag("ISPIN", 1)
+    # vasp_incar.set_tag("LORBIT", 11)
+    # vasp_incar.set_tag("NEDOS", 1500)
 
-    if not os.path.exists(config.log_vasp_dir):
-        os.mkdir(config.log_vasp_dir)
+    # ------------------- DFT ------------------------
+    logger.info(f"== DFT(vasp)")
+    # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
+    # vasp.run(mode="test")
+    # vasp.run(mode=config.run_mode)
+    ret = vasp.run(mode="mpi")
+    if not ret:
+        logger.error("**Error**: vasp execution failed")
+        sys.exit(-1)
 
-    vasp.run(mode="mpi")
-    # vasp.run(mode=run_mode)
     # vasp.postprocess(
-    #     log_dir=config.log_vasp_dir,
+    #     log_dir=vasp_dir,
     #     cfg_name=config.cfg_name,
-    # )
-    vasp.postprocess()  ## backup, contcar to poscar, poscar2cfg(xxx,cfg)
+    # )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
+    logger.info(f"loop end")
