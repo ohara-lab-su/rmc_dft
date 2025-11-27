@@ -41,24 +41,33 @@ class RmcPotFit:
         self.background: List[float] = []
 
         # 読み取り
-        self.read_fit()
+        # self.read_fit()
 
     def read_fit(
         self,
         filename: Optional[str] = None,
-    ) -> None:
+    ) -> Optional[bool]:
         """
         .fit ファイルを読み取り、主要データ列を格納する。
-
         self.filename: fullname
+
+        Args:
+            filename:
+
+        Returns:
+
         """
         if filename is None:
             filename = self.filename
 
         self._logger.info(f"== read_fit({filename})")
 
-        with open(self.filename, "r") as f:
-            lines = f.readlines()
+        try:
+            with open(self.filename, "r") as f:
+                lines = f.readlines()
+        except FileNotFoundError:
+            self._logger.error(f"file not found: {filename}")
+            return False
 
         # データブロックは "Total F(Q)" 以降に並ぶため、それを探す
         data_started = False
@@ -85,6 +94,8 @@ class RmcPotFit:
                     self.F_exp_renorm.append(f_exp_ren)
                     self.F_exp_orig.append(f_exp_orig)
                     self.background.append(bg)
+
+        return True
 
     # S(Q) に変換するためのメソッド
     def get_S_calc(self) -> List[float]:

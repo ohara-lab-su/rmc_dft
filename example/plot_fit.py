@@ -11,14 +11,14 @@ from rmc_dft import RmcPotFit
 
 
 def plot_sq(
-    cfg_or_fit: str,
+    cfg_name: str,
     target_dir: Optional[str] = None,
-) -> None:
+) -> Optional[bool]:
     """
     RmcPotFit を用いて S(Q) をプロットする。
 
     Args:
-        cfg_or_fit (str): RmcPotFit に渡す文字列
+        cfg_name (str): RmcPotFit に渡す文字列
         target_dir (str): フォルダ名（None の場合はカレントディレクトリ）
     """
 
@@ -28,7 +28,10 @@ def plot_sq(
         if target_dir is not None:
             os.chdir(target_dir)
 
-        fit = RmcPotFit(cfg_or_fit)
+        fit = RmcPotFit(cfg_name)
+        ret = fit.read_fit()
+        if not ret:
+            return False
 
         Q = fit.Q
         S_calc = fit.get_S_calc()
@@ -57,7 +60,7 @@ if __name__ == "__main__":
     #   2) フォルダを指定して、そのフォルダ内で cfg 指定
     #        python plot_fit.py /path/to/dir aaa
     #
-    #      上記どちらでも RmcPotFit への引数（cfg_or_fit）は同じ意味で渡される。
+    #      上記どちらでも RmcPotFit への引数（cfg_name)は同じ意味で渡される。
 
     #    if len(sys.argv) != 2:
     #        print("Usage: python plot_sq.py <cfg_name>")
@@ -67,15 +70,15 @@ if __name__ == "__main__":
     #    plot_sq(_fitfile)
 
     if len(sys.argv) == 2:
-        # カレントフォルダで cfg_or_fit を指定
-        cfg_or_fit_arg: str = sys.argv[1]
-        plot_sq(cfg_or_fit_arg, target_dir=None)
+        # カレントフォルダで cfg_name を指定
+        cfg_name_: str = sys.argv[1]
+        plot_sq(cfg_name_, target_dir=None)
 
     elif len(sys.argv) == 3:
-        # 第1引数でフォルダ、第2引数で cfg_or_fit
-        dir_arg: str = sys.argv[1]
-        cfg_or_fit_arg: str = sys.argv[2]
-        plot_sq(cfg_or_fit_arg, target_dir=dir_arg)
+        # 第1引数でフォルダ、第2引数で cfg_name
+        dir_name: str = sys.argv[1]
+        cfg_name_: str = sys.argv[2]
+        plot_sq(cfg_name_, target_dir=dir_name)
 
     else:
         print("Usage:")
