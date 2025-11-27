@@ -18,8 +18,8 @@ class RmcPotHst:
 
     def __init__(
         self,
-        hst_path: str,
-        config: Config = Config(),
+        hst_path: Optional[str] = None,
+        config: Optional[Config] = None,  # Config(),
         logger: Optional[XLogger] = None,
     ) -> None:
         """
@@ -30,8 +30,8 @@ class RmcPotHst:
             logger (XLogger):
         """
         self._logger: Optional[XLogger] = logger or XLogger(logger_name="RmcPotFit")
-        self._config: Config = config
-        self._hst_path: Optional[str] = hst_path or config.cfg_name
+        self._config: Optional[Config] = config or Config()
+        self._hst_path: Optional[str] = hst_path or self._config.cfg_name
 
     def read_chi2(self) -> Union[Tuple[List[int], List[float]], bool]:
         """

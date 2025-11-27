@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.3.24 nakada
+
+- データー欠損がある場合のプロット(計算途中でのプロット)
+  - plot_multi_converge
+  - plot_multi_fit
+
+(*) まだ単独版だと、バグが残っているかもしれない
+
 ## v0.3.23 nakada
 
 - セルサイズの便利？ツール追加

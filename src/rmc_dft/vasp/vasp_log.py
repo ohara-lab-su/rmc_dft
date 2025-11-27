@@ -21,13 +21,13 @@ class VaspLog:
 
     def __init__(
         self,
-        logger: Optional[XLogger] = XLogger(),
+        logger: Optional[XLogger] = None,  # XLogger(),
     ) -> None:
         """
         Args:
             logger (XLogger): 全てのインスタンスが同じ XLogger()
         """
-        self._logger = logger
+        self._logger = logger or XLogger()
 
     #
     # Vcopy 互換

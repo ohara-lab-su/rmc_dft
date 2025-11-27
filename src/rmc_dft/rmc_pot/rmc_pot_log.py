@@ -16,8 +16,8 @@ class RmcPotLog:
 
     def __init__(
         self,
-        config: Config = Config(),
-        logger: Optional[XLogger] = XLogger,
+        config: Optional[Config] = None,  # Config(),
+        logger: Optional[XLogger] = None,  # XLogger,
         *,
         cfg_name: str = None,
     ) -> None:
@@ -29,9 +29,9 @@ class RmcPotLog:
             logger (XLogger): 全てのインスタンスが同じ XLogger()
             cfg_name (str):
         """
-        self._logger: Optional[XLogger] = logger
-        self._config: Config = config
-        self._cfg_name: Optional[str] = cfg_name or config.cfg_name
+        self._logger: Optional[XLogger] = logger or XLogger()
+        self._config: Optional[Config] = config or Config()
+        self._cfg_name: Optional[str] = cfg_name or self._config.cfg_name
 
     def set_cfg_name(
         self,

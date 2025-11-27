@@ -10,7 +10,10 @@ import matplotlib.pyplot as plt
 from rmc_dft import RmcPotFit
 
 
-def read_sq_from_fit(dir_name: str, cfg_name: str) -> Tuple[list, list, list]:
+def read_sq_from_fit(
+    dir_name: str,
+    cfg_name: str,
+) -> Union[Tuple[list, list, list], bool]:
     """
     dir_name に一時的に移動し、cfg_name.fit から
     Q, S_calc, S_exp を読み取る。
@@ -18,8 +21,14 @@ def read_sq_from_fit(dir_name: str, cfg_name: str) -> Tuple[list, list, list]:
     """
     original_cwd: str = os.getcwd()
     try:
-        os.chdir(dir_name)
+        try:
+            os.chdir(dir_name)
+        except FileNotFoundError:
+            return False
         fit = RmcPotFit(cfg_name)
+        ret = fit.read_fit()
+        if not ret:
+            return False
 
         Q = fit.Q
         S_calc = fit.get_S_calc()
@@ -47,7 +56,11 @@ def plot_multi_fit(
 
     # 全データを読み込み、軸レンジを決める
     for d in dir_list:
-        Q, S_calc, S_exp = read_sq_from_fit(d, cfg_name)
+        result = read_sq_from_fit(d, cfg_name)
+        if result is False:
+            break
+
+        Q, S_calc, S_exp = result
         all_data.append((d, Q, S_calc, S_exp))
 
         if len(Q) > 0:
@@ -110,9 +123,9 @@ if __name__ == "__main__":
         print("例:     plot_multi_fit.py aaa")
         sys.exit(1)
 
-    cfg_name_arg: str = sys.argv[1]
+    cfg_name_: str = sys.argv[1]
 
-    dir_list = [
+    dir_list_ = [
         "log01",
         "log02",
         "log03",
@@ -134,4 +147,4 @@ if __name__ == "__main__":
         "log19",
     ]
 
-    plot_multi_fit(dir_list, cfg_name_arg, ncols=4)
+    plot_multi_fit(dir_list_, cfg_name_, ncols=4)

@@ -24,14 +24,14 @@ class VaspPotcarBuilder:
     def __init__(
         self,
         base_dir: str = "~/potpaw_PBE.64",
-        logger: Optional[XLogger] = XLogger(),
+        logger: Optional[XLogger] = None,  # XLogger(),
     ):
         """
         Args:
             base_dir (str):
             logger (XLogger): 全てのインスタンスが同じ XLogger()
         """
-        self._logger = logger
+        self._logger = logger or XLogger()
 
         self.base_dir = os.path.expanduser(base_dir)
         self.priority = {

@@ -47,7 +47,7 @@ class VaspKpoints:
     def __init__(
         self,
         kpoints_name: str = "KPOINTS",
-        logger: Optional[XLogger] = XLogger(),
+        logger: Optional[XLogger] = None,  # XLogger(),
         *,
         auto_write: bool = True,
     ) -> None:
@@ -58,9 +58,9 @@ class VaspKpoints:
             logger (XLogger):
             auto_write (bool):
         """
+        self.logger = logger or XLogger()
         self.kpoints_name: str = kpoints_name
         self.auto_write: bool = auto_write
-        self.logger = logger
 
         # 内部状態（厳格に長さ3のタプルで保持）
         self._mode: str

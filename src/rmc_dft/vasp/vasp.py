@@ -48,8 +48,8 @@ class Vasp:
         vasp_log: VaspLog = None,  # instance (データー解析用)
         vasp_incar: VaspIncar = None,
         vasp_kpoints: VaspKpoints = None,
-        config: Config = Config(),  # instance
-        logger: Optional[XLogger] = XLogger(),  # instance
+        config: Optional[Config] = None,  # Config(),  # instance
+        logger: Optional[XLogger] = None,  # XLogger(),  # instance
         auto_write: bool = True,
         vasp_name: str = None,
         dft_bin: str = None,
@@ -81,11 +81,9 @@ class Vasp:
             job_cmd (str): ジョブ投入コマンド（None ならローカル実行）
             make_default_input (bool): インプットファイルを自動作成(既存があるときはそっちを優先)
         """
-        self._logger = logger
-        self._logger.debug("== create Vasp()")
-
-        # INCAR ファイルのOUTファイル入出力インスタンスの移譲を受ける
-        self._config: Config = config
+        self._logger.info("== create Vasp()")
+        self._logger = logger or XLogger()
+        self._config: Config = config or Config()
 
         # INCAR/KPOINTS/
         self.incar_name: str = incar_name
