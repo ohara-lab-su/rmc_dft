@@ -81,9 +81,9 @@ class Vasp:
             job_cmd (str): ジョブ投入コマンド（None ならローカル実行）
             make_default_input (bool): インプットファイルを自動作成(既存があるときはそっちを優先)
         """
-        self._logger.info("== create Vasp()")
         self._logger = logger or XLogger()
         self._config: Config = config or Config()
+        self._logger.info("== create Vasp()")
 
         # INCAR/KPOINTS/
         self.incar_name: str = incar_name
