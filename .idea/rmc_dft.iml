@@ -6,6 +6,8 @@
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/src/rmc_dft.egg-info" />
       <excludeFolder url="file://$MODULE_DIR$/rmc_dft.egg-info" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/dictionaries" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/inspectionProfiles" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
