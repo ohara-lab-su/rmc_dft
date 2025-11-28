@@ -2,7 +2,7 @@
 !POTCAR
 !POSCAR
 !INCAR
-
+__pycache__
 build/
 work/
 .idea/
