@@ -2,9 +2,11 @@
 !POTCAR
 !POSCAR
 !INCAR
-__pycache__
+
+__pycache__/
 build/
 work/
 .idea/
 *.egg-info/
 *.pyc
+*.py[cod]
