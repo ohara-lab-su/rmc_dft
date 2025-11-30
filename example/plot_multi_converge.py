@@ -14,6 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from rmc_dft import RmcPotHst, VaspOutcar
+from x_logger import XLogger
 
 
 def read_chi2_from_dir(
@@ -31,6 +32,9 @@ def read_chi2_from_dir(
 
     if not reader:
         # HST が無い / 読めない場合は False を返して呼び元で処理
+        return False
+
+    if result is False:
         return False
 
     steps, chi2 = result
@@ -56,7 +60,12 @@ def hide_yticklabels_except_first(axes_row):
             ax.set_yticklabels([])
 
 
-def plot_multi_converge(dir_list: List[str], cfg_name: str) -> None:
+def plot_multi_converge(
+    dir_list: List[str],
+    cfg_name: str,
+    logger: Optional[XLogger] = None,
+) -> None:
+    logger = logger or XLogger()
 
     # -------------------- データ読み取り --------------------
     hst_data = []
@@ -98,7 +107,7 @@ def plot_multi_converge(dir_list: List[str], cfg_name: str) -> None:
 
     # 1つもデータが無ければ何もしない
     if len(hst_data) == 0 or len(en_data) == 0:
-        self._logger.error("有効なデータが見つかりませんでした。")
+        logger.error("有効なデータが見つかりませんでした。")
         return
 
     # 両方揃っている列数だけを使う
@@ -163,6 +172,8 @@ def plot_multi_converge(dir_list: List[str], cfg_name: str) -> None:
 if __name__ == "__main__":
     import sys
 
+    logger_ = XLogger(log_level="debug", logger_name="rmc_run")
+
     if len(sys.argv) != 2:
         print("Usage:")
         print("  plot_multi_converge.py <cfg_name_prefix>")
@@ -171,6 +182,7 @@ if __name__ == "__main__":
     cfg_name_ = sys.argv[1]
 
     dir_list_ = [
+        "log00",
         "log01",
         "log02",
         "log03",
@@ -192,4 +204,4 @@ if __name__ == "__main__":
         "log19",
     ]
 
-    plot_multi_converge(dir_list_, cfg_name_)
+    plot_multi_converge(dir_list_, cfg_name_, logger_)

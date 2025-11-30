@@ -104,6 +104,7 @@ if __name__ == "__main__":
 
     # ここでフォルダ名を手で並べる
     dir_list_: List[str] = [
+        "log00",
         "log01",
         "log02",
         "log03",

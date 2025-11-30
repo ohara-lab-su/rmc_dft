@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.3.25 nakada
+
+- bugfix
+  - 主にplot系
+ 
 ## v0.3.24 nakada
 
 - データー欠損がある場合のプロット(計算途中でのプロット)
