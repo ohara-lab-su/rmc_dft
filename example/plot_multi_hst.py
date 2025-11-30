@@ -13,13 +13,24 @@ from rmc_dft import RmcPotHst
 def read_chi2_from_dir(
     dir_name: str,
     cfg_name: str,
-) -> Tuple[list, list]:
+) -> Union[Tuple[list, list], bool]:
     """
     指定フォルダ dir_name 内の <cfg_name>.hst から (steps, chi2) を読み取る
     """
     hst_path: str = os.path.join(dir_name, f"{cfg_name}.hst")
-    reader = RmcPotHst(hst_path)
-    steps, chi2 = reader.read_chi2()
+    # reader = RmcPotHst(hst_path)
+    # steps, chi2 = reader.read_chi2()
+    try:
+        reader = RmcPotHst(hst_path)
+        result = reader.read_chi2()
+    except (RuntimeError, FileNotFoundError):
+        return False
+
+    if not reader:
+        # HST が無い / 読めない場合は False を返して呼び元で処理
+        return False
+
+    steps, chi2 = result
     return steps, chi2
 
 

@@ -99,6 +99,13 @@ if __name__ == "__main__":
     vasp_incar.set_tag("ISPIN", 1)
     vasp_incar.set_tag("LORBIT", 11)
     vasp_incar.set_tag("NEDOS", 1500)
+    #
+    # ==== mixing (大規模アモルファス用・保守的設定) ====
+    vasp_incar.set_tag("IMIX", 4)
+    vasp_incar.set_tag("INIMIX", 1)
+    vasp_incar.set_tag("AMIX", 0.02)
+    vasp_incar.set_tag("BMIX", 0.0001)
+    vasp_incar.set_tag("MAXMIX", 20)
 
     vasp_log = VaspLog(logger=logger)
 
