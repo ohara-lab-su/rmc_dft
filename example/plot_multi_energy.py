@@ -91,6 +91,7 @@ if __name__ == "__main__":
 
     # ここでフォルダ名を手で並べる（plot_multi_hst と同じ方式）
     _dir_list: List[str] = [
+        "log00",
         "log01",
         "log02",
         "log03",

@@ -126,6 +126,7 @@ if __name__ == "__main__":
     cfg_name_: str = sys.argv[1]
 
     dir_list_ = [
+        "log00",
         "log01",
         "log02",
         "log03",

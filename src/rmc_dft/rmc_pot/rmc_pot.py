@@ -44,38 +44,59 @@ class RmcPot:
             logger (XLogger): 全てインスタンスが同じ XLogger()
             cfg_name (str): cfg-filename
         """
-        self._logger = logger or XLogger()
-        self._config = config or Config()
+        # ------------------------------------------------------------
+        # 1. logger と config を決定
+        # ------------------------------------------------------------
+        # （引数で与えればそれを使う／なければ新規作成）
+        self._logger: XLogger = logger or XLogger()
+        self._config: Config = config or Config()
 
+        # ------------------------------------------------------------
+        # 2. cfg_name の決定
+        # ------------------------------------------------------------
+        # config インスタンスが cfg_name を持っていれば、それを使っても良い
+        # 逆に引数で明示された cfg_name は config に反映する
         if cfg_name is None:
-            cfg_name: str = config.cfg_name
+            cfg_name = self._config.cfg_name
         else:
-            config.cfg_name = cfg_name
+            self._config.cfg_name = cfg_name
 
-        # aaa.dat ファイルなどの CFG ファイル名 prefix
-        self._cfg_name = cfg_name
+        # このクラス自身も cfg_name を内部保持する
+        self._cfg_name: str = cfg_name
 
-        auto_write = config.auto_write
+        # Config 内の auto_write を取り出して内部保持
+        self._auto_write: bool = self._config.auto_write
 
-        # RMC 出力ファイル処理 instance
+        # ------------------------------------------------------------
+        # 3. RMC ログ処理クラスの準備
+        # ------------------------------------------------------------
+        # 引数で外部から渡されていなければ、ここで新規作成
         if rmc_log is None:
-            rmc_log = RmcPotLog(config=config, logger=logger)
+            rmc_log = RmcPotLog(
+                config=self._config,
+                logger=self._logger,
+            )
 
-        self._rmc_log = rmc_log
+        self._rmc_log: RmcPotLog = rmc_log
+
+        # RMC ログクラスに cfg_name を反映
         self._logger.info(f"== rmc_log.set_cfg_name({cfg_name})")
         self._rmc_log.set_cfg_name(cfg_name)
 
-        # .dat ファイル処理 instance
+        # ------------------------------------------------------------
+        # 4. RMC データ処理クラス (.dat) の準備
+        # ------------------------------------------------------------
+        # 外部指定なければ新規作成する
         if rmc_dat is None:
             rmc_dat = RmcPotDat(
-                cfg_name=cfg_name,  # cfg_name = aaa.dat/aaa.cfg
-                auto_write=auto_write,
-                config=config,
-                logger=logger,
+                cfg_name=self._cfg_name,
+                auto_write=self._auto_write,
+                config=self._config,
+                logger=self._logger,
             )
 
-        self._rmc_dat = rmc_dat
-        self._logger.info(f"== rmc_pot_dat()")
+        self._rmc_dat: RmcPotDat = rmc_dat
+        self._logger.info("== rmc_pot_dat()")
 
     @property
     def rmc_dat(self):

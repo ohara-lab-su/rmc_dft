@@ -26,13 +26,14 @@ cp ~/zaiene_dev/rmc_dft/example/plot_fit.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_hst.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_ppcf.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_energy.py ./
+cp ~/zaiene_dev/rmc_dft/example/plot_distance_histgram.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/plot_multi_fit.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_multi_hst.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_multi_energy.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_multi_converge.py ./
-cp ~/zaiene_dev/rmc_dft/example/plot_distance_histgram.py ./
 #
-cp ~/zaiene_dev/rmc_dft/example/make_amorphous.py ./
-#
-cp ~/zaiene_dev/rmc_dft/example/print_distance.py ./
+# cp ~/zaiene_dev/rmc_dft/example/print_distance.py ./
+# cp ~/zaiene_dev/rmc_dft/example/make_amorphous.py ./
+# cp ~/zaiene_dev/rmc_dft/example/make_cell_size.py ./
+
