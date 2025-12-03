@@ -14,6 +14,7 @@ from rmc_dft import (
     Vasp,
     VaspIncar,
     VaspKpoints,
+    VaspOutcar,
     VaspLog,
     RmcPot,
     RmcPotLog,

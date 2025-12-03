@@ -2,7 +2,7 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 
-既存の入力ファイルを使って計算する
+既存の入力ファイル(INCARなど)を使って計算する
 """
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
@@ -13,6 +13,7 @@ from rmc_dft import (
     Vasp,
     VaspIncar,
     VaspKpoints,
+    VaspOutcar,
     VaspPotcarBuilder,
     VaspLog,
     RmcPot,

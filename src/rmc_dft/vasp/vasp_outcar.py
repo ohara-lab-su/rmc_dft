@@ -30,21 +30,23 @@ class VaspOutcar:
     def __init__(
         self,
         filename: str,
+        logger: Optional[XLogger] = None,
     ) -> None:
         """
 
         Args:
             filename (str):  OUTCAR (パス指定OK)
+            logger:
         """
+        self._logger = logger or XLogger()
         self.filename: str = filename
 
         with open(filename, "r", encoding="utf-8", errors="ignore") as f:
             self.lines = f.readlines()
 
         # OUTCAR の終了判定
-        # インスタンス生成にこけるようにしている。
-        # インスタンスを作ってしまって、メソッドで判定し、
-        # 再読み込み機能を入れるのも一つの手段ではあるが。
+        # OUTCAR が正常終了してないと解析ができないので、
+        # インスタンス生成時に例外を出すようにしている。
         self.finished: bool = self._detect_finished()
         if not self.finished:
             raise RuntimeError(f"OUTCAR seems not finished: {self.filename}")
@@ -463,3 +465,9 @@ class VaspOutcar:
                 return True
 
         return False
+
+    def is_finalized(self) -> bool:
+        """
+        OUTCAR が正常終了しているかどうかを返す。
+        """
+        return bool(self.finished)
