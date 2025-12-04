@@ -8,12 +8,14 @@ cp ~/zaiene_dev/rmc_dft/example/rmc_run.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_vasp.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script.py ./
 # cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script_edit.py ./
+cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script_restart.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/RMC_DFT_dft_run.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/conv_poscar2cfg.py ./
 cp ~/zaiene_dev/rmc_dft/example/conv_cfg2poscar.py ./
-cp ~/zaiene_dev/rmc_dft/example/check_vasp_finalized.py ./
+cp ~/zaiene_dev/rmc_dft/example/check_rmc_finalized.py ./
+cp ~/zaiene_dev/rmc_dft/example/check_rcm_finalized.py ./
 cp ~/zaiene_dev/rmc_dft/example/check_vasp_distance.py ./
 cp ~/zaiene_dev/rmc_dft/example/diff_incar.py ./
 #

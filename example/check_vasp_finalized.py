@@ -25,7 +25,11 @@ from rmc_dft import (
 from x_logger import XLogger
 
 
-def main() -> None:
+def main() -> bool:
+    """
+    Returns:
+        bool: True(VASPが正常に終了)
+    """
     # 引数が 0 個 → デフォルト OUTCAR
     # 引数が 1 個 → 指定されたファイル
     if len(sys.argv) == 1:
@@ -40,14 +44,14 @@ def main() -> None:
         outcar = VaspOutcar(filename)
         if outcar.is_finalized():
             print(f"[OK] VASP finished successfully: {filename}")
-            sys.exit(0)
+            return True
         else:
             print(f"[NG] OUTCAR is not finalized: {filename}")
-            sys.exit(2)
+            return False
 
     except RuntimeError:
         print(f"[NG] OUTCAR is not finalized: {filename}")
-        sys.exit(3)
+        return False
 
     except Exception as e:
         print(f"[ERROR] Failed to read OUTCAR: {e}")
@@ -55,4 +59,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    ret = main()

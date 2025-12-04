@@ -45,7 +45,7 @@ class RmcPotLog:
         self._log_lines: List[str] = []
 
         # --- ログファイルの自動読み込み ---
-        self._load_log()
+        self.load_log()
 
     # ============================================================
     # ログファイル読込み(メモリに入れる)
@@ -86,7 +86,7 @@ class RmcPotLog:
         self._log_filename = f"{cfg_name}.log"
 
         # ログファイルの再読み込み
-        self._load_log()
+        self.load_log()
 
     def get_cfg_name(self) -> str:
         return self._cfg_name
@@ -277,6 +277,7 @@ class RmcPotLog:
             f"{cfg_name}.ppcf",
             f"{cfg_name}.fit",
             f"{cfg_name}.pfq",
+            f"{cfg_name}.log",
         ]
 
         for file_name in files_to_copy:

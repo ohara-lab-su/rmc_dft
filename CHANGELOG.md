@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.3.26 nakada
+## v0.4.0 nakada
 
 - RMC-DFT を途中で止めた時の再開処理について検討・実装
 
