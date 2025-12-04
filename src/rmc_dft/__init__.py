@@ -25,8 +25,12 @@ from rmc_dft.packmol.packmol import Packmol
 from rmc_dft.packmol.packmol_inp import PackmolInp
 
 from rmc_dft.config import Config
+
 from rmc_dft.util import poscar2cfg
 from rmc_dft.util import ensure_vasp5_format
+from rmc_dft.util import check_rmc_and_vasp
+from rmc_dft.util import find_next_log_index
+from rmc_dft.util import logs_exist
 
 
 # from .vasp.vasp import Vasp

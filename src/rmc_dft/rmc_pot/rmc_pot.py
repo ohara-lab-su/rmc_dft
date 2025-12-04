@@ -287,6 +287,7 @@ class RmcPot:
         self,
         cfg_name: Optional[str] = None,
         blocking: Optional[bool] = True,
+        save_stdout: Optional[bool] = True,
     ) -> bool:
         """
         RMC を実行する
@@ -294,6 +295,7 @@ class RmcPot:
         Args:
             cfg_name (str):
             blocking (bool)_:  subprocessをブロッキングで起動(default: True)
+            save_stdout (bool): True ならログをファイルに保存
 
         Returns:
             bool: 正しく終わったデー
@@ -302,27 +304,80 @@ class RmcPot:
             cfg_name = self._cfg_name
         self._logger.info(f"== run(cfg_name={cfg_name})")
 
-        try:
-            # 2025 あたりの rmc_pot
-            # subprocess.run([f"{self._config.rmc_bin}", f"{cfg_name}"], check=True)
-            # 2014 あたりの rmc_pot
-            subprocess.run([f"{self._config.rmc_bin}", f"{cfg_name}", "y"], check=True)
-            # 2014 あたりの書式で 2025 でも動く
-        except subprocess.CalledProcessError as e:
-            self._logger.error(f"**Error**: {e}")
-            sys.exit(-1)
+        # --- ログ出力準備 ---
+        log_filename = f"{cfg_name}.log"
+        self._logger.info(f"log_filename = {cfg_name}.log")
 
+        if save_stdout:
+            f = open(log_filename, "w", encoding="utf-8")
+        else:
+            f = None
+
+        # 2025 あたりの rmc_pot
+        # subprocess.run([f"{self._config.rmc_bin}", f"{cfg_name}"], check=True)
+        # 2014 あたりの rmc_pot
+        # subprocess.run([f"{self._config.rmc_bin}", f"{cfg_name}", "y"], check=True)
+        # 2014 あたりの書式で 2025 でも動く
+        cmd = [f"{self._config.rmc_bin}", f"{cfg_name}", "y"]
+
+        # --- blocking=True の場合（従来通り run()） ---
+        if blocking:
+            try:
+                subprocess.run(
+                    cmd,
+                    check=True,
+                    stdout=f,
+                    stderr=f,
+                    text=True,
+                )
+            except subprocess.CalledProcessError as e:
+                self._logger.error(f"**Error**: {e}")
+                sys.exit(-1)
+            finally:
+                if f is not None:
+                    f.close()
+            return True
+
+        # --- blocking=False の場合（Python終了後も生存） ---
+        # 完全デタッチ（Python が死んでも RMC_POT が継続）
+        p = subprocess.Popen(
+            cmd,
+            stdout=f,
+            stderr=f,
+            text=True,
+            preexec_fn=os.setsid,
+        )
+
+        # ログファイルは閉じてよい（プロセスが保持している）
+        if f is not None:
+            f.close()
+
+        # 非同期開始なので True を返して Python は先に進む
         return True
 
     #
     # Utilities
     #
+
     @staticmethod
     def ensure_vasp5_format(
         poscar_name: str,
         element_info: Optional[str] = None,
         logger: XLogger = XLogger(),
     ) -> bool:
+        """
+        RMC_POT には元素種の情報がなくて、VASP4 の POSCAR 相当のものしか
+        変換では作ることができない。そのために、VASP4 形式の POSCASR に
+        元素種の情報を付加する。そのための method (utility)
+
+        Args:
+            poscar_name:
+            element_info:
+            logger:
+
+        Returns:
+
+        """
         return ensure_vasp5_format(poscar_name, element_info, logger=logger)
 
     def cfg2poscar(
@@ -331,6 +386,11 @@ class RmcPot:
         vasp_name: Optional[str] = None,
     ) -> bool:
         """
+        CFG から POSCAR 変換
+
+        CFG からそのまま作るので、そのままだと元素種の情報がないので
+        VASP4 形式の POSCAR となる。
+
         Args:
             cfg_name (str):  xxx.cfg（拡張子なしのベース名を想定）
             vasp_name (str): xxx.vasp（拡張子なしのベース名を想定）
