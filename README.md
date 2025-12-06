@@ -32,5 +32,5 @@ pip install .
   - kengo.nakada@gmail.com
 
 ## Collaborator
- - K. Kobahashi
+ - K. Kobayashi
  - K. NAKADA
