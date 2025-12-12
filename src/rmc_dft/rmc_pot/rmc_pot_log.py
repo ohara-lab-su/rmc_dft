@@ -134,6 +134,34 @@ class RmcPotLog:
 
         return blocks
 
+    def _scan_rmc_loops(self, block_index: int) -> List[Tuple[int, int]]:
+        """
+        指定された RMC ブロック内の loop 開始・終了行番号 (start, end) を返す。
+        """
+        blocks = self._scan_rmc_blocks()
+        if block_index < 0 or block_index >= len(blocks):
+            return []
+
+        b_start, b_end = blocks[block_index]
+        if b_end == -1:
+            b_end = len(self._log_lines) - 1
+
+        loop_ranges: List[Tuple[int, int]] = []
+        start = -1
+
+        for i in range(b_start, b_end + 1):
+            line = self._log_lines[i]
+
+            if "TOTAL NUMBER OF MOVES" in line:
+                if start >= 0:
+                    loop_ranges.append((start, i - 1))
+                start = i
+
+        if start >= 0:
+            loop_ranges.append((start, b_end))
+
+        return loop_ranges
+
     # ============================================================
     # RMC の終了判定（最後の RMC パートが閉じているか）
     # ============================================================
@@ -168,13 +196,85 @@ class RmcPotLog:
 
         return True
 
-    def count_rmc_blocks(self) -> int:
+    def get_num_rmc_block(self) -> int:
         """
         ログ中に出現した RMC パートの個数（開始ブロックの個数）を返す。
         未完のブロックも 1 と数える。
         """
         blocks: List[Tuple[int, int]] = self._scan_rmc_blocks()
         return len(blocks)
+
+    def get_num_rmc_loop(self, block_index: int) -> int:
+        """
+        RMC ブロック内での loop 数の数
+        Args:
+            block_index:
+
+        Returns:
+
+        """
+        loops = self._scan_rmc_loops(block_index)
+        return len(loops)
+
+    @staticmethod
+    def _extract_value(lines: List[str], key: str, cast_func):
+        for line in lines:
+            if key in line:
+                parts = line.replace("=", " ").split()
+                for p in parts:
+                    try:
+                        return cast_func(p)
+                    except Exception:
+                        pass
+        return None
+
+    def get_generated(self, block: int, loop: int) -> Optional[int]:
+        loops = self._scan_rmc_loops(block)
+        if loop < 0 or loop >= len(loops):
+            return None
+        s, e = loops[loop]
+        lines = self._log_lines[s : e + 1]
+        return self._extract_value(lines, "GENERATED", int)
+
+    def get_tried(self, block: int, loop: int) -> Optional[int]:
+        loops = self._scan_rmc_loops(block)
+        if loop < 0 or loop >= len(loops):
+            return None
+        s, e = loops[loop]
+        lines = self._log_lines[s : e + 1]
+        return self._extract_value(lines, "TRIED", int)
+
+    def get_accepted(self, block: int, loop: int) -> Optional[int]:
+        loops = self._scan_rmc_loops(block)
+        if loop < 0 or loop >= len(loops):
+            return None
+        s, e = loops[loop]
+        lines = self._log_lines[s : e + 1]
+        return self._extract_value(lines, "ACCEPTED", int)
+
+    def get_global_chi2(self, block: int, loop: int) -> Optional[float]:
+        loops = self._scan_rmc_loops(block)
+        if loop < 0 or loop >= len(loops):
+            return None
+        s, e = loops[loop]
+        lines = self._log_lines[s : e + 1]
+        return self._extract_value(lines, "Global chi-squared value", float)
+
+    def get_dataset_chi2(self, block: int, loop: int) -> Optional[float]:
+        loops = self._scan_rmc_loops(block)
+        if loop < 0 or loop >= len(loops):
+            return None
+        s, e = loops[loop]
+        lines = self._log_lines[s : e + 1]
+        return self._extract_value(lines, "Chi-square/npoints", float)
+
+    def get_rw(self, block: int, loop: int) -> Optional[float]:
+        loops = self._scan_rmc_loops(block)
+        if loop < 0 or loop >= len(loops):
+            return None
+        s, e = loops[loop]
+        lines = self._log_lines[s : e + 1]
+        return self._extract_value(lines, "Rw for the set", float)
 
     def clear(
         self,

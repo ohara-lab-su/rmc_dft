@@ -59,7 +59,7 @@ def main() -> bool:
     # rmc_log.reload_log()
 
     # RMC パートの個数
-    block_count: int = rmc_log.count_rmc_blocks()
+    block_count: int = rmc_log.get_num_rmc_block()
 
     # 最後の RMC パートが閉じているかどうか
     finished: bool = rmc_log.is_finished()
