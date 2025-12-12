@@ -56,6 +56,11 @@ if __name__ == "__main__":
     rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
     rmc_dat.set_r_spacing(0.025)
     rmc_dat.set_data_flags([0, 0, 1, 0])
+
+    # σ（実験データの許容誤差の標準偏差）
+    #    小さいほど「ズレ」を許さず、結果的により厳しくフィットさせようとする。
+    rmc_dat.set_sigma_factor(5e-4)
+
     ######################################
 
     # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, config=config, logger=logger)
@@ -79,9 +84,11 @@ if __name__ == "__main__":
     # backup folder がすでにある前提
     # ---------------------------
     # rmc.postprocess()  ## backup and output xxx.vasp
-    rmc.postprocess(
-        log_dir=rmc_dir,
-        cfg_name=config.cfg_name,
-        element_info=config.element_info,
-    )  # backup(loop番号つき), cfg --> xxx.vasp
+
+    ## カレントフォルダで回すだけだと必要ない
+    ## rmc.postprocess(
+    ##     log_dir=rmc_dir,
+    ##     cfg_name=config.cfg_name,
+    ##     element_info=config.element_info,
+    ## )  # backup(loop番号つき), cfg --> xxx.vasp
     logger.info("end")

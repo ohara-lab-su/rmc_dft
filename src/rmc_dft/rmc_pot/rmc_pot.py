@@ -323,13 +323,24 @@ class RmcPot:
         # --- blocking=True の場合（従来通り run()） ---
         if blocking:
             try:
-                subprocess.run(
+                # subprocess.run(
+                proc = subprocess.Popen(
                     cmd,
-                    check=True,
-                    stdout=f,
-                    stderr=f,
+                    # check=True,
+                    # stdout=f,
+                    # stderr=f,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
                     text=True,
                 )
+
+                # --- リアルタイムで読みながら画面にも表示し、ログにも書く ---
+                for line in proc.stdout:
+                    sys.stdout.write(line)  # 画面へ
+                    if f is not None:
+                        f.write(line)  # ログへ
+                proc.wait()
+
             except subprocess.CalledProcessError as e:
                 self._logger.error(f"**Error**: {e}")
                 sys.exit(-1)
