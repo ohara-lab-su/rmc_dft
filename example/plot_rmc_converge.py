@@ -44,6 +44,14 @@ print(r.get_generated(0, 0))
 print(r.get_generated(0, 1))
 print(r.get_generated(0, 2))
 
+for i in range(r.get_num_rmc_loop(0)):
+    print(
+        i,
+        r.get_global_chi2(0, i),
+        r.get_dataset_chi2(0, i),
+        r.get_rw(0, i),
+    )
+
 # def main(cfg_name: str) -> None:
 #     # RMC の cfg_name.log ログファイルを読み込む
 #     rmc = RmcPotLog(cfg_name=cfg_name)

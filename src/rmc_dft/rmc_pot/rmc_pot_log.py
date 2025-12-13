@@ -49,6 +49,9 @@ class RmcPotLog:
 
         # --- ログ解析の一時保存
         self._moves_cache = {}
+        self._chi2_cache = {}
+        self._dataset_cache = {}
+        self._rw_cache = {}
 
     # ============================================================
     # ログファイル読込み(メモリに入れる)
