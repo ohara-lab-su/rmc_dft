@@ -134,33 +134,92 @@ class RmcPotLog:
 
         return blocks
 
-    def _scan_rmc_loops(self, block_index: int) -> List[Tuple[int, int]]:
+    def _scan_loops_inspect(self, block_index: int) -> None:
         """
-        指定された RMC ブロック内の loop 開始・終了行番号 (start, end) を返す。
+        RMC ログのループ構造を、順序のみで厳密に検出する検証専用ルーチン。
+        ※「40 行以内」などの行距離条件は完全に排除。
         """
+
+        print("============================================================")
+        print(" INSPECT scan_rmc_loops (順序ベースの正しい検証)")
+        print("============================================================")
+
+        # --- ブロック範囲を取得 ---
         blocks = self._scan_rmc_blocks()
         if block_index < 0 or block_index >= len(blocks):
-            return []
+            print(f"[INSPECT] invalid block_index={block_index}")
+            return
 
         b_start, b_end = blocks[block_index]
         if b_end == -1:
             b_end = len(self._log_lines) - 1
 
-        loop_ranges: List[Tuple[int, int]] = []
-        start = -1
+        print(f"[INSPECT] block range = {b_start} 〜 {b_end}")
+
+        # --- ループ検出 ---
+        loop_starts = []
+        last_global_idx = -1  # 前回検出した Global の行番号
+
+        print("\n[INSPECT] scanning TOTAL → Global …")
 
         for i in range(b_start, b_end + 1):
-            line = self._log_lines[i]
+            line = self._log_lines[i].rstrip()
 
+            # -------------------------------
+            # STEP 1: TOTAL NUMBER OF MOVES
+            # -------------------------------
             if "TOTAL NUMBER OF MOVES" in line:
-                if start >= 0:
-                    loop_ranges.append((start, i - 1))
-                start = i
 
-        if start >= 0:
-            loop_ranges.append((start, b_end))
+                # 現在位置 i を開始候補として記録
+                total_idx = i
+                print(f"[FOUND TOTAL] line {total_idx}: {line}")
 
-        return loop_ranges
+                # -------------------------------
+                # STEP 2: total_idx 以降で Global を探す
+                # -------------------------------
+                found_global = False
+
+                for j in range(total_idx + 1, b_end + 1):
+                    line2 = self._log_lines[j].rstrip()
+
+                    if "Global chi-squared value" in line2:
+                        print(f"    [FOUND GLOBAL] line {j}: {line2}")
+
+                        # 以前検出した Global より後ならば loop として採用
+                        if j > last_global_idx:
+                            loop_starts.append(total_idx)
+                            last_global_idx = j
+                            print(
+                                f"    [REGISTER LOOP] start={total_idx}, global_at={j}"
+                            )
+                        else:
+                            print(
+                                f"    [SKIP] global {j} は前の global {last_global_idx} より前"
+                            )
+
+                        found_global = True
+                        break
+
+                if not found_global:
+                    print(
+                        f"    [SKIP] TOTAL {total_idx} に対応する Global が見つからない"
+                    )
+
+        print("\n[INSPECT] loop_starts =", loop_starts)
+        print(f"[INSPECT] total loops detected = {len(loop_starts)}")
+
+        # --- start/end の構造を可視化 ---
+        print("\n[INSPECT] constructing loop ranges …")
+        for idx, s in enumerate(loop_starts):
+            if idx + 1 < len(loop_starts):
+                e = loop_starts[idx + 1] - 1
+            else:
+                e = b_end
+            print(f"    loop {idx}: start={s}, end={e}")
+
+        print("============================================================")
+        print(" END INSPECT")
+        print("============================================================")
 
     # ============================================================
     # RMC の終了判定（最後の RMC パートが閉じているか）

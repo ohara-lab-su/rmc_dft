@@ -32,6 +32,7 @@ cp ~/zaiene_dev/rmc_dft/example/plot_hst.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_ppcf.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_energy.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_distance_histgram.py ./
+cp ~/zaiene_dev/rmc_dft/example/plot_rmc_converge.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/plot_multi_fit.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_multi_hst.py ./
