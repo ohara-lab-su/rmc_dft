@@ -1,9 +1,48 @@
 #!/usr/bin/env python3
 from rmc_dft import RmcPotLog
 
+####################
+# test0
+# r = RmcPotLog(cfg_name="aaa")
+# r._scan_loops_inspect(0)
 
+####################
+# test1
+# r = RmcPotLog(cfg_name="aaa")
+# r._inspect_moves(0)
+
+
+####################
+# test2
+# log = RmcPotLog(cfg_name="aaa")
+#
+# # --- ブロック検出 ---
+# blocks = log._scan_rmc_blocks()
+# print("blocks =", blocks)
+#
+# # テストなので block=0 だけ使う
+# b_start, b_end = blocks[0]
+# if b_end < 0:
+#     b_end = len(log._log_lines) - 1
+#
+# print("block range =", b_start, b_end)
+#
+# # --- _scan_moves を直接叩く（これがテスト本番） ---
+# moves = log._scan_moves(b_start, b_end)
+#
+# print("=== moves detected ===")
+# print("count =", len(moves))
+#
+# for i, (g, t, a) in enumerate(moves):
+#     print(f"{i:3d} : GENERATED={g}, TRIED={t}, ACCEPTED={a}")
+
+
+####################
+# test3
 r = RmcPotLog(cfg_name="aaa")
-r._scan_loops_inspect(0)
+print(r.get_generated(0, 0))
+print(r.get_generated(0, 1))
+print(r.get_generated(0, 2))
 
 # def main(cfg_name: str) -> None:
 #     # RMC の cfg_name.log ログファイルを読み込む
@@ -33,7 +72,7 @@ r._scan_loops_inspect(0)
 #             print(f"    Global χ²    : {gchi2}")
 #             print(f"    Dataset χ²   : {dchi2}")
 #             print(f"    Rw (%)       : {rw}")
-
-
+#
+#
 # if __name__ == "__main__":
-#    main("aaa")
+#     main("aaa")
