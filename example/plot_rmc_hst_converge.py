@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+hst ファイルからRMCの収束に関する結果を抜き出す。
+"""
 
 from rmc_dft import Config
 from rmc_dft import RmcPotHst
@@ -16,7 +19,7 @@ def main():
     # --------------------------------------------------------------
     # 総ループ数
     # --------------------------------------------------------------
-    total_loops = hst.get_num_loops()
+    total_loops = hst.get_num_rmc_loops()
     print(f"Total loops = {total_loops}")
     print("=" * 80)
 
@@ -30,8 +33,8 @@ def main():
     all_tried = hst.get_tried()
     all_accepted = hst.get_accepted()
     all_time = hst.get_time()
-    all_tpg = hst.get_tried_per_gen()
-    all_apt = hst.get_acc_per_tried()
+    all_tpg = hst.get_tried_per_generated()
+    all_apt = hst.get_accepted_per_tried()
     all_chi2_tot = hst.get_chi2_tot()
     all_chi2_set1 = hst.get_chi2_set1()
 
@@ -57,8 +60,8 @@ def main():
         tri = hst.get_tried(loop)
         acc = hst.get_accepted(loop)
         tim = hst.get_time(loop)
-        tpg = hst.get_tried_per_gen(loop)
-        apt = hst.get_acc_per_tried(loop)
+        tpg = hst.get_tried_per_generated(loop)
+        apt = hst.get_accepted_per_tried(loop)
         ctot = hst.get_chi2_tot(loop)
         cset = hst.get_chi2_set1(loop)
 

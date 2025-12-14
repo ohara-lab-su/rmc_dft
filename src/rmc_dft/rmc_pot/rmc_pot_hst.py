@@ -199,7 +199,7 @@ class RmcPotHst:
     # ==============================================================
     # ループ総数
     # ==============================================================
-    def get_num_loops(self) -> int:
+    def get_num_rmc_loops(self) -> int:
         """
         hst に含まれるデータ行数＝ループ数を返す。
         """
@@ -252,7 +252,7 @@ class RmcPotHst:
         return self._records[loop_index]["time"]
 
     # -----------------------------
-    def get_tried_per_gen(self, loop_index: Optional[int] = None):
+    def get_tried_per_generated(self, loop_index: Optional[int] = None):
         if loop_index is None:
             out: List[float] = []
             for rec in self._records:
@@ -261,7 +261,7 @@ class RmcPotHst:
         return self._records[loop_index]["tried_per_gen"]
 
     # -----------------------------
-    def get_acc_per_tried(self, loop_index: Optional[int] = None):
+    def get_accepted_per_tried(self, loop_index: Optional[int] = None):
         if loop_index is None:
             out: List[float] = []
             for rec in self._records:
@@ -271,6 +271,21 @@ class RmcPotHst:
 
     # -----------------------------
     def get_chi2_tot(self, loop_index: Optional[int] = None):
+        """
+        全データーセットをまとめた chi
+        chi2_tota/data_point
+
+        おそらく
+        log側 (global)
+        hst側 (total)
+        で同じものを指している
+
+        Args:
+            loop_index:
+
+        Returns:
+
+        """
         if loop_index is None:
             out: List[float] = []
             for rec in self._records:

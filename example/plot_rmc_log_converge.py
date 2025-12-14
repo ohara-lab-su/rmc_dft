@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 from rmc_dft import RmcPotLog
 
+"""
+log ファイルからRMCの収束に関する結果を抜き出す。
+(こちらが hst の下情報になるが、整理されている形式ではないので注意)
+"""
 ####################
 # test0
 # r = RmcPotLog(cfg_name="aaa")
@@ -47,8 +51,8 @@ from rmc_dft import RmcPotLog
 # for i in range(r.get_num_rmc_loop(0)):
 #     print(
 #         i,
-#         r.get_global_chi2(0, i),
-#         r.get_dataset_chi2(0, i),
+#         r.get_chi2_tot(0, i),
+#         r.get_chi2_dataset(0, i),
 #         r.get_rw(0, i),
 #     )
 
@@ -70,8 +74,8 @@ def main(cfg_name: str) -> None:
             generated = rmc.get_generated(b, l)
             tried = rmc.get_tried(b, l)
             accepted = rmc.get_accepted(b, l)
-            gchi2 = rmc.get_global_chi2(b, l)
-            dchi2 = rmc.get_dataset_chi2(b, l)
+            gchi2 = rmc.get_chi2_tot(b, l)
+            dchi2 = rmc.get_chi2_dataset(b, l)
             rw = rmc.get_rw(b, l)
 
             # HST の 8要素に合わせて、ログに存在する 6要素に「比率 2要素」を足す

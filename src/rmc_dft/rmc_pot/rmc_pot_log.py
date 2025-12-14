@@ -420,7 +420,15 @@ class RmcPotLog:
         self._moves_cache[block_index] = results
         return results
 
-    def _scan_global_chi2(self, block_index: int):
+    def _scan_chi2_global(self, block_index: int):
+        """
+        Global chi-squared value (per data point)
+        Args:
+            block_index:
+
+        Returns:
+
+        """
         if block_index in self._chi2_cache:
             return self._chi2_cache[block_index]
 
@@ -444,7 +452,7 @@ class RmcPotLog:
         self._chi2_cache[block_index] = chi2_list
         return chi2_list
 
-    def _scan_dataset_chi2(self, block_index: int):
+    def _scan_chi2_dataset(self, block_index: int):
         if block_index in self._dataset_cache:
             return self._dataset_cache[block_index]
 
@@ -589,14 +597,45 @@ class RmcPotLog:
             return None
         return moves[loop][2]
 
-    def get_global_chi2(self, block: int, loop: int) -> Optional[float]:
-        vals = self._scan_global_chi2(block)
+    def get_chi2_tot(self, block: int, loop: int) -> Optional[float]:
+        """
+        Hst 側に合わせて golbal -> tot に名前を変える
+        (意味が変わってしまうかもしれないので注意)
+
+        おそらく
+        log側 (global)
+        hst側 (total)
+        で同じものを指している
+
+        Args:
+            block:
+            loop:
+
+        Returns:
+
+        """
+        vals = self._scan_chi2_global(block)
         if loop < 0 or loop >= len(vals):
             return None
         return vals[loop]
 
-    def get_dataset_chi2(self, block: int, loop: int) -> Optional[float]:
-        vals = self._scan_dataset_chi2(block)
+    def get_chi2_dataset(self, block: int, loop: int) -> Optional[float]:
+        """
+        Golobal に対して、データーセット別の意味で dataset
+
+        もともと、
+        hst 側では set1(特定セット)
+        log 側では dataset(個別セット)
+        統計集団が異なる可能性があるので注意
+
+        Args:
+            block:
+            loop:
+
+        Returns:
+
+        """
+        vals = self._scan_chi2_dataset(block)
         if loop < 0 or loop >= len(vals):
             return None
         return vals[loop]
