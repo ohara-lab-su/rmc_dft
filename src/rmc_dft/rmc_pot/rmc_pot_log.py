@@ -52,6 +52,7 @@ class RmcPotLog:
         self._chi2_cache = {}
         self._dataset_cache = {}
         self._rw_cache = {}
+        self._time_cache = {}
 
     # ============================================================
     # ログファイル読込み(メモリに入れる)
@@ -84,6 +85,13 @@ class RmcPotLog:
             self._logger.error(f"Failed to read log file: {e}")
             self._log_lines = []
 
+        # --- ログ再読込時の整合性のため、キャッシュを破棄 ---
+        self._moves_cache = {}
+        self._chi2_cache = {}
+        self._dataset_cache = {}
+        self._rw_cache = {}
+        self._time_cache = {}
+
     def set_cfg_name(
         self,
         cfg_name: str,
@@ -109,27 +117,31 @@ class RmcPotLog:
         ※「40 行以内」などの行距離条件は完全に排除。
         """
 
-        print("============================================================")
-        print(" INSPECT scan_rmc_loops (順序ベースの正しい検証)")
-        print("============================================================")
+        self._logger.info(
+            "============================================================"
+        )
+        self._logger.info(" INSPECT scan_rmc_loops (順序ベースの正しい検証)")
+        self._logger.info(
+            "============================================================"
+        )
 
         # --- ブロック範囲を取得 ---
         blocks = self._scan_rmc_blocks()
         if block_index < 0 or block_index >= len(blocks):
-            print(f"[INSPECT] invalid block_index={block_index}")
+            self._logger.info(f"[INSPECT] invalid block_index={block_index}")
             return
 
         b_start, b_end = blocks[block_index]
         if b_end == -1:
             b_end = len(self._log_lines) - 1
 
-        print(f"[INSPECT] block range = {b_start} 〜 {b_end}")
+        self._logger.info(f"[INSPECT] block range = {b_start} 〜 {b_end}")
 
         # --- ループ検出 ---
         loop_starts = []
         last_global_idx = -1  # 前回検出した Global の行番号
 
-        print("\n[INSPECT] scanning TOTAL → Global …")
+        self._logger.info("\n[INSPECT] scanning TOTAL → Global …")
 
         for i in range(b_start, b_end + 1):
             line = self._log_lines[i].rstrip()
@@ -141,7 +153,7 @@ class RmcPotLog:
 
                 # 現在位置 i を開始候補として記録
                 total_idx = i
-                print(f"[FOUND TOTAL] line {total_idx}: {line}")
+                self._logger.info(f"[FOUND TOTAL] line {total_idx}: {line}")
 
                 # -------------------------------
                 # STEP 2: total_idx 以降で Global を探す
@@ -152,17 +164,17 @@ class RmcPotLog:
                     line2 = self._log_lines[j].rstrip()
 
                     if "Global chi-squared value" in line2:
-                        print(f"    [FOUND GLOBAL] line {j}: {line2}")
+                        self._logger.info(f"    [FOUND GLOBAL] line {j}: {line2}")
 
                         # 以前検出した Global より後ならば loop として採用
                         if j > last_global_idx:
                             loop_starts.append(total_idx)
                             last_global_idx = j
-                            print(
+                            self._logger.info(
                                 f"    [REGISTER LOOP] start={total_idx}, global_at={j}"
                             )
                         else:
-                            print(
+                            self._logger.info(
                                 f"    [SKIP] global {j} は前の global {last_global_idx} より前"
                             )
 
@@ -170,25 +182,29 @@ class RmcPotLog:
                         break
 
                 if not found_global:
-                    print(
+                    self._logger.info(
                         f"    [SKIP] TOTAL {total_idx} に対応する Global が見つからない"
                     )
 
-        print("\n[INSPECT] loop_starts =", loop_starts)
-        print(f"[INSPECT] total loops detected = {len(loop_starts)}")
+        self._logger.info("\n[INSPECT] loop_starts =", loop_starts)
+        self._logger.info(f"[INSPECT] total loops detected = {len(loop_starts)}")
 
         # --- start/end の構造を可視化 ---
-        print("\n[INSPECT] constructing loop ranges …")
+        self._logger.info("\n[INSPECT] constructing loop ranges …")
         for idx, s in enumerate(loop_starts):
             if idx + 1 < len(loop_starts):
                 e = loop_starts[idx + 1] - 1
             else:
                 e = b_end
-            print(f"    loop {idx}: start={s}, end={e}")
+            self._logger.info(f"    loop {idx}: start={s}, end={e}")
 
-        print("============================================================")
-        print(" END INSPECT")
-        print("============================================================")
+        self._logger.info(
+            "============================================================"
+        )
+        self._logger.info(" END INSPECT")
+        self._logger.info(
+            "============================================================"
+        )
 
     def _inspect_moves(self, block_index: int) -> None:
         """
@@ -199,25 +215,29 @@ class RmcPotLog:
         本番のパース処理はここでは一切しない。
         """
 
-        print("============================================================")
-        print(" INSPECT moves (内部検証)")
-        print("============================================================")
+        self._logger.info(
+            "============================================================"
+        )
+        self._logger.info(" INSPECT moves (内部検証)")
+        self._logger.info(
+            "============================================================"
+        )
 
         # ブロック検出（あなたと同じ）
         blocks = self._scan_rmc_blocks()
-        print(f"[INSPECT] blocks = {blocks}")
+        self._logger.info(f"[INSPECT] blocks = {blocks}")
 
         if block_index < 0 or block_index >= len(blocks):
-            print(f"[INSPECT] invalid block_index={block_index}")
+            self._logger.info(f"[INSPECT] invalid block_index={block_index}")
             return
 
         b_start, b_end = blocks[block_index]
         if b_end == -1:
             b_end = len(self._log_lines) - 1
 
-        print(f"[INSPECT] block range = {b_start} 〜 {b_end}")
+        self._logger.info(f"[INSPECT] block range = {b_start} 〜 {b_end}")
 
-        print("\n[INSPECT] scanning lines for moves header and numbers...")
+        self._logger.info("\n[INSPECT] scanning lines for moves header and numbers...")
 
         header_line = None
         numbers_line = None
@@ -227,22 +247,26 @@ class RmcPotLog:
 
             # GENERATED/TRIED/ACCEPTED という「ヘッダー行」
             if "GENERATED" in line and "TRIED" in line and "ACCEPTED" in line:
-                print(f"[FOUND HEADER] line {i}: {line}")
+                self._logger.info(f"[FOUND HEADER] line {i}: {line}")
                 header_line = i
 
                 # 次の行をそのまま印字（数字行のはず）
                 if i + 1 <= b_end:
                     numline = self._log_lines[i + 1].rstrip()
-                    print(f"[FOUND NUMBER] line {i+1}: {numline}")
+                    self._logger.info(f"[FOUND NUMBER] line {i+1}: {numline}")
                     numbers_line = i + 1
-                print("")
+                self._logger.info("")
 
-        print(f"[INSPECT] header_line  = {header_line}")
-        print(f"[INSPECT] numbers_line = {numbers_line}")
+        self._logger.info(f"[INSPECT] header_line  = {header_line}")
+        self._logger.info(f"[INSPECT] numbers_line = {numbers_line}")
 
-        print("============================================================")
-        print(" END INSPECT")
-        print("============================================================")
+        self._logger.info(
+            "============================================================"
+        )
+        self._logger.info(" END INSPECT")
+        self._logger.info(
+            "============================================================"
+        )
 
     # -----------------------
     # ログファイルをパース
@@ -582,6 +606,38 @@ class RmcPotLog:
         if loop < 0 or loop >= len(vals):
             return None
         return vals[loop]
+
+    def get_tried_per_generated(self, block: int, loop: int) -> Optional[float]:
+        generated = self.get_generated(block, loop)
+        if generated is None:
+            return None
+
+        tried = self.get_tried(block, loop)
+        if tried is None:
+            return None
+
+        if generated == 0:
+            return 0.0
+
+        return float(tried) / float(generated)
+
+    def get_accepted_per_tried(self, block: int, loop: int) -> Optional[float]:
+        tried = self.get_tried(block, loop)
+        if tried is None:
+            return None
+
+        accepted = self.get_accepted(block, loop)
+        if accepted is None:
+            return None
+
+        if tried == 0:
+            return 0.0
+
+        return float(accepted) / float(tried)
+
+    # ----------------------------
+    # ユーティリティ
+    # ----------------------------
 
     def clear(
         self,

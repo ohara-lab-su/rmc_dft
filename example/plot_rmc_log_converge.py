@@ -39,48 +39,64 @@ from rmc_dft import RmcPotLog
 
 ####################
 # test3
-r = RmcPotLog(cfg_name="aaa")
-print(r.get_generated(0, 0))
-print(r.get_generated(0, 1))
-print(r.get_generated(0, 2))
+# r = RmcPotLog(cfg_name="aaa")
+# print(r.get_generated(0, 0))
+# print(r.get_generated(0, 1))
+# print(r.get_generated(0, 2))
+#
+# for i in range(r.get_num_rmc_loop(0)):
+#     print(
+#         i,
+#         r.get_global_chi2(0, i),
+#         r.get_dataset_chi2(0, i),
+#         r.get_rw(0, i),
+#     )
 
-for i in range(r.get_num_rmc_loop(0)):
-    print(
-        i,
-        r.get_global_chi2(0, i),
-        r.get_dataset_chi2(0, i),
-        r.get_rw(0, i),
-    )
 
-# def main(cfg_name: str) -> None:
-#     # RMC の cfg_name.log ログファイルを読み込む
-#     rmc = RmcPotLog(cfg_name=cfg_name)
-#
-#     # RMC ブロック数（RMC 単体なら通常 1、RMC–VASP なら 2 以上もあり得る）
-#     num_blocks = rmc.get_num_rmc_block()
-#
-#     print(f"RMC Blocks: {num_blocks}")
-#
-#     for b in range(num_blocks):
-#         num_loops = rmc.get_num_rmc_loop(b)
-#         print(f"\n=== RMC BLOCK {b} : Loops = {num_loops} ===")
-#
-#         for l in range(num_loops):
-#             generated = rmc.get_generated(b, l)
-#             tried = rmc.get_tried(b, l)
-#             accepted = rmc.get_accepted(b, l)
-#             gchi2 = rmc.get_global_chi2(b, l)
-#             dchi2 = rmc.get_dataset_chi2(b, l)
-#             rw = rmc.get_rw(b, l)
-#
-#             print(f"\n  LOOP {l}")
-#             print(f"    GENERATED    : {generated}")
-#             print(f"    TRIED        : {tried}")
-#             print(f"    ACCEPTED     : {accepted}")
-#             print(f"    Global χ²    : {gchi2}")
-#             print(f"    Dataset χ²   : {dchi2}")
-#             print(f"    Rw (%)       : {rw}")
-#
-#
-# if __name__ == "__main__":
-#     main("aaa")
+def main(cfg_name: str) -> None:
+    # RMC の cfg_name.log ログファイルを読み込む
+    rmc = RmcPotLog(cfg_name=cfg_name)
+
+    # RMC ブロック数（RMC 単体なら通常 1、RMC–VASP なら 2 以上もあり得る）
+    num_blocks = rmc.get_num_rmc_block()
+
+    print(f"RMC Blocks: {num_blocks}")
+
+    for b in range(num_blocks):
+        num_loops = rmc.get_num_rmc_loop(b)
+        print(f"\n=== RMC BLOCK {b} : Loops = {num_loops} ===")
+
+        for l in range(num_loops):
+            generated = rmc.get_generated(b, l)
+            tried = rmc.get_tried(b, l)
+            accepted = rmc.get_accepted(b, l)
+            gchi2 = rmc.get_global_chi2(b, l)
+            dchi2 = rmc.get_dataset_chi2(b, l)
+            rw = rmc.get_rw(b, l)
+
+            # HST の 8要素に合わせて、ログに存在する 6要素に「比率 2要素」を足す
+            tried_per_generated = None
+            if generated is not None:
+                if generated != 0:
+                    if tried is not None:
+                        tried_per_generated = tried / generated
+
+            accepted_per_tried = None
+            if tried is not None:
+                if tried != 0:
+                    if accepted is not None:
+                        accepted_per_tried = accepted / tried
+
+            print(f"\n  LOOP {l}")
+            print(f"    GENERATED    : {generated}")
+            print(f"    TRIED        : {tried}")
+            print(f"    ACCEPTED     : {accepted}")
+            print(f"    TRIED/GENERATED     : {tried_per_generated}")
+            print(f"    ACCEPTED/TRIED      : {accepted_per_tried}")
+            print(f"    Global χ²    : {gchi2}")
+            print(f"    Dataset χ²   : {dchi2}")
+            print(f"    Rw (%)       : {rw}")
+
+
+if __name__ == "__main__":
+    main("aaa")
