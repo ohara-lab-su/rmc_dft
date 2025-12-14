@@ -39,33 +39,44 @@ class RmcPotHst:
 
     def __init__(
         self,
+        hst_name: Optional[str] = None,
         cfg_name: Optional[str] = None,
         config: Optional[Config] = None,
         logger: Optional[XLogger] = None,
     ) -> None:
+        """
+        1) cfg_name があればそれが優先
+           hst_nameと書いている場合がある
+           基本的には hst_name.hst ファイルを読む
+           内部的には cfg_name として扱う
+        2) config があればそれが優先
 
-        # ロガー
+        Args:
+            hst_path (str):
+            cfg_name (str):
+            config (Config):
+            logger (XLogger):
+        """
         self._logger: XLogger = logger or XLogger(logger_name="RmcPotHst")
 
-        # Config の処理（cfg_name を前提とした設計を保持）
-        if config is not None:
-            self._config: Config = config
-        else:
-            self._config: Config = Config()
-
-        # cfg_name が明示された場合はそれを優先
-        if cfg_name is not None:
-            self._cfg_name: str = cfg_name
-        else:
-            self._cfg_name: str = self._config.cfg_name
-
         # HST ファイル名は cfg_name を基準に決定する
-        self._hst_file: str = f"{self._cfg_name}.hst"
+        if hst_name is not None:
+            self._hst_file: str = hst_name
+        elif cfg_name is not None:
+            self._hst_file: str = f"{cfg_name}.hst"
+        elif config is not None:
+            config: Config = Config("config.yaml")
+            cfg_name: str = config.cfg_name
+            self._hst_file: str = f"{cfg_name}.hst"
+        else:
+            self._logger.error(f"hst_name or cfg_name not provided")
+            raise NotImplementedError
 
         # 生ログ行と記録行
         self._lines: List[str] = []
         self._records: List[Dict[str, Union[int, float]]] = []
 
+        # パースしたか？
         self._parsed: bool = False
 
         self._load_file()
@@ -76,34 +87,51 @@ class RmcPotHst:
     # ---------------------------------------------------------------
     def _load_file(self) -> None:
         try:
-            with open(self._hst_path, "r") as f:
+            with open(self._hst_file, "r") as f:
                 self._lines = f.readlines()
-            self._logger.info(f"Loaded HST: {self._hst_path}")
+            self._logger.info(f"Loaded HST: {self._hst_file}")
         except FileNotFoundError:
-            self._logger.warning(f"HST not found: {self._hst_path}")
+            self._logger.warning(f"HST not found: {self._hst_file}")
             self._lines = []
 
+    # ---------------------------------------------------------------
+    # パース（唯一の構造化処理）
+    # ---------------------------------------------------------------
     # ---------------------------------------------------------------
     # パース（唯一の構造化処理）
     # ---------------------------------------------------------------
     def _parse(self) -> None:
         """
         hst の「データ行」を抽出し、_records に格納する。
-        データ行の条件：
-            ・空白区切りで 9 カラム以上
-            ・すべて数値として読み込める
+
+        あなたの hst 仕様では、データ行は以下の 8 列で構成される：
+
+            generated
+            tried
+            accepted
+            time
+            tried/gen
+            acc/tried
+            chi2_tot/data_point
+            chi2_set1
+
+        ※以前の私の実装では「9 列以上であること」を条件にしてしまい、
+          hst の本来のデータ行がすべて読み落とされていた。
+          これを正しく 8 列で判定するよう修正する。
         """
         if self._parsed:
             return
 
         for line in self._lines:
             items = line.strip().split()
-            if len(items) < 9:
+
+            # hst のデータ行は 8 列であるため、
+            # 8 列未満は即スキップ
+            if len(items) < 8:
                 continue
 
-            # データ行かどうかの判定：generated が整数であるかどうか
-            # （hst は行番号ではないため先頭の items[0] の名前は "generated"）
             try:
+                # 数値変換できるかどうかでデータ行か判定
                 rec = {
                     "generated": int(items[0]),
                     "tried": int(items[1]),
@@ -115,8 +143,9 @@ class RmcPotHst:
                     "chi2_set1": float(items[7]),
                 }
                 self._records.append(rec)
+
             except Exception:
-                # 数値変換できない行は無視
+                # 数値変換できない＝ヘッダ行など → 無視
                 continue
 
         self._parsed = True
