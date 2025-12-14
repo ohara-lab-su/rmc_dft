@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 
 def find_next_log_index(
