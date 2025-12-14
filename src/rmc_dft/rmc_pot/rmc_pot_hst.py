@@ -36,13 +36,10 @@ from x_logger import XLogger
 
 
 class RmcPotHst:
-    """
-    RMC_POT .hst 履歴データクラス。
-    """
 
     def __init__(
         self,
-        hst_path: Optional[str] = None,
+        cfg_name: Optional[str] = None,
         config: Optional[Config] = None,
         logger: Optional[XLogger] = None,
     ) -> None:
@@ -50,22 +47,27 @@ class RmcPotHst:
         # ロガー
         self._logger: XLogger = logger or XLogger(logger_name="RmcPotHst")
 
-        # Config
-        self._config: Config = config or Config()
+        # Config の処理（cfg_name を前提とした設計を保持）
+        if config is not None:
+            self._config: Config = config
+        else:
+            self._config: Config = Config()
 
-        # HST ファイルパス
-        self._hst_path: str = hst_path or self._config.cfg_name
+        # cfg_name が明示された場合はそれを優先
+        if cfg_name is not None:
+            self._cfg_name: str = cfg_name
+        else:
+            self._cfg_name: str = self._config.cfg_name
 
-        # 生ログ行
+        # HST ファイル名は cfg_name を基準に決定する
+        self._hst_file: str = f"{self._cfg_name}.hst"
+
+        # 生ログ行と記録行
         self._lines: List[str] = []
-
-        # パース済みデータ
         self._records: List[Dict[str, Union[int, float]]] = []
 
-        # フラグ
         self._parsed: bool = False
 
-        # 読み込み → パース
         self._load_file()
         self._parse()
 
