@@ -2,6 +2,9 @@
 """
 K.KOBAYASHI
 K.NAKADA, kengo.nakada@gmail.com
+
+ログ解析で、hst ファイルと同様（もっと詳しい）
+情報を引っ張り出す
 """
 import os
 import shutil
@@ -48,11 +51,11 @@ class RmcPotLog:
         self.load_log()
 
         # --- ログ解析の一時保存
-        self._moves_cache = {}
-        self._chi2_cache = {}
-        self._dataset_cache = {}
-        self._rw_cache = {}
-        self._time_cache = {}
+        self._cache_moves = {}
+        self._cache_chi2 = {}
+        self._cache_dataset = {}
+        self._cache_rw = {}
+        self._cache_time = {}
 
     # ============================================================
     # ログファイル読込み(メモリに入れる)
@@ -86,11 +89,11 @@ class RmcPotLog:
             self._log_lines = []
 
         # --- ログ再読込時の整合性のため、キャッシュを破棄 ---
-        self._moves_cache = {}
-        self._chi2_cache = {}
-        self._dataset_cache = {}
-        self._rw_cache = {}
-        self._time_cache = {}
+        self._cache_moves = {}
+        self._cache_chi2 = {}
+        self._cache_dataset = {}
+        self._cache_rw = {}
+        self._cache_time = {}
 
     def set_cfg_name(
         self,
@@ -391,8 +394,8 @@ class RmcPotLog:
         Returns:
 
         """
-        if block_index in self._moves_cache:
-            return self._moves_cache[block_index]
+        if block_index in self._cache_moves:
+            return self._cache_moves[block_index]
 
         results = []
 
@@ -417,7 +420,7 @@ class RmcPotLog:
 
             i += 1
 
-        self._moves_cache[block_index] = results
+        self._cache_moves[block_index] = results
         return results
 
     def _scan_chi2_global(self, block_index: int):
@@ -429,8 +432,8 @@ class RmcPotLog:
         Returns:
 
         """
-        if block_index in self._chi2_cache:
-            return self._chi2_cache[block_index]
+        if block_index in self._cache_chi2:
+            return self._cache_chi2[block_index]
 
         loops = self._scan_rmc_loops(block_index)
         chi2_list = []
@@ -449,12 +452,12 @@ class RmcPotLog:
                     break
             chi2_list.append(val)
 
-        self._chi2_cache[block_index] = chi2_list
+        self._cache_chi2[block_index] = chi2_list
         return chi2_list
 
     def _scan_chi2_dataset(self, block_index: int):
-        if block_index in self._dataset_cache:
-            return self._dataset_cache[block_index]
+        if block_index in self._cache_dataset:
+            return self._cache_dataset[block_index]
 
         loops = self._scan_rmc_loops(block_index)
         ds_list = []
@@ -473,12 +476,12 @@ class RmcPotLog:
                     break
             ds_list.append(val)
 
-        self._dataset_cache[block_index] = ds_list
+        self._cache_dataset[block_index] = ds_list
         return ds_list
 
     def _scan_rw(self, block_index: int):
-        if block_index in self._rw_cache:
-            return self._rw_cache[block_index]
+        if block_index in self._cache_rw:
+            return self._cache_rw[block_index]
 
         loops = self._scan_rmc_loops(block_index)
         rw_list = []
@@ -497,7 +500,7 @@ class RmcPotLog:
                     break
             rw_list.append(val)
 
-        self._rw_cache[block_index] = rw_list
+        self._cache_rw[block_index] = rw_list
         return rw_list
 
     # ============================================================
