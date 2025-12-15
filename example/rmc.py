@@ -59,6 +59,8 @@ if __name__ == "__main__":
     rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
     # 5 行目：r spacing（g(r) のビン幅）を設定する
     rmc_dat.set_r_spacing(0.025)
+    # 6行目: moveout を認めるかどうか？
+    rmc_dat.set_moveout_option(True)
     # 10 行目：データ種の使用フラグ（g(r), neutron, x-ray, EXAFS）を設定する
     rmc_dat.set_data_flags([0, 0, 1, 0])
     # 実験データファイル名（11 行目）を設定する
