@@ -74,12 +74,16 @@ def main() -> None:
     input_name: str = sys.argv[1]
 
     # POSCAR または cfg → POSCAR
+    logger.info(f"")
+    logger.info(f"== CFG --> POSCAR")
     poscar_name = load_poscar_from_input(input_name, logger)
 
     # POSCAR 読み込み
     poscar = VaspPoscar(poscar_name)
     analyzer = VaspPoscarAnalyzer(poscar)
 
+    logger.info(f"")
+    logger.info(f"== cal: discance")
     # 距離収集
     distances = collect_all_pair_distances(analyzer, pbc=True, r_max=None)
     if distances.size == 0:

@@ -99,8 +99,26 @@ class RmcPotFit:
 
     # S(Q) に変換するためのメソッド
     def get_S_calc(self) -> List[float]:
-        """S_calc(Q) = F_calc + 1"""
+        """
+        S_calc(Q) = F_calc + 1
+        RMC_POT の F(Q) はこちらの形
+        """
         return [f + 1.0 for f in self.F_calc]
+
+    # def get_S_calc(self) -> List[float]:
+    #    """
+    #    S_calc(Q) = 1 + F_calc(Q) / Q
+    #    ※ Q=0 は除外または無視する前提（RMC_POT の fit では通常 Q>0）
+    #    """
+    #    s_list: List[float] = []
+
+    #    for q, f in zip(self.Q, self.F_calc):
+    #        if q == 0.0:
+    #            s_list.append(1.0)
+    #        else:
+    #            s_list.append(1.0 + f / q)
+
+    #    return s_list
 
     def get_S_exp(self) -> List[float]:
         """S_exp(Q) = renormalized F_exp + 1"""
