@@ -283,3 +283,31 @@ def convert_to_cfg(
 
     cfg.close()
     return True
+
+
+if __name__ == "__main__":
+    logger = XLogger(log_level="info", logger_name="vasp2cfg")
+
+    if len(sys.argv) < 2:
+        logger.error("Usage: python Rvasp2cfg_nonLIB2025.py vasp_name [cfg_name]")
+        sys.exit(1)
+
+    vasp_name: str = sys.argv[1]
+
+    if len(sys.argv) >= 3:
+        cfg_name: str = sys.argv[2]
+    else:
+        cfg_name: str = vasp_name
+
+    logger.info(f"vasp_name = {vasp_name}")
+    logger.info(f"cfg_name  = {cfg_name}")
+
+    ret = vasp2cfg(
+        vasp_name=vasp_name,
+        cfg_name=cfg_name,
+        logger=logger,
+    )
+
+    if not ret:
+        logger.error("vasp2cfg failed")
+        sys.exit(1)

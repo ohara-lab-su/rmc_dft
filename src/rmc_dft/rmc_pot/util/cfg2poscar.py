@@ -207,3 +207,31 @@ def cfg2poscar(
         # sys.exit(1)
 
     return True
+
+
+if __name__ == "__main__":
+    logger = XLogger(log_level="info", logger_name="cfg2poscar")
+
+    if len(sys.argv) < 2:
+        logger.error("Usage: python cfg2poscar_nonLIB.py cfg_name [vasp_name]")
+        sys.exit(1)
+
+    cfg_name: str = sys.argv[1]
+
+    if len(sys.argv) >= 3:
+        vasp_name: str = sys.argv[2]
+    else:
+        vasp_name: str = cfg_name
+
+    logger.info(f"cfg_name  = {cfg_name}")
+    logger.info(f"vasp_name = {vasp_name}")
+
+    ret = cfg2poscar(
+        cfg_name=cfg_name,
+        vasp_name=vasp_name,
+        logger=logger,
+    )
+
+    if not ret:
+        logger.error("cfg2poscar failed")
+        sys.exit(1)
