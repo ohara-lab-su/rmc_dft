@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.2 nakada
+
+- bugfix
+ 
 ## v0.4.1 nakada
 
 - Log 解析で hst と同等のことができるように修正(むしろこちらの方が生情報)
