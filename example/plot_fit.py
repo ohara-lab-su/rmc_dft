@@ -28,7 +28,7 @@ def plot_sq(
         if target_dir is not None:
             os.chdir(target_dir)
 
-        fit = RmcPotFit(cfg_name)
+        fit = RmcPotFit(cfg_name=cfg_name)
         ret = fit.read_fit()
         if not ret:
             return False
