@@ -31,9 +31,70 @@ import numpy as np
 from x_logger import XLogger
 
 
+from typing import Optional, Union, Sequence, List
+
+
+def parse_elements(
+    element_info: Optional[Union[str, Sequence[str]]] = None,
+) -> Optional[List[str]]:
+
+    # ----------------------------
+    # None の場合
+    # ----------------------------
+    if element_info is None:
+        elements = None
+        return elements
+
+    # ----------------------------
+    # str の場合
+    #   - まずファイルとして open を試す
+    #   - 失敗したら文字列として扱う
+    # ----------------------------
+    if isinstance(element_info, str):
+        text = None
+
+        try:
+            with open(element_info, "r") as f:
+                text = f.read()
+        except OSError:
+            # ファイルとして開けなければ、そのまま文字列として扱う
+            text = element_info
+
+        text = text.strip()
+        elements = []
+
+        for token in text.split(","):
+            elements.append(token.strip())
+
+        return elements
+
+    # ----------------------------
+    # Sequence[str] の場合
+    # ----------------------------
+    elements = []
+
+    for elem in element_info:
+        elements.append(elem)
+
+    return elements
+
+
+def make_vasp_elements_line(elements: List[str]) -> str:
+    line = ""
+
+    for elem in elements:
+        line += elem
+        line += " "
+
+    line = line.rstrip()
+
+    return line
+
+
 def cfg2poscar(
     cfg_name: str,
     vasp_name: Optional[str] = None,
+    element_info: Optional[Union[str, Sequence[str]]] = None,
     logger: Optional[XLogger] = XLogger(),
 ) -> bool:
     """
@@ -43,6 +104,7 @@ def cfg2poscar(
     Args:
         cfg_name (str)::
         vasp_name (str):
+        element_info (str or Sequence[str]):
         logger (XLogger):
     Returns:
         bool:
@@ -176,6 +238,12 @@ def cfg2poscar(
         ## OUTPUT for VASP
         vasp = open(vasp_name + ".vasp", "w")
 
+        # --------------------------------------------------
+        # [ADDED] VASP elements 情報を解釈
+        #   element_info は cfg2poscar の引数
+        # --------------------------------------------------
+        elements = parse_elements(element_info)
+
         # ***.vasp へ出力
         print(comment, file=vasp)
         print("1.0", file=vasp)
@@ -183,9 +251,17 @@ def cfg2poscar(
         print("  %13.9f %13.9f %13.9f" % (t2_x, t2_y, t2_z), file=vasp)
         print("  %13.9f %13.9f %13.9f" % (t3_x, t3_y, t3_z), file=vasp)
 
+        # ==================================================
+        # [ADDED] VASP5 POSCAR elements 行
+        #   lattice vectors の直後
+        #   elements が None の場合は何も出力しない
+        # ==================================================
+        if elements is not None:
+            print(make_vasp_elements_line(elements), file=vasp)
+
         ####
         # print >> vasp, " atoms"
-        print(" atoms", file=vasp)
+        # print(" atoms", file=vasp)
         ####
 
         for i in range(int(ntype)):
@@ -207,3 +283,31 @@ def cfg2poscar(
         # sys.exit(1)
 
     return True
+
+
+if __name__ == "__main__":
+    logger = XLogger(log_level="info", logger_name="cfg2poscar")
+
+    if len(sys.argv) < 2:
+        logger.error("Usage: python cfg2poscar_nonLIB.py cfg_name [vasp_name]")
+        sys.exit(1)
+
+    cfg_name: str = sys.argv[1]
+
+    if len(sys.argv) >= 3:
+        vasp_name: str = sys.argv[2]
+    else:
+        vasp_name: str = cfg_name
+
+    logger.info(f"cfg_name  = {cfg_name}")
+    logger.info(f"vasp_name = {vasp_name}")
+
+    ret = cfg2poscar(
+        cfg_name=cfg_name,
+        vasp_name=vasp_name,
+        logger=logger,
+    )
+
+    if not ret:
+        logger.error("cfg2poscar failed")
+        sys.exit(1)

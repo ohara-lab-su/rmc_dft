@@ -17,6 +17,7 @@ class RmcPotFit:
 
     def __init__(
         self,
+        fit_name: Optional[str] = None,
         cfg_name: Optional[str] = None,
         config: Optional[Config] = None,  # Config(),
         logger: Optional[XLogger] = None,
@@ -24,14 +25,23 @@ class RmcPotFit:
         """
 
         Args:
+            fit_name (str): aaa.fit まで含めた名前
             cfg_name (str): cfg_name.fit (.fitを含むフルのファイル名)
             config (Config):
             logger (XLogger):
         """
         self._logger = logger or XLogger(logger_name="RmcPotFit")
-        self._config = config or Config()
-        self._cfg_name: Optional[str] = cfg_name or self._config.cfg_name
-        self.filename: str = f"{cfg_name}.fit"
+        self._cfg_name = None
+        self._config = None
+        self.filename = None
+
+        if fit_name:
+            self.filename: str = fit_name
+        else:
+            self._config = config or Config()
+            self._cfg_name: Optional[str] = cfg_name or self._config.cfg_name
+            self.filename: str = f"{cfg_name}.fit"
+        self._logger.info(f"== fit filename = {fit_name}")
 
         # データ格納
         self.Q: List[float] = []
