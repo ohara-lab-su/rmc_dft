@@ -31,12 +31,15 @@ class RmcPotFit:
             logger (XLogger):
         """
         self._logger = logger or XLogger(logger_name="RmcPotFit")
-        self._config = config or Config()
-        self._cfg_name: Optional[str] = cfg_name or self._config.cfg_name
+        self._cfg_name = None
+        self._config = None
+        self.filename = None
 
         if fit_name:
-            self.filename = fit_name
+            self.filename: str = fit_name
         else:
+            self._config = config or Config()
+            self._cfg_name: Optional[str] = cfg_name or self._config.cfg_name
             self.filename: str = f"{cfg_name}.fit"
         self._logger.info(f"== fit filename = {fit_name}")
 
