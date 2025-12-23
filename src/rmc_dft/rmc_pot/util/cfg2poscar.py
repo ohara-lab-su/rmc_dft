@@ -261,7 +261,7 @@ def cfg2poscar(
 
         ####
         # print >> vasp, " atoms"
-        print(" atoms", file=vasp)
+        # print(" atoms", file=vasp)
         ####
 
         for i in range(int(ntype)):

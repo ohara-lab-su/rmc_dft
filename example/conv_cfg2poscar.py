@@ -34,9 +34,6 @@ if __name__ == "__main__":
     # element_info = "label.txt" # kobayashi-method
     element_info = ["Fe", "Si", "B"]  # normal-method
 
-    # POSCAR to CFG
-    poscar2cfg(cfg_name)
-
     rmc_log = RmcPotLog(
         cfg_name=cfg_name,
         logger=logger,
