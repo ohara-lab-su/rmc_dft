@@ -34,6 +34,11 @@ def plot_chi(
 
         # 表示のみ（保存はしない）
         plt.show()
+
+        save = True
+        if save:
+            out_name: str = f"{cfg_name}_chi2.png"
+            plt.savefig(out_name, dpi=300)
     finally:
         # 元のディレクトリに戻す
         os.chdir(original_cwd)

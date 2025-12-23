@@ -28,7 +28,7 @@ def plot_sq(
         if target_dir is not None:
             os.chdir(target_dir)
 
-        fit = RmcPotFit(cfg_name)
+        fit = RmcPotFit(cfg_name=cfg_name)
         ret = fit.read_fit()
         if not ret:
             return False
@@ -45,6 +45,12 @@ def plot_sq(
         plt.legend()
         plt.tight_layout()
         plt.show()
+
+        save = True
+        if save:
+            out_name: str = f"{cfg_name}_sq.png"
+            plt.savefig(out_name, dpi=300)
+
     finally:
         # 元のディレクトリに戻す
         os.chdir(original_cwd)

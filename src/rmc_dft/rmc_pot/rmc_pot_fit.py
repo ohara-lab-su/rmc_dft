@@ -17,6 +17,7 @@ class RmcPotFit:
 
     def __init__(
         self,
+        *,
         fit_name: Optional[str] = None,
         cfg_name: Optional[str] = None,
         config: Optional[Config] = None,  # Config(),
