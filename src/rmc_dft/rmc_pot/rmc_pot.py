@@ -395,6 +395,7 @@ class RmcPot:
         self,
         cfg_name: Optional[str] = None,
         vasp_name: Optional[str] = None,
+        element_info: Optional[Union[str, Sequence[str]]] = None,
     ) -> bool:
         """
         CFG から POSCAR 変換
@@ -405,6 +406,7 @@ class RmcPot:
         Args:
             cfg_name (str):  xxx.cfg（拡張子なしのベース名を想定）
             vasp_name (str): xxx.vasp（拡張子なしのベース名を想定）
+            element_info (str or Sequence[str]): ["Fe","Si",,,]
         """
         if cfg_name is None:
             cfg_name = self._cfg_name
@@ -414,7 +416,11 @@ class RmcPot:
         self._logger.info(f"cfg_name  = {cfg_name}")
         self._logger.info(f"vasp_name = {vasp_name}")
 
-        cfg2poscar(cfg_name=cfg_name, vasp_name=vasp_name)
+        cfg2poscar(
+            cfg_name=cfg_name,
+            vasp_name=vasp_name,
+            element_info=element_info,
+        )
 
         # POSCAR を後に上書きしちゃうので保存しておく
         # 繰り返し作業するとそれも上書きされるのでほぼ意味はないが

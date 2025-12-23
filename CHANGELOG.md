@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.4.3 nakada
+
+- cfg2poscar 自身を 引数 element_info として、
+  1. リスト(str) をファイルとして読み込み、そこ書かれている Fe,Si,B という内容を、"Fe,Si,B" として扱う
+  2. リスト(str) をファイルとして読むのに失敗したら、そのストリングを、"Fe,Si,B"
+  3. ["Fe","Si","B"] のようなリストとして受ける
+
+機能を追加した
+
 ## v0.4.2 nakada
 
 - bugfix
