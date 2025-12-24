@@ -1,6 +1,10 @@
 # CHANGELOG
 
 
+## v0.4.4 nakada
+
+- density 関係のメソッドの名前変更と単独で実行可能な main-python化
+
 ## v0.4.3 nakada
 
 - cfg2poscar 自身を 引数 element_info として、
