@@ -15,8 +15,8 @@ class Config:
     max_rmc_dft_loop: int = 10
 
     N_tot: int = 400  # セルサイズ(原子数)
-    rho_g_cm3: float = 7.35  # 質量密度
-    n_per_A3: float = 0.0915  # 数密度
+    mass_density_g_cm3: float = 7.35  # 質量密度
+    number_density_per_A3: float = 0.0915  # 数密度
     # element_info: Union[str, Sequence[str]] = "label.txt"
     element_info: Union[str, Sequence[str]] = ["Fe", "Si", "B"]
     ratios: Sequence[int] = [80, 9, 11]

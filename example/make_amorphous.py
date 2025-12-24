@@ -43,7 +43,7 @@ def main() -> None:
         logger.info("config.yaml is found.")
         config = Config("config.yml")
         N_tot = config.N_tot
-        rho_g_cm3 = config.rho_g_cm3
+        rho_g_cm3 = config.mass_density_g_cm3
         ratios = config.ratios
         symbols = config.element_info
     else:
