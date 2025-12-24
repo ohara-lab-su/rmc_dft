@@ -19,6 +19,10 @@ cp ~/zaiene_dev/rmc_dft/example/check_rcm_finalized.py ./
 cp ~/zaiene_dev/rmc_dft/example/check_vasp_distance.py ./
 cp ~/zaiene_dev/rmc_dft/example/diff_incar.py ./
 #
+cp ~/zaiene_dev/rmc_dft/example/make_cell_size.py ./
+cp ~/zaiene_dev/rmc_dft/example/make_amorphous.py ./
+cp ~/zaiene_dev/rmc_dft/example/make_number_density.py ./
+#
 cp ~/zaiene_dev/rmc_dft/example/job_hpcs2024_node1.sh ./
 cp ~/zaiene_dev/rmc_dft/example/job_hpcs2024_node2.sh ./
 #

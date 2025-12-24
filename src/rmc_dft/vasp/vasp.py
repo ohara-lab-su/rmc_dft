@@ -564,6 +564,7 @@ class Vasp:
     ) -> bool:
         """
         Convert VASP POSCAR を RMC CFG 形式に変換する
+        POSCAR の名前は固定、aaa.cfg ファイル名に変換
 
         Args:
             cfg_name: str = "aaa": Name of the output file without extension.

@@ -227,28 +227,28 @@ class Packmol:
         return total_mass / float(total_atoms)
 
     # @staticmethod
-    # def number_density_from_rho(
+    # def number_density_from_mass_density(
     #     M_avg: float,
-    #     rho_g_cm3: float,
+    #     mass_density_g_cm3: float,
     # ) -> float:
     #     """密度から数密度を計算する。
     #     数密度 n [1/Å^3] は、平均原子量 M_avg を用いて次式で与えられる::
-    #     n = rho * NA / M_avg * A3_TO_CM3
+    #     n = mass_density * NA / M_avg * A3_TO_CM3
     #     Args:
     #         M_avg (float): 平均原子量 [g/mol]。
-    #         rho_g_cm3 (float): 質量密度 [g/cm^3]。
+    #         mass_density_g_cm3 (float): 質量密度 [g/cm^3]。
 
     #     Returns:
     #         float:
     #             数密度 n [1/Å^3]。
     #     """
-    #     return rho_g_cm3 * NA * A3_TO_CM3 / M_avg
+    #     return mass_density_g_cm3 * NA * A3_TO_CM3 / M_avg
 
-    def number_density_from_rho(
+    def number_density_from_mass_density(
         self,
         symbols: Sequence[str],
         ratios: Sequence[int],
-        rho_g_cm3: float,
+        mass_density_g_cm3: float,
     ) -> float:
         """汎用
 
@@ -259,37 +259,37 @@ class Packmol:
         Args:
             symbols (Sequence[str]): 元素記号の並び。
             ratios (Sequence[int]): 各元素の化学量論比。
-            rho_g_cm3 (float): 質量密度 ρ [g/cm^3]。
+            mass_density_g_cm3 (float): 質量密度 ρ [g/cm^3]。
 
         Returns:
             float:
                 数密度 n [1/Å^3]。
         """
-        self._logger.info("== number_density_from_rho()")
+        self._logger.info("== number_density_from_mass_density()")
         M_avg: float = self.average_atomic_weight(symbols, ratios)
-        # n = rho * NA / M * (cm^3→Å^3 の変換係数)
-        return rho_g_cm3 * NA * A3_TO_CM3 / M_avg
+        # n = mass_density * NA / M * (cm^3→Å^3 の変換係数)
+        return mass_density_g_cm3 * NA * A3_TO_CM3 / M_avg
 
     # @staticmethod
-    # def rho_from_number_density(
+    # def mass_density_from_number_density(
     #     M_avg: float,
-    #     n_per_A3: float,
+    #     number_density_per_A3: float,
     # ) -> float:
     #     """
     #     数密度から密度を計算する。
     #     Args:
     #         M_avg (float): 平均原子量 [g/mol]。
-    #         n_per_A3 (float): 数密度 n [1/Å^3]。
+    #         number_density_per_A3 (float): 数密度 n [1/Å^3]。
     #     Returns:
     #         float: 質量密度 ρ [g/cm^3]。
     #     """
-    #     return n_per_A3 * M_avg / (NA * A3_TO_CM3)
+    #     return number_density_per_A3 * M_avg / (NA * A3_TO_CM3)
 
-    def rho_from_number_density(
+    def mass_density_from_number_density(
         self,
         symbols: Sequence[str],
         ratios: Sequence[int],
-        n_per_A3: float,
+        number_density_per_A3: float,
     ) -> float:
         """汎用
 
@@ -300,21 +300,21 @@ class Packmol:
                 元素記号の並び。
             ratios (Sequence[int]):
                 各元素の化学量論比。
-            n_per_A3 (float):
+            number_density_per_A3 (float):
                 数密度 n [1/Å^3]。
 
         Returns:
             float: 質量密度 ρ [g/cm^3]。
         """
-        self._logger.info("== rho_from_number_density()")
+        self._logger.info("== mass_density_from_number_density()")
         M_avg: float = self.average_atomic_weight(symbols, ratios)
         # ρ = n * M / (NA * A3_TO_CM3)
-        return n_per_A3 * M_avg / (NA * A3_TO_CM3)
+        return number_density_per_A3 * M_avg / (NA * A3_TO_CM3)
 
     def cell_length_from_number_density(
         self,
         N_tot: int,
-        n_per_A3: float,
+        number_density_per_A3: float,
     ) -> float:
         """汎用
 
@@ -327,7 +327,7 @@ class Packmol:
 
         Args:
             N_tot (int): セル内の総原子数。
-            n_per_A3 (float): 数密度 n [1/Å^3]。
+            number_density_per_A3 (float): 数密度 n [1/Å^3]。
 
         Returns:
             float: 立方体セルの一辺の長さ L [Å]。
@@ -335,10 +335,12 @@ class Packmol:
         self._logger.info("== cell_length_from_number_density()")
         if N_tot <= 0:
             raise ValueError("N_tot は正の整数である必要があります。")
-        if n_per_A3 <= 0.0:
-            raise ValueError("数密度 n_per_A3 は正の値である必要があります。")
+        if number_density_per_A3 <= 0.0:
+            raise ValueError(
+                "数密度 number_density_per_A3 は正の値である必要があります。"
+            )
 
-        volume_A3: float = float(N_tot) / n_per_A3
+        volume_A3: float = float(N_tot) / number_density_per_A3
         L: float = volume_A3 ** (1.0 / 3.0)
         return L
 
