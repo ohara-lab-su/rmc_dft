@@ -49,25 +49,32 @@ if __name__ == "__main__":
     # パラメーター調整
     ######################################
     # rmc_dat.set_exp_filename("ascast.xsq")
+    rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
+
     # 1 行目のコメント（系名）を設定する
     rmc_dat.set_comment("comment FeSiB")
     # 2 行目：number density（数密度）を設定する
-    rmc_dat.set_density(0.0915)
+    # rmc_dat.set_density(0.0915)
+    rmc_dat.set_density(0.09119)
 
     # 3 行目：cut offs（各原子種ペアのカットオフ距離）を設定する
     # rmc_dat.set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
-    rmc_dat.set_cutoffs([2.1, 1.9, 1.75, 1.8, 1.75, 1.5])
+    # FeSiB -- 123
+    # 11(Fe-Fe), 12(Fe-Si), 13(Fe-B), 22(Si-Si), 23(Si-B), 33
+    rmc_dat.set_cutoffs([2.4, 2.3, 2.1, 2.0, 2.4, 1.7])
 
     # 4 行目：maximum moves（1 回の移動での最大変位量）を設定する
     # rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
-    rmc_dat.set_maximu_moves([0.05, 0.05, 0.05])
+    rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
 
-    # 5 行目：r spacing（g(r) のビン幅）を設定する
+    # 5 行目：r spacing を設定する
+    # rのステップ(Δr)
     rmc_dat.set_r_spacing(0.025)
 
     # 6行目: moveout を認めるかどうか？
-    # rmc_dat.set_moveout_option(True)
-    rmc_dat.set_moveout_option(False)
+    # カットオフ以下の位置での原子の存在を排除するか？認めるか？
+    rmc_dat.set_moveout_option(True)
+    # rmc_dat.set_moveout_option(False)
 
     # 9行目
     # 計算時間と構造をsaveするステップ間隔
@@ -84,7 +91,8 @@ if __name__ == "__main__":
     # σ（実験データの許容誤差の標準偏差）
     #    小さいほど「ズレ」を許さず、結果的により厳しくフィットさせようとする。
     # rmc_dat.set_sigma_factor(5e-4)
-    rmc_dat.set_sigma_factor(1e-5)
+    # rmc_dat.set_sigma_factor(1e-5)
+    rmc_dat.set_sigma_factor(1e-7)
 
     ######################################
 

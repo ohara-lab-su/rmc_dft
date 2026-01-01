@@ -15,11 +15,14 @@ class Config:
     max_rmc_dft_loop: int = 10
 
     N_tot: int = 400  # セルサイズ(原子数)
-    mass_density_g_cm3: float = 7.35  # 質量密度
-    number_density_per_A3: float = 0.0915  # 数密度
+    # mass_density_g_cm3: float = 7.35  # 質量密度
+    mass_density_g_cm3: float = 7.3336  # 質量密度
+    # number_density_A3: float = 0.0915 # 数密度
+    number_density_A3: float = 0.09119  # 数密度
     # element_info: Union[str, Sequence[str]] = "label.txt"
     element_info: Union[str, Sequence[str]] = ["Fe", "Si", "B"]
-    ratios: Sequence[int] = [80, 9, 11]
+    # ratios: Sequence[int] = [80, 9, 11]
+    ratios: Sequence[int] = [92, 4, 14]
 
     # ---------- RMC -----------
     rmc_code: str = "RmcPot"

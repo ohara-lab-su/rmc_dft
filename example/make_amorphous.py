@@ -63,15 +63,15 @@ def main() -> None:
 
     pm = Packmol()
 
-    n_per_A3 = pm.number_density_from_mass_density(symbols, ratios, rho_g_cm3)
-    # mass_density_g_cm3 = pm.mass_density_from_number_density(symbols, ratios, number_density_per_A3)
+    number_density_A3 = pm.number_density_from_mass_density(symbols, ratios, rho_g_cm3)
+    # mass_density_g_cm3 = pm.mass_density_from_number_density(symbols, ratios, number_density_A3)
 
     # Fe-Si-B の総原子数からそれぞれの原子数を決める,化学量論比はすでに決定済み
     counts = pm.compute_element_counts(symbols, ratios, N_tot)
     N_Fe = counts["Fe"]
     N_Si = counts["Si"]
     N_B = counts["B"]
-    L = pm.cell_length_from_number_density(N_tot, n_per_A3)
+    L = pm.cell_length_from_number_density(N_tot, number_density_A3)
 
     logger.info(f"{counts}")
     logger.info(f"L = {L:.6f}")

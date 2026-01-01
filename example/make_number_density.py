@@ -21,20 +21,20 @@ def main() -> None:
     # ----------------------------------
     # 質量密度 → 数密度
     # ----------------------------------
-    number_density_per_A3 = packmol.number_density_from_mass_density(
+    number_density_A3 = packmol.number_density_from_mass_density(
         symbols=symbols,
         ratios=ratios,
         mass_density_g_cm3=mass_density_g_cm3,
     )
 
-    logger.info(f"number density n = {number_density_per_A3:.6e} [1/Å^3]")
+    logger.info(f"number density n = {number_density_A3:.6e} [1/Å^3]")
 
     # ----------------------------------
     # 数密度 → セル一辺長
     # ----------------------------------
     L = packmol.cell_length_from_number_density(
         N_tot=N_tot,
-        number_density_per_A3=number_density_per_A3,
+        number_density_A3=number_density_A3,
     )
 
     logger.info(f"cell length L = {L:.6f} [Å]")
