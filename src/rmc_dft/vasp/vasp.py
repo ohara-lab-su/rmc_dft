@@ -93,8 +93,11 @@ class Vasp:
         self.auto_write: bool = auto_write
 
         # aaa.vasp
+        if config:
+            if vasp_name is None:
+                vasp_name: str = config.vasp_name
         if vasp_name is None:
-            vasp_name: str = config.vasp_name
+            vasp_name: str = "POSCAR"
         self._vasp_name: str = vasp_name
 
         # VASP 実行系設定

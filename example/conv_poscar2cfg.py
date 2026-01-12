@@ -31,7 +31,7 @@ if __name__ == "__main__":
     config = None
 
     # ---------------------------------------------
-    # 引数あり: config を使わず、cfg_name = vasp_name = argv[1]
+    # 引数あり: cfg_name = vasp_name = argv[1]
     # ---------------------------------------------
     if len(sys.argv) >= 2:
         cfg_name: str = sys.argv[1]
@@ -42,20 +42,17 @@ if __name__ == "__main__":
         logger.info(f"vasp_name = {vasp_name}")
 
     # ---------------------------------------------
-    # 引数なし: 従来通り config.yml を使用
+    # 引数なし: POSCAR を使う（config は使わない）
     # ---------------------------------------------
     else:
-        config = Config("config.yml")
+        cfg_name: str = "POSCAR"
+        vasp_name: str = "POSCAR"
 
-        # POSCAR to CFG (rmc用のCFG変換)
-        cfg_name = config.cfg_name
-        vasp_name = config.vasp_name
-
-        logger.info("no command-line argument; use config.yml")
+        logger.info("no command-line argument; use POSCAR")
         logger.info(f"cfg_name  = {cfg_name}")
         logger.info(f"vasp_name = {vasp_name}")
 
-    vasp = Vasp(config=config, logger=logger)
+    vasp = Vasp(config=None, logger=logger)
     # rmc = RmcPot(config=config, _logger=_logger)
 
     # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
