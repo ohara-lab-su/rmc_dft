@@ -12,8 +12,8 @@ def main() -> None:
     # 入力パラメータ
     # ----------------------------------
     symbols = ["Fe", "Si", "B"]
-    ratios = [80, 9, 11]  # Fe80Si9B11
-    mass_density_g_cm3 = 7.3  # 質量密度 [g/cm^3]
+    ratios = [82, 4, 14]  # Fe80Si9B11
+    mass_density_g_cm3 = 7.3336  # 質量密度 [g/cm^3]
     N_tot = 2000  # 総原子数
 
     packmol = Packmol(logger=logger)

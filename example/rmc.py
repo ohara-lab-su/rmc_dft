@@ -59,9 +59,16 @@ if __name__ == "__main__":
 
     # 3 行目：cut offs（各原子種ペアのカットオフ距離）を設定する
     # rmc_dat.set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
-    # FeSiB -- 123
-    # 11(Fe-Fe), 12(Fe-Si), 13(Fe-B), 22(Si-Si), 23(Si-B), 33
-    rmc_dat.set_cutoffs([2.4, 2.3, 2.1, 2.0, 2.4, 1.7])
+    # FeSiB
+    # 11(Fe-Fe) 2.45-2.55
+    # 12(Fe-Si) 2.35-2.45
+    # 13(Fe-B)  2.05-2.15
+    # 22(Si-Si) 2.35-2.50
+    # 23(Si-B)  2.0-2.1
+    # 33(B-B)   1.7-1.9
+    rmc_dat.set_cutoffs([2.2, 1.9, 1.75, 1.8, 1.75, 1.5])
+    # rmc_dat.set_cutoffs([2.1, 1.9, 1.75, 1.8, 1.75, 1.5])
+    # rmc_dat.set_cutoffs([2.4, 2.3, 2.1, 2.0, 2.4, 1.7])j
 
     # 4 行目：maximum moves（1 回の移動での最大変位量）を設定する
     # rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])

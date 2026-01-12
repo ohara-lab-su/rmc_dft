@@ -21,8 +21,8 @@ def plot_ppcf(
         if target_dir is not None:
             os.chdir(target_dir)
 
-        indices = [0, 1, 2]
-        labels = ["g11(r)", "g12(r)", "g13(r)"]
+        indices = [0, 1, 2, 3, 4, 5]
+        labels = ["g11(r)", "g12(r)", "g13(r)", "g22(r)", "g23(r)", "g33(r)"]
 
         reader = RmcPotPpcf(cfg_name)
         reader.load()
