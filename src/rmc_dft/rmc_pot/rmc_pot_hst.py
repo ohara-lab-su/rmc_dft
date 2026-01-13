@@ -222,6 +222,134 @@ class RmcPotHst:
 
         return steps, chi2
 
+    def detect_convergence(
+        self,
+        rel_tol: float = 1.0e-2,
+        acc_tol: float = 1.0e-3,
+        min_consecutive: int = 2,
+    ) -> Optional[int]:
+        """
+        RMC の履歴データに基づいて「実質的な収束点」を判定する。
+
+        本関数は、chi2_tot の絶対値ではなく、
+        連続ループ間での「相対的な改善率」と
+        探索の活動度（accepted/tried）を用いて収束を定義する。
+
+        判定の考え方は以下の通り：
+
+        1. 各ループ i について、直前ループとの差分から
+           相対改善率 delta を計算する。
+
+               delta = (chi2[i-1] - chi2[i]) / chi2[i-1]
+
+        2. 次の 2 条件を同時に満たす場合、
+           そのループは「改善がほぼ止まっている」とみなす。
+
+           (a) 相対改善率が十分小さい
+               delta < rel_tol
+
+           (b) 試行の受理率が十分小さい
+               accepted/tried < acc_tol
+
+           これは、
+           「chi2 はほとんど下がらず、かつ探索も動いていない」
+           状態を意味する。
+
+        3. 上記の「停滞状態」が min_consecutive 回
+           連続して観測された場合にのみ、
+           偶然ではない実質的な収束と判断する。
+
+        4. 戻り値として返す loop index は、
+           「収束状態に最初に入ったループ番号」であり、
+           最終ループ番号ではない点に注意する。
+
+        Args:
+            rel_tol (float):
+                連続ループ間の相対変化率
+                chi2 の相対改善率に対する閾値。
+                これ未満の改善は「停滞」とみなす。
+            acc_tol (float):
+                accepted/tried に対する閾値。
+                これ未満は「探索がほぼ停止」とみなす。
+            min_consecutive (int):
+                停滞状態が連続して必要な最小ループ数。
+
+        Returns:
+            Optional[int]:
+                収束と判断された最初の loop index。
+                判定条件を満たさない場合は None。
+        """
+        # chi2_tot の履歴（loop ごと）
+        chi2 = self.get_chi2_tot()
+
+        # accepted/tried の履歴（探索の活動度）
+        acc = self.get_accepted_per_tried()
+
+        # 停滞状態が何回連続したかを数えるカウンタ
+        consec = 0
+
+        # loop 1 以降で前ループとの差分を見る
+        for i in range(1, len(chi2)):
+            # 前ループの chi2 が非正の場合は評価不能なのでスキップ
+            if chi2[i - 1] <= 0.0:
+                continue
+
+            # 相対改善率を計算
+            delta = (chi2[i - 1] - chi2[i]) / chi2[i - 1]
+
+            # 改善が小さく、かつ探索も止まっているか？
+            if delta < rel_tol and acc[i] < acc_tol:
+                consec += 1
+
+                # 規定回数連続したら収束と判断
+                if consec >= min_consecutive:
+                    # 収束状態に「入り始めた」loop index を返す
+                    return i - min_consecutive + 1
+            else:
+                # どちらか一方でも条件を満たさなければリセット
+                consec = 0
+
+        # 最後まで条件を満たさなければ未収束
+        return None
+
+    def detect_convergence_set1(
+        self,
+        rel_tol: float = 1.0e-2,
+        acc_tol: float = 1.0e-3,
+        min_consecutive: int = 2,
+    ) -> Optional[int]:
+        """
+        F(Q) set#1 の chi2 を用いて RMC の実質的収束点を判定する。
+
+        chi2_tot ではなく、hst 中の
+        「chi2/F(Q)_set#1」を評価量として用いる点のみが
+        detect_convergence() との違いである。
+
+        Returns:
+            Optional[int]:
+                収束と判断された最初の loop index。
+                判定できない場合は None。
+        """
+        chi2 = self.get_chi2_set1(None)
+        acc = self.get_accepted_per_tried(None)
+
+        consec = 0
+
+        for i in range(1, len(chi2)):
+            if chi2[i - 1] <= 0.0:
+                continue
+
+            delta = (chi2[i - 1] - chi2[i]) / chi2[i - 1]
+
+            if delta < rel_tol and acc[i] < acc_tol:
+                consec += 1
+                if consec >= min_consecutive:
+                    return i - min_consecutive + 1
+            else:
+                consec = 0
+
+        return None
+
     # ==============================================================
     # ループ総数
     # ==============================================================
@@ -418,11 +546,6 @@ class RmcPotHst:
         全データーセットをまとめた chi
         chi2_tota/data_point
 
-        おそらく
-        log側 (global)
-        hst側 (total)
-        で同じものを指している
-
         Args:
             loop_index:
 
@@ -437,7 +560,10 @@ class RmcPotHst:
         return self._records[loop_index]["chi2_tot"]
 
     # -----------------------------
-    def get_chi2_set1(self, loop_index: Optional[int] = None):
+    def get_chi2_set1(
+        self,
+        loop_index: Optional[int],
+    ):
         """
         指定したループに対応する chi2_set1 の値、または全ループ分の値を取得する。
 

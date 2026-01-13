@@ -11,6 +11,7 @@ import os
 import argparse
 import sys
 import shutil
+import re
 
 from rmc_dft import (
     Config,
@@ -23,10 +24,12 @@ from rmc_dft import (
     RmcPot,
     RmcPotLog,
     RmcPotDat,
+    RmcPotHst,
     RmcPotFit,
     RmcPotPpcf,
 )
 from rmc_dft.util import poscar2cfg
+from rmc_dft.util import next_log_dir_name as next_log_dir_name
 from x_logger import XLogger
 
 
@@ -36,10 +39,6 @@ if __name__ == "__main__":
     config = Config("config.yml")
     rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
     rmc_dat = RmcPotDat(config=config, logger=logger)
-
-    ##################
-    rmc_dir = "log20"
-    ##################
 
     # 初期POSCAR 作成
     # shutil.copy(f"POSCAR0", "POSCAR")
@@ -85,7 +84,12 @@ if __name__ == "__main__":
 
     # 9行目
     # 計算時間と構造をsaveするステップ間隔
+    # rmc_dat.set_time_and_save(30, 1)
     rmc_dat.set_time_and_save(60, 1)
+    # rmc_dat.set_time_and_save(120, 1)
+    # rmc_dat.set_time_and_save(360, 1)
+    # rmc_dat.set_time_and_save(480, 1)
+    # rmc_dat.set_time_and_save(720, 1)
 
     # 10 行目：データ種の使用フラグ（g(r), neutron, x-ray, EXAFS）を設定する
     rmc_dat.set_data_flags([0, 0, 1, 0])
@@ -98,8 +102,8 @@ if __name__ == "__main__":
     # σ（実験データの許容誤差の標準偏差）
     #    小さいほど「ズレ」を許さず、結果的により厳しくフィットさせようとする。
     # rmc_dat.set_sigma_factor(5e-4)
-    # rmc_dat.set_sigma_factor(1e-5)
-    rmc_dat.set_sigma_factor(1e-7)
+    rmc_dat.set_sigma_factor(1e-5)
+    # rmc_dat.set_sigma_factor(1e-7)
 
     ######################################
 
@@ -120,19 +124,42 @@ if __name__ == "__main__":
     # aaa.cfg がすでにある前提
     # ---------------------------
 
-    rmc.preprocess()  # check inputfile
-    # rmc.run(cfg_name=config.cfg_name)
-    rmc.run()
+    while True:
+        ##################
+        # rmc_dir = f"log01_rmc"
+        rmc_dir = next_log_dir_name("rmc")
+        ##################
 
-    # ---------------------------
-    # backup folder がすでにある前提
-    # ---------------------------
-    # rmc.postprocess()  ## backup and output xxx.vasp
+        logger.info("====================")
+        logger.info(f"rmc_dir = {rmc_dir}")
 
-    ## カレントフォルダで回すだけだと必要ない
-    ## rmc.postprocess(
-    ##     log_dir=rmc_dir,
-    ##     cfg_name=config.cfg_name,
-    ##     element_info=config.element_info,
-    ## )  # backup(loop番号つき), cfg --> xxx.vasp
-    logger.info("end")
+        rmc.preprocess()  # check inputfile
+        # rmc.run(cfg_name=config.cfg_name)
+        rmc.run()
+
+        hst = RmcPotHst(cfg_name=f"{config.cfg_name}")  # sample.cfg → sample.hst
+        # RMC 収束判定
+        loop: Optional[int] = hst.detect_convergence(
+            rel_tol=1.0e-2,
+            acc_tol=1.0e-3,
+            min_consecutive=2,
+        )
+
+        # ---------------------------
+        # backup folder がすでにある前提
+        # ---------------------------
+        # rmc.postprocess()  ## backup and output xxx.vasp
+
+        # カレントフォルダで回すだけだと必要ない
+        rmc.postprocess(
+            log_dir=rmc_dir,
+            cfg_name=config.cfg_name,
+            element_info=config.element_info,
+        )  # backup(loop番号つき), cfg --> xxx.vasp
+        logger.info("end")
+
+        if loop is None:
+            logger.info("RMC is NOT converged.")
+            continue
+        else:
+            break
