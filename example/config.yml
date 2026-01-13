@@ -2,10 +2,12 @@
 
 max_rmc_dft_loop: 20
 N_tot: 400  # セルサイズ(for packmol)
-mass_density_g_cm3: 7.35  # 質量密度
-number_density_A3: 0.0915  # 数密度
+mass_density_g_cm3: 7.3336  # 質量密度
+number_density_A3: 0.09119  # 数密度
+# mass_density_g_cm3: 7.35  # 質量密度
+# number_density_A3: 0.0915  # 数密度
 element_info: ["Fe", "Si", "B"]
-ratios: [84, 4, 14]  # 化学量論比
+ratios: [82, 4, 14]  # 化学量論比
 rmc_exp_filename: "ascast.xsq"
 
 # ---------- RMC -----------

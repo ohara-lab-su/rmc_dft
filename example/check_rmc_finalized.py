@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-RMC_POT のログファイルを解析して、
+K.NAKADA, kengo.nakada@gmail.com
+
+RMC_POT のログ(標準出力)ファイルを解析して、
 - 最後の RMC パートが正常終了しているか
 - RMC パートがいくつあったか（開始ブロック数）
 

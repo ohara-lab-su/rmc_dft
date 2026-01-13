@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 import sys
 from rmc_dft import VaspIncar
 

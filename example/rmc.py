@@ -36,6 +36,7 @@ from x_logger import XLogger
 def run_rmc(
     config: Config,
     *,
+    auto_converge: bool = False,
     msg: str = None,
     logger: XLogger = None,
 ):
@@ -46,9 +47,9 @@ def run_rmc(
         logger = XLogger()
 
     if msg:
-        info(f"=============== RMC(RMC_POT) {msg} ============")
+        logger.info(f"=============== RMC(RMC_POT) {msg} ============")
     else:
-        info(f"=============== RMC(RMC_POT) ============")
+        logger.info(f"=============== RMC(RMC_POT) ============")
 
     rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
     rmc_dat = RmcPotDat(config=config, logger=logger)
@@ -144,12 +145,17 @@ def run_rmc(
 
         hst = RmcPotHst(cfg_name=f"{config.cfg_name}")  # sample.cfg → sample.hst
 
+        ###################################################
         # RMC 収束判定
-        loop: Optional[int] = hst.detect_convergence(
-            rel_tol=1.0e-2,
-            acc_tol=1.0e-3,
-            min_consecutive=2,
-        )
+        if auto_converge:
+            loop: Optional[int] = hst.detect_convergence(
+                rel_tol=1.0e-2,
+                acc_tol=1.0e-3,
+                min_consecutive=2,
+            )
+        else:
+            loop = 0  # とりあえず None 以外の数字
+        ###################################################
 
         # ---------------------------
         # backup folder がすでにある前提

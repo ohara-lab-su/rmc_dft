@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """
+K.NAKADA, kengo.nakada@gmail.com
+
 rmc_dft 用の VASP 入力ファイル
 """
 from x_logger import XLogger

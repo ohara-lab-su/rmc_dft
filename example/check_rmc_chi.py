@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 from typing import Optional
 from rmc_dft.config import Config
 from rmc_dft.rmc_pot.rmc_pot_hst import RmcPotHst
