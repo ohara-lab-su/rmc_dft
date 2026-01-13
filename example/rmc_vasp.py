@@ -20,6 +20,7 @@ from rmc_dft import (
     RmcPotLog,
     RmcPotDat,
     RmcPotFit,
+    RmcPotHst,
     RmcPotPpcf,
 )
 from x_logger import XLogger

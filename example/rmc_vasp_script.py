@@ -22,6 +22,7 @@ from rmc_dft import (
     RmcPotLog,
     RmcPotDat,
     RmcPotFit,
+    RmcPotHst,
     RmcPotPpcf,
 )
 from rmc_dft.util import poscar2cfg, contcar2cfg

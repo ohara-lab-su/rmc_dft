@@ -24,8 +24,8 @@ from rmc_dft import (
     RmcPot,
     RmcPotLog,
     RmcPotDat,
-    RmcPotHst,
     RmcPotFit,
+    RmcPotHst,
     RmcPotPpcf,
 )
 from rmc_dft.util import poscar2cfg
@@ -206,4 +206,4 @@ if __name__ == "__main__":
     # poscar2cfg(cfg_name=config.cfg_name)#
     # ---------------------------
 
-    run_rmc(_config, msg=_msg, logger=_logger)
+    run_rmc(_config, auto_converge=True, msg=_msg, logger=_logger)
