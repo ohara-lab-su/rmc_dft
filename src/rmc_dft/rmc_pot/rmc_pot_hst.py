@@ -43,6 +43,12 @@ class RmcPotHst:
         logger: Optional[XLogger] = None,
     ) -> None:
         """
+        RmcPotHst を初期化し、.hst ファイルの読み込みとパースを行う。
+
+        hst_name、cfg_name、config のいずれかを指定することで
+        対象となる .hst ファイルが決定される。
+        hst_name が指定されている場合はそれが最優先される。
+
         1) cfg_name があればそれが優先
            hst_nameと書いている場合がある
            基本的には hst_name.hst ファイルを読む
@@ -50,10 +56,10 @@ class RmcPotHst:
         2) config があればそれが優先
 
         Args:
-            hst_path (str):
-            cfg_name (str):
-            config (Config):
-            logger (XLogger):
+            hst_name (Optional[str]): 読み込む .hst ファイル名。
+            cfg_name (Optional[str]): CFG 名。指定された場合は「{cfg_name}.hst」を対象とする。
+            config (Optional[Config]): Config オブジェクト。内部から cfg_name を参照する。
+            logger (Optional[XLogger]): 使用するロガー。
         """
         self._logger: XLogger = logger or XLogger(logger_name="RmcPotHst")
 
@@ -84,6 +90,12 @@ class RmcPotHst:
     # HST ファイル読み込み（純粋に行読み取り）
     # ---------------------------------------------------------------
     def _load_file(self) -> None:
+        """
+        .hst ファイルを読み込み、生の行データとして保持する。
+
+        ファイルが存在しない場合は警告を出力し、
+        内部の行データは空リストとして扱う。
+        """
         try:
             with open(self._hst_file, "r") as f:
                 self._lines = f.readlines()
@@ -97,7 +109,15 @@ class RmcPotHst:
     # ---------------------------------------------------------------
     def _parse(self) -> None:
         """
-        hst の「履歴表」を抽出し、_records に格納する。
+
+        .hst ファイル中の履歴テーブルを解析し、内部レコード(_records)として格納する。
+
+        「generated」で始まる表ヘッダ行の直後から、
+        横方向に 8 個の数値カラムを持つ行のみを
+        履歴レコードとして採用する。
+
+        空行または数値に変換できない行が現れた時点で
+        履歴テーブルの終端とみなす。
 
         履歴表の構造（横方向＝1 レコード＝History::save 1 回分）:
             generated
@@ -112,8 +132,6 @@ class RmcPotHst:
         つまり、**横方向に 8 個の数値カラム**を持つ行だけを
         1 レコードとして採用する。
         """
-
-        # ==== 修正ここから ====
         if self._parsed:
             return
 
@@ -171,13 +189,17 @@ class RmcPotHst:
             self._records.append(rec)
 
         self._parsed = True
-        # ==== 修正ここまで ====
 
     # ==============================================================
     # 互換 API（read_chi2）
     # ==============================================================
     def read_chi2(self) -> Tuple[List[int], List[float]]:
         """
+        chi2_tot の履歴を取得するための互換 API。
+
+        旧 RmcPotHst クラスとの互換性を保つため、
+        ステップ番号は行番号（0 始まり）として扱う。
+
         （互換 API）
         旧 RmcPotHst は：
             steps = [0, 1, 2, ...]
@@ -186,6 +208,10 @@ class RmcPotHst:
 
         ※ hst には "step" が存在しないため、
           行番号＝ステップ番号として扱う。
+
+        Returns:
+            Tuple[List[int], List[float]]:
+                ステップ番号のリストと chi2_tot のリスト。
         """
         steps: List[int] = []
         chi2: List[float] = []
@@ -201,20 +227,39 @@ class RmcPotHst:
     # ==============================================================
     def get_num_rmc_loops(self) -> int:
         """
-        hst に含まれるデータ行数＝ループ数を返す。
+        .hst に含まれる履歴レコード数を返す。
+
+        Returns:
+            int: RMC ループ回数。
         """
         return len(self._records)
 
     # ==============================================================
-    # 以下、個別 API
+    # 個別 API
     # ==============================================================
 
     # -----------------------------
-    def get_generated(self, loop_index: Optional[int] = None):
+    def get_generated(
+        self,
+        loop_index: Optional[int] = None,
+    ):
         """
+        指定したループに対応する値、または全ループ分の値を取得する。
+
+        loop_index を指定しない場合は全ループ分のリストを返し、
+        指定した場合は対応する単一の値を返す。
+
         generated（このループで生成した移動数）を返す。
         loop_index=None → 全ループ list
         loop_index=int → 当該ループの値
+
+        Args:
+            loop_index (Optional[int]):
+                取得対象のループ番号。
+
+        Returns:
+            Union[int, float, List[int], List[float]]:
+                対応する値。
         """
         if loop_index is None:
             out: List[int] = []
@@ -225,7 +270,26 @@ class RmcPotHst:
         return self._records[loop_index]["generated"]
 
     # -----------------------------
-    def get_tried(self, loop_index: Optional[int] = None):
+    def get_tried(
+        self,
+        loop_index: Optional[int] = None,
+    ):
+        """
+        指定したループに対応する tried の値、または全ループ分の値を取得する。
+
+        tried は、そのループにおいて試行された移動回数を表す。
+
+        loop_index を指定しない場合は全ループ分のリストを返し、
+        指定した場合は対応する単一の値を返す。
+
+        Args:
+            loop_index (Optional[int]):
+                取得対象のループ番号。
+
+        Returns:
+            Union[int, List[int]]:
+                tried の値。
+        """
         if loop_index is None:
             out: List[int] = []
             for rec in self._records:
@@ -234,7 +298,26 @@ class RmcPotHst:
         return self._records[loop_index]["tried"]
 
     # -----------------------------
-    def get_accepted(self, loop_index: Optional[int] = None):
+    def get_accepted(
+        self,
+        loop_index: Optional[int] = None,
+    ):
+        """
+        指定したループに対応する accepted の値、または全ループ分の値を取得する。
+
+        accepted は、そのループにおいて受理された移動回数を表す。
+
+        loop_index を指定しない場合は全ループ分のリストを返し、
+        指定した場合は対応する単一の値を返す。
+
+        Args:
+            loop_index (Optional[int]):
+                取得対象のループ番号。
+
+        Returns:
+            Union[int, List[int]]:
+                accepted の値。
+        """
         if loop_index is None:
             out: List[int] = []
             for rec in self._records:
@@ -243,7 +326,26 @@ class RmcPotHst:
         return self._records[loop_index]["accepted"]
 
     # -----------------------------
-    def get_time(self, loop_index: Optional[int] = None):
+    def get_time(
+        self,
+        loop_index: Optional[int] = None,
+    ):
+        """
+        指定したループに対応する time の値、または全ループ分の値を取得する。
+
+        time は、そのループに対応する経過時間（hst 出力に記録された値）を表す。
+
+        loop_index を指定しない場合は全ループ分のリストを返し、
+        指定した場合は対応する単一の値を返す。
+
+        Args:
+            loop_index (Optional[int]):
+                取得対象のループ番号。
+
+        Returns:
+            Union[int, List[int]]:
+                time の値。
+        """
         if loop_index is None:
             out: List[int] = []
             for rec in self._records:
@@ -252,7 +354,26 @@ class RmcPotHst:
         return self._records[loop_index]["time"]
 
     # -----------------------------
-    def get_tried_per_generated(self, loop_index: Optional[int] = None):
+    def get_tried_per_generated(
+        self,
+        loop_index: Optional[int] = None,
+    ):
+        """
+        指定したループに対応する tried_per_gen の値、または全ループ分の値を取得する。
+
+        tried_per_gen は、generated に対する tried の比率を表す。
+
+        loop_index を指定しない場合は全ループ分のリストを返し、
+        指定した場合は対応する単一の値を返す。
+
+        Args:
+            loop_index (Optional[int]):
+                取得対象のループ番号。
+
+        Returns:
+            Union[float, List[float]]:
+                tried_per_gen の値。
+        """
         if loop_index is None:
             out: List[float] = []
             for rec in self._records:
@@ -261,7 +382,26 @@ class RmcPotHst:
         return self._records[loop_index]["tried_per_gen"]
 
     # -----------------------------
-    def get_accepted_per_tried(self, loop_index: Optional[int] = None):
+    def get_accepted_per_tried(
+        self,
+        loop_index: Optional[int] = None,
+    ):
+        """
+        指定したループに対応する acc_per_tried の値、または全ループ分の値を取得する。
+
+        acc_per_tried は、tried に対する accepted の比率を表す。
+
+        loop_index を指定しない場合は全ループ分のリストを返し、
+        指定した場合は対応する単一の値を返す。
+
+        Args:
+            loop_index (Optional[int]):
+                取得対象のループ番号。
+
+        Returns:
+            Union[float, List[float]]:
+                acc_per_tried の値。
+        """
         if loop_index is None:
             out: List[float] = []
             for rec in self._records:
@@ -270,7 +410,10 @@ class RmcPotHst:
         return self._records[loop_index]["acc_per_tried"]
 
     # -----------------------------
-    def get_chi2_tot(self, loop_index: Optional[int] = None):
+    def get_chi2_tot(
+        self,
+        loop_index: Optional[int] = None,
+    ):
         """
         全データーセットをまとめた chi
         chi2_tota/data_point
@@ -295,6 +438,24 @@ class RmcPotHst:
 
     # -----------------------------
     def get_chi2_set1(self, loop_index: Optional[int] = None):
+        """
+        指定したループに対応する chi2_set1 の値、または全ループ分の値を取得する。
+
+        chi2_set1 は、hst 出力における
+        「chi2/F(Q)_set#1」に対応する chi2 値であり、
+        第 1 データセット（set#1）の評価量を表す。
+
+        loop_index を指定しない場合は全ループ分のリストを返し、
+        指定した場合は対応する単一の値を返す。
+
+        Args:
+            loop_index (Optional[int]):
+                取得対象のループ番号。
+
+        Returns:
+            Union[float, List[float]]:
+                chi2_set1 の値。
+        """
         if loop_index is None:
             out: List[float] = []
             for rec in self._records:
