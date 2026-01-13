@@ -24,55 +24,60 @@ from rmc_dft import (
 )
 from x_logger import XLogger
 
+from rmc_vasp_init import run_dft_init
 
-if __name__ == "__main__":
-    """"""
-    config = Config("config.yml")
 
-    #######################
-    log_dir = "log25"
-    #######################
+def run_dft(
+    config: Config,
+    *,
+    mode: str = None,
+    msg: str = None,
+    logger: XLogger = None,
+):
+    if logger is None:
+        logger = XLogger()
 
-    logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
-    vasp = Vasp(vasp_incar=vasp_incar, config=config, logger=logger)
+    vasp_log = VaspLog(logger=logger)
 
-    # 初期構造として POSCAR を用いた場合、それをベースに CFG ファイルを作成する
-    # vasp.poscar2cfg(config.cfg_name)
+    vasp = Vasp(
+        vasp_log=vasp_log,  # instance
+        vasp_incar=vasp_incar,  # instance
+        config=config,  # instance
+        logger=logger,  # instance
+    )
 
-    # make INCAR
-    # vasp_incar = VaspIncar(logger=logger)
-    # vasp_incar.set_tag("EDIFF", 1e-04)
-    # vasp_incar.set_tag("EDIFFG", 1e-05)
-    # vasp_incar.set_tag("ISTART", 0)
-    # #
-    # vasp_incar.set_tag("ISMEAR", 0)  # Gussian
-    # vasp_incar.set_tag("SIGMA", 0.1)
-    # vasp_incar.set_tag("NELM", 30)
-    # #
-    # vasp_incar.set_tag("NSW", 10)
-    # vasp_incar.set_tag("ISIF", 2)
-    # vasp_incar.set_tag("IBRION", 2)  # CG
-    # # vasp_incar.set_tag("IBRION", 3)  # Dampd
-    # # vasp_incar.set_tag("POTIM", 0.05)  # Dampd scaling
-    # vasp_incar.set_tag("LREAL", "auto")
-    # # extra
-    # vasp_incar.set_tag("ISPIN", 1)
-    # vasp_incar.set_tag("LORBIT", 11)
-    # vasp_incar.set_tag("NEDOS", 1500)
+    # -----------------------
+    # このスクリプト自体をジョブで投げる。mpi だとジョブが システムの mpi run する
+    # -----------------------
+    if msg:
+        logger.info(f"=============== DFT(vasp) {msg} ============")
+    else:
+        logger.info(f"=============== DFT(vasp) {msg} ============")
 
-    # ------------------- DFT ------------------------
-    logger.info(f"== DFT(vasp)")
     # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
     # vasp.run(mode="test")
     # vasp.run(mode=config.run_mode)
-    ret = vasp.run(mode="mpi")
+    # ret = vasp.run(mode="mpi")
+    ret = vasp.run(mode="local")
     if not ret:
         logger.error("**Error**: vasp execution failed")
         sys.exit(-1)
 
-    # vasp.postprocess(
-    #     log_dir=vasp_dir,
-    #     cfg_name=config.cfg_name,
-    # )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
-    vasp.backup(log_dir=log_dir)
-    logger.info(f"loop end")
+    vasp.postprocess(
+        log_dir=vasp_dir,
+        cfg_name=config.cfg_name,
+    )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
+    # vasp.backup(log_dir=log_dir)
+
+    logger.info("END of DFT")
+    logger.info("")
+
+
+if __name__ == "__main__":
+    """"""
+    _config = Config("config.yml")
+    _logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+    _msg = None
+
+    run_dft_init(_config, logger=_logger)
+    run_dft(_config, msg=None, logger=_logger)

@@ -10,7 +10,7 @@ def main() -> None:
     logger = XLogger(logger_name="RMC_CONVERGENCE")
 
     # HST 読み込み（cfg_name または hst_name を指定）
-    hst = RmcPotHst(cfg_name="sample")  # sample.cfg → sample.hst
+    hst = RmcPotHst(cfg_name="aaa")  # sample.cfg → sample.hst
 
     # 収束判定
     loop: Optional[int] = hst.detect_convergence(

@@ -33,20 +33,28 @@ from rmc_dft.util import next_log_dir_name as next_log_dir_name
 from x_logger import XLogger
 
 
-if __name__ == "__main__":
-    logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+def run_rmc(
+    config: Config,
+    *,
+    msg: str = None,
+    logger: XLogger = None,
+):
+    """
+    RMC
+    """
+    if logger is None:
+        logger = XLogger()
 
-    config = Config("config.yml")
+    if msg:
+        info(f"=============== RMC(RMC_POT) {msg} ============")
+    else:
+        info(f"=============== RMC(RMC_POT) ============")
+
     rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
     rmc_dat = RmcPotDat(config=config, logger=logger)
 
-    # 初期POSCAR 作成
-    # shutil.copy(f"POSCAR0", "POSCAR")
-    # 初期CFG 作成 (POSCAR to CFG)
-    # poscar2cfg(cfg_name=config.cfg_name)
-
-    # パラメーター調整
     ######################################
+    # パラメーター調整
     # rmc_dat.set_exp_filename("ascast.xsq")
     rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
 
@@ -109,16 +117,13 @@ if __name__ == "__main__":
 
     # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, config=config, logger=logger)
     # rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
+
     rmc = RmcPot(
         rmc_dat=rmc_dat,  # instance
         rmc_log=rmc_log,  # instance
         config=config,
         logger=logger,
     )
-
-    # ---------------------------
-    # 入力の構造を用意する
-    # ---------------------------
 
     # ---------------------------
     # aaa.cfg がすでにある前提
@@ -138,6 +143,7 @@ if __name__ == "__main__":
         rmc.run()
 
         hst = RmcPotHst(cfg_name=f"{config.cfg_name}")  # sample.cfg → sample.hst
+
         # RMC 収束判定
         loop: Optional[int] = hst.detect_convergence(
             rel_tol=1.0e-2,
@@ -163,3 +169,35 @@ if __name__ == "__main__":
             continue
         else:
             break
+
+    # 収束点の情報を取得
+    generated = hst.get_generated(loop)
+    chi2_tot = hst.get_chi2_tot(loop)
+    chi2_set1 = hst.get_chi2_set1(loop)
+    acc = hst.get_accepted_per_tried(loop)
+
+    logger.info("====================")
+    logger.info("RMC is converged.")
+    logger.info(f"  loop index           = {loop}")
+    logger.info(f"  generated            = {generated}")
+    logger.info(f"  chi2_tot             = {chi2_tot:.6e}")
+    logger.info(f"  chi2/F(Q)_set#1      = {chi2_set1:.6e}")
+    logger.info(f"  accepted/tried       = {acc:.6e}")
+
+    logger.info("END of RMC")
+    logger.info("")
+
+
+if __name__ == "__main__":
+    _logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+    _config = Config("config.yml")
+    _msg = None
+
+    # ---------------------------
+    # 初期POSCAR 作成
+    # shutil.copy(f"POSCAR0", "POSCAR")
+    # 初期CFG 作成 (POSCAR to CFG)
+    # poscar2cfg(cfg_name=config.cfg_name)#
+    # ---------------------------
+
+    run_rmc(_config, msg=_msg, logger=_logger)

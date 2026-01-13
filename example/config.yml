@@ -2,15 +2,15 @@
 
 max_rmc_dft_loop: 20
 N_tot: 400  # セルサイズ(for packmol)
-rho_g_cm3: 7.35  # 質量密度
-n_per_A3: 0.0915  # 数密度
+mass_density_g_cm3: 7.35  # 質量密度
+number_density_A3: 0.0915  # 数密度
 element_info: ["Fe", "Si", "B"]
-ratios: [80, 9, 11]  # 化学量論比
+ratios: [84, 4, 14]  # 化学量論比
 rmc_exp_filename: "ascast.xsq"
 
 # ---------- RMC -----------
 rmc_code: "RmcPot" # RMC code ClassNames
-rmc_log_dir: "log" # LOG 保存
+rmc_log_dir: "rmc" # log{xxx}_rmc
 # rmc_log_dir: "rmc_log" # LOG 保存
 # -------------------------
 cfg_name: "aaa" # input_file: RMC: aaa.cfg
@@ -18,7 +18,7 @@ cfg_name: "aaa" # input_file: RMC: aaa.cfg
 
 # ------- DFT (VASP) --------
 dft_code: "Vasp" # VASP code ClassNames
-dft_log_dir: "log" # LOG 保存 (for VASP)
+dft_log_dir: "vasp" # log{xxx}_vasp
 # dft_log_dir: "vasp_log" # LOG 保存 (for VASP)
 # -------------------------
 vasp_name: "aaa" # input_file: VASP: aaa.vasp (for VASP)
