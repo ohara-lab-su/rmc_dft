@@ -4,6 +4,7 @@
 
 - RMC の自動収束に関して機能追加
   - それに伴い、rmc_vasp_script/rmc_vasp/rmc の sample ファイル関係を調整
+  - **短い時間でRMCを回すと hst における step 数が少ないために、自動判定でエンドレス化するので注意**
 
 ## v0.4.4 nakada
 

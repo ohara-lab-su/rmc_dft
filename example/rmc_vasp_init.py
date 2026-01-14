@@ -4,6 +4,7 @@ K.NAKADA, kengo.nakada@gmail.com
 
 rmc_dft 用の VASP 入力ファイル
 """
+from rmc_dft import Config
 from x_logger import XLogger
 
 from rmc_dft import (
@@ -88,3 +89,10 @@ def run_dft_init(
     vasp_incar.set_tag("AMIX", 0.02)
     vasp_incar.set_tag("BMIX", 0.0001)
     vasp_incar.set_tag("MAXMIX", 20)
+
+
+if __name__ == "__main__":
+    logger_ = XLogger(log_level="debug", logger_name="rmc_run")
+    config_ = Config("config.yml")
+
+    run_dft_init(config_, logger=logger_)

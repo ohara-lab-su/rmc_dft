@@ -39,7 +39,7 @@ def run_rmc(
     auto_converge: bool = False,
     msg: str = None,
     logger: XLogger = None,
-):
+) -> bool:
     """
     RMC
     """
@@ -170,7 +170,11 @@ def run_rmc(
         )  # backup(loop番号つき), cfg --> xxx.vasp
         logger.info("end")
 
-        if loop is None:
+        if loop == -1:
+            logger.error("**Error**: Insufficient HST records for convergence check.")
+            # break
+            return False
+        elif loop is None:
             logger.info("RMC is NOT converged.")
             continue
         else:
@@ -192,6 +196,7 @@ def run_rmc(
 
     logger.info("END of RMC")
     logger.info("")
+    return True
 
 
 if __name__ == "__main__":

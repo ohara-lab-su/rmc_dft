@@ -226,7 +226,7 @@ class RmcPotHst:
         self,
         rel_tol: float = 1.0e-2,
         acc_tol: float = 1.0e-3,
-        min_consecutive: int = 2,
+        min_consecutive: int = 3,
     ) -> Optional[int]:
         """
         RMC の履歴データに基づいて「実質的な収束点」を判定する。
@@ -284,6 +284,12 @@ class RmcPotHst:
 
         # accepted/tried の履歴（探索の活動度）
         acc = self.get_accepted_per_tried()
+
+        # 必要な hstルグの step数に対して
+        # 実際のステップ数が少ない場合は自動ループだと無限に回るだけなので
+        # エラーを返すようにする
+        if len(chi2) < min_consecutive + 1:
+            return -1  # 判定不能（行数不足）
 
         # 停滞状態が何回連続したかを数えるカウンタ
         consec = 0
