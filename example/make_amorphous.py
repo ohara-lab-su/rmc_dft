@@ -39,20 +39,20 @@ def main() -> None:
     B_xyz_file = "B.xyz"
 
     ##########################
-    if os.path.exists("config.yml"):
-        logger.info("config.yaml is found.")
-        config = Config("config.yml")
-        N_tot = config.N_tot
-        rho_g_cm3 = config.mass_density_g_cm3
-        ratios = config.ratios
-        symbols = config.element_info
-    else:
-        logger.info("config.yaml is not found.")
-        logger.info("set default parameters")
-        N_tot = 400  # セルの原子数
-        rho_g_cm3 = 7.35  # 質量密度
-        ratios = [80, 9, 11]  # 化学量論比
-        symbols = ["Fe", "Si", "B"]
+    # if os.path.exists("config.yml"):
+    #     logger.info("config.yaml is found.")
+    #     config = Config("config.yml")
+    #     N_tot = config.N_tot
+    #     rho_g_cm3 = config.mass_density_g_cm3
+    #     ratios = config.ratios
+    #     symbols = config.element_info
+    # else:
+    logger.info("config.yaml is not found.")
+    logger.info("set default parameters")
+    N_tot = 400  # セルの原子数
+    rho_g_cm3 = 7.3336  # 質量密度(250)
+    ratios = [82, 4, 14]  # 化学量論比
+    symbols = ["Fe", "Si", "B"]
     ##########################
     logger.info(f"== config parameters ==")
     logger.info(f"{N_tot}")
@@ -63,15 +63,15 @@ def main() -> None:
 
     pm = Packmol()
 
-    n_per_A3 = pm.number_density_from_mass_density(symbols, ratios, rho_g_cm3)
-    # mass_density_g_cm3 = pm.mass_density_from_number_density(symbols, ratios, number_density_per_A3)
+    number_density_A3 = pm.number_density_from_mass_density(symbols, ratios, rho_g_cm3)
+    # mass_density_g_cm3 = pm.mass_density_from_number_density(symbols, ratios, number_density_A3)
 
     # Fe-Si-B の総原子数からそれぞれの原子数を決める,化学量論比はすでに決定済み
     counts = pm.compute_element_counts(symbols, ratios, N_tot)
     N_Fe = counts["Fe"]
     N_Si = counts["Si"]
     N_B = counts["B"]
-    L = pm.cell_length_from_number_density(N_tot, n_per_A3)
+    L = pm.cell_length_from_number_density(N_tot, number_density_A3)
 
     logger.info(f"{counts}")
     logger.info(f"L = {L:.6f}")

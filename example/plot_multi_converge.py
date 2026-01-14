@@ -34,7 +34,7 @@ def read_chi2_from_dir(
         # HST が無い / 読めない場合は False を返して呼び元で処理
         return False
 
-    if result is False:
+    if not result:
         return False
 
     steps, chi2 = result

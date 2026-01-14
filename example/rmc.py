@@ -11,6 +11,7 @@ import os
 import argparse
 import sys
 import shutil
+import re
 
 from rmc_dft import (
     Config,
@@ -24,54 +25,80 @@ from rmc_dft import (
     RmcPotLog,
     RmcPotDat,
     RmcPotFit,
+    RmcPotHst,
     RmcPotPpcf,
 )
 from rmc_dft.util import poscar2cfg
+from rmc_dft.util import next_log_dir_name as next_log_dir_name
 from x_logger import XLogger
 
 
-if __name__ == "__main__":
-    logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+def run_rmc(
+    config: Config,
+    *,
+    auto_converge: bool = False,
+    msg: str = None,
+    logger: XLogger = None,
+) -> bool:
+    """
+    RMC
+    """
+    if logger is None:
+        logger = XLogger()
 
-    config = Config("config.yml")
+    if msg:
+        logger.info(f"=============== RMC(RMC_POT) {msg} ============")
+    else:
+        logger.info(f"=============== RMC(RMC_POT) ============")
+
     rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
     rmc_dat = RmcPotDat(config=config, logger=logger)
 
-    ##################
-    rmc_dir = "log20"
-    ##################
-
-    # 初期POSCAR 作成
-    # shutil.copy(f"POSCAR0", "POSCAR")
-    # 初期CFG 作成 (POSCAR to CFG)
-    # poscar2cfg(cfg_name=config.cfg_name)
-
-    # パラメーター調整
     ######################################
+    # パラメーター調整
     # rmc_dat.set_exp_filename("ascast.xsq")
+    rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
+
     # 1 行目のコメント（系名）を設定する
     rmc_dat.set_comment("comment FeSiB")
     # 2 行目：number density（数密度）を設定する
-    rmc_dat.set_density(0.0915)
+    # rmc_dat.set_density(0.0915)
+    rmc_dat.set_density(0.09119)
 
     # 3 行目：cut offs（各原子種ペアのカットオフ距離）を設定する
     # rmc_dat.set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
-    rmc_dat.set_cutoffs([2.1, 1.9, 1.75, 1.8, 1.75, 1.5])
+    # FeSiB
+    # 11(Fe-Fe) 2.45-2.55
+    # 12(Fe-Si) 2.35-2.45
+    # 13(Fe-B)  2.05-2.15
+    # 22(Si-Si) 2.35-2.50
+    # 23(Si-B)  2.0-2.1
+    # 33(B-B)   1.7-1.9
+    rmc_dat.set_cutoffs([2.2, 1.9, 1.75, 1.8, 1.75, 1.5])
+    # rmc_dat.set_cutoffs([2.1, 1.9, 1.75, 1.8, 1.75, 1.5])
+    # rmc_dat.set_cutoffs([2.4, 2.3, 2.1, 2.0, 2.4, 1.7])j
 
     # 4 行目：maximum moves（1 回の移動での最大変位量）を設定する
     # rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
-    rmc_dat.set_maximu_moves([0.05, 0.05, 0.05])
+    rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
 
-    # 5 行目：r spacing（g(r) のビン幅）を設定する
+    # 5 行目：r spacing を設定する
+    # rのステップ(Δr)
     rmc_dat.set_r_spacing(0.025)
 
     # 6行目: moveout を認めるかどうか？
-    # rmc_dat.set_moveout_option(True)
-    rmc_dat.set_moveout_option(False)
+    # カットオフ以下の位置での原子の存在を排除するか？認めるか？
+    rmc_dat.set_moveout_option(True)
+    # rmc_dat.set_moveout_option(False)
 
     # 9行目
     # 計算時間と構造をsaveするステップ間隔
+    # rmc_dat.set_time_and_save(30, 1)
     rmc_dat.set_time_and_save(60, 1)
+    # rmc_dat.set_time_and_save(120, 1)
+    # rmc_dat.set_time_and_save(360, 1)
+    # rmc_dat.set_time_and_save(480, 1)
+    # rmc_dat.set_time_and_save(720, 1)
 
     # 10 行目：データ種の使用フラグ（g(r), neutron, x-ray, EXAFS）を設定する
     rmc_dat.set_data_flags([0, 0, 1, 0])
@@ -85,11 +112,13 @@ if __name__ == "__main__":
     #    小さいほど「ズレ」を許さず、結果的により厳しくフィットさせようとする。
     # rmc_dat.set_sigma_factor(5e-4)
     rmc_dat.set_sigma_factor(1e-5)
+    # rmc_dat.set_sigma_factor(1e-7)
 
     ######################################
 
     # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, config=config, logger=logger)
     # rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
+
     rmc = RmcPot(
         rmc_dat=rmc_dat,  # instance
         rmc_log=rmc_log,  # instance
@@ -98,26 +127,88 @@ if __name__ == "__main__":
     )
 
     # ---------------------------
-    # 入力の構造を用意する
-    # ---------------------------
-
-    # ---------------------------
     # aaa.cfg がすでにある前提
     # ---------------------------
 
-    rmc.preprocess()  # check inputfile
-    # rmc.run(cfg_name=config.cfg_name)
-    rmc.run()
+    while True:
+        ##################
+        # rmc_dir = f"log01_rmc"
+        rmc_dir = next_log_dir_name("rmc")
+        ##################
+
+        logger.info("====================")
+        logger.info(f"rmc_dir = {rmc_dir}")
+
+        rmc.preprocess()  # check inputfile
+        # rmc.run(cfg_name=config.cfg_name)
+        rmc.run()
+
+        hst = RmcPotHst(cfg_name=f"{config.cfg_name}")  # sample.cfg → sample.hst
+
+        ###################################################
+        # RMC 収束判定
+        if auto_converge:
+            loop: Optional[int] = hst.detect_convergence(
+                rel_tol=1.0e-2,
+                acc_tol=1.0e-3,
+                min_consecutive=2,
+            )
+        else:
+            loop = 0  # とりあえず None 以外の数字
+        ###################################################
+
+        # ---------------------------
+        # backup folder がすでにある前提
+        # ---------------------------
+        # rmc.postprocess()  ## backup and output xxx.vasp
+
+        # カレントフォルダで回すだけだと必要ない
+        rmc.postprocess(
+            log_dir=rmc_dir,
+            cfg_name=config.cfg_name,
+            element_info=config.element_info,
+        )  # backup(loop番号つき), cfg --> xxx.vasp
+        logger.info("end")
+
+        if loop == -1:
+            logger.error("**Error**: Insufficient HST records for convergence check.")
+            # break
+            return False
+        elif loop is None:
+            logger.info("RMC is NOT converged.")
+            continue
+        else:
+            break
+
+    # 収束点の情報を取得
+    generated = hst.get_generated(loop)
+    chi2_tot = hst.get_chi2_tot(loop)
+    chi2_set1 = hst.get_chi2_set1(loop)
+    acc = hst.get_accepted_per_tried(loop)
+
+    logger.info("====================")
+    logger.info("RMC is converged.")
+    logger.info(f"  loop index           = {loop}")
+    logger.info(f"  generated            = {generated}")
+    logger.info(f"  chi2_tot             = {chi2_tot:.6e}")
+    logger.info(f"  chi2/F(Q)_set#1      = {chi2_set1:.6e}")
+    logger.info(f"  accepted/tried       = {acc:.6e}")
+
+    logger.info("END of RMC")
+    logger.info("")
+    return True
+
+
+if __name__ == "__main__":
+    _logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+    _config = Config("config.yml")
+    _msg = None
 
     # ---------------------------
-    # backup folder がすでにある前提
+    # 初期POSCAR 作成
+    # shutil.copy(f"POSCAR0", "POSCAR")
+    # 初期CFG 作成 (POSCAR to CFG)
+    # poscar2cfg(cfg_name=config.cfg_name)#
     # ---------------------------
-    # rmc.postprocess()  ## backup and output xxx.vasp
 
-    ## カレントフォルダで回すだけだと必要ない
-    ## rmc.postprocess(
-    ##     log_dir=rmc_dir,
-    ##     cfg_name=config.cfg_name,
-    ##     element_info=config.element_info,
-    ## )  # backup(loop番号つき), cfg --> xxx.vasp
-    logger.info("end")
+    run_rmc(_config, auto_converge=True, msg=_msg, logger=_logger)

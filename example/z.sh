@@ -4,8 +4,14 @@ cp ~/zaiene_dev/rmc_dft/example/clean_rmc.py ./
 cp ~/zaiene_dev/rmc_dft/example/clean_dft.py ./
 cp ~/zaiene_dev/rmc_dft/example/clean.sh ./
 #
-cp ~/zaiene_dev/rmc_dft/example/rmc_run.py ./
+cp ~/zaiene_dev/rmc_dft/example/check_vasp_finalized.py ./
+cp ~/zaiene_dev/rmc_dft/example/check_vasp_distance.py ./
+cp ~/zaiene_dev/rmc_dft/example/check_rmc_chi.py ./
+cp ~/zaiene_dev/rmc_dft/example/check_rmc_finalized.py ./
+#
+cp ~/zaiene_dev/rmc_dft/example/rmc.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_vasp.py ./
+cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_init.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script.py ./
 # cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script_edit.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script_restart.py ./
@@ -14,9 +20,6 @@ cp ~/zaiene_dev/rmc_dft/example/RMC_DFT_dft_run.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/conv_poscar2cfg.py ./
 cp ~/zaiene_dev/rmc_dft/example/conv_cfg2poscar.py ./
-cp ~/zaiene_dev/rmc_dft/example/check_rmc_finalized.py ./
-cp ~/zaiene_dev/rmc_dft/example/check_rcm_finalized.py ./
-cp ~/zaiene_dev/rmc_dft/example/check_vasp_distance.py ./
 cp ~/zaiene_dev/rmc_dft/example/diff_incar.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/make_cell_size.py ./
@@ -34,9 +37,10 @@ cp ~/zaiene_dev/rmc_dft/example/data_edit_potcar.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_fit.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_hst.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_ppcf.py ./
+cp ~/zaiene_dev/rmc_dft/example/plot_ppcf2.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_energy.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_distance_histgram.py ./
-cp ~/zaiene_dev/rmc_dft/example/plot_rmc_converge.py ./
+cp ~/zaiene_dev/rmc_dft/example/plot_rmc_log_converge.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/plot_multi_fit.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_multi_hst.py ./
@@ -44,5 +48,6 @@ cp ~/zaiene_dev/rmc_dft/example/plot_multi_energy.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_multi_converge.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/make_amorphous.py ./
+cp ~/zaiene_dev/rmc_dft/example/make_number_density.py ./
 cp ~/zaiene_dev/rmc_dft/example/make_cell_size.py ./
 

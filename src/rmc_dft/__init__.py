@@ -30,6 +30,7 @@ from rmc_dft.util import poscar2cfg
 from rmc_dft.util import ensure_vasp5_format
 from rmc_dft.util import check_rmc_and_vasp
 from rmc_dft.util import find_next_log_index
+from rmc_dft.util import next_log_dir_name
 from rmc_dft.util import logs_exist
 
 

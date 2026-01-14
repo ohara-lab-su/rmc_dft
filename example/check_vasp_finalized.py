@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+K.NAKADA, kengo.nakada@gmail.com
 OUTCAR が正常終了しているかどうかを判定するスクリプト
 """
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence

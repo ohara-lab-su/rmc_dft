@@ -266,14 +266,21 @@ class RmcPot:
         # RMC_POT 結果から、POSCAR (VASP4 style) 作成
         # --> xxx.vasp
         self._logger.info(f"== cfg2poscar({cfg_name}.vasp)")
-        self.cfg2poscar(cfg_name=cfg_name, vasp_name=cfg_name)
-
-        # VASP4 --> VASP5
-        self._logger.info(f"== ensure vasp5 format ({cfg_name}.vasp)")
-        self.ensure_vasp5_format(
-            poscar_name=f"{cfg_name}.vasp",
+        self.cfg2poscar(
+            cfg_name=cfg_name,
+            vasp_name=cfg_name,
             element_info=element_info,
         )
+
+        ###########################
+        # cfg2poscar update のため廃止
+        # # VASP4 --> VASP5
+        # self._logger.info(f"== ensure vasp5 format ({cfg_name}.vasp)")
+        # self.ensure_vasp5_format(
+        #     poscar_name=f"{cfg_name}.vasp",
+        #     element_info=element_info,
+        # )
+        ###########################
 
         # ここで POSCAR にすると入力の元になった POSCAR があると
         # 干渉するので method の使い方で破綻する恐れがある。

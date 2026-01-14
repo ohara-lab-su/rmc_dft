@@ -93,16 +93,26 @@ class Vasp:
         self.auto_write: bool = auto_write
 
         # aaa.vasp
+        if config:
+            if vasp_name is None:
+                vasp_name: str = config.vasp_name
         if vasp_name is None:
-            vasp_name: str = config.vasp_name
+            vasp_name: str = "POSCAR"
         self._vasp_name: str = vasp_name
 
         # VASP 実行系設定
-        self.dft_bin: str = dft_bin or config.dft_bin
-        self.mpi_cmd: Optional[str] = mpi_cmd or config.mpi_cmd
-        self.mpi_flag: Optional[str] = mpi_flag or config.mpi_flag
-        self.num_procs: Optional[int] = num_procs or config.num_procs
-        self.job_cmd: Optional[str] = job_cmd or config.job_cmd
+        if config:
+            self.dft_bin: str = dft_bin or config.dft_bin
+            self.mpi_cmd: Optional[str] = mpi_cmd or config.mpi_cmd
+            self.mpi_flag: Optional[str] = mpi_flag or config.mpi_flag
+            self.num_procs: Optional[int] = num_procs or config.num_procs
+            self.job_cmd: Optional[str] = job_cmd or config.job_cmd
+        else:
+            self.dft_bin: str = dft_bin
+            self.mpi_cmd: Optional[str] = mpi_cmd
+            self.mpi_flag: Optional[str] = mpi_flag
+            self.num_procs: Optional[int] = num_procs
+            self.job_cmd: Optional[str] = job_cmd
         # self.job_cmd = job_cmd
 
         self._logger.info(f"")
