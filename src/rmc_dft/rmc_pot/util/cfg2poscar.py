@@ -294,17 +294,25 @@ if __name__ == "__main__":
 
     cfg_name: str = sys.argv[1]
 
-    if len(sys.argv) >= 3:
-        vasp_name: str = sys.argv[2]
-    else:
+    if len(sys.argv) <= 2:
         vasp_name: str = cfg_name
+    if len(sys.argv) == 3:
+        vasp_name: str = sys.argv[2]
+    elif len(sys.argv) == 4:
+        element_info = sys.argv[3]
+    else:
+        logger.info(f"Error")
+        sys.exit(1)
 
     logger.info(f"cfg_name  = {cfg_name}")
     logger.info(f"vasp_name = {vasp_name}")
 
+    # element_info = ["Li","P","S"]
+
     ret = cfg2poscar(
         cfg_name=cfg_name,
         vasp_name=vasp_name,
+        element_info=element_info,
         logger=logger,
     )
 
