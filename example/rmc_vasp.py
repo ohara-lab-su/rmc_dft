@@ -31,6 +31,8 @@ from rmc_vasp_init import run_dft_init
 def run_dft(
     config: Config,
     *,
+    vasp_log: VaspLog,
+    vasp_incar: VaspIncar,
     mode: str = None,
     msg: str = None,
     logger: XLogger = None,
@@ -38,7 +40,11 @@ def run_dft(
     if logger is None:
         logger = XLogger()
 
-    vasp_log = VaspLog(logger=logger)
+    if vasp_log is None:
+        vasp_log = VaspLog(logger=logger)
+
+    if vasp_incar is None:
+        vasp_incar = VaspIncar(logger=logger)
 
     vasp = Vasp(
         vasp_log=vasp_log,  # instance
@@ -76,9 +82,21 @@ def run_dft(
 
 if __name__ == "__main__":
     """"""
-    _config = Config("config.yml")
-    _logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
-    _msg = None
+    config_ = Config("config.yml")
+    logger_ = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+    vasp_log_ = VaspLog(logger=logger)
+    vasp_incar_ = VaspIncar(logger=logger_)
+    msg_ = None
 
-    run_dft_init(_config, logger=_logger)
-    run_dft(_config, msg=None, logger=_logger)
+    run_dft_init(
+        config_,
+        vasp_incar=vasp_incar_,
+        logger=logger_,
+    )
+    run_dft(
+        config_,
+        vasp_log=vasp_log_,
+        vasp_incar=vasp_incar_,
+        msg=None,
+        logger=logger_,
+    )

@@ -30,6 +30,8 @@ from rmc_dft import (
 def run_dft_init(
     config: Config,
     *,
+    vasp_incar: VaspIncar = None,
+    vasp_kpoints: VaspKpoints = None,
     logger: XLogger = None,
 ):
     """
@@ -44,7 +46,8 @@ def run_dft_init(
     # ------------------
     if not os.path.exists("KPOINTS"):
         logger.info("== make KPOINTS")
-        vasp_kpoints = VaspKpoints(logger=logger)
+        if vasp_kpoints is None:
+            vasp_kpoints = VaspKpoints(logger=logger)
         vasp_kpoints.set_mode("Monkhorst-Pack")
         vasp_kpoints.set_grid(1, 1, 1)
         vasp_kpoints.set_shift(0, 0, 0)
@@ -65,8 +68,9 @@ def run_dft_init(
     # ------------------
     # make INCAR
     # ------------------
+    if vasp_incar is None:
+        vasp_incar = VaspIncar(logger=logger)
     logger.info("== make INCAR")
-    vasp_incar = VaspIncar(logger=logger)
     vasp_incar.set_tag("EDIFF", 1e-04)
     vasp_incar.set_tag("EDIFFG", 1e-05)
     vasp_incar.set_tag("ISTART", 0)
@@ -95,7 +99,12 @@ def run_dft_init(
 
 
 if __name__ == "__main__":
-    logger_ = XLogger(log_level="debug", logger_name="rmc_run")
     config_ = Config("config.yml")
+    logger_ = XLogger(log_level="debug", logger_name="rmc_run")
+    vasp_incar_ = VaspIncar(logger=logger_)
 
-    run_dft_init(config_, logger=logger_)
+    run_dft_init(
+        config_,
+        vasp_incar=vasp_incar,
+        logger=logger_,
+    )

@@ -175,7 +175,13 @@ def run_rmc(
             # break
             return False
         elif loop is None:
+            logger.info("")
             logger.info("RMC is NOT converged.")
+            logger.info("Continue RMC loop.")
+            logger.info("")
+            logger.info("=====================")
+            logger.info("=====================")
+            logger.info("")
             continue
         else:
             break
