@@ -26,6 +26,7 @@ from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import sys
 import os
 import optparse
+import logging
 
 # from numpy import *
 import numpy as np
@@ -34,7 +35,7 @@ from x_logger import XLogger
 
 def contcar2cfg(
     cfg_name: str,
-    logger: Optional[XLogger] = XLogger(),
+    logger: Optional[Any] = None,
 ):
     """
     2025.10.29 update CONTCAR タイプ対応
@@ -47,6 +48,10 @@ def contcar2cfg(
     Returns:
 
     """
+    if logger is None:
+        # logger = XLogger(logger_name="contcar2cfg")
+        logger = logging.getLogger("contcar2cfg")
+
     logger.info(f"INPUT file name : CONTCAR")
     logger.info(f"OUTPUT file name: {cfg_name}.cfg")
 
@@ -55,7 +60,7 @@ def contcar2cfg(
 
 def poscar2cfg(
     cfg_name: str,
-    logger: Optional[XLogger] = XLogger(),
+    logger: Optional[Any] = None,
 ) -> bool:
     """
     2025.10.29 update CONTCAR タイプ対応
@@ -63,13 +68,16 @@ def poscar2cfg(
 
     Args:
         cfg_name (str):  CFG 保存用の名前
-        logger (str):
+        logger (Any):
 
     Returns:
 
     """
-    logger.info(f"== poscar2cfg(poscar_name=POSCAR, cfg_name={cfg_name})")
+    if logger is None:
+        # logger = XLogger(logger_name="contcar2cfg")
+        logger = logging.getLogger("contcar2cfg")
 
+    logger.info(f"== poscar2cfg(poscar_name=POSCAR, cfg_name={cfg_name})")
     logger.info(f"INPUT file name : POSCAR")
     logger.info(f"OUTPUT file name: {cfg_name}.cfg")
 
@@ -79,7 +87,7 @@ def poscar2cfg(
 def vasp2cfg(
     vasp_name: str,
     cfg_name: str = None,
-    logger: Optional[XLogger] = XLogger(),
+    logger: Optional[Any] = None,
 ):
     """
     2025.10.29 update CONTCAR タイプ対応
@@ -98,6 +106,10 @@ def vasp2cfg(
     Returns:
 
     """
+    if logger is None:
+        # logger = XLogger(logger_name="contcar2cfg")
+        logger = logging.getLogger("contcar2cfg")
+
     if cfg_name is None:
         cfg_name = vasp_name
 
@@ -114,7 +126,7 @@ def vasp2cfg(
 def convert_to_cfg(
     poscar_name: str = "POSCAR",
     cfg_name: str = "aaa",
-    logger: Optional[XLogger] = XLogger(),
+    logger: Optional[Any] = None,
 ) -> bool:
     """
     name ファイルを中身 POSCAR/CONTCAR とみなして、そのファイルを cfg 形式にする
@@ -127,6 +139,10 @@ def convert_to_cfg(
     Returns:
 
     """
+    if logger is None:
+        # logger = XLogger(logger_name="contcar2cfg")
+        logger = logging.getLogger("contcar2cfg")
+
     if not os.path.exists(poscar_name):
         logger.error(f"{poscar_name} file not found")
         return False
@@ -135,7 +151,7 @@ def convert_to_cfg(
     ###############################################
     # comment
     # ntype
-    # type
+    # type_
     # natom
     # t1_x,t1_y,t1_z
     # t2_x,t2_y,t2_z
@@ -193,18 +209,18 @@ def convert_to_cfg(
     ## Read Atoms
     ##
     # _lines = 17
-    # type = np.zeros((int(ntype) + 1))
+    # type_ = np.zeros((int(ntype) + 1))
     # for i in range(int(ntype)):
     #    _lines += 1
     #    n = datlines[_lines].split()
-    #    type[i] = n[0]
+    #    type_[i] = n[0]
     #    _lines += 1
     #    tmp = datlines[_lines]
     #    _lines += 1
     #    tmp = datlines[_lines]
     #    _lines += 1
     #    tmp = datlines[_lines]
-    type = list(
+    type_ = list(
         map(int, datlines[6].split())
     )  # length is different from original deffinition
     ###############################################
@@ -270,7 +286,7 @@ def convert_to_cfg(
     print("", file=cfg)
 
     for i in range(ntype):
-        print("       %d molecules of type  %d" % (type[i], (i + 1)), file=cfg)
+        print("       %d molecules of type  %d" % (type_[i], (i + 1)), file=cfg)
         print("          1 atomic sites ", file=cfg)
         print("              0.000000   0.000000   0.000000", file=cfg)
         print("", file=cfg)
@@ -286,28 +302,33 @@ def convert_to_cfg(
 
 
 if __name__ == "__main__":
-    logger = XLogger(log_level="info", logger_name="vasp2cfg")
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(name)s %(levelname)s %(message)s",
+    )
+    logger_ = logging.getLogger("cfg2poscar")
+    # logger_ = XLogger(log_level="info", logger_name="vasp2cfg")
 
     if len(sys.argv) < 2:
-        logger.error("Usage: python Rvasp2cfg_nonLIB2025.py vasp_name [cfg_name]")
+        logger_.error("Usage: python Rvasp2cfg_nonLIB2025.py vasp_name [cfg_name]")
         sys.exit(1)
 
-    vasp_name: str = sys.argv[1]
+    vasp_name_: str = sys.argv[1]
 
     if len(sys.argv) >= 3:
-        cfg_name: str = sys.argv[2]
+        cfg_name_: str = sys.argv[2]
     else:
-        cfg_name: str = vasp_name
+        cfg_name_: str = vasp_name_
 
-    logger.info(f"vasp_name = {vasp_name}")
-    logger.info(f"cfg_name  = {cfg_name}")
+    logger_.info(f"vasp_name = {vasp_name_}")
+    logger_.info(f"cfg_name  = {cfg_name_}")
 
     ret = vasp2cfg(
-        vasp_name=vasp_name,
-        cfg_name=cfg_name,
-        logger=logger,
+        vasp_name=vasp_name_,
+        cfg_name=cfg_name_,
+        logger=logger_,
     )
 
     if not ret:
-        logger.error("vasp2cfg failed")
+        logger_.error("vasp2cfg failed")
         sys.exit(1)
