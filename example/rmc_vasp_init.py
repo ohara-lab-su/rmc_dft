@@ -4,6 +4,9 @@ K.NAKADA, kengo.nakada@gmail.com
 
 rmc_dft 用の VASP 入力ファイル
 """
+import os
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
+
 from rmc_dft import Config
 from x_logger import XLogger
 
