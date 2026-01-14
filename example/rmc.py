@@ -93,8 +93,8 @@ def run_rmc(
 
     # 9行目
     # 計算時間と構造をsaveするステップ間隔
-    # rmc_dat.set_time_and_save(30, 1)
-    rmc_dat.set_time_and_save(60, 1)
+    rmc_dat.set_time_and_save(30, 1)
+    # rmc_dat.set_time_and_save(60, 1)
     # rmc_dat.set_time_and_save(120, 1)
     # rmc_dat.set_time_and_save(360, 1)
     # rmc_dat.set_time_and_save(480, 1)
