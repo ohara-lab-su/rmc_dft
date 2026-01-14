@@ -22,7 +22,7 @@ class Config:
     # element_info: Union[str, Sequence[str]] = "label.txt"
     element_info: Union[str, Sequence[str]] = ["Fe", "Si", "B"]
     # ratios: Sequence[int] = [80, 9, 11]
-    ratios: Sequence[int] = [92, 4, 14]
+    ratios: Sequence[int] = [82, 4, 14]
 
     # ---------- RMC -----------
     rmc_code: str = "RmcPot"
