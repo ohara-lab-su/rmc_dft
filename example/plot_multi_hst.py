@@ -17,11 +17,11 @@ def read_chi2_from_dir(
     """
     指定フォルダ dir_name 内の <cfg_name>.hst から (steps, chi2) を読み取る
     """
-    hst_path: str = os.path.join(dir_name, f"{cfg_name}.hst")
+    hst_name: str = os.path.join(dir_name, f"{cfg_name}.hst")
     # reader = RmcPotHst(hst_path)
     # steps, chi2 = reader.read_chi2()
     try:
-        reader = RmcPotHst(hst_path)
+        reader = RmcPotHst(hst_name=hst_name)
         result = reader.read_chi2()
     except (RuntimeError, FileNotFoundError):
         return False

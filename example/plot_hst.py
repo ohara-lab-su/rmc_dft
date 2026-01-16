@@ -14,7 +14,7 @@ def plot_chi(
     cfg_name: str,
     target_dir: Optional[str] = None,
 ) -> None:
-    hst_file = f"{cfg_name}.hst"
+    hst_name = f"{cfg_name}.hst"
 
     # フォルダ指定がある場合は一時的に移動
     original_cwd: str = os.getcwd()
@@ -22,7 +22,7 @@ def plot_chi(
         if target_dir is not None:
             os.chdir(target_dir)
 
-        reader = RmcPotHst(hst_file)
+        reader = RmcPotHst(hst_name=hst_name)
         steps, chi2 = reader.read_chi2()
 
         plt.figure(figsize=(8, 5))

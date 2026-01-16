@@ -22,10 +22,10 @@ def read_chi2_from_dir(
     cfg_name: str,
 ) -> Union[Tuple[list, list], bool]:
     """あるディレクトリのあるファイルの chi を読んで返す"""
-    hst_path: str = os.path.join(dir_name, f"{cfg_name}.hst")
+    hst_name: str = os.path.join(dir_name, f"{cfg_name}.hst")
 
     try:
-        reader = RmcPotHst(hst_path)
+        reader = RmcPotHst(hst_name=hst_name)
         result = reader.read_chi2()
     except (RuntimeError, FileNotFoundError):
         return False

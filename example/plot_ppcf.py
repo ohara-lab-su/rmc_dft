@@ -24,7 +24,7 @@ def plot_ppcf(
         indices = [0, 1, 2, 3, 4, 5]
         labels = ["g11(r)", "g12(r)", "g13(r)", "g22(r)", "g23(r)", "g33(r)"]
 
-        reader = RmcPotPpcf(cfg_name)
+        reader = RmcPotPpcf(cfg_name=cfg_name)
         reader.load()
 
         r = reader.get_r()
