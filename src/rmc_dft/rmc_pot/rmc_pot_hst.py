@@ -376,7 +376,7 @@ class RmcPotHst:
     def get_generated(
         self,
         loop_index: Optional[int] = None,
-    ):
+    ) -> Union[int, List[int]]:
         """
         指定したループに対応する値、または全ループ分の値を取得する。
 
@@ -407,7 +407,7 @@ class RmcPotHst:
     def get_tried(
         self,
         loop_index: Optional[int] = None,
-    ):
+    ) -> Union[int, List[int]]:
         """
         指定したループに対応する tried の値、または全ループ分の値を取得する。
 
@@ -435,7 +435,7 @@ class RmcPotHst:
     def get_accepted(
         self,
         loop_index: Optional[int] = None,
-    ):
+    ) -> Union[int, List[int]]:
         """
         指定したループに対応する accepted の値、または全ループ分の値を取得する。
 
@@ -463,7 +463,7 @@ class RmcPotHst:
     def get_time(
         self,
         loop_index: Optional[int] = None,
-    ):
+    ) -> Union[int, List[int]]:
         """
         指定したループに対応する time の値、または全ループ分の値を取得する。
 
@@ -491,7 +491,7 @@ class RmcPotHst:
     def get_tried_per_generated(
         self,
         loop_index: Optional[int] = None,
-    ):
+    ) -> Union[float, List[float]]:
         """
         指定したループに対応する tried_per_gen の値、または全ループ分の値を取得する。
 
@@ -519,7 +519,7 @@ class RmcPotHst:
     def get_accepted_per_tried(
         self,
         loop_index: Optional[int] = None,
-    ):
+    ) -> Union[float, List[float]]:
         """
         指定したループに対応する acc_per_tried の値、または全ループ分の値を取得する。
 
@@ -547,7 +547,7 @@ class RmcPotHst:
     def get_chi2_tot(
         self,
         loop_index: Optional[int] = None,
-    ):
+    ) -> Union[float, List[float]]:
         """
         全データーセットをまとめた chi
         chi2_tota/data_point
@@ -568,8 +568,8 @@ class RmcPotHst:
     # -----------------------------
     def get_chi2_set1(
         self,
-        loop_index: Optional[int],
-    ):
+        loop_index: Optional[int] = None,
+    ) -> Union[float, List[float]]:
         """
         指定したループに対応する chi2_set1 の値、または全ループ分の値を取得する。
 

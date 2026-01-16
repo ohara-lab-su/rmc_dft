@@ -25,7 +25,7 @@ def read_sq_from_fit(
             os.chdir(dir_name)
         except FileNotFoundError:
             return False
-        fit = RmcPotFit(cfg_name)
+        fit = RmcPotFit(cfg_name=cfg_name)
         ret = fit.read_fit()
         if not ret:
             return False
