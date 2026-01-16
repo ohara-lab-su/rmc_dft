@@ -33,6 +33,7 @@ def run_dft(
     *,
     vasp_log: VaspLog,
     vasp_incar: VaspIncar,
+    log_dir_vasp: str = None,  # backup_dir
     mode: str = None,
     msg: str = None,
     logger: XLogger = None,
@@ -71,7 +72,7 @@ def run_dft(
         sys.exit(-1)
 
     vasp.postprocess(
-        log_dir=vasp_dir,
+        log_dir=log_dir_vasp,
         cfg_name=config.cfg_name,
     )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
     # vasp.backup(log_dir=log_dir)
@@ -86,6 +87,7 @@ if __name__ == "__main__":
     logger_ = XLogger(log_level="debug", logger_name="rmc_vasp_run")
     vasp_log_ = VaspLog(logger=logger)
     vasp_incar_ = VaspIncar(logger=logger_)
+    vasp_dir = config_.dft_log_dir
     msg_ = None
 
     run_dft_init(
@@ -97,6 +99,7 @@ if __name__ == "__main__":
         config_,
         vasp_log=vasp_log_,
         vasp_incar=vasp_incar_,
+        log_dir_vasp=vasp_dir,
         msg=None,
         logger=logger_,
     )
