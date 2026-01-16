@@ -36,9 +36,11 @@ from x_logger import XLogger
 def run_rmc(
     config: Config,
     *,
-    auto_converge: bool = False,
-    msg: str = None,
-    logger: XLogger = None,
+    rmc_log: Optional[RmcPotLog] = None,
+    rmc_dat: Optional[RmcPotDat] = None,
+    auto_converge: Optional[bool] = False,
+    msg: Optional[str] = None,
+    logger: Optional[Any] = None,
 ) -> bool:
     """
     RMC
@@ -46,13 +48,11 @@ def run_rmc(
     if logger is None:
         logger = XLogger()
 
-    if msg:
-        logger.info(f"=============== RMC(RMC_POT) {msg} ============")
-    else:
-        logger.info(f"=============== RMC(RMC_POT) ============")
+    if rmc_log is None:
+        rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
 
-    rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
-    rmc_dat = RmcPotDat(config=config, logger=logger)
+    if rmc_dat is None:
+        rmc_dat = RmcPotDat(config=config, logger=logger)
 
     ######################################
     # パラメーター調整
@@ -130,19 +130,25 @@ def run_rmc(
     # aaa.cfg がすでにある前提
     # ---------------------------
 
+    if msg:
+        logger.info(f"=============== RMC(RMC_POT) {msg} ============")
+    else:
+        logger.info(f"=============== RMC(RMC_POT) ============")
+
     while True:
         ##################
         # rmc_dir = f"log01_rmc"
         rmc_dir = next_log_dir_name("rmc")
         ##################
 
-        logger.info("====================")
+        logger.info("")
         logger.info(f"rmc_dir = {rmc_dir}")
 
         rmc.preprocess()  # check inputfile
         # rmc.run(cfg_name=config.cfg_name)
         rmc.run()
 
+        # インスタンス生成時にログ読み込みする
         hst = RmcPotHst(cfg_name=f"{config.cfg_name}")  # sample.cfg → sample.hst
 
         ###################################################
@@ -206,9 +212,9 @@ def run_rmc(
 
 
 if __name__ == "__main__":
-    _logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
-    _config = Config("config.yml")
-    _msg = None
+    logger_ = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+    config_ = Config("config.yml")
+    msg_ = None
 
     # ---------------------------
     # 初期POSCAR 作成
@@ -217,4 +223,13 @@ if __name__ == "__main__":
     # poscar2cfg(cfg_name=config.cfg_name)#
     # ---------------------------
 
-    run_rmc(_config, auto_converge=True, msg=_msg, logger=_logger)
+    rmc_log_ = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
+    rmc_dat_ = RmcPotDat(config=config, logger=logger)
+    run_rmc(
+        config=config_,
+        rmc_log=rmc_log_,
+        rmc_dat=rmc_dat_,
+        auto_converge=True,
+        msg=msg_,
+        logger=logger_,
+    )

@@ -48,6 +48,7 @@ if __name__ == "__main__":
     poscar2cfg(cfg_name=config.cfg_name)  #
     # ---------------------------
 
+    # RMC 関連インスタンスは RMC-DFT loop で毎回作った方がハンドリングしやすいのでここでは作らん
     # rmc_log = RmcPotLog(config=config, _logger=_logger)
     # rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
     # rmc_dat = RmcPotDat(config=config, logger=logger)
@@ -71,7 +72,13 @@ if __name__ == "__main__":
         vasp_dir = next_log_dir_name("dft")
 
         # ------------------- RMC ------------------------
-        run_rmc(config, msg=f"{i}", logger=logger)
+        # log_dir_rmc は RMC-内部loop ごとに取得するのでここでは直接書かない
+        run_rmc(
+            config=config,
+            auto_converge=True,
+            msg=f"{i}",
+            logger=logger,
+        )
         shutil.copy(f"{config.cfg_name}.vasp", "POSCAR")
 
         logger.info("")
@@ -81,9 +88,10 @@ if __name__ == "__main__":
 
         # ------------------- DFT ------------------------
         run_dft(
-            config,
+            config=config,
             vasp_log=vasp_log,
             vasp_incar=vasp_incar,
+            log_dir_vasp=vasp_dir,
             msg=f"{i}",
             logger=logger,
         )

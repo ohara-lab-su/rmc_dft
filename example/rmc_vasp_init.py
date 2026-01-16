@@ -30,9 +30,9 @@ from rmc_dft import (
 def run_dft_init(
     config: Config,
     *,
-    vasp_incar: VaspIncar = None,
-    vasp_kpoints: VaspKpoints = None,
-    logger: XLogger = None,
+    vasp_incar: Optional[VaspIncar] = None,
+    vasp_kpoints: Optional[VaspKpoints] = None,
+    logger: Optional[Any] = None,
 ):
     """
     VASP の KPOINTS/INCAR/POTCAR のスクリプトによる生成
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     vasp_incar_ = VaspIncar(logger=logger_)
 
     run_dft_init(
-        config_,
+        config=config_,
         vasp_incar=vasp_incar,
         logger=logger_,
     )

@@ -31,12 +31,12 @@ from rmc_vasp_init import run_dft_init
 def run_dft(
     config: Config,
     *,
-    vasp_log: VaspLog,
-    vasp_incar: VaspIncar,
-    log_dir_vasp: str = None,  # backup_dir
-    mode: str = None,
-    msg: str = None,
-    logger: XLogger = None,
+    vasp_log: Optional[VaspLog] = None,
+    vasp_incar: Optional[VaspIncar] = None,
+    log_dir_vasp: Optional[str] = None,  # backup_dir
+    mode: Optional[str] = None,
+    msg: Optional[str] = None,
+    logger: Optional[Any] = None,
 ):
     if logger is None:
         logger = XLogger()
@@ -48,9 +48,9 @@ def run_dft(
         vasp_incar = VaspIncar(logger=logger)
 
     vasp = Vasp(
+        config=config,  # instance
         vasp_log=vasp_log,  # instance
         vasp_incar=vasp_incar,  # instance
-        config=config,  # instance
         logger=logger,  # instance
     )
 
