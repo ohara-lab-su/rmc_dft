@@ -14,9 +14,10 @@ from x_logger import XLogger
 if __name__ == "__main__":
 
     logger = XLogger(log_level="debug")
-    config = Config("config.yml")
-    ratios: Sequence[int] = config.ratios
+    # config = Config("config.yml")
+    # ratios: Sequence[int] = config.ratios
 
+    ratios = [82, 4, 14]  # 化学量論比
     max_atom_count: int = 1000
 
     pm = Packmol()

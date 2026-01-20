@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import sys
 import os
 import optparse
+import logging
 
 # from numpy import *
 import numpy as np
@@ -95,20 +96,24 @@ def cfg2poscar(
     cfg_name: str,
     vasp_name: Optional[str] = None,
     element_info: Optional[Union[str, Sequence[str]]] = None,
-    logger: Optional[XLogger] = XLogger(),
+    logger: Optional[Any] = None,
 ) -> bool:
     """
     RMCPOT cfg 形式を poscar 形式にする
     SAE を使わない独立版(noLIB)
 
     Args:
-        cfg_name (str)::
+        cfg_name (str):
         vasp_name (str):
         element_info (str or Sequence[str]):
-        logger (XLogger):
+        logger (Any):
     Returns:
         bool:
     """
+    if logger is None:
+        logger = logging.getLogger("cfg2poscar")
+        # logger = XLogger(logger_name="cfg2poscar")
+
     if not vasp_name:
         vasp_name = cfg_name
 
@@ -286,28 +291,48 @@ def cfg2poscar(
 
 
 if __name__ == "__main__":
-    logger = XLogger(log_level="info", logger_name="cfg2poscar")
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(name)s %(levelname)s %(message)s",
+    )
+    logger_ = logging.getLogger("cfg2poscar")
+    # logger_ = XLogger(log_level="info", logger_name="cfg2poscar")
 
     if len(sys.argv) < 2:
-        logger.error("Usage: python cfg2poscar_nonLIB.py cfg_name [vasp_name]")
+        logger_.error("Usage: python cfg2poscar_nonLIB.py cfg_name [vasp_name]")
         sys.exit(1)
 
-    cfg_name: str = sys.argv[1]
+    cfg_name_: str = sys.argv[1]
 
+    # vasp_name
     if len(sys.argv) >= 3:
-        vasp_name: str = sys.argv[2]
+        vasp_name_: str = sys.argv[2]
     else:
-        vasp_name: str = cfg_name
+        vasp_name_: str = cfg_name_
 
-    logger.info(f"cfg_name  = {cfg_name}")
-    logger.info(f"vasp_name = {vasp_name}")
+    # element_info
+    if len(sys.argv) >= 4:
+        element_info_ = sys.argv[3]
+    else:
+        element_info_ = None
+
+    if len(sys.argv) > 4:
+        logger_.error("Too many arguments")
+        sys.exit(1)
+
+    logger.info(f"cfg_name  = {cfg_name_}")
+    logger.info(f"vasp_name = {vasp_name_}")
+    logger.info(f"element_info = {element_info_}")
+
+    # element_info = ["Li","P","S"]
 
     ret = cfg2poscar(
-        cfg_name=cfg_name,
-        vasp_name=vasp_name,
-        logger=logger,
+        cfg_name=cfg_name_,
+        vasp_name=vasp_name_,
+        element_info=element_info_,
+        logger=logger_,
     )
 
     if not ret:
-        logger.error("cfg2poscar failed")
+        logger_.error("cfg2poscar failed")
         sys.exit(1)

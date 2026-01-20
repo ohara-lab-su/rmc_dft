@@ -31,19 +31,26 @@ from rmc_vasp_init import run_dft_init
 def run_dft(
     config: Config,
     *,
-    mode: str = None,
-    msg: str = None,
-    logger: XLogger = None,
+    vasp_log: Optional[VaspLog] = None,
+    vasp_incar: Optional[VaspIncar] = None,
+    log_dir_vasp: Optional[str] = None,  # backup_dir
+    mode: Optional[str] = None,
+    msg: Optional[str] = None,
+    logger: Optional[Any] = None,
 ):
     if logger is None:
         logger = XLogger()
 
-    vasp_log = VaspLog(logger=logger)
+    if vasp_log is None:
+        vasp_log = VaspLog(logger=logger)
+
+    if vasp_incar is None:
+        vasp_incar = VaspIncar(logger=logger)
 
     vasp = Vasp(
+        config=config,  # instance
         vasp_log=vasp_log,  # instance
         vasp_incar=vasp_incar,  # instance
-        config=config,  # instance
         logger=logger,  # instance
     )
 
@@ -65,7 +72,7 @@ def run_dft(
         sys.exit(-1)
 
     vasp.postprocess(
-        log_dir=vasp_dir,
+        log_dir=log_dir_vasp,
         cfg_name=config.cfg_name,
     )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
     # vasp.backup(log_dir=log_dir)
@@ -76,9 +83,23 @@ def run_dft(
 
 if __name__ == "__main__":
     """"""
-    _config = Config("config.yml")
-    _logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
-    _msg = None
+    config_ = Config("config.yml")
+    logger_ = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+    vasp_log_ = VaspLog(logger=logger)
+    vasp_incar_ = VaspIncar(logger=logger_)
+    vasp_dir = config_.dft_log_dir
+    msg_ = None
 
-    run_dft_init(_config, logger=_logger)
-    run_dft(_config, msg=None, logger=_logger)
+    run_dft_init(
+        config_,
+        vasp_incar=vasp_incar_,
+        logger=logger_,
+    )
+    run_dft(
+        config_,
+        vasp_log=vasp_log_,
+        vasp_incar=vasp_incar_,
+        log_dir_vasp=vasp_dir,
+        msg=None,
+        logger=logger_,
+    )
