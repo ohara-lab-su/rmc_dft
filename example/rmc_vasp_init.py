@@ -106,6 +106,6 @@ if __name__ == "__main__":
 
     run_dft_init(
         config=config_,
-        vasp_incar=vasp_incar,
+        vasp_incar=vasp_incar_,
         logger=logger_,
     )
