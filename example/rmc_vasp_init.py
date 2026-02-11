@@ -72,7 +72,6 @@ def run_dft_init(
         vasp_incar = VaspIncar(logger=logger)
     logger.info("== make INCAR")
     vasp_incar.set_tag("EDIFF", 1e-04)
-    # vasp_incar.set_tag("EDIFFG", 1e-05)
     vasp_incar.set_tag("EDIFFG", 1e-03)
     vasp_incar.set_tag("ISTART", 0)
     #
@@ -106,6 +105,6 @@ if __name__ == "__main__":
 
     run_dft_init(
         config=config_,
-        vasp_incar=vasp_incar_,
+        vasp_incar=vasp_incar,
         logger=logger_,
     )

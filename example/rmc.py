@@ -229,7 +229,7 @@ if __name__ == "__main__":
         config=config_,
         rmc_log=rmc_log_,
         rmc_dat=rmc_dat_,
-        auto_converge=True,
+        auto_converge=False,
         msg=msg_,
         logger=logger_,
     )
