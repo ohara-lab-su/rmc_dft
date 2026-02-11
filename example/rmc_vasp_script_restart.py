@@ -26,26 +26,25 @@ from rmc_dft.util import logs_exist
 from x_logger import XLogger
 
 
-if __name__ == "__main__":
-    logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+def check_restart(
+    *,
+    config: Config,
+    rmc_log_filename: Optional[str],
+    max_loop: int,
+    logger: XLogger,
+) -> Tuple[int, str]:
+    """
+    どのモードで、どこからスタートするか調べる
 
-    # ----------------------------------------------------------
-    # 設定読込
-    # ----------------------------------------------------------
-    config = Config("config.yml")
-    cfg = config.cfg_name
-    max_loop = config.max_rmc_dft_loop
+    Args:
+        config:
+        logger:
+        rmc_log_filename:
+        max_loop:
 
-    # ----------------------------------------------------------
-    # コマンドライン引数：RMC ログファイル（ジョブファイル等）指定
-    #   rmc_vasp_script_restart.py [rmc_log_file]
-    # ----------------------------------------------------------
-    if len(sys.argv) >= 2:
-        rmc_log_filename = sys.argv[1]
-        logger.info(f"[ARG] RMC log file specified: {rmc_log_filename}")
-    else:
-        rmc_log_filename = None
+    Returns:
 
+    """
     # ----------------------------------------------------------
     # RMC/VASP の終了判定
     # ----------------------------------------------------------
@@ -88,11 +87,13 @@ if __name__ == "__main__":
     # ----------------------------------------------------------
     if (not rmc_finished) and vasp_finished:
         # ケース1: RMC 未完・VASP 完了 →「次の」ループとして RMC から再開
+        #################
         start_loop = next_rmc_idx
         start_mode = "RMC"
+        #################
         logger.info(
             "[DECISION] RMC not finished, VASP finished → "
-            f"restart from RMC loop {start_loop}"
+            f"restart from {start_mode} loop {start_loop}"
         )
 
     elif rmc_finished and (not vasp_finished):
@@ -102,19 +103,24 @@ if __name__ == "__main__":
                 "[ERROR] RMC finished flag is True but no RMC log directory is found."
             )
             sys.exit(1)
+        #################
         start_loop = last_rmc_idx
         start_mode = "VASP"
+        #################
         logger.info(
             "[DECISION] RMC finished, VASP not finished → "
-            f"restart from VASP loop {start_loop}"
+            f"restart from {start_mode} loop {start_loop}"
         )
 
     elif rmc_finished and vasp_finished:
         # ケース3: 両方完了 → 次のループで新規 RMC から
+        #################
         start_loop = next_rmc_idx
         start_mode = "RMC"
+        #################
         logger.info(
-            "[DECISION] RMC & VASP finished → start new RMC loop " f"{start_loop}"
+            f"[DECISION] RMC & VASP finished → start new {start_mode} loop "
+            f"{start_loop}"
         )
 
     else:
@@ -126,8 +132,10 @@ if __name__ == "__main__":
             rmc_logs_exist = logs_exist(config.rmc_log_dir)
             vasp_logs_exist = logs_exist(config.dft_log_dir)
 
+            #################
             start_loop = 0
             start_mode = "RMC"
+            #################
             logger.warning(
                 "[DECISION] RMC/VASP both not finished, but no existing log "
                 "directories are found.\n"
@@ -142,37 +150,68 @@ if __name__ == "__main__":
             sys.exit(1)
 
     logger.info(f"[RESTART] loop = {start_loop}, mode = {start_mode}")
+    return start_loop, start_mode
+
+
+if __name__ == "__main__":
+    logger_ = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+
+    # ----------------------------------------------------------
+    # 設定読込
+    # ----------------------------------------------------------
+    config_ = Config("config.yml")
+    cfg = config_.cfg_name
+    max_loop_ = config_.max_rmc_dft_loop
+
+    # ----------------------------------------------------------
+    # コマンドライン引数：RMC ログファイル（ジョブファイル等）指定
+    #   rmc_vasp_script_restart.py [rmc_log_file]
+    # ----------------------------------------------------------
+    if len(sys.argv) >= 2:
+        rmc_log_filename_ = sys.argv[1]
+        logger.info(f"[ARG] RMC log file specified: {rmc_log_filename}")
+    else:
+        rmc_log_filename_ = None
+
+    ret = check_restart(
+        config=config_,
+        rmc_log_filename=rmc_log_filename_,
+        max_loop=max_loop_,
+        logger=logger_,
+    )
+    start_loop_ = ret[0]
+    start_mode_ = ret[1]
 
     # ----------------------------------------------------------
     # RMC/VASP インスタンス構築（入力ファイルは既存前提）
     # ----------------------------------------------------------
-    rmc_log = RmcPotLog(cfg_name=cfg, logger=logger)
-    rmc_dat = RmcPotDat(config=config, logger=logger)
+    rmc_log = RmcPotLog(cfg_name=cfg, logger=logger_)
+    rmc_dat = RmcPotDat(config=config_, logger=logger_)
 
     rmc = RmcPot(
         rmc_dat=rmc_dat,
         rmc_log=rmc_log,
-        config=config,
-        logger=logger,
+        config=config_,
+        logger=logger_,
     )
 
-    vasp_log = VaspLog(logger=logger)
+    vasp_log = VaspLog(logger=logger_)
     vasp = Vasp(
         vasp_log=vasp_log,
-        config=config,
-        logger=logger,
+        config=config_,
+        logger=logger_,
     )
 
     # ----------------------------------------------------------
     # メインループ：決定した start_loop から max_loop まで
     # ----------------------------------------------------------
-    mode = start_mode
-    logger.info(f"start_mode = {mode}")
+    mode = start_mode_
+    logger_.info(f"start_mode = {mode}")
 
-    for i in range(start_loop, max_loop):
+    for i in range(start_loop_, max_loop_):
 
-        rmc_dir = f"{config.rmc_log_dir}{str(i).zfill(rmc_digits)}"
-        vasp_dir = f"{config.dft_log_dir}{str(i).zfill(vasp_digits)}"
+        rmc_dir = f"{config_.rmc_log_dir}{str(i).zfill(rmc_digits)}"
+        vasp_dir = f"{config_.dft_log_dir}{str(i).zfill(vasp_digits)}"
 
         if not os.path.exists(rmc_dir):
             os.mkdir(rmc_dir)
@@ -181,16 +220,16 @@ if __name__ == "__main__":
 
         # ---------------- RMC パート ----------------
         if mode == "RMC":
-            logger.info("")
-            logger.info(f"======================== RMC loop {i}")
-            logger.info("")
+            logger_.info("")
+            logger_.info(f"======================== RMC loop {i}")
+            logger_.info("")
 
             rmc.preprocess()
             rmc.run()
             rmc.postprocess(
                 log_dir=rmc_dir,
                 cfg_name=cfg,
-                element_info=config.element_info,
+                element_info=config_.element_info,
             )  # backup(loop番号つき), cfg --> xxx.vasp
 
             # RMC の結果から POSCAR 更新
@@ -201,13 +240,13 @@ if __name__ == "__main__":
 
         # ---------------- VASP パート ----------------
         if mode == "VASP":
-            logger.info("")
-            logger.info(f"======================== VASP loop {i}")
-            logger.info("")
+            logger_.info("")
+            logger_.info(f"======================== VASP loop {i}")
+            logger_.info("")
 
             ret = vasp.run(mode="mpi")
             if not ret:
-                logger.error("**Error**: vasp execution failed")
+                logger_.error("**Error**: vasp execution failed")
                 sys.exit(-1)
 
             vasp.postprocess(
@@ -218,6 +257,6 @@ if __name__ == "__main__":
             # 次ループは再び RMC から
             mode = "RMC"
 
-        logger.info(f"---- LOOP {i} END ----")
+        logger_.info(f"---- LOOP {i} END ----")
 
-    logger.info("==== ALL LOOP FINISHED ====")
+    logger_.info("==== ALL LOOP FINISHED ====")

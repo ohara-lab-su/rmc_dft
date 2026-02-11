@@ -58,9 +58,13 @@ def run_dft(
     # このスクリプト自体をジョブで投げる。mpi だとジョブが システムの mpi run する
     # -----------------------
     if msg:
-        logger.info(f"=============== DFT(vasp) {msg} ============")
+        logger.info(
+            f"=============== DFT(vasp) vasp_dir={log_dir_vasp}, {msg} ============"
+        )
     else:
-        logger.info(f"=============== DFT(vasp) {msg} ============")
+        logger.info(
+            f"=============== DFT(vasp) vasp_dir={log_dir_vasp}, {msg} ============"
+        )
 
     # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
     # vasp.run(mode="test")
@@ -71,6 +75,7 @@ def run_dft(
         logger.error("**Error**: vasp execution failed")
         sys.exit(-1)
 
+    # log_dir にバックアップする
     vasp.postprocess(
         log_dir=log_dir_vasp,
         cfg_name=config.cfg_name,
@@ -85,7 +90,7 @@ if __name__ == "__main__":
     """"""
     config_ = Config("config.yml")
     logger_ = XLogger(log_level="debug", logger_name="rmc_vasp_run")
-    vasp_log_ = VaspLog(logger=logger)
+    vasp_log_ = VaspLog(logger=logger_)
     vasp_incar_ = VaspIncar(logger=logger_)
     vasp_dir = config_.dft_log_dir
     msg_ = None
