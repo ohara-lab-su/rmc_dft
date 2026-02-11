@@ -72,8 +72,7 @@ def run_dft_init(
         vasp_incar = VaspIncar(logger=logger)
     logger.info("== make INCAR")
     vasp_incar.set_tag("EDIFF", 1e-04)
-    # vasp_incar.set_tag("EDIFFG", 1e-05)
-    vasp_incar.set_tag("EDIFFG", 1e-03)
+    vasp_incar.set_tag("EDIFFG", 1e-05)
     vasp_incar.set_tag("ISTART", 0)
     #
     vasp_incar.set_tag("ISMEAR", 0)  # Gussian
@@ -92,11 +91,11 @@ def run_dft_init(
     vasp_incar.set_tag("NEDOS", 1500)
     #
     # ==== mixing (大規模アモルファス用・保守的設定) ====
-    # vasp_incar.set_tag("IMIX", 4)
-    # vasp_incar.set_tag("INIMIX", 1)
-    # vasp_incar.set_tag("AMIX", 0.02)
-    # vasp_incar.set_tag("BMIX", 0.0001)
-    # vasp_incar.set_tag("MAXMIX", 20)
+    vasp_incar.set_tag("IMIX", 4)
+    vasp_incar.set_tag("INIMIX", 1)
+    vasp_incar.set_tag("AMIX", 0.02)
+    vasp_incar.set_tag("BMIX", 0.0001)
+    vasp_incar.set_tag("MAXMIX", 20)
 
 
 if __name__ == "__main__":
@@ -106,6 +105,6 @@ if __name__ == "__main__":
 
     run_dft_init(
         config=config_,
-        vasp_incar=vasp_incar_,
+        vasp_incar=vasp_incar,
         logger=logger_,
     )
