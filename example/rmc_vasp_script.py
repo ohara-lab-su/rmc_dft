@@ -75,7 +75,8 @@ if __name__ == "__main__":
         # log_dir_rmc は RMC-内部loop ごとに取得するのでここでは直接書かない
         run_rmc(
             config=config,
-            auto_converge=True,
+            # auto_converge=True,
+            auto_converge=False,
             msg=f"{i}",
             logger=logger,
         )
