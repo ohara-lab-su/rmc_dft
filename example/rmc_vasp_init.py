@@ -27,7 +27,7 @@ from rmc_dft import (
 )
 
 
-def run_dft_init(
+def run_vasp_init(
     config: Config,
     *,
     vasp_incar: Optional[VaspIncar] = None,
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     logger_ = XLogger(log_level="debug", logger_name="rmc_run")
     vasp_incar_ = VaspIncar(logger=logger_)
 
-    run_dft_init(
+    run_vasp_init(
         config=config_,
         vasp_incar=vasp_incar,
         logger=logger_,

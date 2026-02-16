@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.4.7 nakada
+
+- 旧版で実装していた restart 系を新盤 0.4.x 系で復帰
+- rmc_vasp を読んでいるときは run_dft 系をやめて、run_vasp に統一し直す
+
 ## v0.4.6 nakada
 
 - RMCの自動収束が少しイマイチなので手動をデフォルトに変更
