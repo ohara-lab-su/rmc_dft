@@ -66,11 +66,13 @@ def run_dft(
             f"=============== DFT(vasp) vasp_dir={log_dir_vasp}, {msg} ============"
         )
 
+    ###################
     # vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
     # vasp.run(mode="test")
-    # vasp.run(mode=config.run_mode)
+    vasp.run(mode=config.run_mode)
     # ret = vasp.run(mode="mpi")
-    ret = vasp.run(mode="local")
+    # ret = vasp.run(mode="local")
+    ###################
     if not ret:
         logger.error("**Error**: vasp execution failed")
         sys.exit(-1)
