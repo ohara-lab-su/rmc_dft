@@ -107,6 +107,10 @@ def run_rmc(
 
     # 実験データファイル名（11 行目）を設定する
     rmc_dat.set_exp_filename(config.rmc_exp_filename)
+
+    # 12 (データ範囲)
+    rmc_dat.set_exp_range(1, 1091, auto_write=True)
+
     # 26 行目：1 回の move で動かす原子数（通常 1）を設定する
     rmc_dat.set_num_atoms_per_move(1)
 

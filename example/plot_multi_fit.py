@@ -1,4 +1,3 @@
-# plot_multi_fit.py
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """plot_multi_fit.py
