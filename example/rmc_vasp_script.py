@@ -80,6 +80,8 @@ if __name__ == "__main__":
             msg=f"{i}",
             logger=logger,
         )
+
+        # 次回のDFTの初期構造ファイル
         shutil.copy(f"{config.cfg_name}.vasp", "POSCAR")
 
         logger.info("")
@@ -96,4 +98,7 @@ if __name__ == "__main__":
             msg=f"{i}",
             logger=logger,
         )
+
+        # 次回のRMCの初期構造ファイル
         contcar2cfg(cfg_name=config.cfg_name)
+        shutil.copy(f"{config.cfg_name}.cfg", f"{cfg_name}.cfg0")

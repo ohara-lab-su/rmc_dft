@@ -1,42 +1,58 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""plot_multi_energy.py
+
+VASP OUTCAR を複数ログ（logX_dft）から読み取り、
+SCF の flatten energy 列を横一列のサブプロットとして描画
+
 """
-K.NAKADA, kengo.nakada@gmail.com
-"""
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
+from typing import List, Tuple
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 
 from rmc_dft import VaspOutcar
 
+import make_log_dirname
+
 
 def read_energy_from_dir(
     dir_name: str,
 ) -> np.ndarray:
+    """指定ディレクトリ内の OUTCAR から flatten energy 列を返します。
+
+    Args:
+        dir_name (str):
+            OUTCAR を含むディレクトリ（パス）。
+
+    Returns:
+        np.ndarray:
+            shape=(N,) のエネルギー列。
     """
-    指定フォルダ dir_name 内の OUTCAR から
-    flatten energy sequence（全 SCF のエネルギー列）を返す。
-    """
+
     outcar_path: str = os.path.join(dir_name, "OUTCAR")
     out = VaspOutcar(outcar_path)
-    energies: np.ndarray = out.get_energy_flat()  # shape = (N,)
+    energies: np.ndarray = out.get_energy_flat()
     return energies
 
 
 def plot_multi_energy(
     dir_list: List[str],
 ) -> None:
+    """複数ディレクトリの flatten energy を横一列で描画します。
+
+    Args:
+        dir_list (List[str]):
+            OUTCAR を含むディレクトリ（パス）の列。
+
+    Returns:
+        None
     """
-    dir_list に列挙されたフォルダごとに OUTCAR を読み込み、
-    flatten energy を横一列のサブプロットにして表示する。
-    縦軸は全てのサブプロットで共有。
-    """
+
     all_data: List[Tuple[str, np.ndarray]] = []
     ymin: float = float("inf")
     ymax: float = float("-inf")
 
-    # まず全データを読み込み、縦軸範囲を決定
     for d in dir_list:
         energies = read_energy_from_dir(d)
         all_data.append((d, energies))
@@ -59,14 +75,13 @@ def plot_multi_energy(
         sharey=True,
     )
 
-    # n=1 の特別処理
     if n == 1:
         axes = [axes]
 
     for ax, (d, energies) in zip(axes, all_data):
         x = np.arange(energies.size)
         ax.plot(x, energies)
-        ax.set_title(d)
+        ax.set_title(os.path.basename(d))
         ax.set_xlabel("SCF step")
         ax.set_ylim(ymin, ymax)
         ax.grid(True)
@@ -81,36 +96,22 @@ def plot_multi_energy(
 
 
 if __name__ == "__main__":
-    import sys
 
-    if len(sys.argv) != 1:
-        print("Usage:")
-        print("  plot_multi_energy.py")
-        print("フォルダ名はスクリプトの下部で手動編集します。")
-        sys.exit(1)
+    # -------------------- 設定 --------------------
+    base_dir_: str = "."
 
-    # ここでフォルダ名を手で並べる（plot_multi_hst と同じ方式）
-    _dir_list: List[str] = [
-        "log00",
-        "log01",
-        "log02",
-        "log03",
-        "log04",
-        "log05",
-        "log06",
-        "log07",
-        "log08",
-        "log09",
-        "log10",
-        "log11",
-        "log12",
-        "log13",
-        "log14",
-        "log15",
-        "log16",
-        "log17",
-        "log18",
-        "log19",
-    ]
+    # -------------------- dir_list（手動） --------------------
+    # dir_list_names_: List[str] = [
+    #     "log0_dft",
+    #     "log1_dft",
+    #     "log2_dft",
+    # ]
 
-    plot_multi_energy(_dir_list)
+    # -------------------- dir_list（自動） --------------------
+    dir_list_names_: List[str] = make_log_dirname.find_dft_dirs(base_dir_)
+
+    dir_list_paths_: List[str] = []
+    for name in dir_list_names_:
+        dir_list_paths_.append(os.path.join(base_dir_, name))
+
+    plot_multi_energy(dir_list_paths_)

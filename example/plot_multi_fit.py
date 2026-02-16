@@ -1,30 +1,45 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""plot_multi_fit.py
+
+RMC_POT の <cfg_name>.fit を複数ログ（logX_rmc）から読み取り、
+S(Q) を多段サブプロットで描画
+
 """
-K.NAKADA, kengo.nakada@gmail.com
-"""
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
+
+from typing import List, Tuple, Union
 import os
 import matplotlib.pyplot as plt
 
 from rmc_dft import RmcPotFit
+
+import make_log_dirname
 
 
 def read_sq_from_fit(
     dir_name: str,
     cfg_name: str,
 ) -> Union[Tuple[list, list, list], bool]:
+    """指定ディレクトリの <cfg_name>.fit から Q, S_calc, S_exp を読み取ります。
+
+    Args:
+        dir_name (str):
+            <cfg_name>.fit を含むディレクトリ（パス）。
+        cfg_name (str):
+            cfg 名（拡張子なし）。
+
+    Returns:
+        Union[Tuple[list, list, list], bool]:
+            読めた場合は (Q, S_calc, S_exp)、読めない場合は False。
     """
-    dir_name に一時的に移動し、cfg_name.fit から
-    Q, S_calc, S_exp を読み取る。
-    単体版 plot_sq.py と同じロジック。
-    """
+
     original_cwd: str = os.getcwd()
     try:
         try:
             os.chdir(dir_name)
         except FileNotFoundError:
             return False
+
         fit = RmcPotFit(cfg_name=cfg_name)
         ret = fit.read_fit()
         if not ret:
@@ -33,6 +48,7 @@ def read_sq_from_fit(
         Q = fit.Q
         S_calc = fit.get_S_calc()
         S_exp = fit.get_S_exp()
+
         return Q, S_calc, S_exp
     finally:
         os.chdir(original_cwd)
@@ -43,9 +59,18 @@ def plot_multi_fit(
     cfg_name: str,
     ncols: int = 4,
 ) -> None:
-    """
-    dir_list に列挙されたフォルダごとに <cfg_name>.fit を読み込み、
-    S(Q) を多段サブプロットで表示する。
+    """複数ディレクトリの S(Q) を多段サブプロットで描画します。
+
+    Args:
+        dir_list (List[str]):
+            <cfg_name>.fit を含むディレクトリ（パス）の列。
+        cfg_name (str):
+            cfg 名（拡張子なし）。
+        ncols (int):
+            サブプロットの列数。
+
+    Returns:
+        None
     """
 
     all_data: List[Tuple[str, list, list, list]] = []
@@ -54,11 +79,10 @@ def plot_multi_fit(
     xmin: float = float("inf")
     xmax: float = float("-inf")
 
-    # 全データを読み込み、軸レンジを決める
     for d in dir_list:
         result = read_sq_from_fit(d, cfg_name)
         if result is False:
-            break
+            continue
 
         Q, S_calc, S_exp = result
         all_data.append((d, Q, S_calc, S_exp))
@@ -66,9 +90,11 @@ def plot_multi_fit(
         if len(Q) > 0:
             xmin = min(xmin, min(Q))
             xmax = max(xmax, max(Q))
+
         if len(S_calc) > 0:
             ymin = min(ymin, min(S_calc))
             ymax = max(ymax, max(S_calc))
+
         if len(S_exp) > 0:
             ymin = min(ymin, min(S_exp), ymin)
             ymax = max(ymax, max(S_exp), ymax)
@@ -77,7 +103,7 @@ def plot_multi_fit(
         print("有効な FIT データがありません。")
         return
 
-    n: int = len(dir_list)
+    n: int = len(all_data)
     nrows: int = (n + ncols - 1) // ncols
 
     fig, axes = plt.subplots(
@@ -93,19 +119,18 @@ def plot_multi_fit(
     for ax, (d, Q, S_calc, S_exp) in zip(axes, all_data):
         ax.plot(Q, S_calc, label="S_calc")
         ax.plot(Q, S_exp, label="S_exp")
-        ax.set_title(d)
+        ax.set_title(os.path.basename(d))
         ax.set_xlim(xmin, xmax)
         ax.set_ylim(ymin, ymax)
         ax.grid(True)
         ax.legend(fontsize=6)
 
-    # 余った subplot を消す
     for ax in axes[len(all_data) :]:
         ax.axis("off")
 
-    # 軸ラベル
     for ax in axes[-ncols:]:
         ax.set_xlabel("Q")
+
     axes[0].set_ylabel("S(Q)")
 
     plt.tight_layout()
@@ -116,36 +141,24 @@ def plot_multi_fit(
 
 
 if __name__ == "__main__":
-    import sys
 
-    if len(sys.argv) != 2:
-        print("Usage:  plot_multi_fit.py <cfg_name>")
-        print("例:     plot_multi_fit.py aaa")
-        sys.exit(1)
+    # -------------------- 設定 --------------------
+    cfg_name_: str = "aaa"
+    base_dir_: str = "."
+    ncols_: int = 4
 
-    cfg_name_: str = sys.argv[1]
+    # -------------------- dir_list（手動） --------------------
+    # dir_list_names_: List[str] = [
+    #     "log0_rmc",
+    #     "log1_rmc",
+    #     "log2_rmc",
+    # ]
 
-    dir_list_ = [
-        "log00",
-        "log01",
-        "log02",
-        "log03",
-        "log04",
-        "log05",
-        "log06",
-        "log07",
-        "log08",
-        "log09",
-        "log10",
-        "log11",
-        "log12",
-        "log13",
-        "log14",
-        "log15",
-        "log16",
-        "log17",
-        "log18",
-        "log19",
-    ]
+    # -------------------- dir_list（自動） --------------------
+    dir_list_names_: List[str] = make_log_dirname.find_rmc_dirs(base_dir_)
 
-    plot_multi_fit(dir_list_, cfg_name_, ncols=4)
+    dir_list_paths_: List[str] = []
+    for name in dir_list_names_:
+        dir_list_paths_.append(os.path.join(base_dir_, name))
+
+    plot_multi_fit(dir_list_paths_, cfg_name_, ncols=ncols_)

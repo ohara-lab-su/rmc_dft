@@ -776,6 +776,7 @@ class RmcPotLog:
             "grep_khi_RMC.txt",
             f"{cfg_name}.chi",
             f"{cfg_name}.cfg",
+            f"{cfg_name}.cfg0",
             f"{cfg_name}.sq",
             f"{cfg_name}.dat",
             f"{cfg_name}.hst",

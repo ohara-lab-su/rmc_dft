@@ -36,9 +36,9 @@ rmc_bin: "rmcp.exe"
 # VASP  path
 # dft_bin: "/home/hpc/vasp/bin/vasp-gamma"
 # dft_bin: "/home/k/Downloads/vasp.6.4.2/bin/vasp_gam"
-# dft_bin: "vasp_gam"
+dft_bin: "vasp_gam"
 # dft_bin: "vasp-gamma"  # hpcs
-dft_bin: "vasp_std"
+# dft_bin: "vasp_std"
 
 # mpi: "mpirun -np {num_procs} {os.path.expanduser('/home/hpc/vasp/bin/vasp')}"
 mpi_cmd: "mpirun"
