@@ -39,6 +39,7 @@ def run_rmc(
     rmc_log: Optional[RmcPotLog] = None,
     rmc_dat: Optional[RmcPotDat] = None,
     auto_converge: Optional[bool] = False,
+    postprocess: Optional[bool] = True,
     msg: Optional[str] = None,
     logger: Optional[Any] = None,
 ) -> bool:
@@ -80,7 +81,8 @@ def run_rmc(
 
     # 4 行目：maximum moves（1 回の移動での最大変位量）を設定する
     # rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
-    rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
+    # rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
+    rmc_dat.set_maximu_moves([0.05, 0.01, 0.01])
 
     # 5 行目：r spacing を設定する
     # rのステップ(Δr)
@@ -111,7 +113,8 @@ def run_rmc(
     # σ（実験データの許容誤差の標準偏差）
     #    小さいほど「ズレ」を許さず、結果的により厳しくフィットさせようとする。
     # rmc_dat.set_sigma_factor(5e-4)
-    rmc_dat.set_sigma_factor(1e-5)
+    rmc_dat.set_sigma_factor(1e-2)
+    # rmc_dat.set_sigma_factor(1e-5)
     # rmc_dat.set_sigma_factor(1e-7)
 
     ######################################
@@ -168,12 +171,13 @@ def run_rmc(
         # ---------------------------
         # rmc.postprocess()  ## backup and output xxx.vasp
 
-        # カレントフォルダで回すだけだと必要ない
-        rmc.postprocess(
-            log_dir=rmc_dir,
-            cfg_name=config.cfg_name,
-            element_info=config.element_info,
-        )  # backup(loop番号つき), cfg --> xxx.vasp
+        if postprocess:
+            # カレントフォルダで回すだけだと必要ない
+            rmc.postprocess(
+                log_dir=rmc_dir,
+                cfg_name=config.cfg_name,
+                element_info=config.element_info,
+            )  # backup(loop番号つき), cfg --> xxx.vasp
         logger.info("end")
 
         if loop == -1:
