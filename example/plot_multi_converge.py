@@ -1,27 +1,43 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-K.NAKADA, kengo.nakada@gmail.com
-未完:
-読み込んだファイルが全て正しければ、きちんと動作するが
-エラーや計算途中のファイルがあるとちょっとまだ意図しない動作をする
+"""plot_multi_converge.py
+
+RMC と DFT の収束状況を同一 Figure に並べて描画
+
+- 上段: RMC_POT の <cfg_name>.hst の chi2
+- 下段: VASP OUTCAR の flatten energy
+
+前提:
+- 新ログ構造では、RMC と DFT が別ディレクトリ:
+    logX_rmc
+    logX_dft
+
+本スクリプトでは、make_log_dirname.find_log_pairs(base_dir) が返す
+ペア情報を入力として扱う
+
+- log_pairs
+  - 手動: [{"index":"0","rmc":"log0_rmc","dft":"log0_dft"}, ...]
+  - 自動: log_search.find_log_pairs(base_dir)
+  のいずれかをコメントアウトで切り替え
 
 """
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
+from typing import Dict, List, Optional, Tuple, Union
 import os
-
 import numpy as np
 import matplotlib.pyplot as plt
 
 from rmc_dft import RmcPotHst, VaspOutcar
 from x_logger import XLogger
 
+import make_log_dirname
+
 
 def read_chi2_from_dir(
     dir_name: str,
     cfg_name: str,
 ) -> Union[Tuple[list, list], bool]:
-    """あるディレクトリのあるファイルの chi を読んで返す"""
+    """指定ディレクトリ内の <cfg_name>.hst から (steps, chi2) を読み取り"""
+
     hst_name: str = os.path.join(dir_name, f"{cfg_name}.hst")
 
     try:
@@ -31,7 +47,6 @@ def read_chi2_from_dir(
         return False
 
     if not reader:
-        # HST が無い / 読めない場合は False を返して呼び元で処理
         return False
 
     if not result:
@@ -44,164 +59,165 @@ def read_chi2_from_dir(
 def read_energy_from_dir(
     dir_name: str,
 ) -> Union[np.ndarray, bool]:
-    """あるディレクトリのあるファイルの energy を読んで返す"""
+    """指定ディレクトリ内の OUTCAR から flatten energy 列を返す"""
+
     outcar_path: str = os.path.join(dir_name, "OUTCAR")
+
     try:
         out = VaspOutcar(outcar_path)
     except (RuntimeError, FileNotFoundError):
         return False
+
     energies: np.ndarray = out.get_energy_flat()
     return energies
 
 
-def hide_yticklabels_except_first(axes_row):
+def _hide_yticklabels_except_first(axes_row) -> None:
     for j, ax in enumerate(axes_row):
         if j != 0:
             ax.set_yticklabels([])
 
 
 def plot_multi_converge(
-    dir_list: List[str],
+    log_pairs: List[Dict[str, str]],
     cfg_name: str,
+    base_dir: str,
     logger: Optional[XLogger] = None,
 ) -> None:
+    """RMC(上段) と DFT(下段) を同一 Figure に並べて描画
+
+    Args:
+        log_pairs (List[Dict[str, str]]):
+            log_search.find_log_pairs(base_dir) と同形式のリスト。
+            各要素は {"index","rmc","dft"} を持つ。
+        cfg_name (str):
+            RMC_POT の cfg 名（拡張子なし）。
+        base_dir (str):
+            logX_* が存在する基準ディレクトリ。
+        logger (Optional[XLogger]):
+            ロガー。
+
+    Returns:
+        None
+    """
+
     logger = logger or XLogger()
 
-    # -------------------- データ読み取り --------------------
-    hst_data = []
-    en_data = []
+    hst_data: List[Tuple[str, list, list]] = []
+    en_data: List[Tuple[str, np.ndarray]] = []
 
-    hst_ymin = float("inf")
-    hst_ymax = float("-inf")
+    hst_ymin: float = float("inf")
+    hst_ymax: float = float("-inf")
 
-    en_ymin = float("inf")
-    en_ymax = float("-inf")
+    en_ymin: float = float("inf")
+    en_ymax: float = float("-inf")
 
-    for d in dir_list:
-        # HST
-        h = read_chi2_from_dir(d, cfg_name)
+    for pair in log_pairs:
+        idx_str: str = pair.get("index", "")
+        rmc_dir_name: str = pair.get("rmc", "")
+        dft_dir_name: str = pair.get("dft", "")
+
+        rmc_dir_path: str = os.path.join(base_dir, rmc_dir_name)
+        dft_dir_path: str = os.path.join(base_dir, dft_dir_name)
+
+        title: str = f"log{idx_str}"
+
+        h = read_chi2_from_dir(rmc_dir_path, cfg_name)
         if h is False:
-            # continue
-            # ここで以降のディレクトリも存在しない前提で止める
-            break
+            continue
 
         steps, chi2 = h
-        hst_data.append((d, steps, chi2))
+        hst_data.append((title, steps, chi2))
+
         if len(chi2) > 0:
             hst_ymin = min(hst_ymin, min(chi2))
             hst_ymax = max(hst_ymax, max(chi2))
 
-        # Energy
-        e = read_energy_from_dir(d)
+        e = read_energy_from_dir(dft_dir_path)
         if e is False:
-            # continue
-            # エネルギーも読めなくなったら打ち切り
-            break
+            continue
 
         energies = e
-        en_data.append((d, energies))
+        en_data.append((title, energies))
 
         if energies.size > 0:
             en_ymin = min(en_ymin, float(np.min(energies)))
             en_ymax = max(en_ymax, float(np.max(energies)))
 
-    # 1つもデータが無ければ何もしない
     if len(hst_data) == 0 or len(en_data) == 0:
         logger.error("有効なデータが見つかりませんでした。")
         return
 
-    # 両方揃っている列数だけを使う
-    n = min(len(hst_data), len(en_data))
+    n: int = min(len(hst_data), len(en_data))
     hst_data = hst_data[:n]
     en_data = en_data[:n]
-    # n = len(dir_list)
 
-    # -------------------- Figure 準備 --------------------
     fig, axes = plt.subplots(
         nrows=2,
         ncols=n,
-        figsize=(2.7 * n, 8),  # 横幅をわずかに拡大
+        figsize=(2.7 * n, 8),
     )
 
     if n == 1:
         axes = np.array([[axes[0]], [axes[1]]])
 
-    # -------------------- 上段（RMC） --------------------
-    for col, (d, steps, chi2) in enumerate(hst_data):
+    for col, (title, steps, chi2) in enumerate(hst_data):
         ax = axes[0, col]
         ax.plot(steps, chi2)
-        ax.set_title(d)
+        ax.set_title(title)
         if hst_ymin != float("inf"):
             ax.set_ylim(hst_ymin, hst_ymax)
         ax.set_xlabel("Step")
         ax.grid(True)
 
     axes[0, 0].set_ylabel("Chi^2")
-    hide_yticklabels_except_first(axes[0])
+    _hide_yticklabels_except_first(axes[0])
 
-    # -------------------- 下段（DFT Energy） --------------------
-    for col, (d, energies) in enumerate(en_data):
+    for col, (title, energies) in enumerate(en_data):
         ax = axes[1, col]
         x = np.arange(energies.size, dtype=int)
         ax.plot(x, energies)
+        ax.set_title(title)
         if en_ymin != float("inf"):
             ax.set_ylim(en_ymin, en_ymax)
         ax.set_xlabel("SCF step")
         ax.grid(True)
 
     axes[1, 0].set_ylabel("Energy [eV]")
-    hide_yticklabels_except_first(axes[1])
+    _hide_yticklabels_except_first(axes[1])
 
-    # -------------------- 全体タイトル --------------------
     fig.suptitle("RMC (top)  /  DFT (bottom)", fontsize=16, y=0.98)
 
-    # -------------------- 余白調整（左側を広げる） --------------------
-    # left=0.11 で左側だけ大きな余白を固定し、tight_layout と両立
-    # plt.tight_layout(rect=[0.11, 0.03, 1.0, 0.96],)
     plt.tight_layout(
         rect=(0.05, 0.03, 1.0, 0.96),
     )
 
     plt.show()
 
-    # -------------------- PNG 保存 --------------------
     fig.savefig("plot_multi_converge.png", dpi=300)
     print("Saved: plot_multi_converge.png")
 
 
 if __name__ == "__main__":
-    import sys
 
     logger_ = XLogger(log_level="debug", logger_name="rmc_run")
 
-    if len(sys.argv) != 2:
-        print("Usage:")
-        print("  plot_multi_converge.py <cfg_name_prefix>")
-        sys.exit(1)
+    # -------------------- 設定 --------------------
+    cfg_name_: str = "aaa"
+    base_dir_: str = "."
 
-    cfg_name_ = sys.argv[1]
+    # -------------------- log_pairs（手動） --------------------
+    # log_pairs_: List[Dict[str, str]] = [
+    #     {"index": "0", "rmc": "log0_rmc", "dft": "log0_dft"},
+    #     {"index": "1", "rmc": "log1_rmc", "dft": "log1_dft"},
+    # ]
 
-    dir_list_ = [
-        "log00",
-        "log01",
-        "log02",
-        "log03",
-        "log04",
-        "log05",
-        "log06",
-        "log07",
-        "log08",
-        "log09",
-        "log10",
-        "log11",
-        "log12",
-        "log13",
-        "log14",
-        "log15",
-        "log16",
-        "log17",
-        "log18",
-        "log19",
-    ]
+    # -------------------- log_pairs（自動） --------------------
+    log_pairs_ = make_log_dirname.find_log_pairs(base_dir_)
 
-    plot_multi_converge(dir_list_, cfg_name_, logger_)
+    plot_multi_converge(
+        log_pairs_,
+        cfg_name_,
+        base_dir_,
+        logger_,
+    )

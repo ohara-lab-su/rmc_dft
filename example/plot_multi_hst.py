@@ -1,25 +1,40 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""plot_multi_hst.py
+
+RMC_POT の .hst を複数ログ（logX_rmc）から読み取り、
+chi2 の推移を横一列のサブプロットとして描画
+
 """
-K.NAKADA, kengo.nakada@gmail.com
-"""
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
+
+from typing import List, Tuple, Union
 import os
 import matplotlib.pyplot as plt
 
 from rmc_dft import RmcPotHst
+
+import make_log_dirname
 
 
 def read_chi2_from_dir(
     dir_name: str,
     cfg_name: str,
 ) -> Union[Tuple[list, list], bool]:
+    """指定ディレクトリ内の <cfg_name>.hst から (steps, chi2) を読み取ります。
+
+    Args:
+        dir_name (str):
+            .hst を含むディレクトリ（パス）。
+        cfg_name (str):
+            cfg 名（拡張子なし）。
+
+    Returns:
+        Union[Tuple[list, list], bool]:
+            読めた場合は (steps, chi2)、読めない場合は False。
     """
-    指定フォルダ dir_name 内の <cfg_name>.hst から (steps, chi2) を読み取る
-    """
+
     hst_name: str = os.path.join(dir_name, f"{cfg_name}.hst")
-    # reader = RmcPotHst(hst_path)
-    # steps, chi2 = reader.read_chi2()
+
     try:
         reader = RmcPotHst(hst_name=hst_name)
         result = reader.read_chi2()
@@ -27,7 +42,9 @@ def read_chi2_from_dir(
         return False
 
     if not reader:
-        # HST が無い / 読めない場合は False を返して呼び元で処理
+        return False
+
+    if not result:
         return False
 
     steps, chi2 = result
@@ -38,22 +55,33 @@ def plot_multi_chi(
     dir_list: List[str],
     cfg_name: str,
 ) -> None:
-    """
-    dir_list に列挙されたフォルダごとに <cfg_name>.hst を読み込み、
-    一枚の図の中に横一列で並べてプロットする。
-    縦軸スケールは全サブプロットで共通とする。
+    """複数ディレクトリの chi2 を横一列で描画します。
+
+    Args:
+        dir_list (List[str]):
+            .hst を含むディレクトリ（パス）の列。
+        cfg_name (str):
+            cfg 名（拡張子なし）。
+
+    Returns:
+        None
     """
 
     all_data: List[Tuple[str, list, list]] = []
     ymin: float = float("inf")
     ymax: float = float("-inf")
 
-    # まず全フォルダからデータを読み込んで、縦軸レンジを決める
     for d in dir_list:
-        steps, chi2 = read_chi2_from_dir(d, cfg_name)
+        result = read_chi2_from_dir(d, cfg_name)
+        if result is False:
+            continue
+
+        steps, chi2 = result
         all_data.append((d, steps, chi2))
+
         if len(chi2) == 0:
             continue
+
         ymin = min(ymin, min(chi2))
         ymax = max(ymax, max(chi2))
 
@@ -62,7 +90,6 @@ def plot_multi_chi(
         return
 
     n: int = len(all_data)
-    # 横一列に並べる
     fig, axes = plt.subplots(
         nrows=1,
         ncols=n,
@@ -70,18 +97,16 @@ def plot_multi_chi(
         sharey=True,
     )
 
-    # n=1 の場合の扱い
     if n == 1:
         axes = [axes]
 
     for ax, (d, steps, chi2) in zip(axes, all_data):
         ax.plot(steps, chi2)
-        ax.set_title(d)
+        ax.set_title(os.path.basename(d))
         ax.set_xlabel("Step")
         ax.set_ylim(ymin, ymax)
         ax.grid(True)
 
-    # 縦軸ラベルは左端だけ
     axes[0].set_ylabel("Chi^2 (total/data_point)")
 
     plt.tight_layout()
@@ -92,38 +117,23 @@ def plot_multi_chi(
 
 
 if __name__ == "__main__":
-    import sys
 
-    if len(sys.argv) != 2:
-        print("Usage:")
-        print("  plot_multi_chi.py <cfg_name_prefix>")
-        print("例: plot_multi_chi.py aaa")
-        sys.exit(1)
+    # -------------------- 設定 --------------------
+    cfg_name_: str = "aaa"
+    base_dir_: str = "."
 
-    cfg_name_: str = sys.argv[1]
+    # -------------------- dir_list（手動） --------------------
+    # dir_list_names_: List[str] = [
+    #     "log0_rmc",
+    #     "log1_rmc",
+    #     "log2_rmc",
+    # ]
 
-    # ここでフォルダ名を手で並べる
-    dir_list_: List[str] = [
-        "log00",
-        "log01",
-        "log02",
-        "log03",
-        "log04",
-        "log05",
-        "log06",
-        "log07",
-        "log08",
-        "log09",
-        "log10",
-        "log11",
-        "log12",
-        "log13",
-        "log14",
-        "log15",
-        "log16",
-        "log17",
-        "log18",
-        "log19",
-    ]
+    # -------------------- dir_list（自動） --------------------
+    dir_list_names_: List[str] = make_log_dirname.find_rmc_dirs(base_dir_)
 
-    plot_multi_chi(dir_list_, cfg_name_)
+    dir_list_paths_: List[str] = []
+    for name in dir_list_names_:
+        dir_list_paths_.append(os.path.join(base_dir_, name))
+
+    plot_multi_chi(dir_list_paths_, cfg_name_)
