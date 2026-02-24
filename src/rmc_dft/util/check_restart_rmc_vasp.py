@@ -3,35 +3,36 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 
-RMC–VASP restart system
-途中再開＋ログ継続管理用。
+RMC–VASP restart 用
+
 """
 
 import os
 import sys
 import shutil
-from typing import Tuple  # find_next_log_index の型注釈用
+from typing import Optional, Any, Tuple  # find_next_log_index の型注釈用
 
-from rmc_dft import (
-    Config,
-    Vasp,
-    VaspLog,
-    RmcPot,
-    RmcPotLog,
-    RmcPotDat,
-)
+# from rmc_dft import (
+#     Config,
+#     Vasp,
+#     VaspLog,
+#     RmcPot,
+#     RmcPotLog,
+#     RmcPotDat,
+# )
+from rmc_dft.config import Config
 from rmc_dft.util import check_rmc_and_vasp
 from rmc_dft.util import find_next_log_index
 from rmc_dft.util import logs_exist
 from x_logger import XLogger
 
 
-def check_restart(
+def check_restart_rmc_vasp(
     *,
     config: Config,
     rmc_log_filename: Optional[str],
     max_loop: int,
-    logger: XLogger,
+    logger: Any,
 ) -> Tuple[int, str]:
     """
     どのモードで、どこからスタートするか調べる
@@ -79,9 +80,16 @@ def check_restart(
     #
     # ルール：
     #   1) RMC 未完・VASP 完了   → RMC から再開（新しい log 番号）
+    #       RMC, start_loop= next_rmc_idx
+    #
     #   2) RMC 完了・VASP 未完   → VASP から再開（同じ log 番号）
+    #       VASP, start_loop= last_rmc_idx
+    #
     #   3) RMC 完了・VASP 完了   → 次ループの RMC から開始（新しい log 番号）
-    #   4) RMC 未完・VASP 未完   →
+    #       RMC, start_loop= next_rmc_idx
+    #
+    #   4) RMC 未完・VASP 未完
+    #       RMC, start_loop= 0
     #        - 既存ログが一切無ければ「新規スタート扱い」で loop=0, RMC から
     #        - 既存ログがあるなら危険なので何もしないで終了
     # ----------------------------------------------------------
@@ -182,81 +190,4 @@ if __name__ == "__main__":
     start_loop_ = ret[0]
     start_mode_ = ret[1]
 
-    # ----------------------------------------------------------
-    # RMC/VASP インスタンス構築（入力ファイルは既存前提）
-    # ----------------------------------------------------------
-    rmc_log = RmcPotLog(cfg_name=cfg, logger=logger_)
-    rmc_dat = RmcPotDat(config=config_, logger=logger_)
-
-    rmc = RmcPot(
-        rmc_dat=rmc_dat,
-        rmc_log=rmc_log,
-        config=config_,
-        logger=logger_,
-    )
-
-    vasp_log = VaspLog(logger=logger_)
-    vasp = Vasp(
-        vasp_log=vasp_log,
-        config=config_,
-        logger=logger_,
-    )
-
-    # ----------------------------------------------------------
-    # メインループ：決定した start_loop から max_loop まで
-    # ----------------------------------------------------------
-    mode = start_mode_
-    logger_.info(f"start_mode = {mode}")
-
-    for i in range(start_loop_, max_loop_):
-
-        rmc_dir = f"{config_.rmc_log_dir}{str(i).zfill(rmc_digits)}"
-        vasp_dir = f"{config_.dft_log_dir}{str(i).zfill(vasp_digits)}"
-
-        if not os.path.exists(rmc_dir):
-            os.mkdir(rmc_dir)
-        if not os.path.exists(vasp_dir):
-            os.mkdir(vasp_dir)
-
-        # ---------------- RMC パート ----------------
-        if mode == "RMC":
-            logger_.info("")
-            logger_.info(f"======================== RMC loop {i}")
-            logger_.info("")
-
-            rmc.preprocess()
-            rmc.run()
-            rmc.postprocess(
-                log_dir=rmc_dir,
-                cfg_name=cfg,
-                element_info=config_.element_info,
-            )  # backup(loop番号つき), cfg --> xxx.vasp
-
-            # RMC の結果から POSCAR 更新
-            shutil.copy(f"{cfg}.vasp", "POSCAR")
-
-            # 次は VASP へ
-            mode = "VASP"
-
-        # ---------------- VASP パート ----------------
-        if mode == "VASP":
-            logger_.info("")
-            logger_.info(f"======================== VASP loop {i}")
-            logger_.info("")
-
-            ret = vasp.run(mode="mpi")
-            if not ret:
-                logger_.error("**Error**: vasp execution failed")
-                sys.exit(-1)
-
-            vasp.postprocess(
-                log_dir=vasp_dir,
-                cfg_name=cfg,
-            )  # BACKUP(loop番号つき), CONTCAR --> POSCAR, aaa.cfg
-
-            # 次ループは再び RMC から
-            mode = "RMC"
-
-        logger_.info(f"---- LOOP {i} END ----")
-
-    logger_.info("==== ALL LOOP FINISHED ====")
+    print(f"start_loop = {start_loop_}, start_mode = {start_mode_}")
