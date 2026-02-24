@@ -34,7 +34,7 @@ def run_vasp(
     vasp_log: Optional[VaspLog] = None,
     vasp_incar: Optional[VaspIncar] = None,
     log_dir_vasp: Optional[str] = None,  # backup_dir
-    mode: Optional[str] = None,
+    run_mode: Optional[str] = None,
     msg: Optional[str] = None,
     logger: Optional[Any] = None,
 ):
@@ -69,9 +69,12 @@ def run_vasp(
     ###################
     # ret = vasp.run(mode="job", job_cmd="qsub job_hpcs2024_node2.sh")
     # ret = vasp.run(mode="test")
-    ret = vasp.run(mode=config.run_mode)
     # ret = vasp.run(mode="mpi")
     # ret = vasp.run(mode="local")
+    # ret = vasp.run(mode=config.run_mode)
+    if run_mode is None:
+        run_mode = config.run_mode
+    ret = vasp.run(mode=run_mode)
     ###################
     if not ret:
         logger.error("**Error**: vasp execution failed")
@@ -107,6 +110,7 @@ if __name__ == "__main__":
         vasp_log=vasp_log_,
         vasp_incar=vasp_incar_,
         log_dir_vasp=vasp_dir,
+        run_mode=None,
         msg=None,
         logger=logger_,
     )

@@ -10,16 +10,17 @@ RMC–VASP restart 用
 import os
 import sys
 import shutil
-from typing import Tuple  # find_next_log_index の型注釈用
+from typing import Optional, Any, Tuple  # find_next_log_index の型注釈用
 
-from rmc_dft import (
-    Config,
-    Vasp,
-    VaspLog,
-    RmcPot,
-    RmcPotLog,
-    RmcPotDat,
-)
+# from rmc_dft import (
+#     Config,
+#     Vasp,
+#     VaspLog,
+#     RmcPot,
+#     RmcPotLog,
+#     RmcPotDat,
+# )
+from rmc_dft.config import Config
 from rmc_dft.util import check_rmc_and_vasp
 from rmc_dft.util import find_next_log_index
 from rmc_dft.util import logs_exist

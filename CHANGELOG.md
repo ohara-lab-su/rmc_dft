@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.8 nakada
+
+- bugfix: 使い方によっては巡回importするのを改善
+
 ## v0.4.7 nakada
 
 - 旧版で実装していた restart 系を新盤 0.4.x 系で復帰
