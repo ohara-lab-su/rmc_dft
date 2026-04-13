@@ -231,8 +231,8 @@ if __name__ == "__main__":
     # poscar2cfg(cfg_name=config.cfg_name)#
     # ---------------------------
 
-    rmc_log_ = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
-    rmc_dat_ = RmcPotDat(config=config, logger=logger)
+    rmc_log_ = RmcPotLog(cfg_name=config_.cfg_name, logger=logger_)
+    rmc_dat_ = RmcPotDat(config=config_, logger=logger_)
     run_rmc(
         config=config_,
         rmc_log=rmc_log_,
