@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.9 nakada
+
+example の rmc.py のバグ修正
+
 ## v0.4.8 nakada
 
 - bugfix: 使い方によっては巡回importするのを改善
