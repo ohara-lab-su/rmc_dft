@@ -143,63 +143,64 @@ def run_rmc(
     else:
         logger.info(f"=============== RMC(RMC_POT) ============")
 
-    while True:
-        ##################
-        # rmc_dir = f"log01_rmc"
-        rmc_dir = next_log_dir_name("rmc")
-        ##################
+    # while True:
 
-        logger.info("")
-        logger.info(f"rmc_dir = {rmc_dir}")
+    ##################
+    # rmc_dir = f"log01_rmc"
+    rmc_dir = next_log_dir_name("rmc")
+    ##################
 
-        rmc.preprocess()  # check inputfile
-        # rmc.run(cfg_name=config.cfg_name)
-        rmc.run()
+    logger.info("")
+    logger.info(f"rmc_dir = {rmc_dir}")
 
-        # インスタンス生成時にログ読み込みする
-        hst = RmcPotHst(cfg_name=f"{config.cfg_name}")  # sample.cfg → sample.hst
+    rmc.preprocess()  # check inputfile
+    # rmc.run(cfg_name=config.cfg_name)
+    rmc.run()
 
-        ###################################################
-        # RMC 収束判定
-        if auto_converge:
-            loop: Optional[int] = hst.detect_convergence(
-                rel_tol=1.0e-2,
-                acc_tol=1.0e-3,
-                min_consecutive=2,
-            )
-        else:
-            loop = 0  # とりあえず None 以外の数字
-        ###################################################
+    # インスタンス生成時にログ読み込みする
+    hst = RmcPotHst(cfg_name=f"{config.cfg_name}")  # sample.cfg → sample.hst
 
-        # ---------------------------
-        # backup folder がすでにある前提
-        # ---------------------------
-        # rmc.postprocess()  ## backup and output xxx.vasp
+    ###################################################
+    # RMC 収束判定
+    # if auto_converge:
+    #     loop: Optional[int] = hst.detect_convergence(
+    #         rel_tol=1.0e-2,
+    #         acc_tol=1.0e-3,
+    #         min_consecutive=2,
+    #     )
+    # else:
+    #     loop = 0  # とりあえず None 以外の数字
+    ###################################################
 
-        if postprocess:
-            # カレントフォルダで回すだけだと必要ない
-            rmc.postprocess(
-                log_dir=rmc_dir,
-                cfg_name=config.cfg_name,
-                element_info=config.element_info,
-            )  # backup(loop番号つき), cfg --> xxx.vasp
-        logger.info("end")
+    # ---------------------------
+    # backup folder がすでにある前提
+    # ---------------------------
+    # rmc.postprocess()  ## backup and output xxx.vasp
 
-        if loop == -1:
-            logger.error("**Error**: Insufficient HST records for convergence check.")
-            # break
-            return False
-        elif loop is None:
-            logger.info("")
-            logger.info("RMC is NOT converged.")
-            logger.info("Continue RMC loop.")
-            logger.info("")
-            logger.info("=====================")
-            logger.info("=====================")
-            logger.info("")
-            continue
-        else:
-            break
+    if postprocess:
+        # カレントフォルダで回すだけだと必要ない
+        rmc.postprocess(
+            log_dir=rmc_dir,
+            cfg_name=config.cfg_name,
+            element_info=config.element_info,
+        )  # backup(loop番号つき), cfg --> xxx.vasp
+    logger.info("end")
+
+    # if loop == -1:
+    #     logger.error("**Error**: Insufficient HST records for convergence check.")
+    #     # break
+    #     return False
+    # elif loop is None:
+    #     logger.info("")
+    #     logger.info("RMC is NOT converged.")
+    #     logger.info("Continue RMC loop.")
+    #     logger.info("")
+    #     logger.info("=====================")
+    #     logger.info("=====================")
+    #     logger.info("")
+    #     continue
+    # else:
+    #     break
 
     # 収束点の情報を取得
     generated = hst.get_generated(loop)
