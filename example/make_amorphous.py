@@ -49,10 +49,13 @@ def main() -> None:
     # else:
     logger.info("config.yaml is not found.")
     logger.info("set default parameters")
+
     N_tot = 400  # セルの原子数
     rho_g_cm3 = 7.3336  # 質量密度(250)
+
     ratios = [82, 4, 14]  # 化学量論比
     symbols = ["Fe", "Si", "B"]
+
     ##########################
     logger.info(f"== config parameters ==")
     logger.info(f"{N_tot}")
