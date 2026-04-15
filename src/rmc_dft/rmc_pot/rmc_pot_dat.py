@@ -784,7 +784,7 @@ class RmcPotDat:
     def set_time_and_save(
         self,
         time_limit_min: float,
-        save_interval_step: int,
+        save_interval_step: float,
         *,
         auto_write: Optional[bool] = True,
     ) -> None:
@@ -808,7 +808,7 @@ class RmcPotDat:
 
         Args:
             time_limit_min (float): 最大実行時間（単位: 分）
-            save_interval_step (int): 保存ステップ間隔
+            save_interval_step (float): 保存ステップ時間
             auto_write (bool | None): True で即時保存。None は既定に従う。
         """
         if time_limit_min < 0:
@@ -820,7 +820,7 @@ class RmcPotDat:
                 f"save_interval_step は 0 以上を指定してください: {save_interval_step}"
             )
 
-        values = [self._fmt_number(time_limit_min), str(int(save_interval_step))]
+        values = [self._fmt_number(time_limit_min), str(float(save_interval_step))]
         self.set_line(9, values, auto_write=auto_write)
 
     def get_data_flags(self) -> Tuple[int, int, int, int]:
