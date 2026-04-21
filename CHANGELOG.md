@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.10 nakada
+
+主にリスタート機能のバグ修正
+
 ## v0.4.9 nakada
 
 example の rmc.py のバグ修正
