@@ -1,3 +1,6 @@
+import os
+
+
 def check_restart_rmc_vasp(
     *,
     config,
