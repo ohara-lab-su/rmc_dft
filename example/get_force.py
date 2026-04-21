@@ -7,7 +7,6 @@ def extract_last_forces(outcar_filename: str) -> list[list[float]]:
         lines = f.readlines()
 
     start_index = -1
-
     for i, line in enumerate(lines):
         if "TOTAL-FORCE (eV/Angst)" in line:
             start_index = i
@@ -18,7 +17,6 @@ def extract_last_forces(outcar_filename: str) -> list[list[float]]:
     forces: list[list[float]] = []
 
     i = start_index + 2
-
     while i < len(lines):
         line = lines[i].strip()
 

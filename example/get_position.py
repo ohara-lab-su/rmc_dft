@@ -136,8 +136,8 @@ if __name__ == "__main__":
     structures = read_structures_from_vasprun(vasprun_filename)
     results = calc_step_displacements(structures)
 
-    write_step_summary(results, "ionic_step_displacement_summary.csv")
-    write_atomwise_displacements(results, "ionic_step_atom_displacements.csv")
+    # write_step_summary(results, "ionic_step_displacement_summary.csv")
+    # write_atomwise_displacements(results, "ionic_step_atom_displacements.csv")
 
     for result in results:
         print(
