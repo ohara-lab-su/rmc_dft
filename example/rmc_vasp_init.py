@@ -71,15 +71,19 @@ def run_vasp_init(
     if vasp_incar is None:
         vasp_incar = VaspIncar(logger=logger)
     logger.info("== make INCAR")
-    vasp_incar.set_tag("EDIFF", 1e-04)
-    vasp_incar.set_tag("EDIFFG", 1e-03)
+    # vasp_incar.set_tag("EDIFF", 1e-04)
+    # vasp_incar.set_tag("EDIFFG", 1e-03)
+    vasp_incar.set_tag("EDIFF", 1e-06)
+    vasp_incar.set_tag("EDIFFG", 1e-05)
     vasp_incar.set_tag("ISTART", 0)
     #
     vasp_incar.set_tag("ISMEAR", 0)  # Gussian
     vasp_incar.set_tag("SIGMA", 0.1)
-    vasp_incar.set_tag("NELM", 30)
+    # vasp_incar.set_tag("NELM", 30)
+    vasp_incar.set_tag("NELM", 300)
     #
-    vasp_incar.set_tag("NSW", 10)
+    # vasp_incar.set_tag("NSW", 10)
+    vasp_incar.set_tag("NSW", 300)
     vasp_incar.set_tag("ISIF", 2)
     vasp_incar.set_tag("IBRION", 2)  # CG
     # vasp_incar.set_tag("IBRION", 3)  # Dampd

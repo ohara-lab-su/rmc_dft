@@ -83,15 +83,14 @@ if __name__ == "__main__":
     # RMC で止めるか、VASP で止めるか？
     stop_mode = "VASP"
 
-    # RMC 関連インスタンスは RMC-DFT loop で毎回作った方がハンドリングしやすいのでここでは作らん
-    # rmc_log = RmcPotLog(config=config, _logger=_logger)
-    # rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
-    # rmc_dat = RmcPotDat(config=config, logger=logger)
+    # 1. RMC 関連インスタンスは RMC-DFT loop で毎回作った方がハンドリングしやすいのでここでは作らん
 
+    # 2. VASP 関係インスタンス
     vasp_log = VaspLog(logger=logger)
     vasp_incar = VaspIncar(logger=logger)
     vasp_kpoints = VaspKpoints(logger=logger)
 
+    # 3. VASP の INPUT 作成
     run_vasp_init(
         config,
         vasp_incar=vasp_incar,
