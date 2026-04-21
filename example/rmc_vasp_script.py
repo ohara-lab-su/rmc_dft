@@ -44,24 +44,38 @@ if __name__ == "__main__":
     max_rmc_dft_loop = config.max_rmc_dft_loop
 
     #####################################################
-    # どちらかを選ぶ(コメントアウトを外す)
+    # 起動モード
+    #   引数なし        → 通常開始
+    #   restart 指定    → restart
+    #                     rmc_vasp_script.py restart
+    #####################################################
+    # どちらかを選ぶ
 
-    # ---------------------------
-    # 初期から始める、初期POSCAR 作成
-    shutil.copy(f"POSCAR0", "POSCAR")
-    # 初期CFG 作成 (POSCAR to CFG)
-    poscar2cfg(cfg_name=config.cfg_name)
-    start_loop = 0
-    start_mode = "RMC"
+    if len(sys.argv) >= 2 and sys.argv[1] == "restart":
+        # ---------------------------
+        # Restart する場合
+        #   (RMC からスタートするときは aaa.cfg がある前提)
+        #
+        logger.info("[MODE] restart")
 
-    # ---------------------------
-    # Restart する場合
-    # start_loop, start_mode = check_restart_rmc_vasp(
-    #     config=config,
-    #     rmc_log_filename=None,
-    #     max_loop=max_rmc_dft_loop,
-    #     logger=logger,
-    # )
+        start_loop, start_mode = check_restart_rmc_vasp(
+            config=config,
+            rmc_log_filename=None,
+            max_loop=max_rmc_dft_loop,
+            logger=logger,
+        )
+
+    else:
+        # ---------------------------
+        # 初期から始める、初期POSCAR 作成
+        #
+        logger.info("[MODE] normal start")
+
+        shutil.copy(f"POSCAR0", "POSCAR")
+        # 初期CFG 作成 (POSCAR to CFG)
+        poscar2cfg(cfg_name=config.cfg_name)
+        start_loop = 0
+        start_mode = "RMC"
 
     #####################################################
     # sys.exit()  # コメントアウトしないとプログラムを止める
@@ -85,6 +99,8 @@ if __name__ == "__main__":
         logger=logger,
     )
 
+    # True: その周回では RMC と VASP のどちらか一方だけ実行
+    #       start_mode で決まる(ログフォルダ名称から決まる)
     first = True
 
     i = 0
@@ -136,4 +152,5 @@ if __name__ == "__main__":
             if (i == max_rmc_dft_loop - 1) and (stop_mode == "VASP"):
                 break
 
+        # RMC->VASP の順番に計算を戻す
         first = False

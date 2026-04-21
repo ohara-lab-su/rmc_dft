@@ -21,8 +21,11 @@ from typing import Optional, Any, Tuple  # find_next_log_index の型注釈用
 #     RmcPotDat,
 # )
 from rmc_dft.config import Config
-from rmc_dft.util import check_rmc_and_vasp
-from rmc_dft.util import find_next_log_index
+
+# from rmc_dft.util import check_rmc_and_vasp
+# from rmc_dft.util import find_next_log_index
+from rmc_dft.util.check_rmc_and_vasp import check_rmc_and_vasp
+from rmc_dft.util.find_next_log_index import find_next_log_index
 from rmc_dft.util import logs_exist
 from x_logger import XLogger
 

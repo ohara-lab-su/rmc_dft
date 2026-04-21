@@ -18,3 +18,4 @@ cd $PBS_O_WORKDIR
 # $HOME/.pyenv/shims/python ./rmc_vasp0.py
 # $HOME/.pyenv/shims/python ./rmc_vasp.py
 $HOME/.pyenv/shims/python ./rmc_vasp_script.py
+# $HOME/.pyenv/shims/python ./rmc_vasp_script.py restart
