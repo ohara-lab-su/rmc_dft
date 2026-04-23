@@ -104,16 +104,11 @@ if __name__ == "__main__":
 
     i = 0
     for i in range(start_loop, max_rmc_dft_loop):
-
-        rmc_dir = next_log_dir_name("rmc")
-        vasp_dir = next_log_dir_name("dft")
-
         # ------------------- RMC ------------------------
-        # log_dir_rmc は RMC-内部loop ごとに取得するのでここでは直接書かない
         if (not first) or (start_mode == "RMC"):
+            # 保存フォルダ名はそれぞれの run_rmc 内部で決まる
             run_rmc(
                 config=config,
-                # auto_converge=True,
                 auto_converge=False,
                 msg=f"{i}",
                 logger=logger,
@@ -132,11 +127,11 @@ if __name__ == "__main__":
 
         # ------------------- DFT ------------------------
         if (not first) or (start_mode == "VASP"):
+            # 保存フォルダ名はそれぞれの run_vasp 内部で決まる
             run_vasp(
                 config=config,
                 vasp_log=vasp_log,
                 vasp_incar=vasp_incar,
-                log_dir_vasp=vasp_dir,
                 msg=f"{i}",
                 logger=logger,
             )
