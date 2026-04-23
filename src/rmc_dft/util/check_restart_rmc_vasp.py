@@ -1,59 +1,64 @@
+#!/usr/bin/env thon
+"""
+最新の logNN_ をそのまま見て、次を決める
+"""
 import os
 
 
 def check_restart_rmc_vasp(
-    *,
-    config,
-    rmc_log_filename,
-    max_loop,
-    logger,
+    config=None,
+    rmc_log_filename=None,
+    max_loop=None,
+    logger=logger,
 ):
+    """logger 以外は使わないので None が前提.互換性維持のため"""
 
     # ----------------------------------------------------------
     # logNN_rmc / logNN_dft から状態を判定
     # ----------------------------------------------------------
 
-    def find_last_index(prefix):
-        idx = -1
-        for name in os.listdir("."):
-            if name.startswith(prefix):
-                try:
-                    n = int(name.split("_")[0].replace("log", ""))
-                    if n > idx:
-                        idx = n
-                except Exception:
-                    pass
-        return idx
+    # 見つかった中で最大の番号
+    latest_index = -1
 
-    last_rmc = find_last_index("log")
-    last_dft = -1
+    # その番号の種類
+    latest_stage = None
 
     for name in os.listdir("."):
-        if name.endswith("_dft"):
-            try:
-                n = int(name.split("_")[0].replace("log", ""))
-                if n > last_dft:
-                    last_dft = n
-            except Exception:
-                pass
+        if not name.startswith("log"):
+            continue
 
-    logger.info(f"[LOG] last_rmc = {last_rmc}")
-    logger.info(f"[LOG] last_dft = {last_dft}")
+        parts = name.split("_")
+        if len(parts) != 2:
+            continue
+
+        try:
+            n = int(parts[0].replace("log", ""))
+        except Exception:
+            continue
+
+        stage = parts[1]
+
+        if n > latest_index:
+            latest_index = n
+            latest_stage = stage
+
+    logger.info(f"[LOG] latest_index = {latest_index}")
+    logger.info(f"[LOG] latest_stage = {latest_stage}")
 
     # ----------------------------------------------------------
     # 判定
     # ----------------------------------------------------------
 
-    if last_rmc < 0 and last_dft < 0:
+    if latest_index < 0:
         start_loop = 0
         start_mode = "RMC"
 
-    elif last_rmc > last_dft:
-        start_loop = last_rmc
+    elif latest_stage == "rmc":
+        start_loop = latest_index
         start_mode = "VASP"
 
     else:
-        start_loop = last_dft + 1
+        start_loop = latest_index + 1
         start_mode = "RMC"
 
     logger.info(f"[RESTART] start_loop={start_loop} start_mode={start_mode}")

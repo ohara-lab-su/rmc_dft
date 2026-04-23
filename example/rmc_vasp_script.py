@@ -42,6 +42,7 @@ if __name__ == "__main__":
 
     config = Config("config.yml")
     max_rmc_dft_loop = config.max_rmc_dft_loop
+    logger.info(f"max_rmc_dft_loop: {max_rmc_dft_loop}")
 
     #####################################################
     # 起動モード
@@ -57,17 +58,11 @@ if __name__ == "__main__":
         #   (RMC からスタートするときは aaa.cfg がある前提)
         #
         logger.info("[MODE] restart")
-
-        start_loop, start_mode = check_restart_rmc_vasp(
-            config=config,
-            rmc_log_filename=None,
-            max_loop=max_rmc_dft_loop,
-            logger=logger,
-        )
+        start_loop, start_mode = check_restart_rmc_vasp(logger=logger)
 
     else:
         # ---------------------------
-        # 初期から始める、初期POSCAR 作成
+        # 初期から始める、初期POSCAR 作成 (POSCAR0 からコピーして、全てを始める)1
         #
         logger.info("[MODE] normal start")
 
@@ -99,7 +94,8 @@ if __name__ == "__main__":
     )
 
     i = 0
-    for i in range(start_loop, max_rmc_dft_loop):
+    for i in range(start_loop, start_loop + max_rmc_dft_loop):
+        # for i in range(start_loop, max_rmc_dft_loop):
         # ------------------- RMC ------------------------
         if start_mode == "RMC":
             # 保存フォルダ名はそれぞれの run_rmc 内部で決まる
