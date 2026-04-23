@@ -98,14 +98,10 @@ if __name__ == "__main__":
         logger=logger,
     )
 
-    # True: その周回では RMC と VASP のどちらか一方だけ実行
-    #       start_mode で決まる(ログフォルダ名称から決まる)
-    first = True
-
     i = 0
     for i in range(start_loop, max_rmc_dft_loop):
         # ------------------- RMC ------------------------
-        if (not first) or (start_mode == "RMC"):
+        if start_mode == "RMC":
             # 保存フォルダ名はそれぞれの run_rmc 内部で決まる
             run_rmc(
                 config=config,
@@ -120,13 +116,15 @@ if __name__ == "__main__":
             if (i == max_rmc_dft_loop - 1) and (stop_mode == "RMC"):
                 break
 
+            start_mode = "VASP"
+
         logger.info("")
         logger.info("=====================")
         logger.info("=====================")
         logger.info("")
 
         # ------------------- DFT ------------------------
-        if (not first) or (start_mode == "VASP"):
+        if start_mode == "VASP":
             # 保存フォルダ名はそれぞれの run_vasp 内部で決まる
             run_vasp(
                 config=config,
@@ -146,5 +144,4 @@ if __name__ == "__main__":
             if (i == max_rmc_dft_loop - 1) and (stop_mode == "VASP"):
                 break
 
-        # RMC->VASP の順番に計算を戻す
-        first = False
+            start_mode = "RMC"
