@@ -155,7 +155,8 @@ def run_rmc(
     else:
         logger.info(f"=============== RMC(RMC_POT) ============")
 
-    # auto converge を無効化
+    # auto converge-loop
+    # (デフォルト autoconve = False)
     while True:
         ##################
         # rmc_dir = f"log01_rmc"
@@ -181,6 +182,7 @@ def run_rmc(
                 min_consecutive=2,
             )
         else:
+            # auto_converge しない
             loop = 0  # とりあえず None 以外の数字
         ###################################################
 
@@ -198,10 +200,13 @@ def run_rmc(
             )  # backup(loop番号つき), cfg --> xxx.vasp
         logger.info("end")
 
+        # auto_converge True: なんか失敗した
         if loop == -1:
             logger.error("**Error**: Insufficient HST records for convergence check.")
             # break
             return False
+
+        # auto_converge True: 収束してないので繰り返す
         elif loop is None:
             logger.info("")
             logger.info("RMC is NOT converged.")
@@ -211,10 +216,12 @@ def run_rmc(
             logger.info("=====================")
             logger.info("")
             continue
+
+        # auto_converge しないとき
         else:
             break
 
-    # 収束点の情報を取得
+    # 収束点の情報を取得 (auto_converge = False のときは loop = 0)
     generated = hst.get_generated(loop)
     chi2_tot = hst.get_chi2_tot(loop)
     chi2_set1 = hst.get_chi2_set1(loop)

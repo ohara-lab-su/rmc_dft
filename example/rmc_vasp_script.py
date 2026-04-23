@@ -42,6 +42,7 @@ if __name__ == "__main__":
 
     config = Config("config.yml")
     max_rmc_dft_loop = config.max_rmc_dft_loop
+    logger.info(f"max_rmc_dft_loop: {max_rmc_dft_loop}")
 
     #####################################################
     # 起動モード
@@ -57,17 +58,11 @@ if __name__ == "__main__":
         #   (RMC からスタートするときは aaa.cfg がある前提)
         #
         logger.info("[MODE] restart")
-
-        start_loop, start_mode = check_restart_rmc_vasp(
-            config=config,
-            rmc_log_filename=None,
-            max_loop=max_rmc_dft_loop,
-            logger=logger,
-        )
+        start_loop, start_mode = check_restart_rmc_vasp(logger=logger)
 
     else:
         # ---------------------------
-        # 初期から始める、初期POSCAR 作成
+        # 初期から始める、初期POSCAR 作成 (POSCAR0 からコピーして、全てを始める)1
         #
         logger.info("[MODE] normal start")
 
@@ -83,15 +78,14 @@ if __name__ == "__main__":
     # RMC で止めるか、VASP で止めるか？
     stop_mode = "VASP"
 
-    # RMC 関連インスタンスは RMC-DFT loop で毎回作った方がハンドリングしやすいのでここでは作らん
-    # rmc_log = RmcPotLog(config=config, _logger=_logger)
-    # rmc_log = RmcPotLog(cfg_name=config.cfg_name, logger=logger)
-    # rmc_dat = RmcPotDat(config=config, logger=logger)
+    # 1. RMC 関連インスタンスは RMC-DFT loop で毎回作った方がハンドリングしやすいのでここでは作らん
 
+    # 2. VASP 関係インスタンス
     vasp_log = VaspLog(logger=logger)
     vasp_incar = VaspIncar(logger=logger)
     vasp_kpoints = VaspKpoints(logger=logger)
 
+    # 3. VASP の INPUT 作成
     run_vasp_init(
         config,
         vasp_incar=vasp_incar,
@@ -99,22 +93,14 @@ if __name__ == "__main__":
         logger=logger,
     )
 
-    # True: その周回では RMC と VASP のどちらか一方だけ実行
-    #       start_mode で決まる(ログフォルダ名称から決まる)
-    first = True
-
     i = 0
-    for i in range(start_loop, max_rmc_dft_loop):
-
-        rmc_dir = next_log_dir_name("rmc")
-        vasp_dir = next_log_dir_name("dft")
-
+    for i in range(start_loop, start_loop + max_rmc_dft_loop):
+        # for i in range(start_loop, max_rmc_dft_loop):
         # ------------------- RMC ------------------------
-        # log_dir_rmc は RMC-内部loop ごとに取得するのでここでは直接書かない
-        if (not first) or (start_mode == "RMC"):
+        if start_mode == "RMC":
+            # 保存フォルダ名はそれぞれの run_rmc 内部で決まる
             run_rmc(
                 config=config,
-                # auto_converge=True,
                 auto_converge=False,
                 msg=f"{i}",
                 logger=logger,
@@ -126,18 +112,20 @@ if __name__ == "__main__":
             if (i == max_rmc_dft_loop - 1) and (stop_mode == "RMC"):
                 break
 
+            start_mode = "VASP"
+
         logger.info("")
         logger.info("=====================")
         logger.info("=====================")
         logger.info("")
 
         # ------------------- DFT ------------------------
-        if (not first) or (start_mode == "VASP"):
+        if start_mode == "VASP":
+            # 保存フォルダ名はそれぞれの run_vasp 内部で決まる
             run_vasp(
                 config=config,
                 vasp_log=vasp_log,
                 vasp_incar=vasp_incar,
-                log_dir_vasp=vasp_dir,
                 msg=f"{i}",
                 logger=logger,
             )
@@ -152,5 +140,4 @@ if __name__ == "__main__":
             if (i == max_rmc_dft_loop - 1) and (stop_mode == "VASP"):
                 break
 
-        # RMC->VASP の順番に計算を戻す
-        first = False
+            start_mode = "RMC"

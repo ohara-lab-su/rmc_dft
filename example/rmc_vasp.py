@@ -26,6 +26,7 @@ from rmc_dft import (
 from x_logger import XLogger
 
 from rmc_vasp_init import run_vasp_init
+from rmc_dft.util import next_log_dir_name as next_log_dir_name
 
 
 def run_vasp(
@@ -46,6 +47,10 @@ def run_vasp(
 
     if vasp_incar is None:
         vasp_incar = VaspIncar(logger=logger)
+
+    # VASP を動かす度に既存のRMC/DFTのフォルダを調査して coutup する
+    if log_dir_vasp is None:
+        log_dir_vasp = next_log_dir_name("dft")
 
     vasp = Vasp(
         config=config,  # instance
