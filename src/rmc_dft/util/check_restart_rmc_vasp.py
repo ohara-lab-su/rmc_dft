@@ -9,7 +9,7 @@ def check_restart_rmc_vasp(
     config=None,
     rmc_log_filename=None,
     max_loop=None,
-    logger=logger,
+    logger=None,
 ):
     """logger 以外は使わないので None が前提.互換性維持のため"""
 
