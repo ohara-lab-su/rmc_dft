@@ -32,9 +32,10 @@ from rmc_dft.util import check_restart_rmc_vasp as check_restart_rmc_vasp
 from x_logger import XLogger
 
 # for local
+from rmc_init import run_rmc_init
 from rmc import run_rmc
-from rmc_vasp_init import run_vasp_init
 from rmc_vasp import run_vasp
+from rmc_vasp_init import run_vasp_init
 
 
 if __name__ == "__main__":
@@ -79,28 +80,30 @@ if __name__ == "__main__":
     stop_mode = "VASP"
 
     # 1. RMC 関連インスタンスは RMC-DFT loop で毎回作った方がハンドリングしやすいのでここでは作らん
+    rmc_dat = RmcPotDat(config=config, logger=logger)
 
     # 2. VASP 関係インスタンス
     vasp_log = VaspLog(logger=logger)
     vasp_incar = VaspIncar(logger=logger)
     vasp_kpoints = VaspKpoints(logger=logger)
 
-    # 3. VASP の INPUT 作成
-    run_vasp_init(
-        config,
-        vasp_incar=vasp_incar,
-        vasp_kpoints=vasp_kpoints,
-        logger=logger,
-    )
-
     i = 0
     for i in range(start_loop, start_loop + max_rmc_dft_loop):
         # for i in range(start_loop, max_rmc_dft_loop):
         # ------------------- RMC ------------------------
         if start_mode == "RMC":
+
+            # RMC のパラメーターを毎回作る
+            run_rmc_init(
+                config=config,
+                rmc_dat=rmc_dat,
+                logger=logger,
+            )
+
             # 保存フォルダ名はそれぞれの run_rmc 内部で決まる
             run_rmc(
                 config=config,
+                rmc_dat=rmc_dat,
                 auto_converge=False,
                 msg=f"{i}",
                 logger=logger,
@@ -121,6 +124,15 @@ if __name__ == "__main__":
 
         # ------------------- DFT ------------------------
         if start_mode == "VASP":
+
+            # VASP の INPUT を毎回作る/KPOINTS/POTCARは一回だけ作る)
+            run_vasp_init(
+                config,
+                vasp_incar=vasp_incar,
+                vasp_kpoints=vasp_kpoints,
+                logger=logger,
+            )
+
             # 保存フォルダ名はそれぞれの run_vasp 内部で決まる
             run_vasp(
                 config=config,

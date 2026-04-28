@@ -43,6 +43,7 @@ def run_vasp_init(
 
     # ------------------
     # make KPOINTS
+    # 存在しないなら作る
     # ------------------
     if not os.path.exists("KPOINTS"):
         logger.info("== make KPOINTS")
@@ -54,6 +55,7 @@ def run_vasp_init(
 
     # ------------------
     # make POTCAR
+    # 存在しないなら作る
     # ------------------
     if not os.path.exists("POTCAR"):
         logger.info("== make POTCAR")

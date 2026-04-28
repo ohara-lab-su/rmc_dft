@@ -78,6 +78,65 @@ def _hide_yticklabels_except_first(axes_row) -> None:
             ax.set_yticklabels([])
 
 
+def find_rmc_dft_pairs(
+    base_dir: str,
+) -> List[Dict[str, str]]:
+    records: List[Tuple[int, str, str]] = []
+
+    for name in os.listdir(base_dir):
+        path_name = os.path.join(base_dir, name)
+
+        if not os.path.isdir(path_name):
+            continue
+
+        parts = name.split("_")
+
+        if len(parts) != 2:
+            continue
+
+        if not parts[0].startswith("log"):
+            continue
+
+        try:
+            index = int(parts[0].replace("log", ""))
+        except ValueError:
+            continue
+
+        stage = parts[1]
+        if stage != "rmc":
+            if stage != "dft":
+                continue
+
+        records.append((index, stage, name))
+
+    records.sort(key=lambda item: item[0])
+
+    pairs: List[Dict[str, str]] = []
+    pending_rmc: Optional[Tuple[int, str]] = None
+
+    for index, stage, name in records:
+        if stage == "rmc":
+            pending_rmc = (index, name)
+            continue
+
+        if stage == "dft":
+            if pending_rmc is None:
+                continue
+
+            rmc_index, rmc_name = pending_rmc
+            pairs.append(
+                {
+                    "index": f"{rmc_index}->{index}",
+                    "rmc": rmc_name,
+                    "dft": name,
+                }
+            )
+
+            pending_rmc = None
+
+    return pairs
+
+
 def plot_multi_converge(
     log_pairs: List[Dict[str, str]],
     cfg_name: str,
@@ -199,7 +258,6 @@ def plot_multi_converge(
 
 
 if __name__ == "__main__":
-
     logger_ = XLogger(log_level="debug", logger_name="rmc_run")
 
     # -------------------- 設定 --------------------
@@ -213,7 +271,11 @@ if __name__ == "__main__":
     # ]
 
     # -------------------- log_pairs（自動） --------------------
-    log_pairs_ = make_log_dirname.find_log_pairs(base_dir_)
+    # 旧仕様
+    # log_pairs_ = make_log_dirname.find_log_pairs(base_dir_)
+
+    # 紳士用
+    log_pairs_ = find_rmc_dft_pairs(base_dir_)
 
     plot_multi_converge(
         log_pairs_,

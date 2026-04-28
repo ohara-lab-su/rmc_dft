@@ -1,5 +1,78 @@
 # CHANGELOG
 
+## v0.4.12 nakada
+
+RMC-DFT の example script 構成を大きく整理した。
+
+これまでの example script では、RMC 側・DFT 側ともに、
+入力ファイルの設定更新と実行処理が同じ関数の中にまとまっていた。
+そのため、RMC-DFT の各 loop ごとにパラメータを変更したい場合、
+run_rmc / run_vasp の内部処理を直接編集する必要があり、
+独自の RMC-DFT スクリプトを作るには少し扱いにくい構成になっていた。
+
+今回の変更では、RMC 側を
+
+  run_rmc_init()
+  run_rmc()
+
+に分離し、DFT 側も
+
+  run_vasp_init()
+  run_vasp()
+
+に分離した。
+
+これにより、rmc_vasp_script.py 側から見ると、
+
+  RMC 入力設定
+  RMC 実行
+  DFT 入力設定
+  DFT 実行
+
+という流れが明確になった。
+
+具体的には、RMC 側では run_rmc_init() で RmcPotDat の set_* 系メソッドを呼び、
+dat ファイルの内容を更新してから、run_rmc() で RMC_POT を実行する。
+DFT 側では run_vasp_init() で INCAR / KPOINTS などの入力条件を更新し、
+その後 run_vasp() で VASP を実行する。
+
+この構造により、各 loop ごとに RMC や DFT のパラメータをスクリプト側で
+明示的に変更しやすくなった。たとえば、最初の数 loop だけ RMC の条件を変える、
+途中から VASP の収束条件を変更する、といった処理を、
+run_rmc_init() / run_vasp_init() の中で比較的直接的に書けるようになった。
+
+RmcPotDat は rmc_vasp_script.py 側で生成し、各 loop で run_rmc_init() に渡す構成とした。
+RmcPotDat の set_* 系メソッドは auto_write=True を前提に dat ファイルへ反映されるため、
+run_rmc_init() で設定した内容を、その直後の run_rmc() が使用する流れになる。
+旧来の run_rmc() 内部で dat を設定してから実行していた構造を、
+初期化処理と実行処理に分けた形である。
+
+VASP 側も同様に、VaspIncar や VaspKpoints を rmc_vasp_script.py 側で保持し、
+run_vasp_init() で毎 loop 必要な設定を行ってから run_vasp() に渡す構成とした。
+これにより、VASP の入力条件更新と VASP 実行の責務を分けた。
+
+ログ番号については、これまでの NEW-style の方針を維持する。
+すなわち、RMC と DFT を同じ番号のペアとして扱うのではなく、
+
+  log1_rmc
+  log2_dft
+  log3_rmc
+  log4_dft
+
+のように、RMC / DFT を通した連番として扱う。
+log 番号の決定は run_rmc() / run_vasp() 側で next_log_dir_name() に委譲し、
+rmc_vasp_script.py 側では直接 log 番号を管理しない。
+
+restart についても、最新の logNN_rmc / logNN_dft を見て、
+次に実行すべき処理を決める構成を維持する。
+たとえば、最新が log23_rmc であれば次は DFT 側から再開し、
+最新が log23_dft であれば次は RMC 側から再開する。
+
+今回の変更により、example script は一見すると少し長くなったが、
+RMC 入力設定、RMC 実行、DFT 入力設定、DFT 実行の責務が分かれたため、
+独自の RMC-DFT 計算スクリプトを作りやすくなった。
+むしろ初期バージョンのRMC-DFT側のインスタンス呼び出し構成に戻したと言える。
+
 ## v0.4.11 nakada
 
 リスタート形におけるログ番号の自動化のルールに合わせて、
@@ -29,7 +102,7 @@ log2_dft
 ```
 というように、rmc-dft のペアを1loopとする数え方を通常モードにおいてもやめる
 
-再起動モードのときは、最初から OLD-style である。
+再起動モードのときは、最初から NEW-style である。
 これは、もし
 ```aiignore
 
