@@ -31,7 +31,9 @@ run_mode: "mpi"
 # RMCPOT path (パスが通ってなければフルパスで書く)
 # rmc_bin: "/home/k/Downloads/Source_RMC_POT_lin_2023.1/rmcp.exe"
 # rmc_bin: "/usr/local/src/RMCPOT/rmcp.exe"
-rmc_bin: "rmcp.exe"
+# rmc_bin: "rmcp.exe"
+# rmc_bin: "/home/u10363/rmcpot/bin/rmcp_local_fix_O2.exe"
+rmc_bin: "/home/u10363/rmcpot/bin/rmcp_fugaku_fix_O2.exe"
 
 # VASP  path
 # dft_bin: "/home/hpc/vasp/bin/vasp-gamma"

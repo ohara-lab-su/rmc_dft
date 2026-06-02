@@ -81,7 +81,7 @@ def run_rmc(
         logger.info(f"=============== RMC(RMC_POT) ============")
 
     # auto converge-loop
-    # (デフォルト autoconve = False)
+    # (デフォルト auto_converge = False)
     while True:
         ##################
         # rmc_dir = f"log01_rmc"
