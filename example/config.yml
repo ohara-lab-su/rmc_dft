@@ -43,7 +43,8 @@ dft_bin: "vasp_gam"
 # dft_bin: "vasp_std"
 
 # mpi: "mpirun -np {num_procs} {os.path.expanduser('/home/hpc/vasp/bin/vasp')}"
-mpi_cmd: "mpirun"
+#mpi_cmd: "mpirun"
+mpi_cmd: "mpiexec"
 
 # MPI process 数
 # num_procs: 1
@@ -52,6 +53,10 @@ num_procs: null
 # mpi_flag
 # mpi_flag: "-np"
 mpi_flag: null
+
+# OpenMP thread 数
+rmc_omp_num_threads: 8
+dft_omp_num_threads: 1
 
 # default job_name
 job_cmd: "qsub job_hpcs2024_node2.sh"

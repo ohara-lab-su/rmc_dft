@@ -320,6 +320,12 @@ class RmcPot:
         else:
             f = None
 
+        # --- 環境変数での OMP などの設定
+        env = os.environ.copy()
+
+        if self._config.rmc_omp_num_threads is not None:
+            env["OMP_NUM_THREADS"] = str(self._config.rmc_omp_num_threads)
+
         # 2025 あたりの rmc_pot
         # subprocess.run([f"{self._config.rmc_bin}", f"{cfg_name}"], check=True)
         # 2014 あたりの rmc_pot
@@ -336,6 +342,7 @@ class RmcPot:
                     # check=True,
                     # stdout=f,
                     # stderr=f,
+                    env=env,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     text=True,
@@ -360,6 +367,7 @@ class RmcPot:
         # 完全デタッチ（Python が死んでも RMC_POT が継続）
         p = subprocess.Popen(
             cmd,
+            env=env,
             stdout=f,
             stderr=f,
             text=True,

@@ -1,5 +1,31 @@
 # CHANGELOG
 
+## v0.4.13 nakada
+
+### 変更内容
+
+- RMC 実行と VASP 実行で、OpenMP のスレッド数を別々に設定できるようにした。
+- `rmc_omp_num_threads` は `rmc_pot` 実行時の `OMP_NUM_THREADS` にのみ反映される。
+- `dft_omp_num_threads` は VASP 実行時の `OMP_NUM_THREADS` にのみ反映される。
+- これにより、RMC 側で指定した OpenMP スレッド数に VASP 側が縛られないようにした。
+
+### 修正
+
+- `rmc_pot` の非同期実行経路でも、設定した環境変数を子プロセスへ渡すように修正した。
+- `example/config.yml` における OpenMP 設定の記述を、正しい YAML 形式に修正した。
+
+### 設定方法
+
+設定例:
+
+```yaml
+mpi_cmd: "mpiexec"
+mpi_flag: null
+
+rmc_omp_num_threads: 8
+dft_omp_num_threads: 1
+```
+
 ## v0.4.12 nakada
 
 これまでの example script では、RMC 側・DFT 側ともに、
