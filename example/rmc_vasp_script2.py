@@ -2,8 +2,7 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 
-RMC-DFT のUIクラスを使わずに直接 rmc_pot, vasp 関係のクラスを起動して
-RMC-VASP を構成する sample script
+特定の用途用のカスタム RMC-DFT
 """
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os

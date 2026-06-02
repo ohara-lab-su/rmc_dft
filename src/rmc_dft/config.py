@@ -58,6 +58,9 @@ class Config:
 
     mpi_flag: Optional[str] = "-np"
 
+    rmc_omp_num_threads: Optional[int] = None
+    dft_omp_num_threads: Optional[int] = None
+
     # default job_name
     job_cmd: Optional[str] = "qsub job_hpcs2024_node2.sh"
 

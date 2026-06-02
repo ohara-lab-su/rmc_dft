@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+python 3.6 環境のための setup.py
+"""
 
 __author__ = "K.Kobayashi, Kengo NAKADA"
 __maintainer__ = "Kengo NAKADA"

@@ -403,6 +403,9 @@ class Vasp:
         # すべてのモードで共通の環境変数を定義
         env = os.environ.copy()
 
+        if self._config.dft_omp_num_threads is not None:
+            env["OMP_NUM_THREADS"] = str(self._config.dft_omp_num_threads)
+
         if mode is None:
             mode = self._config.run_mode
 
