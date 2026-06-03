@@ -5,6 +5,8 @@ K.NAKADA, kengo.nakada@gmail.com
 import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 from pymatgen.io.vasp.inputs import Incar
+
+from rmc_dft.config import Config
 from x_logger import XLogger
 
 
@@ -24,6 +26,7 @@ class VaspIncar:
         incar_name: str = "INCAR",
         logger: Optional[XLogger] = None,
         *,
+        config: Optional[Config] = None,
         auto_write: bool = True,
     ) -> None:
         """
@@ -38,6 +41,7 @@ class VaspIncar:
         # それぞれの tag 操作で自動的に書き換え
         self.auto_write: bool = auto_write
         self._logger: XLogger = logger or XLogger()
+        self._config: Config = config or Config()
         self._lines: list[str] = []
 
         # pymatgen Incar()
@@ -142,6 +146,14 @@ class VaspIncar:
 
         # pymatgen側更新
         self._incar[tag] = value
+
+        if self._config is not None:
+            if self._config.vasp_incar_tags is None:
+                self._config.vasp_incar_tags = {}
+            ##########
+            self._config.vasp_incar_tags[tag] = value
+            ##########
+
         if self.auto_write:
             self.write()
 
@@ -155,8 +167,13 @@ class VaspIncar:
             del self._lines[idx]
 
             self._logger.info(f"[VaspIncar] Removed tag: {tag}")
+
             if tag in self._incar:
                 del self._incar[tag]
+
+            if self._config is not None and self._config.vasp_incar_tags is not None:
+                self._config.vasp_incar_tags.pop(tag, None)
+
             if self.auto_write:
                 self.write()
 

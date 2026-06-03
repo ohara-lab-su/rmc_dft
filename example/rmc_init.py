@@ -74,11 +74,11 @@ def run_rmc_init(
     rmc_dat.set_cutoffs([2.2, 2.1, 1.75, 2.3, 1.6, 1.6])
 
     # 4 行目：maximum moves（1 回の移動での最大変位量）を設定する
-    # rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
-    # rmc_dat.set_maximu_moves([0.1, 0.1, 0.1])
-    # rmc_dat.set_maximu_moves([0.05, 0.01, 0.01])
-    # rmc_dat.set_maximu_moves([0.05, 0.01, 0.01])  # 2026.02.16
-    rmc_dat.set_maximu_moves([0.01, 0.01, 0.01])  # 2026.02.16
+    # rmc_dat.set_maximum_moves([0.1, 0.1, 0.1])
+    # rmc_dat.set_maximum_moves([0.1, 0.1, 0.1])
+    # rmc_dat.set_maximum_moves([0.05, 0.01, 0.01])
+    # rmc_dat.set_maximum_moves([0.05, 0.01, 0.01])  # 2026.02.16
+    rmc_dat.set_maximum_moves([0.01, 0.01, 0.01])  # 2026.02.16
 
     # 5 行目：r spacing を設定する
     # rのステップ(Δr)

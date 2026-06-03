@@ -15,7 +15,7 @@ class RmcPotPpcf:
     def __init__(
         self,
         cfg_name: Optional[str] = None,
-        config: Config = Config(),
+        config: Optional[Config] = None,  # Config(),
         logger: Optional[XLogger] = None,
     ):
         """

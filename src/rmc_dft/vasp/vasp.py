@@ -45,18 +45,18 @@ class Vasp:
         *,
         incar_name: str = "INCAR",
         kpoints_name: str = "KPOINTS",
-        vasp_log: VaspLog = None,  # instance (データー解析用)
-        vasp_incar: VaspIncar = None,
-        vasp_kpoints: VaspKpoints = None,
+        vasp_log: Optional[VaspLog] = None,  # instance (データー解析用)
+        vasp_incar: Optional[VaspIncar] = None,
+        vasp_kpoints: Optional[VaspKpoints] = None,
         config: Optional[Config] = None,  # Config(),  # instance
         logger: Optional[XLogger] = None,  # XLogger(),  # instance
         auto_write: bool = True,
-        vasp_name: str = None,
-        dft_bin: str = None,
-        mpi_cmd: str = None,
-        mpi_flag: str = None,
-        num_procs: int = None,
-        job_cmd: str = None,
+        vasp_name: Optional[str] = None,
+        dft_bin: Optional[str] = None,
+        mpi_cmd: Optional[str] = None,
+        mpi_flag: Optional[str] = None,
+        num_procs: Optional[int] = None,
+        job_cmd: Optional[str] = None,
         make_default_input: bool = False,
     ) -> None:
         """
@@ -95,14 +95,15 @@ class Vasp:
         # aaa.vasp
         if config:
             if vasp_name is None:
-                vasp_name: str = config.vasp_name
+                vasp_name: Optional[str] = config.vasp_name
+
         if vasp_name is None:
             vasp_name: str = "POSCAR"
         self._vasp_name: str = vasp_name
 
         # VASP 実行系設定
         if config:
-            self.dft_bin: str = dft_bin or config.dft_bin
+            self.dft_bin: Optional[str] = dft_bin or config.dft_bin
             self.mpi_cmd: Optional[str] = mpi_cmd or config.mpi_cmd
             self.mpi_flag: Optional[str] = mpi_flag or config.mpi_flag
             self.num_procs: Optional[int] = num_procs or config.num_procs
@@ -145,8 +146,9 @@ class Vasp:
         if vasp_incar is None:
             vasp_incar = VaspIncar(
                 incar_name=self.incar_name,
-                auto_write=self.auto_write,
                 logger=self._logger,
+                config=self._config,
+                auto_write=self.auto_write,
             )
         self._incar: VaspIncar = vasp_incar
 
@@ -154,8 +156,9 @@ class Vasp:
         if vasp_kpoints is None:
             vasp_kpoints = VaspKpoints(
                 kpoints_name=self.kpoints_name,
-                auto_write=self.auto_write,
                 logger=self._logger,
+                config=self._config,
+                auto_write=self.auto_write,
             )
         self._kpoints: VaspKpoints = vasp_kpoints
 
@@ -486,24 +489,28 @@ class Vasp:
 
     def set_mpi(
         self,
-        mpi_cmd: str = None,
-        mpi_flag: str = None,
-        num_procs: int = None,
+        mpi_cmd: Optional[str] = None,
+        mpi_flag: Optional[str] = None,
+        num_procs: Optional[int] = None,
     ):
         """MPI設定書き換え"""
         if mpi_cmd:
             self.mpi_cmd = mpi_cmd
+            self._config.mpi_cmd = mpi_cmd
         if num_procs:
             self.num_procs = num_procs
+            self._config.num_procs = num_procs
         if mpi_flag:
             self.mpi_flag = mpi_flag
+            self._config.mpi_flag = mpi_flag
 
     def set_job_cmd(
         self,
-        job_cmd: str = None,
+        job_cmd: Optional[str] = None,
     ):
         if job_cmd:
             self.job_cmd = job_cmd
+            self._config.job_cmd = job_cmd
 
     #
     # for VASP
