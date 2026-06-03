@@ -201,9 +201,9 @@ class Vasp:
             None:
         """
         if isinstance(value, int):
-            valeue = str(value)
+            value = str(value)
         if isinstance(value, float):
-            valeue = str(value)
+            value = str(value)
 
         self._incar.set(key, value)
 
@@ -219,22 +219,6 @@ class Vasp:
         """INCAR を辞書で取得"""
         return self._incar.export_dict()
 
-    # --- 委譲メソッド群 (KPOINTS) ---
-    def get_kpoints(self, key: str):
-        """KPOINTS の値取得（grid/gamma/comment）"""
-        return self._kpoints.get_value(key)
-
-    def set_kpoints(self, key: str, value) -> None:
-        """
-        KPOINTS 値設定。
-        明示設定は既存ファイルより優先して上書き。
-        """
-        self._kpoints.set_value(key, value)
-
-    def reload_kpoints(self) -> None:
-        """KPOINTS 再読込"""
-        self._kpoints.reload_kpoints()
-
     def export_kpoints_dict(self):
         """KPOINTS を辞書で取得"""
         return self._kpoints.export_dict()
@@ -245,8 +229,8 @@ class Vasp:
 
     def init(
         self,
-        cfg_name: str = None,
-    ):
+        cfg_name: Optional[str] = None,
+    ) -> None:
         """
         POSCAR から cfg を作る
 
@@ -276,7 +260,7 @@ class Vasp:
 
     def preprocess(
         self,
-        vasp_name: str = None,
+        vasp_name: Optional[str] = None,
         element_info: Optional[Union[str, Sequence[str]]] = None,
     ) -> bool:
         """
@@ -418,8 +402,15 @@ class Vasp:
             env["FI_PROVIDER"] = "tcp"
             env["I_MPI_FABRICS"] = "shm:tcp"
             env["I_MPI_DEBUG"] = "5"
-            cmd = ["mpirun", "-np", "1", f"{self.dft_bin}"]
+
             # cmd = [self.dft_bin]
+            # cmd = ["mpirun", "-np", "1", f"{self.dft_bin}"]
+            if self.dft_bin is None:
+                self._logger.error("**Error**: dft_bin が未設定です。")
+                return False
+
+            dft_bin: str = self.dft_bin
+            cmd: List[str] = ["mpirun", "-np", "1", dft_bin]
 
         elif mode == "mpi":
             self._logger.info(f"== mpi mode")
@@ -451,9 +442,24 @@ class Vasp:
 
         # dft_bin がパス上に存在するか確認
         if mode != "job":
-            if shutil.which(self.dft_bin) is None:
+            if self.dft_bin is None:
+                self._logger.error("**Error**: dft_bin が未設定です。")
+                sys.exit(1)
+
+            dft_bin: str = self.dft_bin
+            dft_bin_found = False
+
+            for path_dir in os.environ.get("PATH", "").split(os.pathsep):
+                dft_bin_path = os.path.join(path_dir, dft_bin)
+
+                if os.path.isfile(dft_bin_path):
+                    if os.access(dft_bin_path, os.X_OK):
+                        dft_bin_found = True
+                        break
+
+            if not dft_bin_found:
                 self._logger.error(
-                    f"**Error**: {self.dft_bin} が見つかりません。PATHを確認してください。"
+                    f"**Error**: {dft_bin} が見つかりません。PATHを確認してください。"
                 )
                 sys.exit(1)
 
@@ -461,8 +467,16 @@ class Vasp:
         # self._logger.info(f"env = {json.dumps(env, indent=2)}")
         self._logger.info(f"cmd = {cmd}")
 
+        cmd_args: List[str] = []
+        for cmd_item in cmd:
+            if cmd_item is None:
+                self._logger.error("**Error**: 実行コマンドに None が含まれています。")
+                return False
+
+            cmd_args.append(cmd_item)
+
         try:
-            subprocess.run(cmd, check=True, env=env)
+            subprocess.run(cmd_args, check=True, env=env)
         except subprocess.CalledProcessError as e:
             self._logger.error(f"**Error**: {e}")
             self._logger.error("  VASP実行中にエラーが発生")
@@ -563,7 +577,7 @@ class Vasp:
 
     def contcar2cfg(
         self,
-        cfg_name: str = "aaa",
+        cfg_name: Optional[str] = None,
     ) -> bool:
         """
         convert CONTCAR to CFG
@@ -574,7 +588,11 @@ class Vasp:
         Returns:
             bool:
         """
-        self._logger.info(f"== poscar2cfg({cfg_name})")
+
+        if cfg_name is None:
+            cfg_name: str = str(self._config.cfg_name)
+
+        self._logger.info(f"== contcar2cfg({cfg_name})")
         contcar2cfg(cfg_name)
         return True
 
@@ -598,19 +616,22 @@ class Vasp:
 
     def xdatcar2poscar(
         self,
-        input_name: Optional[str] = None,
+        vasp_name: Optional[str] = None,
     ) -> bool:
         """
         Copy XDATCAR to a new file with the specified name (... .vasp).
         最終結果だけならば CONTCAR で十分
 
         Args:
-            input_name (str): Name of the new file to create. Without extension.
+            vasp_name (str): {vasp_name}.vasp
         Returns:
             bool: 正しく終わったデー
         """
-        self._logger.info(f"== xdatcar2poscar({input_name})")
-        return xdatcar2poscar(input_name)
+        if vasp_name is None:
+            vasp_name = self._config.vasp_name
+
+        self._logger.info(f"== xdatcar2poscar(vasp_name={vasp_name})")
+        return xdatcar2poscar(str(vasp_name))
 
     @staticmethod
     def pdb2poscar(

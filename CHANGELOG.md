@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.16 nakada
+
+- bugfix
+
 ## v0.4.15 nakada
 
 config 周りの整理を進めた。
