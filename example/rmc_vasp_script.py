@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 import sys
 import shutil
+import subprocess
 
 from rmc_dft import (
     Config,
@@ -108,12 +109,16 @@ if __name__ == "__main__":
                 msg=f"{i}",
                 logger=logger,
             )
-            # 次回のDFTの初期構造ファイル
-            shutil.copy(f"{config.cfg_name}.vasp", "POSCAR")
-
             # STOP mode が RMC のときに RMC で止める
             if (i == max_rmc_dft_loop - 1) and (stop_mode == "RMC"):
                 break
+
+            # 次回のDFTの初期構造ファイル
+            shutil.copy(f"{config.cfg_name}.vasp", "POSCAR")
+
+            # 富岳対応 (キャッシュ対策)
+            subprocess.run(["sleep", "10"], check=True)
+            subprocess.run(["ls", "-la", "./"], check=True)
 
             start_mode = "VASP"
 

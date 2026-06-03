@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 import sys
 import shutil
+import subprocess
 
 from rmc_dft import (
     Config,
@@ -106,17 +107,44 @@ if __name__ == "__main__":
     vasp_dir = config_.dft_log_dir
     msg_ = None
 
+    #
+    # POSCAR (構造) は事前に用意しておく
+    #
+
+    # ------------- local
+    # run_vasp_init(
+    #     config_,
+    #     vasp_incar=vasp_incar_,
+    #     logger=logger_,
+    # )
+    # run_vasp(
+    #     config_,
+    #     vasp_log=vasp_log_,
+    #     vasp_incar=vasp_incar_,
+    #     log_dir_vasp=vasp_dir,
+    #     run_mode=None,
+    #     msg=None,
+    #     logger=logger_,
+    # )
+
+    # -------------- mpi-run
+    # VASP の INPUT を毎回作る/KPOINTS/POTCARは一回だけ作る)
     run_vasp_init(
         config_,
         vasp_incar=vasp_incar_,
+        # vasp_kpoints=vasp_kpoints_,
         logger=logger_,
     )
+    # 富岳対応 (cache対策)
+    subprocess.run(["sleep", "10"], check=True)
+    subprocess.run(["ls", "-la", "./"], check=True)
+
+    # 保存フォルダ名はそれぞれの run_vasp 内部で決まる
+    # 動作モード(mpiなど)各種は config から設定を読み取る
     run_vasp(
-        config_,
+        config=config_,
         vasp_log=vasp_log_,
         vasp_incar=vasp_incar_,
-        log_dir_vasp=vasp_dir,
-        run_mode=None,
         msg=None,
         logger=logger_,
     )
