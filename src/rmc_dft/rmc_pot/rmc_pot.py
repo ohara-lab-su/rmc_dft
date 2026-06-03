@@ -187,7 +187,7 @@ class RmcPot:
         self._logger.info(f"work_dir   = {work_dir}")
 
         ##################################################
-        # Config から elemento_info を取得
+        # Config から element_info を取得
         label_name = self._config.element_info
 
         if isinstance(label_name, str):

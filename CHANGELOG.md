@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.4.14 nakada
+
+- RMC-DFT(rmc/vasp/rmc-dft)の基本RUNを富岳で実現するための修正諸々
+- 今までの問題
+  - config で設定するべき parameter
+  - script で編集するべき parameter
+- がちょっとカオスっている（経験で調整した絶妙なバランスで動いている）
+  状態なのを改めて問題(v0.4.15 似て解決？) 
+
 ## v0.4.13 nakada
 
 ### 変更内容

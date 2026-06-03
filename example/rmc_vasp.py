@@ -100,7 +100,9 @@ def run_vasp(
 
 if __name__ == "__main__":
     """"""
+    # RUN-mode (MPI, mpi-command, local などは config.yml で定義)
     config_ = Config("config.yml")
+
     logger_ = XLogger(log_level="debug", logger_name="rmc_vasp_run")
     vasp_log_ = VaspLog(logger=logger_)
     vasp_incar_ = VaspIncar(logger=logger_)
@@ -111,23 +113,6 @@ if __name__ == "__main__":
     # POSCAR (構造) は事前に用意しておく
     #
 
-    # ------------- local
-    # run_vasp_init(
-    #     config_,
-    #     vasp_incar=vasp_incar_,
-    #     logger=logger_,
-    # )
-    # run_vasp(
-    #     config_,
-    #     vasp_log=vasp_log_,
-    #     vasp_incar=vasp_incar_,
-    #     log_dir_vasp=vasp_dir,
-    #     run_mode=None,
-    #     msg=None,
-    #     logger=logger_,
-    # )
-
-    # -------------- mpi-run
     # VASP の INPUT を毎回作る/KPOINTS/POTCARは一回だけ作る)
     run_vasp_init(
         config_,
@@ -136,7 +121,7 @@ if __name__ == "__main__":
         logger=logger_,
     )
     # 富岳対応 (cache対策)
-    subprocess.run(["sleep", "10"], check=True)
+    subprocess.run(["sleep", "5"], check=True)
     subprocess.run(["ls", "-la", "./"], check=True)
 
     # 保存フォルダ名はそれぞれの run_vasp 内部で決まる
@@ -144,6 +129,8 @@ if __name__ == "__main__":
     run_vasp(
         config=config_,
         vasp_log=vasp_log_,
+        # log_dir_vasp=vasp_dir,
+        # run_mode=None,
         vasp_incar=vasp_incar_,
         msg=None,
         logger=logger_,

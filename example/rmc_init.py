@@ -50,9 +50,6 @@ def run_rmc_init(
 
     ######################################
     # パラメーター調整
-    # rmc_dat.set_exp_filename("ascast.xsq")
-    # rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
-    rmc_dat.set_exp_filename("as_cast_0305.xsq")
 
     # 1 行目のコメント（系名）を設定する
     rmc_dat.set_comment("comment FeSiB")
@@ -107,7 +104,10 @@ def run_rmc_init(
     rmc_dat.set_data_flags([0, 0, 1, 0])
 
     # 実験データファイル名（11 行目）を設定する
-    rmc_dat.set_exp_filename(config.rmc_exp_filename)
+    # rmc_dat.set_exp_filename(config.rmc_exp_filename)
+    # rmc_dat.set_exp_filename("ascast.xsq")
+    rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
+    # rmc_dat.set_exp_filename("as_cast_0305.xsq")
 
     # 12 (データ範囲)
     # rmc_dat.set_exp_range(1, 1091, auto_write=True)
