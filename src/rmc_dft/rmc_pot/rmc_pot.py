@@ -28,8 +28,8 @@ class RmcPot:
     def __init__(
         self,
         *,
-        rmc_log: RmcPotLog = None,  # instance
-        rmc_dat: RmcPotDat = None,  # instance
+        rmc_log: Optional[RmcPotLog] = None,  # instance
+        rmc_dat: Optional[RmcPotDat] = None,  # instance
         config: Optional[Config] = None,  # Config(),  # instance
         logger: Optional[XLogger] = None,  # XLogger(),  # instance
         cfg_name: Optional[str] = None,
@@ -187,7 +187,7 @@ class RmcPot:
         self._logger.info(f"work_dir   = {work_dir}")
 
         ##################################################
-        # Config から elemento_info を取得
+        # Config から element_info を取得
         label_name = self._config.element_info
 
         if isinstance(label_name, str):

@@ -329,6 +329,7 @@ class RmcPotDat:
     ) -> None:
         """1 行目 comment を更新。"""
         self._logger.info(f"set_comment = {comment}")
+        self._config.rmc_comment = comment
         self.set_line(1, comment, auto_write=auto_write)
 
     def get_density(self) -> float:
@@ -343,7 +344,18 @@ class RmcPotDat:
             - cfg ファイル中の原子数とシミュレーションボックス体積の
               関係で一致させる必要がある（二重定義）
         """
-        return float(self.get_line(2).split()[0])
+        # return float(self.get_line(2).split()[0])
+        try:
+            return float(self.get_line(2).split()[0])
+
+        except (IndexError, ValueError):
+            if self._config.number_density_A3 is not None:
+                return float(self._config.number_density_A3)
+
+            raise ValueError(
+                "number density が未設定です。"
+                " .dat の 2 行目にもなく、config.number_density_A3 も None です。"
+            )
 
     def set_density(
         self,
@@ -353,6 +365,7 @@ class RmcPotDat:
     ) -> None:
         """2 行目 density を更新。"""
         self._logger.info(f"set_density = {rho}")
+        self._config.number_density_A3 = float(rho)
         self.set_line(2, rho, auto_write=auto_write)
 
     def get_cutoffs(self) -> List[Union[int, float]]:
@@ -452,6 +465,8 @@ class RmcPotDat:
             if not isinstance(v, (int, float)):
                 raise TypeError(f"cut offs には数値のみを指定してください: {v!r}")
 
+        self._config.rmc_cutoffs = seq
+
         # set_line はコメントを保持したまま値部を置換する
         self.set_line(3, seq, auto_write=auto_write)
 
@@ -473,7 +488,7 @@ class RmcPotDat:
             raise ValueError(f"maximum moves 行の要素数が不足: {toks!r}")
         return float(toks[0]), float(toks[1])
 
-    def set_maximu_moves(
+    def set_maximum_moves(
         self,
         values: Sequence[Union[int, float]],
         *,
@@ -497,6 +512,8 @@ class RmcPotDat:
             if not isinstance(v, (int, float)):
                 raise ValueError(f"maximum moves には数値のみ指定してください: {v!r}")
 
+        self._config.rmc_max_moves = seq
+
         # 4 行目へそのまま書き込む
         self.set_line(4, seq, auto_write=auto_write)
 
@@ -513,10 +530,20 @@ class RmcPotDat:
 
                 - 備考: 小さいほど解像度は上がるが計算負荷が増える
         """
-        toks = self.get_line(5).split()
-        if not toks:
-            raise ValueError("r spacing 行が空です")
-        return float(toks[0])
+        try:
+            toks = self.get_line(5).split()
+            if toks:
+                return float(toks[0])
+        except (IndexError, ValueError):
+            pass
+
+        if self._config.rmc_r_spacing is not None:
+            return float(self._config.rmc_r_spacing)
+
+        raise ValueError(
+            "r spacing が未設定です。"
+            " .dat の 5 行目にもなく、config.rmc_r_spacing も None です。"
+        )
 
     def set_r_spacing(
         self,
@@ -526,6 +553,7 @@ class RmcPotDat:
     ) -> None:
         """5 行目 r spacing を更新。"""
         self._logger.info(f"set_r_spacing = {dr}")
+        self._config.rmc_r_spacing = float(dr)
         self.set_line(5, dr, auto_write=auto_write)
 
     def get_moveout_option(self) -> bool:
@@ -557,12 +585,22 @@ class RmcPotDat:
         Returns:
             bool: moveout オプションを有効化している場合は True、無効なら False。
         """
-        token = self.get_line(6).strip().lower()
-        if token in (".true.", "true", "t", "1", "yes", "y"):
-            return True
-        if token in (".false.", "false", "f", "0", "no", "n"):
-            return False
-        raise ValueError(f"6 行目の値が真偽値として解釈できません: {token!r}")
+        try:
+            token = self.get_line(6).strip().lower()
+            if token in (".true.", "true", "t", "1", "yes", "y"):
+                return True
+            if token in (".false.", "false", "f", "0", "no", "n"):
+                return False
+        except IndexError:
+            pass
+
+        if self._config.rmc_moveout_option is not None:
+            return bool(self._config.rmc_moveout_option)
+
+        raise ValueError(
+            "moveout option が未設定です。"
+            " .dat の 6 行目にもなく、config.rmc_moveout_option も None です。"
+        )
 
     def set_moveout_option(
         self,
@@ -597,6 +635,7 @@ class RmcPotDat:
         """
         token = self._to_bool_token(use_moveout)
         self._logger.info(f"set_moveout_option = {token}")
+        self._config.rmc_moveout_option = bool(use_moveout)
         self.set_line(6, token, auto_write=auto_write)
 
     def get_num_config_to_collect(self) -> int:
@@ -675,6 +714,8 @@ class RmcPotDat:
         """
         if num_config < 0:
             raise ValueError(f"num_config は 0 以上を指定してください: {num_config}")
+
+        self._config.rmc_time_and_save = (float(time_limit), int(save_step))
         self.set_line(7, str(int(num_config)), auto_write=auto_write)
 
     def get_print_interval(self) -> int:
@@ -821,6 +862,10 @@ class RmcPotDat:
             )
 
         values = [self._fmt_number(time_limit_min), str(float(save_interval_step))]
+        self._config.rmc_time_and_save = (
+            float(time_limit_min),
+            int(save_interval_step),
+        )
         self.set_line(9, values, auto_write=auto_write)
 
     def get_data_flags(self) -> Tuple[int, int, int, int]:
@@ -849,13 +894,20 @@ class RmcPotDat:
             tuple[int, int, int, int]:
                 (gr_flag, neutron_flag, xray_flag, exafs_flag)
         """
-        tokens = self.get_line(10).split()
-        if len(tokens) < 4:
-            raise ValueError(f"10 行目の要素数が不足しています: {tokens!r}")
         try:
-            return tuple(int(v) for v in tokens[:4])  # type: ignore[return-value]
-        except ValueError as exc:
-            raise ValueError(f"10 行目に整数以外の値があります: {tokens!r}") from exc
+            tokens = self.get_line(10).split()
+            if len(tokens) >= 4:
+                return tuple(int(v) for v in tokens[:4])  # type: ignore[return-value]
+        except (IndexError, ValueError):
+            pass
+
+        if self._config.rmc_data_flags is not None:
+            return tuple(int(v) for v in self._config.rmc_data_flags[:4])  # type: ignore[return-value]
+
+        raise ValueError(
+            "data flags が未設定です。"
+            " .dat の 10 行目にもなく、config.rmc_data_flags も None です。"
+        )
 
     def set_data_flags(
         self,
@@ -901,6 +953,7 @@ class RmcPotDat:
             raise ValueError(f"flags には 0 または 1 のみ指定可能です: {values!r}")
 
         self._logger.info(f"flags: {values!r}")
+        self._config.rmc_data_flags = values
         self.set_line(10, [str(v) for v in values], auto_write=auto_write)
 
     def get_exp_filename(self) -> str:
@@ -946,7 +999,27 @@ class RmcPotDat:
               に対応します。
         """
         self._logger.info(f'== get_exp_filename: "{self.get_line(11)}"')
-        return self.get_line(11).split()[0]
+        # return self.get_line(11).split()[0]
+        try:
+            line = self.get_line(11)
+            self._logger.info(f'== get_exp_filename: "{line}"')
+            tokens = line.split()
+            if tokens:
+                return tokens[0]
+        except IndexError:
+            pass
+
+        # ファイルから読めないときは config のデフォルト値を用いる
+        if self._config.rmc_exp_filename is not None:
+            self._logger.info(
+                f'== get_exp_filename(from config): "{self._config.rmc_exp_filename}"'
+            )
+            return self._config.rmc_exp_filename
+
+        raise ValueError(
+            "実験データファイル名が未設定です。"
+            " .dat の 11 行目にもなく、config.rmc_exp_filename も None です。"
+        )
 
     def set_exp_filename(
         self,
@@ -978,6 +1051,7 @@ class RmcPotDat:
             path: 実験データファイルへのパス（相対・絶対いずれも可）。
             auto_write: True の場合は即時保存。None の場合はインスタンス既定に従う。
         """
+        self._config.rmc_exp_filename = str(Path(path))
         self.set_line(11, str(Path(path)), auto_write=auto_write)
 
     def get_exp_range(self) -> Tuple[int, int]:
@@ -1003,17 +1077,28 @@ class RmcPotDat:
               RMC_POT の版に依存する可能性があります。
               このメソッド自身は読み取りのみを行い、範囲の検査や補正は行いません。
         """
-        toks = self.get_line(12).split()
-        if len(toks) != 2:
-            raise ValueError(f"12 行目は 2 つの整数のみである必要があります: {toks!r}")
         try:
-            start = int(float(toks[0]))
-            end = int(float(toks[1]))
-        except ValueError as exc:
-            raise ValueError(f"12 行目に整数以外の値があります: {toks!r}") from exc
-        if start < 1 or end < start:
-            raise ValueError(f"範囲が不正です: start={start}, end={end}")
-        return start, end
+            toks = self.get_line(12).split()
+            # 12 行目は 2 つの整数のみである必要
+            if len(toks) == 2:
+                start = int(float(toks[0]))
+                end = int(float(toks[1]))
+                if start >= 1 and end >= start:
+                    return start, end
+
+        except (IndexError, ValueError):
+            pass
+
+        if self._config.rmc_exp_range is not None:
+            return (
+                int(self._config.rmc_exp_range[0]),
+                int(self._config.rmc_exp_range[1]),
+            )
+
+        raise ValueError(
+            "実験データ範囲が未設定です。"
+            " .dat の 12 行目にもなく、config.rmc_exp_range も None です。"
+        )
 
     def set_exp_range(
         self,
@@ -1041,7 +1126,9 @@ class RmcPotDat:
         """
         if start < 1 or end < start:
             raise ValueError(f"範囲が不正です: start={start}, end={end}")
+
         # 厳密に「2 トークンのみ」を書き込む
+        self._config.rmc_exp_range = (int(start), int(end))
         self.set_line(12, f"{int(start)} {int(end)}", auto_write=auto_write)
 
     def get_scale_factor(self) -> float:
@@ -1086,8 +1173,20 @@ class RmcPotDat:
         Returns:
             float: 標準偏差（σ）。
         """
-        toks = self.get_line(14).split()
-        return float(toks[0])
+        try:
+            toks = self.get_line(14).split()
+            if toks:
+                return float(toks[0])
+        except (IndexError, ValueError):
+            pass
+
+        if self._config.rmc_sigma_factor is not None:
+            return float(self._config.rmc_sigma_factor)
+
+        raise ValueError(
+            "sigma factor が未設定です。"
+            " .dat の 14 行目にもなく、config.rmc_sigma_factor も None です。"
+        )
 
     def set_sigma_factor(
         self,
@@ -1102,6 +1201,7 @@ class RmcPotDat:
             sigma (float): 標準偏差（σ）。
             auto_write (bool | None): True で即時保存。
         """
+        self._config.rmc_sigma_factor = float(sigma)
         self.set_line(14, self._fmt_number(sigma), auto_write=auto_write)
 
     def get_flag_15(self) -> bool:
@@ -1357,7 +1457,17 @@ class RmcPotDat:
         Returns:
             int: 移動させる原子数。
         """
-        return int(float(self.get_line(26).split()[0]))
+        try:
+            return int(float(self.get_line(26).split()[0]))
+
+        except (IndexError, ValueError):
+            if self._config.rmc_num_atoms_per_move is not None:
+                return int(self._config.rmc_num_atoms_per_move)
+
+            raise ValueError(
+                "num_atoms_per_move が未設定です。"
+                " .dat の 26 行目にもなく、config.rmc_num_atoms_per_move も None です。"
+            )
 
     def set_num_atoms_per_move(
         self,
@@ -1366,6 +1476,7 @@ class RmcPotDat:
         auto_write: Optional[bool] = None,
     ) -> None:
         """26 行目（number of atoms moved）を設定する。"""
+        self._config.rmc_num_atoms_per_move = int(value)
         self.set_line(26, str(int(value)), auto_write=auto_write)
 
     def get_history_buffer_size(self) -> int:

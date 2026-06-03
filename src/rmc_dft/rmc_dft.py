@@ -87,9 +87,11 @@ class RmcDft:
 
     def set_cfg_name(self, cfg_name: str):
         self._cfg_name: str = cfg_name
+        self._config.cfg_name = cfg_name
 
     def set_max_rmc_dft_loop(self, max_rmc_dft_loop: int):
         self._max_rmc_dft_loop: int = max_rmc_dft_loop
+        self._config.max_rmc_dft_loop = max_rmc_dft_loop
 
     def init(self, cfg_name: str):
         # self._dft.init(cfg_name)

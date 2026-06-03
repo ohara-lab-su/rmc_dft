@@ -22,7 +22,7 @@ class RmcPotLog:
         config: Optional[Config] = None,  # Config(),
         logger: Optional[XLogger] = None,  # XLogger,
         *,
-        cfg_name: str = None,
+        cfg_name: Optional[str] = None,
         log_filename: Optional[str] = None,
     ) -> None:
         """

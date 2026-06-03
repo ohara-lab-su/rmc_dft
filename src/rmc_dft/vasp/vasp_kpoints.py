@@ -26,6 +26,7 @@ import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 from pymatgen.io.vasp.inputs import Kpoints
 
+from rmc_dft.config import Config
 from x_logger import XLogger
 
 
@@ -47,8 +48,9 @@ class VaspKpoints:
     def __init__(
         self,
         kpoints_name: str = "KPOINTS",
-        logger: Optional[XLogger] = None,  # XLogger(),
         *,
+        config: Optional[Config] = None,
+        logger: Optional[XLogger] = None,  # XLogger(),
         auto_write: bool = True,
     ) -> None:
         """
@@ -59,6 +61,7 @@ class VaspKpoints:
             auto_write (bool):
         """
         self.logger = logger or XLogger()
+        self._config = config or Config()
         self.kpoints_name: str = kpoints_name
         self.auto_write: bool = auto_write
 
@@ -217,7 +220,12 @@ class VaspKpoints:
         """
         if mode not in ("Gamma", "Monkhorst-Pack"):
             raise ValueError('mode must be "Gamma" or "Monkhorst-Pack"')
+
         self._mode = mode
+
+        if self._config is not None:
+            self._config.vasp_kpoints_mode = mode
+
         self._kpts_obj = self._build_kpoints()
 
         if auto_write is None:
@@ -249,6 +257,10 @@ class VaspKpoints:
         Returns:
         """
         self._grid = (int(kx), int(ky), int(kz))
+
+        if self._config is not None:
+            self._config.vasp_kpoints_grid = self._grid
+
         self._kpts_obj = self._build_kpoints()
 
         if auto_write is None:
@@ -280,6 +292,10 @@ class VaspKpoints:
         Returns:
         """
         self._shift = (int(sx), int(sy), int(sz))
+
+        if self._config is not None:
+            self._config.vasp_kpoints_shift = self._shift
+
         self._kpts_obj = self._build_kpoints()
 
         if auto_write is None:
@@ -294,19 +310,23 @@ class VaspKpoints:
 
     def set_comment(
         self,
-        s: str,
+        comment: str,
         auto_write: Optional[bool] = None,
     ) -> None:
         """
         先頭コメントを設定する。
 
         Args:
-            s (str):
+            comment (str):
             auto_write (bool):
 
         Returns:
         """
-        self._comment = s or "K-Points"
+        self._comment = comment or "K-Points"
+
+        if self._config is not None:
+            self._config.vasp_kpoints_comment = self._comment
+
         self._kpts_obj = self._build_kpoints()
 
         if auto_write is None:

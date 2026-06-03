@@ -24,6 +24,25 @@ class Config:
     # ratios: Sequence[int] = [80, 9, 11]
     ratios: Sequence[int] = [82, 4, 14]
 
+    # RMC parameter mirror
+    rmc_comment: Optional[str] = None
+    rmc_cutoffs: Optional[Sequence[float]] = None
+    rmc_max_moves: Optional[Sequence[float]] = None
+    rmc_r_spacing: Optional[float] = None
+    rmc_moveout_option: Optional[bool] = None
+    rmc_time_and_save: Optional[Tuple[float, int]] = None
+    rmc_data_flags: Optional[Sequence[int]] = None
+    rmc_exp_range: Optional[Tuple[int, int]] = None
+    rmc_sigma_factor: Optional[float] = None
+    rmc_num_atoms_per_move: Optional[int] = None
+
+    # VASP parameter mirror
+    vasp_incar_tags: Dict[str, Any] = {}
+    vasp_kpoints_mode: Optional[str] = None
+    vasp_kpoints_grid: Optional[Tuple[int, int, int]] = None
+    vasp_kpoints_shift: Optional[Tuple[int, int, int]] = None
+    vasp_kpoints_comment: Optional[str] = None
+
     # ---------- RMC -----------
     rmc_code: str = "RmcPot"
     rmc_log_dir: str = "rmc_log"

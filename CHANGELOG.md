@@ -1,5 +1,79 @@
 # CHANGELOG
 
+## v0.4.15 nakada
+
+config 周りの整理を進めた。
+
+これまで、script 側で `set_*()` して変更した値と、他クラスが `config` を見たときの値がずれる箇所があり、
+RMC/DFT の loop をまたいだときや、別クラスから設定値を参照したときに整合が崩れやすかった。
+
+今回の方針は、
+
+- 明示的に `set_*()` した値を最優先とする
+- その値を `Config` インスタンスにも反映する
+- 明示 set が無いときだけ `Config` の既定値を使う
+- どちらにも無いときは未設定として扱う
+
+という形に寄せること。
+
+### RMC 側
+
+- `RmcPotDat` の主要な `set_*()` メソッドで、`.dat` の行更新だけでなく `Config` 側の mirror 値も更新するようにした
+  - comment
+  - density
+  - cutoffs
+  - maximum moves
+  - r spacing
+  - moveout option
+  - time and save
+  - data flags
+  - exp filename
+  - exp range
+  - sigma factor
+  - number of atoms per move
+
+- `xsq` ファイル名取得 (`get_exp_filename`) の挙動を整理した
+  - まず `.dat` 11 行目の現在値を使う
+  - `.dat` 側に値が無いときだけ `config.rmc_exp_filename` を使う
+  - 両方無いときは未設定エラーにする
+
+これにより、`run_rmc_init()` などで `set_exp_filename()` した値が、
+そのまま `RmcPot.preprocess()` の存在チェックでも使われる形に整理された。
+
+### VASP 側
+
+- `VaspIncar` / `VaspKpoints` に `config` を共有できるようにした
+- script 側で `set_tag()` や `set_mode()/set_grid()/set_shift()` した値を、
+  helper クラス内部だけでなく `Config` 側にも反映するようにした
+- `Vasp` 生成時に、内部で作る `VaspIncar` / `VaspKpoints` へ同じ `Config` を渡すようにした
+- `set_mpi()` / `set_job_cmd()` で変更した値も `Config` に反映するようにした
+
+### RMC-DFT 全体
+
+- `RmcDft.set_cfg_name()` と `RmcDft.set_max_rmc_dft_loop()` で、
+  内部値だけでなく `Config` にも反映するようにした
+- `example/rmc_vasp_script.py` でも、
+  `VaspIncar` / `VaspKpoints` を `config` 共有で生成するようにした
+
+### まだ残る注意
+
+- `Config` は依然として「ユーザー向け mirror」と「クラス横断の共有データコンテナ」の両方を兼ねている
+- そのため、今後も新しく `set_*()` を増やす場合は、
+  「内部状態だけでなく `Config` も更新する」ことを原則にした方がよい
+- getter 側についても、`.dat` / `INCAR` / `KPOINTS` の現在値を優先し、
+  無いときだけ `Config` 既定値へ落とす、という方針で今後そろえていく必要がある
+ 
+## v0.4.14 nakada
+
+タグ/ブランチ忘れなので、下記の内容は v0.4.15 に繰り越す
+
+- RMC-DFT(rmc/vasp/rmc-dft)の基本RUNを富岳で実現するための修正諸々
+- 今までの問題
+  - config で設定するべき parameter
+  - script で編集するべき parameter
+- がちょっとカオスっている（経験で調整した絶妙なバランスで動いている）
+  状態なのを改めて問題(v0.4.15 似て解決？) 
+
 ## v0.4.13 nakada
 
 ### 変更内容

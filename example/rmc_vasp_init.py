@@ -6,6 +6,7 @@ rmc_dft 用の VASP 入力ファイル
 """
 import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
+import subprocess
 
 from rmc_dft import Config
 from x_logger import XLogger
@@ -67,6 +68,10 @@ def run_vasp_init(
                 elements = f.readline().strip().split()
         vasp_potcar.build(elements, poscar_name="POTCAR")
 
+        # 富岳対応 (キャッシュ対策)
+        subprocess.run(["sleep", "10"], check=True)
+        subprocess.run(["ls", "-la", "./"], check=True)
+
     # ------------------
     # make INCAR
     # ------------------
@@ -111,6 +116,6 @@ if __name__ == "__main__":
 
     run_vasp_init(
         config=config_,
-        vasp_incar=vasp_incar,
+        vasp_incar=vasp_incar_,
         logger=logger_,
     )
