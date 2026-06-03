@@ -494,13 +494,13 @@ class Vasp:
         num_procs: Optional[int] = None,
     ):
         """MPI設定書き換え"""
-        if mpi_cmd:
+        if mpi_cmd is not None:
             self.mpi_cmd = mpi_cmd
             self._config.mpi_cmd = mpi_cmd
-        if num_procs:
+        if num_procs is not None:
             self.num_procs = num_procs
             self._config.num_procs = num_procs
-        if mpi_flag:
+        if mpi_flag is not None:
             self.mpi_flag = mpi_flag
             self._config.mpi_flag = mpi_flag
 
@@ -508,7 +508,7 @@ class Vasp:
         self,
         job_cmd: Optional[str] = None,
     ):
-        if job_cmd:
+        if job_cmd is not None:
             self.job_cmd = job_cmd
             self._config.job_cmd = job_cmd
 
@@ -516,8 +516,8 @@ class Vasp:
     # for VASP
     #
 
-    @staticmethod
     def ensure_vasp5_format(
+        self,
         poscar_name: str,
         element_info: Optional[Union[str, Sequence[str]]] = None,
         logger: Optional[XLogger] = XLogger(),
@@ -545,8 +545,8 @@ class Vasp:
         # path = Path(output).expanduser()
         # if path.is_dir():
         #     path = path / "POTCAR"
-        builder = PotcarBuilder("~/potpaw_PBE.64")
-        builder.build(elements, output=output)
+        builder = VaspPotcarBuilder("~/potpaw_PBE.64")
+        builder.build(elements, poscar_name=output)
         # builder.build(elements, output=str(path))
         return True
 

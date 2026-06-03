@@ -85,8 +85,8 @@ if __name__ == "__main__":
 
     # 2. VASP 関係インスタンス
     vasp_log = VaspLog(logger=logger)
-    vasp_incar = VaspIncar(logger=logger)
-    vasp_kpoints = VaspKpoints(logger=logger)
+    vasp_incar = VaspIncar(config=config, logger=logger)
+    vasp_kpoints = VaspKpoints(config=config, logger=logger)
 
     i = 0
     for i in range(start_loop, start_loop + max_rmc_dft_loop):

@@ -48,9 +48,9 @@ class VaspKpoints:
     def __init__(
         self,
         kpoints_name: str = "KPOINTS",
-        logger: Optional[XLogger] = None,  # XLogger(),
         *,
         config: Optional[Config] = None,
+        logger: Optional[XLogger] = None,  # XLogger(),
         auto_write: bool = True,
     ) -> None:
         """

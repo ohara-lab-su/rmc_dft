@@ -24,9 +24,9 @@ class VaspIncar:
     def __init__(
         self,
         incar_name: str = "INCAR",
-        logger: Optional[XLogger] = None,
         *,
         config: Optional[Config] = None,
+        logger: Optional[XLogger] = None,
         auto_write: bool = True,
     ) -> None:
         """
