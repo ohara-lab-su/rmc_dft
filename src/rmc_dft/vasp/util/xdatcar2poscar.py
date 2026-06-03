@@ -42,7 +42,7 @@ def xdatcar2poscar(
     VASP の XDATCAR ファイルを POSCAR 形式にする
 
     Args:
-        vasp_name (str): Base name for output files.
+        vasp_name (str): {vasp_name}.vasp
         logger (Xlogger):
     """
     logger.info("INPUT file name : XDATCAR")
