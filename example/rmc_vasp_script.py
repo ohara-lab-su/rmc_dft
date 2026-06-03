@@ -100,25 +100,32 @@ if __name__ == "__main__":
                 rmc_dat=rmc_dat,
                 logger=logger,
             )
+            # 富岳対応 (キャッシュ対策)
+            subprocess.run(["sleep", "5"], check=True)
+            subprocess.run(["ls", "-la", "./"], check=True)
+
+            # msg のレン版番号を作る
+            log_dir_rmc = next_log_dir_name("rmc")
+            msg_rmc = int(log_dir_rmc.split("_")[0].replace("log", ""))
 
             # 保存フォルダ名はそれぞれの run_rmc 内部で決まる
             run_rmc(
                 config=config,
                 rmc_dat=rmc_dat,
                 auto_converge=False,
-                msg=f"{i}",
+                msg=f"{msg_rmc}",
                 logger=logger,
             )
-            # STOP mode が RMC のときに RMC で止める
-            if (i == max_rmc_dft_loop - 1) and (stop_mode == "RMC"):
-                break
-
             # 次回のDFTの初期構造ファイル
             shutil.copy(f"{config.cfg_name}.vasp", "POSCAR")
 
             # 富岳対応 (キャッシュ対策)
-            subprocess.run(["sleep", "10"], check=True)
+            subprocess.run(["sleep", "5"], check=True)
             subprocess.run(["ls", "-la", "./"], check=True)
+
+            # STOP mode が RMC のときに RMC で止める
+            if (i == max_rmc_dft_loop - 1) and (stop_mode == "RMC"):
+                break
 
             start_mode = "VASP"
 
@@ -137,21 +144,35 @@ if __name__ == "__main__":
                 vasp_kpoints=vasp_kpoints,
                 logger=logger,
             )
+            # 富岳対応 (キャッシュ対策)
+            subprocess.run(["sleep", "5"], check=True)
+            subprocess.run(["ls", "-la", "./"], check=True)
+
+            # msg の連番番号を作る
+            log_dir_vasp = next_log_dir_name("dft")
+            msg_vasp = int(log_dir_vasp.split("_")[0].replace("log", ""))
 
             # 保存フォルダ名はそれぞれの run_vasp 内部で決まる
             run_vasp(
                 config=config,
                 vasp_log=vasp_log,
                 vasp_incar=vasp_incar,
-                msg=f"{i}",
+                msg=f"{msg_vasp}",
                 logger=logger,
             )
+            # 富岳対応 (キャッシュ対策)
+            subprocess.run(["sleep", "5"], check=True)
+            subprocess.run(["ls", "-la", "./"], check=True)
+
             # 次回のRMCの初期構造ファイル
             contcar2cfg(cfg_name=config.cfg_name)
             shutil.copy(
                 f"{config.cfg_name}.cfg",
                 f"{config.cfg_name}0.cfg",
             )
+            # 富岳対応 (キャッシュ対策)
+            subprocess.run(["sleep", "5"], check=True)
+            subprocess.run(["ls", "-la", "./"], check=True)
 
             # STOP mode が VASP のときに VASP で止める
             if (i == max_rmc_dft_loop - 1) and (stop_mode == "VASP"):
