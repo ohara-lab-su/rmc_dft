@@ -1,5 +1,51 @@
 # CHANGELOG
 
+## v0.4.17 nakada
+
+config と init スクリプトでの二重定義が混在していたため、
+RMC-DFT 実行時の設定値の流れを整理した。
+
+### 主な整理方針
+
+- `aaa.dat` にある値
+- `config.yml` にある値
+- `init` スクリプトで `set_*()` する値
+
+の優先順位を整理し、
+RMC 側では
+
+- `aaa.dat` / 初期テンプレート値
+- `config.yml`
+- `init` スクリプトの `set_*()`
+
+の順で上書きされることを前提に見直した。
+
+### RMC 側
+
+- `RmcPotDat` の `set_*()` を通して設定した値が、
+  `.dat` の current state だけでなく `Config` 側にも反映されるよう整理した
+- 実験データファイル名 (`exp_filename`) について、
+  `get_exp_filename()` が current state を優先し、
+  必要時のみ `config.yml` 側の既定値へ落ちるように整理した
+- `RMC` 実行前の存在確認は、
+  `RmcPotDat` インスタンス上の current state を参照する流れを前提に確認した
+
+### VASP 側
+
+- `VaspIncar` / `VaspKpoints` を shared `config` で扱う前提を整理した
+- `run_vasp_init()` / `run_vasp()` 側でも、
+  helper インスタンスを経由した設定共有が崩れないよう見直した
+- `Vasp.run()` の設定値解決では、
+  script 側で明示した値を `config` より優先する形に整理した
+
+### 補足
+
+- `restart` はログ番号を引き継ぐだけでなく、
+  既存の `logNN_rmc` / `logNN_dft` を見て
+  `RMC` と `VASP` のどちらから再開するかを判定する用途として残す
+- 通常起動時は初期化から開始するが、
+  ログディレクトリ名は既存最大番号の次を採用する
+ 
 ## v0.4.16 nakada
 
 v0.4.15 で進めた config 周りの整理の続きとして、

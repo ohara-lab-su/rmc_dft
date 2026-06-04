@@ -110,7 +110,7 @@ def run_rmc_init(
     # デフォルト値は config.yaml で書く(ここで書いた値のほうが優先される)
     # rmc_dat.set_exp_filename(config.rmc_exp_filename)
     # rmc_dat.set_exp_filename("ascast.xsq")
-    rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
+    # rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
     # rmc_dat.set_exp_filename("as_cast_0305.xsq")
 
     # 12 (データ範囲)

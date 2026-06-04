@@ -114,6 +114,71 @@ class RmcPotDat:
             self.create_dat_file(str(self._cfg_name))
             self.load()
 
+        # コンストラクタで、config がある場合は、その値を .dat に適応する
+        changed = False
+
+        if self._config.rmc_comment is not None:
+            self.set_comment(self._config.rmc_comment, auto_write=False)
+            changed = True
+
+        if self._config.number_density_A3 is not None:
+            self.set_density(self._config.number_density_A3, auto_write=False)
+            changed = True
+
+        if self._config.rmc_cutoffs is not None:
+            self.set_cutoffs(self._config.rmc_cutoffs, auto_write=False)
+            changed = True
+
+        if self._config.rmc_max_moves is not None:
+            self.set_maximum_moves(self._config.rmc_max_moves, auto_write=False)
+            changed = True
+
+        if self._config.rmc_r_spacing is not None:
+            self.set_r_spacing(self._config.rmc_r_spacing, auto_write=False)
+            changed = True
+
+        if self._config.rmc_moveout_option is not None:
+            self.set_moveout_option(self._config.rmc_moveout_option, auto_write=False)
+            changed = True
+
+        if self._config.rmc_time_and_save is not None:
+            self.set_time_and_save(
+                self._config.rmc_time_and_save[0],
+                self._config.rmc_time_and_save[1],
+                auto_write=False,
+            )
+            changed = True
+
+        if self._config.rmc_data_flags is not None:
+            self.set_data_flags(self._config.rmc_data_flags, auto_write=False)
+            changed = True
+
+        if self._config.rmc_exp_filename is not None:
+            self.set_exp_filename(self._config.rmc_exp_filename, auto_write=False)
+            changed = True
+
+        if self._config.rmc_exp_range is not None:
+            self.set_exp_range(
+                self._config.rmc_exp_range[0],
+                self._config.rmc_exp_range[1],
+                auto_write=False,
+            )
+            changed = True
+
+        if self._config.rmc_sigma_factor is not None:
+            self.set_sigma_factor(self._config.rmc_sigma_factor, auto_write=False)
+            changed = True
+
+        if self._config.rmc_num_atoms_per_move is not None:
+            self.set_num_atoms_per_move(
+                self._config.rmc_num_atoms_per_move,
+                auto_write=False,
+            )
+            changed = True
+
+        if changed and self._auto_write:
+            self.write()
+
     def set_cfg_name(self, cfg_name: str) -> None:
         self._cfg_name = cfg_name
         self._config.cfg_name = cfg_name
@@ -268,7 +333,12 @@ class RmcPotDat:
         """
         idx = self._index(line_no_1based)
         self._lines[idx].value = self._coerce_value(value)
-        do_write = self._auto_write if auto_write is None else auto_write
+
+        if auto_write is None:
+            do_write = self._auto_write
+        else:
+            do_write = auto_write
+
         if do_write:
             self.write()
 
