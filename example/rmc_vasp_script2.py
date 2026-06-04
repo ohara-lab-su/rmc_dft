@@ -3,6 +3,7 @@
 K.NAKADA, kengo.nakada@gmail.com
 
 特定の用途用のカスタム RMC-DFT
+サンプル
 """
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os

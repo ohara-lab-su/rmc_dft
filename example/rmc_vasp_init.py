@@ -65,9 +65,11 @@ def run_vasp_init(
         vasp_potcar = VaspPotcarBuilder("~/potpaw_PBE.64", logger=logger)
         # elements = ["Fe", "Si", "B"]
         elements = config.element_info
+
         if isinstance(elements, str):  # もし、label.txt とかの str ならば、
             with open(elements) as f:
                 elements = f.readline().strip().split()
+
         vasp_potcar.build(elements, poscar_name="POTCAR")
 
         # 富岳対応 (キャッシュ対策)
@@ -81,19 +83,20 @@ def run_vasp_init(
         vasp_incar = VaspIncar(config=config, logger=logger)
 
     logger.info("== make INCAR")
-    # vasp_incar.set_tag("EDIFF", 1e-04)
-    # vasp_incar.set_tag("EDIFFG", 1e-03)
-    vasp_incar.set_tag("EDIFF", 1e-06)
-    vasp_incar.set_tag("EDIFFG", 1e-05)
+    vasp_incar.set_tag("EDIFF", 1e-04)
+    vasp_incar.set_tag("EDIFFG", 1e-03)
+    # vasp_incar.set_tag("EDIFF", 1e-06)
+    # vasp_incar.set_tag("EDIFFG", 1e-05)
     vasp_incar.set_tag("ISTART", 0)
     #
-    vasp_incar.set_tag("ISMEAR", 0)  # Gussian
+    vasp_incar.set_tag("ISMEAR", 0)  # 0:Gaussian
     vasp_incar.set_tag("SIGMA", 0.1)
-    # vasp_incar.set_tag("NELM", 30)
-    vasp_incar.set_tag("NELM", 300)
+    vasp_incar.set_tag("NELM", 30)
+    # vasp_incar.set_tag("NELM", 300)
     #
     # vasp_incar.set_tag("NSW", 10)
-    vasp_incar.set_tag("NSW", 300)
+    vasp_incar.set_tag("NSW", 30)
+    # vasp_incar.set_tag("NSW", 300)
     vasp_incar.set_tag("ISIF", 2)
     vasp_incar.set_tag("IBRION", 2)  # CG
     # vasp_incar.set_tag("IBRION", 3)  # Dampd

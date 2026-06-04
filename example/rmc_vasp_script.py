@@ -3,7 +3,7 @@
 K.NAKADA, kengo.nakada@gmail.com
 
 RMC-DFT のUIクラスを使わずに直接 rmc_pot, vasp 関係のクラスを起動して
-RMC-VASP を構成する sample script
+RMC-VASP を構成する 実用 sample script
 """
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
@@ -157,6 +157,7 @@ if __name__ == "__main__":
                 config=config,
                 vasp_log=vasp_log,
                 vasp_incar=vasp_incar,
+                postprocess_mode=True,
                 msg=f"{msg_vasp}",
                 logger=logger,
             )

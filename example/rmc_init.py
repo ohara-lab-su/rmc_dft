@@ -53,6 +53,8 @@ def run_rmc_init(
 
     # 1 行目のコメント（系名）を設定する
     rmc_dat.set_comment("comment FeSiB")
+
+    # デフォルト値は config.yaml で書く(ここで書いた値のほうが優先される)
     # 2 行目：number density（数密度）を設定する
     # rmc_dat.set_density(0.0915)
     # rmc_dat.set_density(0.09119)
@@ -93,8 +95,9 @@ def run_rmc_init(
     # 計算時間と構造をsaveするステップ間隔
     # rmc_dat.set_time_and_save(0.5, 0.5)
     # rmc_dat.set_time_and_save(5, 1)
+    rmc_dat.set_time_and_save(15, 1)
     # rmc_dat.set_time_and_save(30, 1)
-    rmc_dat.set_time_and_save(60, 1)
+    # rmc_dat.set_time_and_save(60, 1)
     # rmc_dat.set_time_and_save(120, 1)
     # rmc_dat.set_time_and_save(360, 1)
     # rmc_dat.set_time_and_save(480, 1)
@@ -104,9 +107,10 @@ def run_rmc_init(
     rmc_dat.set_data_flags([0, 0, 1, 0])
 
     # 実験データファイル名（11 行目）を設定する
+    # デフォルト値は config.yaml で書く(ここで書いた値のほうが優先される)
     # rmc_dat.set_exp_filename(config.rmc_exp_filename)
     # rmc_dat.set_exp_filename("ascast.xsq")
-    rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
+    # rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
     # rmc_dat.set_exp_filename("as_cast_0305.xsq")
 
     # 12 (データ範囲)
