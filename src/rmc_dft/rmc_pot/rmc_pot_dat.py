@@ -110,9 +110,13 @@ class RmcPotDat:
         else:
             self._logger.info(f"== create *.dat")
             self._logger.info(f"{self._cfg_name}.dat file not found.")
-            self._logger.info(f"create defaut dat file")
-            self.create_dat_file(self._cfg_name)
+            self._logger.info(f"create default dat file")
+            self.create_dat_file(str(self._cfg_name))
             self.load()
+
+    def set_cfg_name(self, cfg_name: str) -> None:
+        self._cfg_name = cfg_name
+        self._config.cfg_name = cfg_name
 
     def create_dat_file(self, basename: str) -> bool:
         """
@@ -715,7 +719,6 @@ class RmcPotDat:
         if num_config < 0:
             raise ValueError(f"num_config は 0 以上を指定してください: {num_config}")
 
-        self._config.rmc_time_and_save = (float(time_limit), int(save_step))
         self.set_line(7, str(int(num_config)), auto_write=auto_write)
 
     def get_print_interval(self) -> int:
@@ -998,8 +1001,6 @@ class RmcPotDat:
               8 列のファイルは 3 元系（Q, F(Q), c11, c12, c13, c22, c23, c33）
               に対応します。
         """
-        self._logger.info(f'== get_exp_filename: "{self.get_line(11)}"')
-        # return self.get_line(11).split()[0]
         try:
             line = self.get_line(11)
             self._logger.info(f'== get_exp_filename: "{line}"')
@@ -1009,7 +1010,6 @@ class RmcPotDat:
         except IndexError:
             pass
 
-        # ファイルから読めないときは config のデフォルト値を用いる
         if self._config.rmc_exp_filename is not None:
             self._logger.info(
                 f'== get_exp_filename(from config): "{self._config.rmc_exp_filename}"'

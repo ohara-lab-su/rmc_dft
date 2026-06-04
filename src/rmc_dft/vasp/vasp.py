@@ -103,11 +103,36 @@ class Vasp:
 
         # VASP 実行系設定
         if config:
-            self.dft_bin: Optional[str] = dft_bin or config.dft_bin
-            self.mpi_cmd: Optional[str] = mpi_cmd or config.mpi_cmd
-            self.mpi_flag: Optional[str] = mpi_flag or config.mpi_flag
-            self.num_procs: Optional[int] = num_procs or config.num_procs
-            self.job_cmd: Optional[str] = job_cmd or config.job_cmd
+            # self.dft_bin: Optional[str] = dft_bin or config.dft_bin
+            # self.mpi_cmd: Optional[str] = mpi_cmd or config.mpi_cmd
+            # self.mpi_flag: Optional[str] = mpi_flag or config.mpi_flag
+            # self.num_procs: Optional[int] = num_procs or config.num_procs
+            # self.job_cmd: Optional[str] = job_cmd or config.job_cmd
+            if config:
+                if dft_bin is not None:
+                    self.dft_bin = dft_bin
+                else:
+                    self.dft_bin = config.dft_bin
+
+                if mpi_cmd is not None:
+                    self.mpi_cmd = mpi_cmd
+                else:
+                    self.mpi_cmd = config.mpi_cmd
+
+                if mpi_flag is not None:
+                    self.mpi_flag = mpi_flag
+                else:
+                    self.mpi_flag = config.mpi_flag
+
+                if num_procs is not None:
+                    self.num_procs = num_procs
+                else:
+                    self.num_procs = config.num_procs
+
+                if job_cmd is not None:
+                    self.job_cmd = job_cmd
+                else:
+                    self.job_cmd = config.job_cmd
         else:
             self.dft_bin: str = dft_bin
             self.mpi_cmd: Optional[str] = mpi_cmd
@@ -283,15 +308,15 @@ class Vasp:
         if vasp_name is None:
             vasp_name = self._vasp_name
 
-        # 実行スクリプトのあるディレクトリを基準にする
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        self._logger.info(f"script_dir = {script_dir}")
+        # 実行カレントを基準にする
+        work_dir = os.getcwd()
+        self._logger.info(f"work_dir = {work_dir}")
 
         for filename in ["INCAR", "KPOINTS", "POTCAR", "POSCAR"]:
-            target_path = os.path.join(script_dir, filename)
+            target_path = os.path.join(work_dir, filename)
             self._logger.info(f"target_path = {target_path}")
 
-            # 実験のファイル存在チェック
+            # 入力ファイル存在チェック
             if not os.path.exists(target_path):
                 self._logger.error(f"**Error**: {target_path} が見つかりません。")
                 sys.exit(-1)
@@ -334,6 +359,12 @@ class Vasp:
 
         # BACKUP-DATA
         self._vasp_log.backup_result(log_dir=log_dir)
+
+        if (not os.path.exists("CONTCAR")) or os.path.getsize("CONTCAR") == 0:
+            self._logger.error(
+                "**Error**: CONTCAR が存在しないか空です。VASP 計算が未完了です。"
+            )
+            return False
 
         # CONTCAR -> POSCAR
         shutil.copyfile("CONTCAR", "POSCAR")

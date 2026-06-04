@@ -48,9 +48,9 @@ def run_vasp(
         vasp_log = VaspLog(logger=logger)
 
     if vasp_incar is None:
-        vasp_incar = VaspIncar(logger=logger)
+        vasp_incar = VaspIncar(config=config, logger=logger)
 
-    # VASP を動かす度に既存のRMC/DFTのフォルダを調査して coutup する
+    # VASP を動かす度に既存のRMC/DFTのフォルダを調査して countup する
     if log_dir_vasp is None:
         log_dir_vasp = next_log_dir_name("dft")
 
@@ -88,10 +88,14 @@ def run_vasp(
         sys.exit(-1)
 
     # log_dir にバックアップする
-    vasp.postprocess(
+    ret = vasp.postprocess(
         log_dir=log_dir_vasp,
         cfg_name=config.cfg_name,
     )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
+
+    if not ret:
+        logger.error("**Error**: vasp postprocess failed")
+        sys.exit(-1)
     # vasp.backup(log_dir=log_dir)
 
     logger.info("END of DFT")
@@ -105,7 +109,7 @@ if __name__ == "__main__":
 
     logger_ = XLogger(log_level="debug", logger_name="rmc_vasp_run")
     vasp_log_ = VaspLog(logger=logger_)
-    vasp_incar_ = VaspIncar(logger=logger_)
+    vasp_incar_ = VaspIncar(config=config_, logger=logger_)
     vasp_dir = config_.dft_log_dir
     msg_ = None
 

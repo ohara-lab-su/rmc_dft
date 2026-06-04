@@ -104,6 +104,12 @@ class RmcPot:
 
     def set_cfg_name(self, cfg_name: str):
         self._cfg_name = cfg_name
+        self._config.cfg_name = cfg_name
+
+        # rmc_dat に cfg_name をセットする
+        if self._rmc_dat:
+            self._rmc_dat.set_cfg_name(cfg_name)
+
         # rmc_log に cfg_name をセットする
         if self._rmc_log:
             self._rmc_log.set_cfg_name(cfg_name)

@@ -21,10 +21,10 @@ class RmcDft:
         rmc_code: Optional[str] = None,  # "RmcPot"
         dft_code: Optional[str] = None,  # "Vasp",
         max_rmc_dft_loop: Optional[int] = None,
-        config: Config = Config(),
-        logger: XLogger = XLogger(),
+        config: Optional[Config] = None,
+        logger: Optional[XLogger] = None,
         *,
-        cfg_name: str = None,
+        cfg_name: Optional[str] = None,
     ):
         """
         RMCとDFTの統合実行クラス。
@@ -37,7 +37,9 @@ class RmcDft:
             logger (XLogger): ロガー（指定がなければ新規作成）
             cfg_name (str): CFGファイルのベース名
         """
-        self._logger = logger
+        logger = logger or XLogger()
+        config = config or Config()
+
         if rmc_code is None:
             rmc_code = config.rmc_code
         if dft_code is None:
@@ -47,6 +49,10 @@ class RmcDft:
         if max_rmc_dft_loop is None:
             max_rmc_dft_loop = config.max_rmc_dft_loop
 
+        if rmc_code is None or dft_code is None or cfg_name is None:
+            raise ValueError("rmc_code, dft_code, cfg_name must not be None")
+
+        self._logger = logger
         self._cfg_name = cfg_name
         self._config = config
         self._max_rmc_dft_loop = max_rmc_dft_loop
@@ -126,7 +132,11 @@ class RmcDft:
         self._logger.info(f"== run({mode})")
 
         if max_rmc_dft_loop is None:
-            max_rmc_dft_loop: int = self._max_rmc_dft_loop
+            max_rmc_dft_loop = self._max_rmc_dft_loop
+
+        if max_rmc_dft_loop is None:
+            raise ValueError("max_rmc_dft_loop is not set")
+
         self._config.max_rmc_dft_loop = max_rmc_dft_loop
         self._logger.info(f"max_rmc_dft_loop = {max_rmc_dft_loop}")
 
@@ -168,15 +178,11 @@ class RmcDft:
 
     @staticmethod
     def poscar2cfg(
-        self,
         cfg_name: str,
-        posscar_name: Optional[str] = None,
+        poscar_name: Optional[str] = None,
     ) -> bool:
-        if not posscar_name:
-            posscar_name = f"{cfg_name}.vasp"
-
         # CFG ファイルを作る
-        poscar2cfg(cfg_name=cfg_name)
+        poscar2cfg(poscar_name=poscar_name, cfg_name=cfg_name)
         return True
 
 
