@@ -38,6 +38,7 @@ def run_vasp(
     vasp_incar: Optional[VaspIncar] = None,
     log_dir_vasp: Optional[str] = None,  # backup_dir
     run_mode: Optional[str] = None,
+    postprocess_mode: bool = True,
     msg: Optional[str] = None,
     logger: Optional[Any] = None,
 ):
@@ -88,15 +89,15 @@ def run_vasp(
         sys.exit(-1)
 
     # log_dir にバックアップする
-    ret = vasp.postprocess(
-        log_dir=log_dir_vasp,
-        cfg_name=config.cfg_name,
-    )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
-
-    if not ret:
-        logger.error("**Error**: vasp postprocess failed")
-        sys.exit(-1)
-    # vasp.backup(log_dir=log_dir)
+    if postprocess_mode:
+        ret = vasp.postprocess(
+            log_dir=log_dir_vasp,
+            cfg_name=config.cfg_name,
+        )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
+        if not ret:
+            logger.error("**Error**: vasp postprocess failed")
+            sys.exit(-1)
+        # vasp.backup(log_dir=log_dir)
 
     logger.info("END of DFT")
     logger.info("")

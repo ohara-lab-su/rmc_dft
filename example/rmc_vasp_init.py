@@ -87,7 +87,7 @@ def run_vasp_init(
     vasp_incar.set_tag("EDIFFG", 1e-05)
     vasp_incar.set_tag("ISTART", 0)
     #
-    vasp_incar.set_tag("ISMEAR", 0)  # Gussian
+    vasp_incar.set_tag("ISMEAR", 0)  # 0:Gaussian
     vasp_incar.set_tag("SIGMA", 0.1)
     # vasp_incar.set_tag("NELM", 30)
     vasp_incar.set_tag("NELM", 300)
