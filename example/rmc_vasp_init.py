@@ -101,12 +101,21 @@ def run_vasp_init(
     vasp_incar.set_tag("IBRION", 2)  # CG
     # vasp_incar.set_tag("IBRION", 3)  # Dampd
     # vasp_incar.set_tag("POTIM", 0.05)  # Dampd scaling
+
     vasp_incar.set_tag("LREAL", "auto")
+
     # extra
     vasp_incar.set_tag("ISPIN", 1)
     vasp_incar.set_tag("LORBIT", 11)
     vasp_incar.set_tag("NEDOS", 1500)
-    #
+
+    vasp_incar.set_tag("ALGO", "Normal")
+
+    # ==== 主に富岳向け(a64)並列パラメータ 1core = 4CMG = 48MPI rank
+    vasp_incar.set_tag("KPAR", 1)  # K点並列
+    vasp_incar.set_tag("NCORE", 12)  # MPI ランク
+    vasp_incar.set_tag("NSIM", 4)  # バンド並列Gr
+
     # ==== mixing (大規模アモルファス用・保守的設定) ====
     # vasp_incar.set_tag("IMIX", 4)
     # vasp_incar.set_tag("INIMIX", 1)

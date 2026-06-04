@@ -38,6 +38,7 @@ def run_rmc(
     *,
     rmc_log: Optional[RmcPotLog] = None,
     rmc_dat: Optional[RmcPotDat] = None,
+    rmc_pot: Optional[RmcPot] = None,
     auto_converge: Optional[bool] = False,
     postprocess: Optional[bool] = True,
     msg: Optional[str] = None,
@@ -63,12 +64,15 @@ def run_rmc(
     # rmc = RmcPot(rmc_log=rmc_log, cfg_name=cfg_name, config=config, logger=logger)
     # rmc = RmcPot(rmc_log=rmc_log, config=config, logger=logger)
 
-    rmc = RmcPot(
-        rmc_dat=rmc_dat,  # instance
-        rmc_log=rmc_log,  # instance
-        config=config,
-        logger=logger,
-    )
+    if rmc_pot is None:
+        rmc = RmcPot(
+            rmc_dat=rmc_dat,  # instance
+            rmc_log=rmc_log,  # instance
+            config=config,
+            logger=logger,
+        )
+    else:
+        rmc = rmc_pot
 
     # ---------------------------
     # 以下

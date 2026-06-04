@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.18 nakada
+
+富岳向けの VASP/RMC_POT デフォルト設定をサンプルに追加
+
 ## v0.4.17 nakada
 
 config と init スクリプトでの二重定義が混在していたため、
