@@ -60,6 +60,7 @@ def contcar2cfg(
 
 def poscar2cfg(
     cfg_name: str,
+    poscar_name: Optional[str] = None,
     logger: Optional[Any] = None,
 ) -> bool:
     """
@@ -67,7 +68,8 @@ def poscar2cfg(
     コア部分を分離
 
     Args:
-        cfg_name (str):  CFG 保存用の名前
+        cfg_name (str): CFG 保存用の名前
+        poscar_name (str):
         logger (Any):
 
     Returns:
@@ -77,11 +79,14 @@ def poscar2cfg(
         # logger = XLogger(logger_name="contcar2cfg")
         logger = logging.getLogger("contcar2cfg")
 
-    logger.info(f"== poscar2cfg(poscar_name=POSCAR, cfg_name={cfg_name})")
-    logger.info(f"INPUT file name : POSCAR")
+    if poscar_name is None:
+        poscar_name = "POSCAR"
+
+    logger.info(f"== poscar2cfg(poscar_name={poscar_name}, cfg_name={cfg_name})")
+    logger.info(f"INPUT file name : {poscar_name}")
     logger.info(f"OUTPUT file name: {cfg_name}.cfg")
 
-    return convert_to_cfg("POSCAR", cfg_name)
+    return convert_to_cfg(f"{poscar_name}", cfg_name)
 
 
 def vasp2cfg(

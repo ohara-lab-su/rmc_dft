@@ -8,6 +8,7 @@ import sys
 
 import glob
 import shutil
+import gzip
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 

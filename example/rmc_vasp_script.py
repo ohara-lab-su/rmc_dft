@@ -164,16 +164,6 @@ if __name__ == "__main__":
             subprocess.run(["sleep", "5"], check=True)
             subprocess.run(["ls", "-la", "./"], check=True)
 
-            # 次回のRMCの初期構造ファイル
-            contcar2cfg(cfg_name=config.cfg_name)
-            shutil.copy(
-                f"{config.cfg_name}.cfg",
-                f"{config.cfg_name}0.cfg",
-            )
-            # 富岳対応 (キャッシュ対策)
-            subprocess.run(["sleep", "5"], check=True)
-            subprocess.run(["ls", "-la", "./"], check=True)
-
             # STOP mode が VASP のときに VASP で止める
             if (i == max_rmc_dft_loop - 1) and (stop_mode == "VASP"):
                 break

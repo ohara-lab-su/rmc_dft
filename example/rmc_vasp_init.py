@@ -48,8 +48,10 @@ def run_vasp_init(
     # ------------------
     if not os.path.exists("KPOINTS"):
         logger.info("== make KPOINTS")
+
         if vasp_kpoints is None:
-            vasp_kpoints = VaspKpoints(logger=logger)
+            vasp_kpoints = VaspKpoints(config=config, logger=logger)
+
         vasp_kpoints.set_mode("Monkhorst-Pack")
         vasp_kpoints.set_grid(1, 1, 1)
         vasp_kpoints.set_shift(0, 0, 0)
@@ -76,7 +78,8 @@ def run_vasp_init(
     # make INCAR
     # ------------------
     if vasp_incar is None:
-        vasp_incar = VaspIncar(logger=logger)
+        vasp_incar = VaspIncar(config=config, logger=logger)
+
     logger.info("== make INCAR")
     # vasp_incar.set_tag("EDIFF", 1e-04)
     # vasp_incar.set_tag("EDIFFG", 1e-03)
