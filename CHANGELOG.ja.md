@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.4.19 nakada
+
+- packmol 関係を強化して、独立パッケージ化(packmol_util)したので、
+rmc-dft 関係のツリーから削除
+- packmol 関係の example を packmol_util の example に置き換え
+  - make_amorphous.py 削除
+    - make_FeSiB.py 追加
+    - make_Li3PO4.py 追加
+ 
 ## v0.4.18 nakada
 
 富岳向けの VASP/RMC_POT デフォルト設定をサンプルに追加
