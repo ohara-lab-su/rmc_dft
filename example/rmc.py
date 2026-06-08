@@ -170,6 +170,8 @@ def run_rmc(
 
 
 if __name__ == "__main__":
+    from rmc_init import run_rmc_init
+
     logger_ = XLogger(log_level="debug", logger_name="rmc_vasp_run")
     config_ = Config("config.yml")
     msg_ = None
@@ -184,11 +186,12 @@ if __name__ == "__main__":
     rmc_log_ = RmcPotLog(cfg_name=config_.cfg_name, logger=logger_)
     rmc_dat_ = RmcPotDat(config=config_, logger=logger_)
 
-    # run_rmc_init(
-    #     config=config_,
-    #     rmc_dat=rmc_dat_,
-    #     logger=logger_,
-    # )
+    # ini パラメーターでをここで作り、config や *.dat を上書きする
+    run_rmc_init(
+        config=config_,
+        rmc_dat=rmc_dat_,
+        logger=logger_,
+    )
 
     run_rmc(
         config=config_,
