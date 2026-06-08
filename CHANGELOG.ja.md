@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.20 nakada
+
+sample の rmc.py が rmc_ini.py を呼び出してなかった(コメントアウトしていた)
+ので、それ自体は rmc.py の趣旨からして間違っていないのだが、RMC のテスト用としては
+不便極まりないので。rmc.py から rmc_init.py を呼び出す（コメントアウトを外す）
+
 ## v0.4.19 nakada
 
 - packmol 関係を強化して、独立パッケージ化(packmol_util)したので、
