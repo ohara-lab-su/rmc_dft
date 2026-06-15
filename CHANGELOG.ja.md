@@ -2,6 +2,13 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.21 nakada
+
+- RmcPotDat の FNC switch 周りを改善
+  - bool による有効/無効設定に対応
+  - FNC option の取得メソッドを追加
+  - fnc=4 の define option を保持できるよう修正
+
 ## v0.4.20 nakada
 
 sample の rmc.py が rmc_ini.py を呼び出してなかった(コメントアウトしていた)

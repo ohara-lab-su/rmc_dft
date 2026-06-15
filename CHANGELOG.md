@@ -2,6 +2,13 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.21 nakada
+
+- Improved FNC switch handling in `RmcPotDat`.
+  - Added bool-based enable/disable support.
+  - Added methods to retrieve FNC options.
+  - Fixed handling of `fnc=4` define options so they are preserved.
+
 ## v0.4.20 nakada
 
 The sample `rmc.py` did not call `rmc_init.py` because that line had been commented out.
