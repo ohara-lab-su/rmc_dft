@@ -1452,25 +1452,108 @@ class RmcPotDat:
 
     def get_fnc_switch(self) -> int:
         """
-        23 行目（FNC switch）を取得する。
+        23 行目（FNC switch）の先頭番号を取得する。
 
         Note:
-            - Fixed Neighbour Constraints (FNC) のオン/オフ。
-              0 の場合は無効、1 の場合は有効。
+            - 0: FNC なし
+            - 1: 通常 FNC。初期構造が FNC 距離範囲内にあることを要求する。
+            - 2: FNC 距離範囲を初期構造に合わせて調整して開始する。
+            - 3: 範囲外ペアを許して開始し、範囲内へ近づく move を受理する。
+            - 4: flexible molecule / bonded potential。通常 FNC ではなく topology を使う。
 
         Returns:
-            int: FNCスイッチ（0または1）。
+            int: FNC switch の先頭番号。
         """
         return int(float(self.get_line(23).split()[0]))
 
+    def get_fnc_options(self) -> List[str]:
+        """
+        23 行目（FNC switch）の先頭番号以降のオプションを取得する。
+
+        Returns:
+            List[str]: 例: ["-D_FF_OPLS", "-D_FLEX", "-DORI_ANGLE"]
+        """
+        toks = self.get_line(23).split()
+        return toks[1:]
+
+    @staticmethod
+    def _coerce_fnc_switch_value(
+        value: Union[bool, int],
+    ) -> int:
+        """
+        FNC switch のユーザー入力を RMC_POT の番号へ変換する。
+
+        bool 入力はユーザー向け I/F として扱う。
+            False -> 0
+            True  -> 1
+
+        int 入力は RMC_POT の生番号指定として扱い、bool より優先してその番号を使う。
+        """
+        if isinstance(value, bool):
+            return 1 if value else 0
+
+        mode = int(value)
+        if mode < 0 or mode > 4:
+            raise ValueError("FNC switch は 0, 1, 2, 3, 4 のいずれかです。")
+        return mode
+
+    @staticmethod
+    def _coerce_fnc_options(
+        opt: Optional[Union[str, Sequence[str]]],
+    ) -> List[str]:
+        """FNC switch 行の追加オプションを token list に正規化する。"""
+        if opt is None:
+            return []
+        if isinstance(opt, str):
+            s = opt.strip()
+            if not s:
+                return []
+            return s.split()
+        return [str(v).strip() for v in opt if str(v).strip()]
+
     def set_fnc_switch(
         self,
-        value: int,
+        value: Union[bool, int],
         *,
+        opt: Optional[Union[str, Sequence[str]]] = None,
+        keep_existing_opt: bool = True,
         auto_write: Optional[bool] = None,
     ) -> None:
-        """23 行目（FNCスイッチ）を設定する。"""
-        self.set_line(23, str(int(value)), auto_write=auto_write)
+        """
+        23 行目（FNC switch）を設定する。
+
+        Args:
+            value: True/False または RMC_POT の FNC switch 番号。
+                True は 1、False は 0 に変換する。
+                int を渡した場合は、その番号指定を最優先する。
+            opt: FNC switch 番号の後ろに付ける追加オプション。
+                例: "-D_FF_OPLS -D_FLEX -DORI_ANGLE -DORI_BOND"
+            keep_existing_opt: opt が None の場合に、既存行の追加オプションを保持する。
+                ただし value が bool の場合は通常の有効/無効操作なので保持しない。
+            auto_write: True 指定で即時保存。None の場合はインスタンス既定に従う。
+
+        Examples:
+            set_fnc_switch(True)
+                -> "1"
+            set_fnc_switch(False)
+                -> "0"
+            set_fnc_switch(3)
+                -> "3"
+            set_fnc_switch(4, opt="-D_FF_OPLS -D_FLEX -DORI_ANGLE -DORI_BOND")
+                -> "4 -D_FF_OPLS -D_FLEX -DORI_ANGLE -DORI_BOND"
+        """
+        is_bool_input = isinstance(value, bool)
+        mode = self._coerce_fnc_switch_value(value)
+
+        if opt is not None:
+            options = self._coerce_fnc_options(opt)
+        elif keep_existing_opt and not is_bool_input:
+            options = self.get_fnc_options()
+        else:
+            options = []
+
+        tokens = [str(mode)] + options
+        self.set_line(23, " ".join(tokens), auto_write=auto_write)
 
     def get_initial_bin_shift(self) -> int:
         """
