@@ -1454,12 +1454,19 @@ class RmcPotDat:
         """
         23 行目（FNC switch）の先頭番号を取得する。
 
+        FNC（Fixed Neighbour Constraint）は、FNC ファイルで指定した
+        原子ペア間距離を rmin–rmax の範囲で拘束する機能である。
+        PO4 の場合は、同一ユニット内の P-O 4本と O-O 6本を
+        FNC ペアとして指定することで、四面体形状を距離条件として指定する。
+
+        FNC switch は、FNC ペアの初期距離が指定範囲から外れている場合の扱いを指定する。
+
         Note:
             - 0: FNC なし
-            - 1: 通常 FNC。初期構造が FNC 距離範囲内にあることを要求する。
-            - 2: FNC 距離範囲を初期構造に合わせて調整して開始する。
-            - 3: 範囲外ペアを許して開始し、範囲内へ近づく move を受理する。
-            - 4: flexible molecule / bonded potential。通常 FNC ではなく topology を使う。
+            - 1: 初期構造で全 FNC ペアが指定距離範囲内にあることを要求する。
+            - 2: 範囲外の初期距離を許すように FNC 距離範囲を調整する。
+            - 3: 範囲外の FNC ペアも許し、指定距離範囲へ戻す move を受理する。
+            - 4: flexible molecule / bonded potential モード。通常 FNC ではなく topology を使う。
 
         Returns:
             int: FNC switch の先頭番号。
