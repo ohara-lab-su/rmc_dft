@@ -127,6 +127,10 @@ def run_rmc_init(
     # rmc_dat.set_sigma_factor(1e-7)
     rmc_dat.set_sigma_factor(0.05)
 
+    # 23 行目
+    # aaa.fnc を aaa.cfg / aaa.dat と同じ basename 側に置いて使う
+    rmc_dat.set_fnc_switch(3)
+
     # 26 行目：1 回の move で動かす原子数（通常 1）を設定する
     rmc_dat.set_num_atoms_per_move(1)
 
