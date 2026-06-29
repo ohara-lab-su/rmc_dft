@@ -52,13 +52,18 @@ def run_rmc_init(
     # パラメーター調整
 
     # 1 行目のコメント（系名）を設定する
-    rmc_dat.set_comment("comment FeSiB")
+    # rmc_dat.set_comment("comment FeSiB")
+    rmc_dat.set_commens("comment Li3PO4")
 
     # デフォルト値は config.yaml で書く(ここで書いた値のほうが優先される)
     # 2 行目：number density（数密度）を設定する
+    # FeSiB
     # rmc_dat.set_density(0.0915)
     # rmc_dat.set_density(0.09119)
-    rmc_dat.set_density(0.0912)
+    # rmc_dat.set_density(0.0912)
+
+    # Li3PO4
+    rmc_dat.set_density(0.0772877)
 
     # 3 行目：cut offs（各原子種ペアのカットオフ距離）を設定する
     # rmc_dat.set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
@@ -73,7 +78,10 @@ def run_rmc_init(
     # rmc_dat.set_cutoffs([2.1, 1.9, 1.75, 1.8, 1.75, 1.5])
     # rmc_dat.set_cutoffs([2.2, 2.2, 1.95, 1.8, 1.8, 2.8]) # 2026.02.16
     # rmc_dat.set_cutoffs([2.4, 2.3, 2.1, 2.0, 2.4, 1.7])
-    rmc_dat.set_cutoffs([2.2, 2.1, 1.75, 2.3, 1.6, 1.6])
+    # rmc_dat.set_cutoffs([2.2, 2.1, 1.75, 2.3, 1.6, 1.6])
+
+    # Li3PO4 (test)
+    rmc_dat.set_cutoffs([2.4, 2.3, 2.1, 2.0, 2.4, 1.7])
 
     # 4 行目：maximum moves（1 回の移動での最大変位量）を設定する
     # rmc_dat.set_maximum_moves([0.1, 0.1, 0.1])
@@ -95,9 +103,9 @@ def run_rmc_init(
     # 計算時間と構造をsaveするステップ間隔
     # rmc_dat.set_time_and_save(0.5, 0.5)
     # rmc_dat.set_time_and_save(5, 1)
-    rmc_dat.set_time_and_save(15, 1)
+    # rmc_dat.set_time_and_save(15, 1)
     # rmc_dat.set_time_and_save(30, 1)
-    # rmc_dat.set_time_and_save(60, 1)
+    rmc_dat.set_time_and_save(60, 1)
     # rmc_dat.set_time_and_save(120, 1)
     # rmc_dat.set_time_and_save(360, 1)
     # rmc_dat.set_time_and_save(480, 1)
@@ -116,7 +124,8 @@ def run_rmc_init(
     # 12 (データ範囲)
     # rmc_dat.set_exp_range(1, 1091, auto_write=True)
     # rmc_dat.set_exp_range(50, 1091)  # 2026.02.16
-    rmc_dat.set_exp_range(85, 1091)  # 2026.02.16
+    # rmc_dat.set_exp_range(85, 1091)  # 2026.02.16
+    rmc_dat.set_exp_range(85, 771)
 
     # 14 (温度因子)
     # σ（実験データの許容誤差の標準偏差）
