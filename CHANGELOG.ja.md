@@ -18,7 +18,6 @@ RMC 実行時の FNC 設定を rmc_init.py 側から調整しやすくした。
   - `rmc_init.py` を保存対象に追加
   - どちらも存在する場合のみ `logNN_rmc` 側へコピーし、存在しない場合は skip する
 
-
 ## v0.4.21 nakada
 
 - RmcPotDat の FNC switch 周りを改善
