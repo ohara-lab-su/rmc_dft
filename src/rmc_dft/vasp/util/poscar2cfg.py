@@ -30,7 +30,11 @@ import logging
 
 # from numpy import *
 import numpy as np
-from x_logger import XLogger
+
+try:
+    from x_logger import XLogger
+except Exception as e:
+    pass
 
 
 def contcar2cfg(
