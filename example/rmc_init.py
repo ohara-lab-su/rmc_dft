@@ -140,6 +140,17 @@ def run_rmc_init(
     # aaa.fnc を aaa.cfg / aaa.dat と同じ basename 側に置いて使う
     rmc_dat.set_fnc_switch(3)
 
+    # FNC ファイルの距離範囲を RMC 実行前に変更する。
+    # 作成時は、packmol_util つかっていたらそれで、初期設定はされている
+    # その値を、rmc するときに rmc 毎に変えるなどするには、
+    # ペア指定は変えず、constraint type ごとの rmin/rmax だけを書き換える。
+    rmc_dat.set_fnc_distance_ranges(
+        {
+            1: (1.24, 1.37),  # P-O
+            2: (2.02, 2.25),  # O-O
+        }
+    )
+
     # 26 行目：1 回の move で動かす原子数（通常 1）を設定する
     rmc_dat.set_num_atoms_per_move(1)
 

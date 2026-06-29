@@ -1562,6 +1562,165 @@ class RmcPotDat:
         tokens = [str(mode)] + options
         self.set_line(23, " ".join(tokens), auto_write=auto_write)
 
+    def _resolve_fnc_path(
+        self,
+        fnc_name: Optional[str] = None,
+    ) -> Path:
+        """
+        FNC ファイルパスを解決する。
+
+        Args:
+            fnc_name: FNC ファイル名または basename。
+                None の場合は self._cfg_name + ".fnc" を使う。
+
+        Returns:
+            Path: FNC ファイルパス。
+        """
+        if fnc_name is None:
+            return Path(f"{self._cfg_name}.fnc")
+
+        path = Path(fnc_name)
+        if path.suffix == ".fnc":
+            return path
+
+        return Path(f"{fnc_name}.fnc")
+
+    def get_fnc_distance_ranges(
+        self,
+        fnc_name: Optional[str] = None,
+    ) -> Dict[int, Tuple[float, float]]:
+        """
+        FNC ファイルの constraint type ごとの rmin/rmax を取得する。
+
+        FNC ファイルの先頭部は次の形式を想定する。
+
+            No. of possible rmin-rmax pairs:
+            2
+            rmin_type1 rmin_type2 ...
+            rmax_type1 rmax_type2 ...
+
+        Returns:
+            Dict[int, Tuple[float, float]]:
+                constraint type を 1 始まり key とした rmin/rmax。
+        """
+        path = self._resolve_fnc_path(fnc_name)
+        if not path.exists():
+            raise FileNotFoundError(f"FNC ファイルが見つかりません: {path}")
+
+        with path.open("r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        if len(lines) < 4:
+            raise ValueError(f"FNC ファイルのヘッダが短すぎます: {path}")
+
+        try:
+            type_count = int(lines[1].split()[0])
+        except (IndexError, ValueError) as exc:
+            raise ValueError(f"FNC type 数を読めません: {path}") from exc
+
+        rmins = [float(v) for v in lines[2].split()]
+        rmaxs = [float(v) for v in lines[3].split()]
+
+        if len(rmins) != type_count:
+            raise ValueError(
+                f"FNC rmin 数が type 数と一致しません: "
+                f"type_count={type_count}, rmin_count={len(rmins)}"
+            )
+
+        if len(rmaxs) != type_count:
+            raise ValueError(
+                f"FNC rmax 数が type 数と一致しません: "
+                f"type_count={type_count}, rmax_count={len(rmaxs)}"
+            )
+
+        ranges: Dict[int, Tuple[float, float]] = {}
+        type_index = 1
+        while type_index <= type_count:
+            ranges[type_index] = (rmins[type_index - 1], rmaxs[type_index - 1])
+            type_index = type_index + 1
+
+        return ranges
+
+    def set_fnc_distance_ranges(
+        self,
+        ranges: Dict[int, Tuple[float, float]],
+        fnc_name: Optional[str] = None,
+    ) -> None:
+        """
+        FNC ファイルの constraint type ごとの rmin/rmax を更新する。
+
+        既存の FNC ペア、neighbor index、constraint type は変更しない。
+        変更するのはヘッダの rmin/rmax のみである。
+
+        Args:
+            ranges:
+                constraint type を 1 始まり key とした rmin/rmax。
+                例:
+                    {
+                        1: (1.24, 1.37),  # P-O
+                        2: (2.02, 2.25),  # O-O
+                    }
+            fnc_name:
+                FNC ファイル名または basename。
+                None の場合は self._cfg_name + ".fnc" を使う。
+        """
+        path = self._resolve_fnc_path(fnc_name)
+        if not path.exists():
+            raise FileNotFoundError(f"FNC ファイルが見つかりません: {path}")
+
+        with path.open("r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        if len(lines) < 4:
+            raise ValueError(f"FNC ファイルのヘッダが短すぎます: {path}")
+
+        try:
+            type_count = int(lines[1].split()[0])
+        except (IndexError, ValueError) as exc:
+            raise ValueError(f"FNC type 数を読めません: {path}") from exc
+
+        rmins = [float(v) for v in lines[2].split()]
+        rmaxs = [float(v) for v in lines[3].split()]
+
+        if len(rmins) != type_count:
+            raise ValueError(
+                f"FNC rmin 数が type 数と一致しません: "
+                f"type_count={type_count}, rmin_count={len(rmins)}"
+            )
+
+        if len(rmaxs) != type_count:
+            raise ValueError(
+                f"FNC rmax 数が type 数と一致しません: "
+                f"type_count={type_count}, rmax_count={len(rmaxs)}"
+            )
+
+        for type_index, distance_range in ranges.items():
+            if type_index < 1 or type_index > type_count:
+                raise ValueError(
+                    f"FNC constraint type が範囲外です: "
+                    f"type_index={type_index}, type_count={type_count}"
+                )
+
+            rmin = float(distance_range[0])
+            rmax = float(distance_range[1])
+
+            if rmin >= rmax:
+                raise ValueError(
+                    f"FNC rmin は rmax より小さい必要があります: "
+                    f"type_index={type_index}, rmin={rmin}, rmax={rmax}"
+                )
+
+            rmins[type_index - 1] = rmin
+            rmaxs[type_index - 1] = rmax
+
+        lines[2] = " ".join(self._fmt_number(v) for v in rmins) + "\n"
+        lines[3] = " ".join(self._fmt_number(v) for v in rmaxs) + "\n"
+
+        with path.open("w", encoding="utf-8") as f:
+            f.writelines(lines)
+
+        self._logger.info(f"== set_fnc_distance_ranges({path})")
+
     def get_initial_bin_shift(self) -> int:
         """
         24 行目（initial bin shift）を取得する。

@@ -774,11 +774,13 @@ class RmcPotLog:
 
         files_to_copy = [
             "grep_khi_RMC.txt",
+            "rmc_init.py",
             f"{cfg_name}.chi",
             f"{cfg_name}.cfg",
             f"{cfg_name}0.cfg",
             f"{cfg_name}.sq",
             f"{cfg_name}.dat",
+            f"{cfg_name}.fnc",
             f"{cfg_name}.hst",
             f"{cfg_name}.ppcf",
             f"{cfg_name}.fit",

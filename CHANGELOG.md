@@ -2,6 +2,23 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.22 nakada
+
+Improved FNC configuration handling during RMC execution so that FNC settings can be adjusted from `rmc_init.py`.
+
+- Added methods to `RmcPotDat` for handling FNC file distance ranges.
+  - Added `get_fnc_distance_ranges()`.
+  - Added `set_fnc_distance_ranges()`.
+  - By default, handles `.fnc` files with the same basename as the cfg/dat files, such as `aaa.fnc`.
+  - Rewrites only the rmin/rmax values in the FNC header without changing FNC pair definitions or constraint type assignments.
+- Made it possible to change distance ranges for each FNC constraint type from `rmc_init.py` before running RMC.
+  - Example: adjust the PO4 shape-retention range by treating type 1 as P-O and type 2 as O-O.
+- Added files to the RMC log backup targets.
+  - Added `*.fnc`.
+  - Added `rmc_init.py`.
+  - Both files are copied to `logNN_rmc` only when they exist; missing files are skipped.
+
+
 ## v0.4.21 nakada
 
 - Improved FNC switch handling in `RmcPotDat`.

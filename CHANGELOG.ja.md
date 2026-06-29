@@ -2,6 +2,23 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.22 nakada
+
+RMC 実行時の FNC 設定を rmc_init.py 側から調整しやすくした。
+
+- `RmcPotDat` に FNC ファイルの距離範囲を扱うメソッドを追加
+  - `get_fnc_distance_ranges()` を追加
+  - `set_fnc_distance_ranges()` を追加
+  - `aaa.fnc` など、cfg/dat と同じ basename の `.fnc` を既定で扱う
+  - FNC ペア指定と constraint type 割当は変更せず、ヘッダの rmin/rmax のみを書き換える
+- `rmc_init.py` から、RMC 実行前に FNC constraint type ごとの距離範囲を変更できるようにした
+  - 例: type 1 を P-O、type 2 を O-O として、PO4 形状保持範囲を調整する
+- RMC ログ保存対象を追加
+  - `*.fnc` を保存対象に追加
+  - `rmc_init.py` を保存対象に追加
+  - どちらも存在する場合のみ `logNN_rmc` 側へコピーし、存在しない場合は skip する
+
+
 ## v0.4.21 nakada
 
 - RmcPotDat の FNC switch 周りを改善
