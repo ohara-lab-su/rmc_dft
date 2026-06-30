@@ -2,6 +2,24 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.23 nakada
+
+v0.4.22 の FNC 距離範囲編集機能に対するバグ修正版
+
+- `RmcPotDat.set_fnc_distance_ranges()` の FNC ヘッダ読み取りを修正
+  - `lines[1]` などの固定行番号読み取りを廃止
+  - `No. of possible rmin-rmax pairs` 行を検索し、その次の type 数、rmin 行、rmax 行を読むように変更
+  - タイトル行や空行を含む `.fnc` ファイルでも正しく読めるようにした
+- FNC ファイルの存在確認を維持
+  - `.fnc` が存在しない場合は `FileNotFoundError` を出す
+  - FNC 有効化時に、存在しないまたは意図しない `.fnc` で黙って進まないようにした
+- `get_fnc_distance_ranges()` / `set_fnc_distance_ranges()` / `_resolve_fnc_path()` を維持
+  - 既存の FNC ペア指定、neighbor index、constraint type 割当は変更しない
+  - 変更対象は FNC ヘッダの rmin/rmax のみである
+- `rmc_init.py` の FNC range 設定例を、実際の `.fnc` に存在する constraint type だけを指定する形に整理
+  - Li3PO4 の現在の例では type 1 の P-O のみを対象とする
+  - O-O は FNC で拘束しない前提を維持する
+
 ## v0.4.22 nakada
 
 RMC 実行時の FNC 設定を rmc_init.py 側から調整しやすくした。
