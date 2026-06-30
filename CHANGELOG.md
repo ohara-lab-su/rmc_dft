@@ -2,6 +2,24 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.23 nakada
+
+Bug-fix release for the FNC distance-range editing feature introduced in v0.4.22.
+
+- Fixed FNC header parsing in `RmcPotDat.set_fnc_distance_ranges()`.
+  - Removed fixed line-index parsing such as `lines[1]`.
+  - The parser now searches for the `No. of possible rmin-rmax pairs` line and reads the type count, rmin line, and rmax line after it.
+  - `.fnc` files containing title lines or blank lines are now handled correctly.
+- Preserved the FNC file existence check.
+  - Missing `.fnc` files raise `FileNotFoundError`.
+  - RMC no longer proceeds silently with a missing or unintended FNC file when FNC is enabled.
+- Preserved `get_fnc_distance_ranges()`, `set_fnc_distance_ranges()`, and `_resolve_fnc_path()`.
+  - Existing FNC pair definitions, neighbor indices, and constraint type assignments are not changed.
+  - Only the rmin/rmax values in the FNC header are rewritten.
+- Organized the FNC range setting example in `rmc_init.py` so that it specifies only constraint types that actually exist in the `.fnc` file.
+  - In the current Li3PO4 example, only type 1 P-O is targeted.
+  - The assumption that O-O is not constrained by FNC is preserved.
+
 ## v0.4.22 nakada
 
 Improved FNC configuration handling during RMC execution so that FNC settings can be adjusted from `rmc_init.py`.
@@ -17,7 +35,6 @@ Improved FNC configuration handling during RMC execution so that FNC settings ca
   - Added `*.fnc`.
   - Added `rmc_init.py`.
   - Both files are copied to `logNN_rmc` only when they exist; missing files are skipped.
-
 
 ## v0.4.21 nakada
 

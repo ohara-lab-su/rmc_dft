@@ -53,7 +53,7 @@ def run_rmc_init(
 
     # 1 行目のコメント（系名）を設定する
     # rmc_dat.set_comment("comment FeSiB")
-    rmc_dat.set_commens("comment Li3PO4")
+    rmc_dat.set_comment("comment Li3PO4")
 
     # デフォルト値は config.yaml で書く(ここで書いた値のほうが優先される)
     # 2 行目：number density（数密度）を設定する
@@ -146,8 +146,9 @@ def run_rmc_init(
     # ペア指定は変えず、constraint type ごとの rmin/rmax だけを書き換える。
     rmc_dat.set_fnc_distance_ranges(
         {
-            1: (1.24, 1.37),  # P-O
-            2: (2.02, 2.25),  # O-O
+            # 1: (1.24, 1.37),  # P-O
+            # 2: (2.02, 2.25),  # O-O
+            1: (1.20, 1.45),  # P-O
         }
     )
 
