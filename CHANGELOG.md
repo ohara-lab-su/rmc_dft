@@ -18,7 +18,6 @@ Improved FNC configuration handling during RMC execution so that FNC settings ca
   - Added `rmc_init.py`.
   - Both files are copied to `logNN_rmc` only when they exist; missing files are skipped.
 
-
 ## v0.4.21 nakada
 
 - Improved FNC switch handling in `RmcPotDat`.

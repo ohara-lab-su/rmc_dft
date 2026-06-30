@@ -1454,19 +1454,12 @@ class RmcPotDat:
         """
         23 行目（FNC switch）の先頭番号を取得する。
 
-        FNC（Fixed Neighbour Constraint）は、FNC ファイルで指定した
-        原子ペア間距離を rmin–rmax の範囲で拘束する機能である。
-        PO4 の場合は、同一ユニット内の P-O 4本と O-O 6本を
-        FNC ペアとして指定することで、四面体形状を距離条件として指定する。
-
-        FNC switch は、FNC ペアの初期距離が指定範囲から外れている場合の扱いを指定する。
-
         Note:
             - 0: FNC なし
-            - 1: 初期構造で全 FNC ペアが指定距離範囲内にあることを要求する。
-            - 2: 範囲外の初期距離を許すように FNC 距離範囲を調整する。
-            - 3: 範囲外の FNC ペアも許し、指定距離範囲へ戻す move を受理する。
-            - 4: flexible molecule / bonded potential モード。通常 FNC ではなく topology を使う。
+            - 1: 通常 FNC。初期構造が FNC 距離範囲内にあることを要求する。
+            - 2: FNC 距離範囲を初期構造に合わせて調整して開始する。
+            - 3: 範囲外ペアを許して開始し、範囲内へ近づく move を受理する。
+            - 4: flexible molecule / bonded potential。通常 FNC ではなく topology を使う。
 
         Returns:
             int: FNC switch の先頭番号。
@@ -1568,13 +1561,6 @@ class RmcPotDat:
     ) -> Path:
         """
         FNC ファイルパスを解決する。
-
-        Args:
-            fnc_name: FNC ファイル名または basename。
-                None の場合は self._cfg_name + ".fnc" を使う。
-
-        Returns:
-            Path: FNC ファイルパス。
         """
         if fnc_name is None:
             return Path(f"{self._cfg_name}.fnc")
@@ -1585,41 +1571,49 @@ class RmcPotDat:
 
         return Path(f"{fnc_name}.fnc")
 
+    def _find_fnc_range_header_index(
+        self,
+        lines: List[str],
+        path: Path,
+    ) -> int:
+        """
+        FNC ファイル内の rmin/rmax 定義ヘッダ行を探す。
+        """
+        for index, line in enumerate(lines):
+            if "No. of possible rmin-rmax pairs" in line:
+                return index
+
+        raise ValueError(
+            f"FNC rmin/rmax ヘッダが見つかりません: {path}"
+        )
+
     def get_fnc_distance_ranges(
         self,
         fnc_name: Optional[str] = None,
     ) -> Dict[int, Tuple[float, float]]:
         """
         FNC ファイルの constraint type ごとの rmin/rmax を取得する。
-
-        FNC ファイルの先頭部は次の形式を想定する。
-
-            No. of possible rmin-rmax pairs:
-            2
-            rmin_type1 rmin_type2 ...
-            rmax_type1 rmax_type2 ...
-
-        Returns:
-            Dict[int, Tuple[float, float]]:
-                constraint type を 1 始まり key とした rmin/rmax。
         """
         path = self._resolve_fnc_path(fnc_name)
+
         if not path.exists():
             raise FileNotFoundError(f"FNC ファイルが見つかりません: {path}")
 
         with path.open("r", encoding="utf-8") as f:
             lines = f.readlines()
 
-        if len(lines) < 4:
+        header_index = self._find_fnc_range_header_index(lines, path)
+
+        if len(lines) <= header_index + 3:
             raise ValueError(f"FNC ファイルのヘッダが短すぎます: {path}")
 
         try:
-            type_count = int(lines[1].split()[0])
+            type_count = int(lines[header_index + 1].split()[0])
         except (IndexError, ValueError) as exc:
             raise ValueError(f"FNC type 数を読めません: {path}") from exc
 
-        rmins = [float(v) for v in lines[2].split()]
-        rmaxs = [float(v) for v in lines[3].split()]
+        rmins = [float(v) for v in lines[header_index + 2].split()]
+        rmaxs = [float(v) for v in lines[header_index + 3].split()]
 
         if len(rmins) != type_count:
             raise ValueError(
@@ -1636,7 +1630,10 @@ class RmcPotDat:
         ranges: Dict[int, Tuple[float, float]] = {}
         type_index = 1
         while type_index <= type_count:
-            ranges[type_index] = (rmins[type_index - 1], rmaxs[type_index - 1])
+            ranges[type_index] = (
+                rmins[type_index - 1],
+                rmaxs[type_index - 1],
+            )
             type_index = type_index + 1
 
         return ranges
@@ -1651,36 +1648,27 @@ class RmcPotDat:
 
         既存の FNC ペア、neighbor index、constraint type は変更しない。
         変更するのはヘッダの rmin/rmax のみである。
-
-        Args:
-            ranges:
-                constraint type を 1 始まり key とした rmin/rmax。
-                例:
-                    {
-                        1: (1.24, 1.37),  # P-O
-                        2: (2.02, 2.25),  # O-O
-                    }
-            fnc_name:
-                FNC ファイル名または basename。
-                None の場合は self._cfg_name + ".fnc" を使う。
         """
         path = self._resolve_fnc_path(fnc_name)
+
         if not path.exists():
             raise FileNotFoundError(f"FNC ファイルが見つかりません: {path}")
 
         with path.open("r", encoding="utf-8") as f:
             lines = f.readlines()
 
-        if len(lines) < 4:
+        header_index = self._find_fnc_range_header_index(lines, path)
+
+        if len(lines) <= header_index + 3:
             raise ValueError(f"FNC ファイルのヘッダが短すぎます: {path}")
 
         try:
-            type_count = int(lines[1].split()[0])
+            type_count = int(lines[header_index + 1].split()[0])
         except (IndexError, ValueError) as exc:
             raise ValueError(f"FNC type 数を読めません: {path}") from exc
 
-        rmins = [float(v) for v in lines[2].split()]
-        rmaxs = [float(v) for v in lines[3].split()]
+        rmins = [float(v) for v in lines[header_index + 2].split()]
+        rmaxs = [float(v) for v in lines[header_index + 3].split()]
 
         if len(rmins) != type_count:
             raise ValueError(
@@ -1713,8 +1701,12 @@ class RmcPotDat:
             rmins[type_index - 1] = rmin
             rmaxs[type_index - 1] = rmax
 
-        lines[2] = " ".join(self._fmt_number(v) for v in rmins) + "\n"
-        lines[3] = " ".join(self._fmt_number(v) for v in rmaxs) + "\n"
+        lines[header_index + 2] = " ".join(
+            self._fmt_number(v) for v in rmins
+        ) + "\n"
+        lines[header_index + 3] = " ".join(
+            self._fmt_number(v) for v in rmaxs
+        ) + "\n"
 
         with path.open("w", encoding="utf-8") as f:
             f.writelines(lines)
