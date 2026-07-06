@@ -2,6 +2,37 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.24 nakada
+
+Added experimental support for generating RMC_POT FNC / Qn-network files for SiO2 glass.
+
+This release freezes the current implementation state first, regardless of whether the new workflow is already fully validated.
+
+- Added `src/rmc_dft/rmc_pot/fnc/`.
+  - Added `qn_network.py`.
+  - Collected the basic functionality for Qn-network analysis, FNC=3 `.fnc` generation, and FNC=4 GROMACS-style topology generation.
+  - The package-side implementation is treated as a generic `central - bridge - second` Qn-network analyzer, not as a SiO2-specific module.
+- Moved SiO2-specific settings to the example side.
+  - Added `example/fnc/SiO2_03/make_sio2_qn_fnc.py`.
+  - Added `example/fnc/SiO2_03/qn_config_sio2.json`.
+  - SiO2-specific settings such as `central=Si`, `bridge=O`, `second=Si`, FNC distance ranges, and FNC=4 topology parameters are collected in the JSON configuration.
+- Cleaned up intermediate scripts that are no longer needed.
+  - The package-side `make_qn_network_constraints.py` is marked for removal because its functionality has been moved into `qn_network.py`.
+  - The package-side `sio2.py` is marked for removal because SiO2-specific defaults should not live in the generic module.
+  - SiO2-specific helper code is kept only under the example directory.
+- Clarified the role of FNC files.
+  - FNC=3 is used to generate distance-window `.fnc` constraints from the extracted network.
+  - FNC=4 is used to generate a flexible-molecule topology for RMC_POT.
+  - A GROMACS BKS-MD `.top` file and an RMC_POT FNC=4 topology are treated as different files with different purposes.
+- Added docstrings and comments.
+  - Added explanations for the Qn definition, RMC index handling, assumptions about POSCAR/cfg atom order, and the roles of FNC=3 and FNC=4.
+  - The current code is organized as an explanatory implementation for understanding and further refinement.
+
+Notes:
+
+- The Qn/FNC generation feature in v0.4.24 is experimental. Before production use, the generated `.fnc` / `.top` files, RMC_POT acceptance ratio, Qn distribution, bond-length distribution, and angle distribution must be checked.
+- The numerical parameters for SiO2 are initial values and are expected to be tuned based on RMC fitting against the experimental profile.
+
 ## v0.4.23 nakada
 
 Bug-fix release for the FNC distance-range editing feature introduced in v0.4.22.
