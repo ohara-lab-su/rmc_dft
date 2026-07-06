@@ -19,8 +19,12 @@ Qn として数える。
 * FNC=3 用 ``*.fnc``
     原子対距離を rmin-rmax の範囲に保つ fixed neighbour constraint。
 * FNC=4 用 ``*.top``
-    RMC_POT の flexible MD-like molecule 用 GROMACS 型 topology。
-    Si-O のような bond、O-Si-O / Si-O-Si のような angle を bonded potential として書く。
+    RMC_POT の flexible molecule 用 topology。
+    これは GROMACS の MD 実行用 topology を真似るためのものではなく、
+    RMC_POT が読む最小限の ``[ moleculetype ]``、``[ atoms ]``、``[ bonds ]``、
+    ``[ angles ]`` を書くためのファイルである。
+    本モジュールでは、初期構造のネットワーク全体を固定する ``write_fnc4_topology`` と、
+    独立分子または独立フラグメントだけを保持する ``write_unit_topology`` を分けている。
 * ``*_qn.csv``
     central atom ごとの Qn 判定結果。
 * ``*_network_bonds.csv``
@@ -43,9 +47,11 @@ RMC_POT の atom index は、入力構造ファイルの原子順を 1 始まり
 
 注意
 ----
-ここで生成する FNC=4 topology は、GROMACS で古典 MD を実行するための topology ではなく、
-RMC_POT が bonded potential を読むための topology 雛形である。
-力定数や sigma は必ず短い RMC_POT 試行で調整する。
+ここで生成する FNC=4 topology は、GROMACS で古典 MD を実行するための topology ではない。
+RMC_POT が bonded potential を読むために必要な RMC 用 topology である。
+ただし RMC_POT は topology の記法として GROMACS 由来の directive 名を採用しているため、
+``[ atoms ]``、``[ bonds ]``、``[ angles ]`` という名前は残る。
+力定数や sigma は RMC_POT の chi2 寄与の重みそのものなので、短い試行計算で調整する。
 
 このファイルはライブラリ本体であり、CLI は持たない。
 特定系の実行スクリプトは ``example/fnc`` 側に置く。
@@ -75,6 +81,7 @@ import numpy as np
 Pair = Tuple[int, int]
 TypedPair = Tuple[int, int, int]
 Angle = Tuple[int, int, int]
+UnitMolecule = Tuple[str, List[int], List[Pair], List[Angle]]
 
 
 class ConfigError(Exception):
@@ -655,18 +662,74 @@ def percentile_line(values: Sequence[float]) -> str:
     return text
 
 
+def get_topology_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """RMC_POT topology 用設定を取得する。
+
+    新しい設定名は ``rmc_top`` とする。
+    過去に作成した JSON との互換性のため、``rmc_top`` が無い場合だけ ``fnc4`` を読む。
+    ここで扱う topology は GROMACS MD 用ではなく、RMC_POT の FNC=4 用である。
+    """
+    if "rmc_top" in config:
+        return config["rmc_top"]
+    if "fnc4" in config:
+        return config["fnc4"]
+    raise ConfigError("config に rmc_top がありません。")
+
+
+
+
+def get_force_field_include(top_config: Dict[str, Any]) -> str:
+    """RMC_POT が force field 名を判定するための include 名を返す。
+
+    RMC_POT は FNC=4 topology の先頭付近にある force-field include 名から
+    force field 種別を判定する。GROMACS 用の実力場を使わない RMC 専用 topology
+    でも、``ffUNKNOWN_READ_PAIRS.itp`` などの認識可能な include 名が必要である。
+    """
+    include_name = top_config.get("force_field_include", None)
+    if include_name is None:
+        include_name = top_config.get("include", None)
+    if include_name is None:
+        include_name = "ffUNKNOWN_READ_PAIRS.itp"
+    return str(include_name)
+
+
+def write_force_field_stub(topology_path: str, include_name: str) -> None:
+    """RMC 専用 UNKNOWN force-field include の空 stub を必要に応じて作る。
+
+    RMC_POT は force field 名を include 名から判定する。実際の非結合 parameter は
+    ``*.dat`` 側から読むため、UNKNOWN 系では include file の中身は最小でよい。
+    既存ファイルがある場合は上書きしない。
+    """
+    if os.path.isabs(include_name):
+        include_path = include_name
+    else:
+        base_dir = os.path.dirname(os.path.abspath(topology_path))
+        include_path = os.path.join(base_dir, include_name)
+
+    if os.path.exists(include_path):
+        return
+
+    include_base = os.path.basename(include_name)
+    if include_base not in ("ffUNKNOWN_READ_PAIRS.itp", "ffUNKNOWN_GENERATE_PAIRS.itp"):
+        return
+
+    with open(include_path, "w", encoding="utf-8") as f:
+        f.write("; Minimal RMC_POT force-field marker include.\n")
+        f.write("; RMC_POT uses the include file name to identify UNKNOWN_READ_PAIRS / UNKNOWN_GENERATE_PAIRS.\n")
+        f.write("; Non-bonded parameters, if used, must be supplied from the RMC_POT *.dat file.\n")
+
 def build_angles(poscar: PoscarData, config: Dict[str, Any], data: NetworkData) -> List[Tuple[int, int, int, str]]:
     """FNC=4 topology の [ angles ] に書く angle list を作る。
 
-    JSON の ``fnc4.angles`` で source を指定する。現在対応する source は次の通り。
+    JSON の ``rmc_top.angles`` で source を指定する。現在対応する source は次の通り。
 
     * ``bridge_central_bridge``: central を中心にした bridge-central-bridge。例: O-Si-O。
     * ``central_bridge_second``: bridge を中心にした central-bridge-second。例: Si-O-Si。
 
     戻り値の index は 0 始まりで、最後の文字列は angle parameter 名である。
     """
-    fnc4_config = get_required(config, "fnc4")
-    angle_items = fnc4_config.get("angles", [])
+    top_config = get_topology_config(config)
+    angle_items = top_config.get("angles", [])
     angles = []  # type: List[Tuple[int, int, int, str]]
     seen = set()  # type: Set[Tuple[int, int, int, str]]
 
@@ -700,8 +763,8 @@ def build_angles(poscar: PoscarData, config: Dict[str, Any], data: NetworkData) 
 
 def find_angle_parameter(config: Dict[str, Any], angle_name: str) -> Dict[str, Any]:
     """angle 名に対応する FNC=4 angle パラメータを JSON 設定から探す。"""
-    fnc4_config = get_required(config, "fnc4")
-    for item in fnc4_config.get("angles", []):
+    top_config = get_topology_config(config)
+    for item in top_config.get("angles", []):
         name = str(get_required(item, "name"))
         if name == angle_name:
             return item
@@ -709,47 +772,69 @@ def find_angle_parameter(config: Dict[str, Any], angle_name: str) -> Dict[str, A
 
 
 def write_topology(path: str, poscar: PoscarData, config: Dict[str, Any], data: NetworkData) -> None:
-    """RMC_POT FNC=4 用 GROMACS 型 topology を書く。
+    """RMC_POT FNC=4 用 topology を書く。
 
-    この topology は、RMC_POT に bonded potential を読ませるためのファイルである。
-    GROMACS で BKS-MD を走らせるための topology とは目的が違う。
+    ここで書く ``*.top`` は GROMACS で MD を実行するための topology ではない。
+    RMC_POT が FNC=4 で bonded potential を計算するために読む topology である。
 
-    [ atoms ] では、RMC_POT 用の first_RMC_index / second_RMC_index を
-    コメント欄の後ろに書く。ここでは 1 分子として全原子を保持するため、
+    RMC_POT の manual では topology の記法として GROMACS 型 directive 名が使われる。
+    ただし RMC が認識する directive は限定されており、この exporter では
+    Qn ネットワーク保持に必要な次の 5 種類だけを書く。
+
+    * ``[ moleculetype ]``: ネットワーク全体を 1 つの molecule として扱うための名前。
+    * ``[ atoms ]``: topology 内 atom index と RMC configuration 内 atom index の対応。
+    * ``[ bonds ]``: Si-O など、ネットワーク edge に対する harmonic bond。
+    * ``[ angles ]``: O-Si-O や Si-O-Si など、ネットワーク angle に対する harmonic angle。
+    * ``[ system ]`` / ``[ molecules ]``: topology の末尾に必要な system 情報。
+
+    ``[ atoms ]`` の行末にある ``; first_RMC_index second_RMC_index`` は RMC_POT 固有情報である。
+    GROMACS ではコメントだが、RMC_POT はこの情報を使って topology atom と
+    RMC configuration atom を対応付ける。ここでは 1 つの network molecule として書くため、
     first と second は同じ index にしている。
 
-    [ bonds ] には network bond、[ angles ] には JSON で指定した角度項を出力する。
-    force constant や sigma は初期値であり、実際の RMC_POT 試行で調整する。
+    ``[ bonds ]`` と ``[ angles ]`` は「結合がある」という幾何学的な宣言だけではない。
+    RMC_POT は harmonic potential として使うため、平衡値、力定数、sigma が必要である。
+    そのため、topology 用 JSON には最低限 ``bond.length_nm``、``bond.force_kj_mol_nm2``、
+    ``bond.sigma``、および各 angle の ``theta_degree``、``force_kj_mol_rad2``、``sigma`` を置く。
     """
-    fnc4_config = get_required(config, "fnc4")
-    molecule_name = str(fnc4_config.get("molecule_name", "QNNET"))
-    residue_name = str(fnc4_config.get("residue_name", "QNN"))
-    nrexcl = int(fnc4_config.get("nrexcl", 2))
+    top_config = get_topology_config(config)
+
+    molecule_name = str(top_config.get("molecule_name", "QNNET"))
+    residue_name = str(top_config.get("residue_name", "QNN"))
+    nrexcl = int(top_config.get("nrexcl", 2))
 
     masses = config.get("masses", {})
     charges = config.get("charges", {})
-    atom_type_prefix = str(fnc4_config.get("atom_type_prefix", "rmc"))
+    atom_type_prefix = str(top_config.get("atom_type_prefix", ""))
 
-    bond_length_nm = float(fnc4_config.get("bond_length_nm", 0.161))
-    bond_force = float(fnc4_config.get("bond_force_kj_mol_nm2", 10000.0))
-    bond_sigma = float(fnc4_config.get("bond_sigma", 1.0))
+    bond_config = top_config.get("bond", {})
+    bond_length_nm = float(bond_config.get("length_nm", top_config.get("bond_length_nm", 0.161)))
+    bond_force = float(bond_config.get("force_kj_mol_nm2", top_config.get("bond_force_kj_mol_nm2", 10000.0)))
+    bond_sigma = float(bond_config.get("sigma", top_config.get("bond_sigma", 10.0)))
 
     angles = build_angles(poscar, config, data)
     data.angles = angles
 
+    include_name = get_force_field_include(top_config)
+    write_force_field_stub(path, include_name)
+
     with open(path, "w", encoding="utf-8") as f:
-        f.write("; RMC_POT FNC=4 topology generated by make_qn_network_constraints.py\n")
-        f.write("; Treats the current Qn network as one flexible molecule.\n")
-        f.write("; Check the topology with a short RMC_POT test before production use.\n")
-        f.write("#include \"ffUNKNOWN_READ_PAIRS.itp\"\n\n")
-        f.write("[ moleculetype ]\n")
-        f.write("; molname nrexcl\n")
-        f.write("%s %d\n\n" % (molecule_name, nrexcl))
+        f.write("; RMC_POT FNC=4 topology generated by qn_network.py\n")
+        f.write("; This is an RMC_POT topology, not a GROMACS MD topology.\n")
+        f.write("; The current Qn network is treated as one flexible molecule.\n")
+        f.write("; Tune force constants and sigmas by short RMC_POT test runs.\n")
+        f.write("#include \"%s\"\n" % str(include_name))
+        f.write("\n[ moleculetype ]\n")
+        f.write("; molname nrexcl ; RMCindex_offset\n")
+        f.write("%s %d ; 0\n\n" % (molecule_name, nrexcl))
 
         f.write("[ atoms ]\n")
         f.write("; nr type resnr residue atom cgnr charge mass ; first_RMC_index second_RMC_index\n")
         for i, label in enumerate(poscar.labels):
-            atom_type = "%s_%s" % (atom_type_prefix, label)
+            if atom_type_prefix:
+                atom_type = "%s_%s" % (atom_type_prefix, label)
+            else:
+                atom_type = label
             charge = 0.0
             if label in charges:
                 charge = float(charges[label])
@@ -762,14 +847,14 @@ def write_topology(path: str, poscar: PoscarData, config: Dict[str, Any], data: 
             ))
 
         f.write("\n[ bonds ]\n")
-        f.write("; i j funct length_nm force_kJ_mol_nm2 ; sigma\n")
+        f.write("; i j funct b_nm kb_kJ_mol_nm2 ; sigma\n")
         for i, j in sorted(data.bond_pairs):
             f.write("%6d %6d 1 %.8f %.8f ; %.8f\n" % (
                 i + 1, j + 1, bond_length_nm, bond_force, bond_sigma
             ))
 
         f.write("\n[ angles ]\n")
-        f.write("; i j k funct theta_deg force_kJ_mol_rad2 ; sigma\n")
+        f.write("; i j k funct theta_deg ktheta_kJ_mol_rad2 ; sigma ; name\n")
         for i, j, k, angle_name in angles:
             param = find_angle_parameter(config, angle_name)
             theta = float(get_required(param, "theta_degree"))
@@ -784,6 +869,285 @@ def write_topology(path: str, poscar: PoscarData, config: Dict[str, Any], data: 
         f.write("[ molecules ]\n")
         f.write("%s 1\n" % molecule_name)
 
+
+
+def get_unit_topology_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """独立分子・独立フラグメント topology 用設定を取得する。
+
+    ``rmc_unit_top`` は、RMC_POT の FNC=4 を「ネットワーク全体の固定」ではなく、
+    「独立した分子単位または構造フラグメントの形状保持」として使うための設定である。
+
+    典型例として、SiO2 を完全な Si-O-Si ネットワークとして固定するのではなく、
+    SiO2 あるいは SiO4 などの局所ユニットを独立 molecule として定義する。
+    この場合、RMC ではユニット間の配置や相対関係は動けるため、実験データに合わせる自由度を
+    残しやすい。一方で、ユニット内部の bond/angle は bonded potential により保たれる。
+    """
+    if "rmc_unit_top" in config:
+        return config["rmc_unit_top"]
+    raise ConfigError("config に rmc_unit_top がありません。")
+
+
+def _select_unit_ligand_candidates(
+    poscar: PoscarData,
+    central_indices: Sequence[int],
+    ligand_indices: Sequence[int],
+    min_distance: float,
+    max_distance: float,
+) -> List[Tuple[float, int, int]]:
+    """central-ligand 候補を距離順に並べて返す。
+
+    戻り値は ``(distance, central_index, ligand_index)`` の list である。
+    ``build_independent_unit_molecules`` の最近接排他的割当で使う。
+    """
+    candidates = []
+    for central in central_indices:
+        for ligand in ligand_indices:
+            distance = pbc_distance(central, ligand, poscar.frac, poscar.cell)
+            if distance >= min_distance and distance <= max_distance:
+                candidates.append((distance, central, ligand))
+    candidates.sort()
+    return candidates
+
+
+def build_independent_unit_molecules(poscar: PoscarData, config: Dict[str, Any]) -> List[UnitMolecule]:
+    """RMC_POT FNC=4 用の独立分子・独立フラグメント一覧を作る。
+
+    この関数は、初期構造から検出したネットワーク全体を 1 つの molecule として固定しない。
+    代わりに、central atom と一定数の ligand atom から成る独立 unit を作る。
+    たとえば SiO2 の Packmol 初期配置に対応させるなら、Si 1 個 + O 2 個を 1 unit とする。
+
+    重要な設計意図は次である。
+
+    * unit 内の bond/angle は RMC_POT の bonded potential で保つ。
+    * unit 間には bond/angle を張らない。
+    * したがって、RMC は unit 間配置を実験データに合わせて探索できる。
+    * 個別の Si-O-Si ネットワーク全体を固定しない。
+
+    JSON の ``rmc_unit_top`` で使う主な項目:
+
+    * ``central_types``: unit 中心 atom type。例: ["Si"]。
+    * ``ligand_types``: unit に含める周辺 atom type。例: ["O"]。
+    * ``ligand_count``: central 1 個あたりに割り当てる ligand 数。SiO2 unit なら 2。
+    * ``distance_min`` / ``distance_max``: 割当候補とする central-ligand 距離範囲。
+    * ``assignment``: 現在は ``nearest_exclusive`` のみ。ligand を複数 unit に重複所属させない。
+
+    注意:
+        この方法は「独立分子単位の保持」であり、共有酸素を持つ無限 Si-O-Si network を
+        表現するものではない。共有ネットワークを固定したい場合は ``write_fnc4_topology`` を使う。
+    """
+    unit_config = get_unit_topology_config(config)
+    central_types = unit_config.get("central_types", None)
+    ligand_types = unit_config.get("ligand_types", None)
+
+    if central_types is None:
+        qn_config = config.get("qn", {})
+        central_types = qn_config.get("central_types", [])
+    if ligand_types is None:
+        qn_config = config.get("qn", {})
+        ligand_types = qn_config.get("bridge_types", [])
+
+    ligand_count = int(get_required(unit_config, "ligand_count"))
+    min_distance = float(unit_config.get("distance_min", 0.0))
+    max_distance = float(unit_config.get("distance_max", 99.0))
+    assignment = str(unit_config.get("assignment", "nearest_exclusive"))
+    allow_incomplete = bool(unit_config.get("allow_incomplete", False))
+    include_unassigned_atoms = bool(unit_config.get("include_unassigned_atoms", True))
+    molecule_name_prefix = str(unit_config.get("molecule_name", "UNIT"))
+    generate_angles = bool(unit_config.get("generate_angles", True))
+
+    if assignment != "nearest_exclusive":
+        raise ConfigError("rmc_unit_top.assignment は nearest_exclusive のみ対応しています。")
+
+    central_indices = select_indices(poscar.labels, central_types)
+    ligand_indices = select_indices(poscar.labels, ligand_types)
+    if len(central_indices) == 0:
+        raise ConfigError("rmc_unit_top.central_types に対応する原子がありません。")
+    if len(ligand_indices) == 0:
+        raise ConfigError("rmc_unit_top.ligand_types に対応する原子がありません。")
+
+    needs = {}
+    assigned = defaultdict(list)  # type: Dict[int, List[int]]
+    for central in central_indices:
+        needs[central] = ligand_count
+
+    used_ligands = set()  # type: Set[int]
+    candidates = _select_unit_ligand_candidates(
+        poscar,
+        central_indices,
+        ligand_indices,
+        min_distance,
+        max_distance,
+    )
+
+    # 距離が短い central-ligand 候補から順に採用する。
+    # ligand は一度だけ使うので、unit 間で atom を共有しない。
+    for distance, central, ligand in candidates:
+        if ligand in used_ligands:
+            continue
+        if needs[central] <= 0:
+            continue
+        assigned[central].append(ligand)
+        used_ligands.add(ligand)
+        needs[central] = needs[central] - 1
+
+    missing = []
+    for central in central_indices:
+        if needs[central] > 0:
+            missing.append((central, needs[central]))
+    if len(missing) > 0 and not allow_incomplete:
+        raise ConfigError(
+            "independent unit 作成で ligand 数が不足しました。"
+            "distance range または ligand_count を見直してください。"
+        )
+
+    molecules = []  # type: List[UnitMolecule]
+    molecule_index = 1
+    included_atoms = set()  # type: Set[int]
+
+    for central in sorted(central_indices):
+        ligands = sorted(assigned.get(central, []))
+
+        atom_indices = [central]
+        for ligand in ligands:
+            atom_indices.append(ligand)
+
+        bonds = []  # type: List[Pair]
+        for local_ligand_index in range(1, len(atom_indices)):
+            bonds.append((0, local_ligand_index))
+
+        angles = []  # type: List[Angle]
+        if generate_angles:
+            local_ligand_indices = list(range(1, len(atom_indices)))
+            for local_i, local_k in itertools.combinations(local_ligand_indices, 2):
+                angles.append((local_i, 0, local_k))
+
+        molecule_name = "%s%06d" % (molecule_name_prefix, molecule_index)
+        molecules.append((molecule_name, atom_indices, bonds, angles))
+        for atom_index in atom_indices:
+            included_atoms.add(atom_index)
+        molecule_index = molecule_index + 1
+
+    if include_unassigned_atoms:
+        for atom_index in range(poscar.atom_count):
+            if atom_index in included_atoms:
+                continue
+            molecule_name = "%s%06d" % (molecule_name_prefix, molecule_index)
+            molecules.append((molecule_name, [atom_index], [], []))
+            included_atoms.add(atom_index)
+            molecule_index = molecule_index + 1
+
+    return molecules
+
+
+def write_unit_topology(path: str, poscar: PoscarData, config: Dict[str, Any]) -> None:
+    """独立分子・独立フラグメント型の RMC_POT topology を書く。
+
+    ``write_topology`` は、検出した current network を 1 つの flexible molecule として書く。
+    それに対して、この関数は unit 間をつながない。各 unit を別々の molecule type として書き、
+    unit 内の bond/angle だけを RMC_POT の bonded potential に渡す。
+
+    RMC_POT の観点では、この topology も FNC=4 用である。ただし、拘束の意味は次のように違う。
+
+    * full network topology: 初期構造の個別 Si-O-Si 接続を固定する方向。
+    * independent unit topology: SiO2, SiO4 などの unit 内形状だけを保持する方向。
+
+    ユーザーが RMC の自由度を重視する場合、まずはこちらを試す方が安全である。
+    """
+    unit_config = get_unit_topology_config(config)
+    molecules = build_independent_unit_molecules(poscar, config)
+
+    residue_name = str(unit_config.get("residue_name", "UNIT"))
+    nrexcl = int(unit_config.get("nrexcl", 2))
+    masses = config.get("masses", {})
+    charges = config.get("charges", {})
+    atom_type_prefix = str(unit_config.get("atom_type_prefix", ""))
+
+    bond_config = unit_config.get("bond", {})
+    bond_length_nm = float(get_required(bond_config, "length_nm"))
+    bond_force = float(get_required(bond_config, "force_kj_mol_nm2"))
+    bond_sigma = float(get_required(bond_config, "sigma"))
+
+    angle_config = unit_config.get("angle", {})
+    angle_theta = float(angle_config.get("theta_degree", 109.47))
+    angle_force = float(angle_config.get("force_kj_mol_rad2", 100.0))
+    angle_sigma = float(angle_config.get("sigma", 10.0))
+
+    include_name = get_force_field_include(unit_config)
+    write_force_field_stub(path, include_name)
+
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("; RMC_POT FNC=4 independent-unit topology generated by qn_network.py\n")
+        f.write("; This file keeps only intramolecular / intra-fragment geometry.\n")
+        f.write("; No bonds or angles are written between different units.\n")
+        f.write("; It is intended to preserve local units while leaving RMC freedom between units.\n")
+        f.write("#include \"%s\"\n" % str(include_name))
+        f.write("\n")
+
+        molecule_names = []
+        for molecule_name, atom_indices, bonds, angles in molecules:
+            molecule_names.append(molecule_name)
+            f.write("[ moleculetype ]\n")
+            f.write("; molname nrexcl ; RMCindex_offset\n")
+            f.write("%s %d ; 0\n\n" % (molecule_name, nrexcl))
+
+            f.write("[ atoms ]\n")
+            f.write("; nr type resnr residue atom cgnr charge mass ; first_RMC_index second_RMC_index\n")
+            for local_index, global_index in enumerate(atom_indices):
+                label = poscar.labels[global_index]
+                if atom_type_prefix:
+                    atom_type = "%s_%s" % (atom_type_prefix, label)
+                else:
+                    atom_type = label
+                charge = 0.0
+                if label in charges:
+                    charge = float(charges[label])
+                mass = 1.0
+                if label in masses:
+                    mass = float(masses[label])
+                atom_name = "%s%d" % (label, global_index + 1)
+                rmc_index = global_index + 1
+                f.write("%6d %-10s 1 %-6s %-8s %6d % .8f % .8f ; %d %d\n" % (
+                    local_index + 1,
+                    atom_type,
+                    residue_name,
+                    atom_name,
+                    local_index + 1,
+                    charge,
+                    mass,
+                    rmc_index,
+                    rmc_index,
+                ))
+
+            f.write("\n[ bonds ]\n")
+            f.write("; i j funct b_nm kb_kJ_mol_nm2 ; sigma\n")
+            for local_i, local_j in bonds:
+                f.write("%6d %6d 1 %.8f %.8f ; %.8f\n" % (
+                    local_i + 1,
+                    local_j + 1,
+                    bond_length_nm,
+                    bond_force,
+                    bond_sigma,
+                ))
+
+            if len(angles) > 0:
+                f.write("\n[ angles ]\n")
+                f.write("; i j k funct theta_deg ktheta_kJ_mol_rad2 ; sigma\n")
+                for local_i, local_j, local_k in angles:
+                    f.write("%6d %6d %6d 1 %.8f %.8f ; %.8f\n" % (
+                        local_i + 1,
+                        local_j + 1,
+                        local_k + 1,
+                        angle_theta,
+                        angle_force,
+                        angle_sigma,
+                    ))
+            f.write("\n")
+
+        f.write("[ system ]\n")
+        f.write("Independent local units generated from RMC/POSCAR structure\n\n")
+        f.write("[ molecules ]\n")
+        for molecule_name in molecule_names:
+            f.write("%s 1\n" % molecule_name)
 
 def write_dat_snippets(prefix: str, config: Dict[str, Any]) -> None:
     """RMC_POT dat ファイルへ転記するための補助 snippet を書く。
@@ -831,7 +1195,7 @@ def write_dat_snippets(prefix: str, config: Dict[str, Any]) -> None:
         f.write("# Atom type order: %s\n" % " ".join(atom_types))
         f.write("# Partial order: %s\n" % " ".join(pair_order))
         f.write("CUT-OFF = %s\n" % " ".join("%.6f" % x for x in cutoff_values))
-        f.write("# FNC=4 means flexible MD-like molecule using bonded potentials from topology.\n")
+        f.write("# FNC=4 means RMC_POT flexible molecule using bonded potentials from topology.\n")
         f.write("# Exact keyword placement depends on the old/free-format dat file being used.\n")
         f.write("FNC = 4\n")
         f.write("TOPOLOGY = %s_fnc4.top\n" % os.path.basename(prefix))
@@ -888,7 +1252,7 @@ def write_report(path: str, poscar: PoscarData, config: Dict[str, Any], data: Ne
         f.write("\nNotes\n")
         f.write("-----\n")
         f.write("FNC=3 is a distance-window constraint.\n")
-        f.write("FNC=4 uses bonded potential terms in the generated topology.\n")
+        f.write("FNC=4 uses bonded potential terms in the generated RMC_POT topology.\n")
         f.write("The generated topology treats the current network as one flexible molecule.\n")
         f.write("For production RMC_POT runs, check the .hst output and acceptance ratio, then tune sigmas/force constants.\n")
 
@@ -939,8 +1303,20 @@ class QnNetworkBuilder(object):
         write_fnc(path, self.poscar.atom_count, self.network.fnc_pairs, ranges, output_title)
 
     def write_fnc4_topology(self, path: str) -> None:
-        """FNC=4 用の GROMACS 型 topology ファイルを書く。"""
+        """FNC=4 用の current-network topology ファイルを書く。
+
+        初期構造から検出した network bond/angle をそのまま保持する強い拘束である。
+        初期 network をかなり信じる場合にだけ使う。
+        """
         write_topology(path, self.poscar, self.config, self.network)
+
+    def write_unit_topology(self, path: str) -> None:
+        """FNC=4 用の independent-unit topology ファイルを書く。
+
+        unit 内の bond/angle だけを書き、unit 間は結合しない。
+        RMC の探索自由度を残したい場合は、current-network topology よりこちらを優先する。
+        """
+        write_unit_topology(path, self.poscar, self.config)
 
     def write_dat_snippets(self, prefix: str) -> None:
         """FNC=3/FNC=4 用の dat snippet を書く。"""

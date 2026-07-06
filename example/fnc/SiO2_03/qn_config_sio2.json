@@ -1,6 +1,9 @@
 {
   "description": "Generic Qn-network settings instantiated for Si-O-Si silica glass.",
-  "atom_types": ["Si", "O"],
+  "atom_types": [
+    "Si",
+    "O"
+  ],
   "masses": {
     "Si": 28.0855,
     "O": 15.999
@@ -10,20 +13,26 @@
     "O": 0.0
   },
   "hard_sphere_cutoffs": {
-    "Si-Si": 2.40,
+    "Si-Si": 2.4,
     "Si-O": 1.25,
-    "O-O": 2.10
+    "O-O": 2.1
   },
   "qn": {
-    "central_types": ["Si"],
-    "bridge_types": ["O"],
-    "second_types": ["Si"],
-    "first_min": 1.20,
-    "first_max": 1.90,
+    "central_types": [
+      "Si"
+    ],
+    "bridge_types": [
+      "O"
+    ],
+    "second_types": [
+      "Si"
+    ],
+    "first_min": 1.2,
+    "first_max": 1.9,
     "first_mode": "nearest",
     "first_nearest_n": 4,
-    "second_min": 1.20,
-    "second_max": 1.90,
+    "second_min": 1.2,
+    "second_max": 1.9,
     "second_use_first_network": true
   },
   "fnc3": {
@@ -39,15 +48,15 @@
         "type_id": 2,
         "name": "central_second_through_bridge",
         "source": "central_second_through_bridge",
-        "rmin": 2.40,
-        "rmax": 3.50
+        "rmin": 2.4,
+        "rmax": 3.5
       },
       {
         "type_id": 3,
         "name": "bridge_bridge_around_central",
         "source": "bridge_bridge_around_central",
-        "rmin": 2.10,
-        "rmax": 3.40
+        "rmin": 2.1,
+        "rmax": 3.4
       }
     ]
   },
@@ -75,5 +84,34 @@
         "sigma": 20.0
       }
     ]
+  },
+  "rmc_unit_top": {
+    "molecule_name": "SIO2U",
+    "residue_name": "SIO2",
+    "nrexcl": 2,
+    "atom_type_prefix": "",
+    "central_types": [
+      "Si"
+    ],
+    "ligand_types": [
+      "O"
+    ],
+    "ligand_count": 2,
+    "assignment": "nearest_exclusive",
+    "distance_min": 1.2,
+    "distance_max": 2.3,
+    "allow_incomplete": true,
+    "generate_angles": true,
+    "bond": {
+      "length_nm": 0.161,
+      "force_kj_mol_nm2": 10000.0,
+      "sigma": 10.0
+    },
+    "angle": {
+      "theta_degree": 109.47,
+      "force_kj_mol_rad2": 100.0,
+      "sigma": 10.0
+    },
+    "include_unassigned_atoms": true
   }
 }

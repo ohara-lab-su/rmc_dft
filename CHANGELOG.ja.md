@@ -2,6 +2,22 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.25 nakada
+
+v0.4.24 で追加した試験実装の FNC=4 topology 生成機能に対するバグ修正版。
+
+- SiO2 用 FNC=4 topology 生成処理を修正
+  - GROMACS 用 topology ではなく、RMC_POT が要求する topology 仕様に合わせて生成処理を見直した。
+  - `qn_network.py` の topology および molecule 生成処理を修正した。
+  - `example/fnc/SiO2_03/make_sio2_qn_fnc.py` の生成処理を修正した。
+  - RMC_POT による読み込み確認で判明した topology 生成上の不整合を修正した。
+- GROMACS 用 topology と RMC_POT 用 topology の違いが分かるよう、コメントおよび内部実装を整理した。
+
+注意:
+
+- FNC=4 topology 生成機能は引き続き試験実装である。
+- RMC_POT の正式な topology 仕様との照合・検証は継続して行う予定である。
+ 
 ## v0.4.24 nakada
 
 SiO2 ガラスの RMC_POT 用 FNC / Qn ネットワーク作成支援を試験的に追加した。
