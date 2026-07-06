@@ -1,15 +1,19 @@
 # K.NAKADA, kengo.nakada@gmail.com
 
 # ------ Packmol ---
-N_tot: 400  # セルサイズ(for packmol)
+# N_tot: 400  # セルサイズ(for packmol)
+# N_tot: 750  # セルサイズ(for packmol)
 # mass_density_g_cm3: 7.35  # 質量密度
 # mass_density_g_cm3: 7.3336  # 質量密度
-ratios: [82, 4, 14]  # 化学量論比
+# ratios: [82, 4, 14]  # 化学量論比
+# ratios: [1, 2]  # 化学量論比
 
 # ------ RMC-DFT 基本動作設定
-number_density_A3: 0.09119  # 数密度 packmol/RMC
-# number_density_A3: 0.0915  # 数密度 packmol/RMC
-element_info: ["Fe", "Si", "B"]  # packmol/構造変換
+# number_density_A3: 0.0665715652 # SiO2 製法A, 数密度 packmol/RMC
+# number_density_A3: 0.09119 # 数密度 packmol/RMC
+# number_density_A3: 0.0915 # 数密度 packmol/RMC
+# element_info: ["Fe", "Si", "B"] # packmol/構造変換
+# element_info: ["Si", "O"] # packmol/構造変換
 # element_info: "label.txt" # VASP4(Rmc.cfg) type --> VASP5 type
 
 max_rmc_dft_loop: 10
@@ -20,15 +24,17 @@ rmc_log_dir: "rmc" # log{xxx}_rmc
 # rmc_log_dir: "rmc_log" # LOG 保存
 #
 cfg_name: "aaa" # input_file: RMC: aaa.cfg
-rmc_exp_filename: "Nomag300_0305.xsq"
+# rmc_exp_filename: "Nomag300_0305.xsq"
+rmc_exp_filename: "Sq_s1_deltaQ005_fpd.txt"
 # OpenMP thread 数 (富岳のOMGは4つで、12コアになるので12がまぁ、良いとは思う)
-rmc_omp_num_threads: 12
+# rmc_omp_num_threads: 12
+rmc_omp_num_threads: 8
 
 # RMCPOT path (パスが通ってなければフルパスで書く)
-# rmc_bin: "rmcp.exe"
+rmc_bin: "rmcp.exe"
 # rmc_bin: "/usr/local/src/RMCPOT/rmcp.exe"
 # rmc_bin: "/home/u10363/rmcpot/bin/rmcp_local_fix_O2.exe"
-rmc_bin: "/home/u10363/rmcpot/bin/rmcp_fugaku_fix_O2.exe"
+# rmc_bin: "/home/u10363/rmcpot/bin/rmcp_fugaku_fix_O2.exe"
 
 # 入力ファイルの自動セーブ(パラメーターの変更時)
 auto_write: True
