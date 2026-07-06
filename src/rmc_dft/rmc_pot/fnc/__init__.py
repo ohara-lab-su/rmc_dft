@@ -32,6 +32,8 @@ from .qn_network import PoscarData
 from .qn_network import QnNetworkBuilder
 from .qn_network import build_fnc3_pairs
 from .qn_network import build_network
+from .qn_network import build_independent_unit_molecules
+from .qn_network import write_unit_topology
 from .qn_network import collect_fnc3_ranges
 from .qn_network import load_config
 from .qn_network import read_poscar
@@ -43,6 +45,8 @@ __all__ = [
     "QnNetworkBuilder",
     "build_fnc3_pairs",
     "build_network",
+    "build_independent_unit_molecules",
+    "write_unit_topology",
     "collect_fnc3_ranges",
     "load_config",
     "read_poscar",

@@ -53,21 +53,22 @@ def run_rmc_init(
 
     # 1 行目のコメント（系名）を設定する
     # rmc_dat.set_comment("comment FeSiB")
-    rmc_dat.set_comment("comment Li3PO4")
+    # rmc_dat.set_comment("comment Li3PO4")
+    rmc_dat.set_comment("comment SiO2")
 
     # デフォルト値は config.yaml で書く(ここで書いた値のほうが優先される)
     # 2 行目：number density（数密度）を設定する
-    # FeSiB
+    # --- FeSiB
     # rmc_dat.set_density(0.0915)
     # rmc_dat.set_density(0.09119)
     # rmc_dat.set_density(0.0912)
 
-    # Li3PO4
+    # --- Li3PO4
     rmc_dat.set_density(0.0772877)
 
     # 3 行目：cut offs（各原子種ペアのカットオフ距離）を設定する
     # rmc_dat.set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
-    # FeSiB
+    # ---- FeSiB
     # 11(Fe-Fe) 2.45-2.55
     # 12(Fe-Si) 2.35-2.45
     # 13(Fe-B)  2.05-2.15
@@ -79,16 +80,21 @@ def run_rmc_init(
     # rmc_dat.set_cutoffs([2.2, 2.2, 1.95, 1.8, 1.8, 2.8]) # 2026.02.16
     # rmc_dat.set_cutoffs([2.4, 2.3, 2.1, 2.0, 2.4, 1.7])
     # rmc_dat.set_cutoffs([2.2, 2.1, 1.75, 2.3, 1.6, 1.6])
+    # --- Li3PO4 (test)
+    # rmc_dat.set_cutoffs([2.4, 2.3, 2.1, 2.0, 2.4, 1.7])
 
-    # Li3PO4 (test)
-    rmc_dat.set_cutoffs([2.4, 2.3, 2.1, 2.0, 2.4, 1.7])
+    # --- SiO2 (test)
+    rmc_dat.set_cutoffs([2.40, 1.25, 2.10])  # Si-Si, Si-O, O-O
 
     # 4 行目：maximum moves（1 回の移動での最大変位量）を設定する
+    # --- FeSiB, Li3PO4
     # rmc_dat.set_maximum_moves([0.1, 0.1, 0.1])
     # rmc_dat.set_maximum_moves([0.1, 0.1, 0.1])
     # rmc_dat.set_maximum_moves([0.05, 0.01, 0.01])
     # rmc_dat.set_maximum_moves([0.05, 0.01, 0.01])  # 2026.02.16
-    rmc_dat.set_maximum_moves([0.01, 0.01, 0.01])  # 2026.02.16
+    # rmc_dat.set_maximum_moves([0.01, 0.01, 0.01])  # 2026.02.16
+    # --- SiO2
+    rmc_dat.set_maximum_moves([0.01, 0.01])
 
     # 5 行目：r spacing を設定する
     # rのステップ(Δr)
@@ -122,9 +128,11 @@ def run_rmc_init(
     # rmc_dat.set_exp_filename("as_cast_0305.xsq")
 
     # 12 (データ範囲)
+    # ---- FeSiB
     # rmc_dat.set_exp_range(1, 1091, auto_write=True)
     # rmc_dat.set_exp_range(50, 1091)  # 2026.02.16
     # rmc_dat.set_exp_range(85, 1091)  # 2026.02.16
+    # ---- Li3PO4
     rmc_dat.set_exp_range(85, 771)
 
     # 14 (温度因子)
