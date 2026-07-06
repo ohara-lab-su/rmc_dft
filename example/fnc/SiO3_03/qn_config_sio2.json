@@ -1,0 +1,79 @@
+{
+  "description": "Generic Qn-network settings instantiated for Si-O-Si silica glass.",
+  "atom_types": ["Si", "O"],
+  "masses": {
+    "Si": 28.0855,
+    "O": 15.999
+  },
+  "charges": {
+    "Si": 0.0,
+    "O": 0.0
+  },
+  "hard_sphere_cutoffs": {
+    "Si-Si": 2.40,
+    "Si-O": 1.25,
+    "O-O": 2.10
+  },
+  "qn": {
+    "central_types": ["Si"],
+    "bridge_types": ["O"],
+    "second_types": ["Si"],
+    "first_min": 1.20,
+    "first_max": 1.90,
+    "first_mode": "nearest",
+    "first_nearest_n": 4,
+    "second_min": 1.20,
+    "second_max": 1.90,
+    "second_use_first_network": true
+  },
+  "fnc3": {
+    "constraints": [
+      {
+        "type_id": 1,
+        "name": "central_bridge_bond",
+        "source": "central_bridge_bonds",
+        "rmin": 1.45,
+        "rmax": 1.85
+      },
+      {
+        "type_id": 2,
+        "name": "central_second_through_bridge",
+        "source": "central_second_through_bridge",
+        "rmin": 2.40,
+        "rmax": 3.50
+      },
+      {
+        "type_id": 3,
+        "name": "bridge_bridge_around_central",
+        "source": "bridge_bridge_around_central",
+        "rmin": 2.10,
+        "rmax": 3.40
+      }
+    ]
+  },
+  "fnc4": {
+    "molecule_name": "SIO2NET",
+    "residue_name": "SIO2",
+    "nrexcl": 2,
+    "atom_type_prefix": "rmc",
+    "bond_length_nm": 0.161,
+    "bond_force_kj_mol_nm2": 10000.0,
+    "bond_sigma": 10.0,
+    "angles": [
+      {
+        "name": "O-Si-O",
+        "source": "bridge_central_bridge",
+        "theta_degree": 109.47,
+        "force_kj_mol_rad2": 100.0,
+        "sigma": 10.0
+      },
+      {
+        "name": "Si-O-Si",
+        "source": "central_bridge_second",
+        "theta_degree": 144.0,
+        "force_kj_mol_rad2": 30.0,
+        "sigma": 20.0
+      }
+    ]
+  }
+}

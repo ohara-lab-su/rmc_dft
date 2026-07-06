@@ -1,0 +1,41 @@
+Qn/RMC_POT constraint generation report
+====================================
+
+Atom count: 750
+Atom types in structure: O Si
+Cell volume: 11265.78698536 A^3
+Number density: 0.0665732453 1/A^3
+
+Qn definition
+-------------
+central_types: Si
+bridge_types : O
+second_types : Si
+first range  : 1.2000 - 1.9000 A
+second range : 1.2000 - 1.9000 A
+
+Qn counts
+---------
+Q3: 1
+Q4: 249
+
+Network counts
+--------------
+central-bridge entries: 1000
+bridge-second entries : 1000
+unique bond pairs      : 1000
+FNC=3 pairs            : 2997
+FNC=4 angles           : 2502
+
+FNC=3 distance statistics
+-------------------------
+type 1 central_bridge_bond: count=1000 min=1.5257 p1=1.5453 p5=1.5628 p50=1.6177 p95=1.6765 p99=1.7050 max=1.7702
+type 2 central_second_through_bridge: count=499 min=2.4599 p1=2.8108 p5=2.9001 p50=3.1052 p95=3.2602 p99=3.2986 max=3.3813
+type 3 bridge_bridge_around_central: count=1498 min=2.1524 p1=2.3855 p5=2.4469 p50=2.6215 p95=2.8558 p99=2.9705 max=3.3357
+
+Notes
+-----
+FNC=3 is a distance-window constraint.
+FNC=4 uses bonded potential terms in the generated topology.
+The generated topology treats the current network as one flexible molecule.
+For production RMC_POT runs, check the .hst output and acceptance ratio, then tune sigmas/force constants.

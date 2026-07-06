@@ -1,0 +1,6 @@
+# RMC_POT fixed-format .dat values for atom order: Si O
+comment SiO2
+0.0665732453 ! number density
+2.40 1.25 2.10 ! cut offs: Si-Si Si-O O-O
+0.01 0.01 ! maximum moves: Si O
+3 ! FNC switch; use SiO2_750_S1_nvt4.fnc
