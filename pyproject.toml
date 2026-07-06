@@ -15,24 +15,28 @@ readme = "README.md"
 # requires-python = ">=3.8"
 requires-python = ">=3.10"
 dependencies = [
-"x_logger",
-"packmol_util" ,
-#
-"dataclasses",
-"coloredlogs",
-"colorlog",
-"pytest",
-"pytest-asyncio",
-"pyyaml",
-"toml",
-# "grpcio",
-"nest_asyncio",
-"sphinx",
-"myst-parser",
-"sphinx-autobuild",
-"sphinx-rtd-theme",
-"sphinxcontrib-napoleon",
-"linkify-it-py"
+    # my-modules
+    "x_logger",
+    "packmol_util" ,
+    # fnc
+    "pymatgen",
+    # basic
+    "dataclasses",
+    "coloredlogs",
+    "colorlog",
+    "pytest",
+    "pytest-asyncio",
+    "pyyaml",
+    "toml",
+    # "grpcio",
+    "nest_asyncio",
+    # pages
+    "sphinx",
+    "myst-parser",
+    "sphinx-autobuild",
+    "sphinx-rtd-theme",
+    "sphinxcontrib-napoleon",
+    "linkify-it-py"
 ]
 
 [tool.pytest.ini_options]
