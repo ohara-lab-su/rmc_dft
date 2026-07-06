@@ -32,7 +32,9 @@ import numpy as np
 try:
     from x_logger import XLogger
 except Exception as e:
-    pass
+    log_level = "INFO"
+    logging.basicConfig(level=log_level.upper())
+    logger = logging.getLogger(__name__)
 
 from typing import Optional, Union, Sequence, List
 
@@ -322,9 +324,9 @@ if __name__ == "__main__":
         logger_.error("Too many arguments")
         sys.exit(1)
 
-    logger.info(f"cfg_name  = {cfg_name_}")
-    logger.info(f"vasp_name = {vasp_name_}")
-    logger.info(f"element_info = {element_info_}")
+    logger_.info(f"cfg_name  = {cfg_name_}")
+    logger_.info(f"vasp_name = {vasp_name_}")
+    logger_.info(f"element_info = {element_info_}")
 
     # element_info = ["Li","P","S"]
 

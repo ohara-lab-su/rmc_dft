@@ -44,12 +44,13 @@ def plot_sq(
         plt.ylabel("S(Q)")
         plt.legend()
         plt.tight_layout()
-        plt.show()
 
         save = True
         if save:
             out_name: str = f"{cfg_name}_sq.png"
             plt.savefig(out_name, dpi=300)
+
+        plt.show()
 
     finally:
         # 元のディレクトリに戻す

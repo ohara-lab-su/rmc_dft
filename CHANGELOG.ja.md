@@ -2,6 +2,37 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.24 nakada
+
+SiO2 ガラスの RMC_POT 用 FNC / Qn ネットワーク作成支援を試験的に追加した。
+
+この版は、動作確認の完了よりも、現在の実装状態をいったん固定するためのバージョンとする。
+
+- `src/rmc_dft/rmc_pot/fnc/` を追加
+  - `qn_network.py` を追加
+  - Qn ネットワーク解析、FNC=3 用 `.fnc` 生成、FNC=4 用 GROMACS 型 topology 生成の基礎機能をまとめた
+  - パッケージ本体側は、SiO2 固有ではなく `central - bridge - second` 型の汎用 Qn ネットワーク解析器として扱う方針にした
+- SiO2 固有設定を example 側へ分離
+  - `example/fnc/SiO2_03/make_sio2_qn_fnc.py` を追加
+  - `example/fnc/SiO2_03/qn_config_sio2.json` を追加
+  - SiO2 固有の `central=Si`, `bridge=O`, `second=Si`、FNC 距離範囲、FNC=4 topology パラメータは JSON 設定に集約した
+- 不要になった中間スクリプトを整理
+  - モジュール側の `make_qn_network_constraints.py` は、`qn_network.py` に機能を寄せたため削除対象とした
+  - モジュール側の `sio2.py` は、SiO2 固有設定を本体に持ち込まない方針として削除対象とした
+  - SiO2 固有の補助コードは example 側だけに残す形に整理した
+- FNC の位置づけを整理
+  - FNC=3 は、既存ネットワークから抽出した原子対の距離範囲拘束 `.fnc` を生成する用途とした
+  - FNC=4 は、RMC_POT の flexible molecule 用 topology を生成する用途とした
+  - GROMACS BKS-MD 用 `.top` と、RMC_POT FNC=4 用 topology は別物として扱う方針を明確化した
+- docstring / コメントを追加
+  - Qn の定義、RMC index の扱い、POSCAR 原子順と cfg 原子順の前提、FNC=3 / FNC=4 の役割を説明するコメントを追加した
+  - 現時点では実装理解を優先した説明付きコードとして整理した
+
+注意:
+
+- v0.4.24 の Qn/FNC 生成機能は試験実装であり、実運用前に生成 `.fnc` / `.top` と RMC_POT の acceptance ratio、Qn 分布、結合長・角度分布を確認する必要がある。
+- SiO2 用の数値パラメータは初期値であり、実験プロファイルへの RMC フィット結果を見ながら調整する前提である。
+
 ## v0.4.23 nakada
 
 v0.4.22 の FNC 距離範囲編集機能に対するバグ修正版

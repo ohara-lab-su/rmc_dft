@@ -1,0 +1,20 @@
+SiO2 RMC_POT constraint report
+atom_count = 750
+Si_count = 250
+O_count = 500
+cell_volume_A3 = 11265.7869853594
+number_density_A3 = 0.0665732453
+bond_detection_mode = nearest
+si_o_cut_A = 1.8000
+nearest_n = 4
+Si-O coordination distribution = {4: 250}
+O-Si coordination distribution = {1: 1, 2: 498, 3: 1}
+Qn distribution from detected network = {3: 1, 4: 249}
+RMC_POT fixed-format cutoff order for Si,O: Si-Si Si-O O-O
+recommended hard-sphere cutoffs_A = 2.40 1.25 2.10
+FNC type 1 = Si-O bond, range 1.45 1.85 A
+FNC type 2 = Si-Si through bridging O, range 2.75 3.45 A
+FNC type 3 = O-O in SiO4 tetrahedron, range 2.30 3.10 A
+FNC type 1 distance stats: count=1000 min=1.5257 p1=1.5453 p5=1.5628 p50=1.6177 p95=1.6765 p99=1.7050 max=1.7702
+FNC type 2 distance stats: count=499 min=2.4599 p1=2.8108 p5=2.9001 p50=3.1052 p95=3.2602 p99=3.2986 max=3.3813
+FNC type 3 distance stats: count=1498 min=2.1524 p1=2.3855 p5=2.4469 p50=2.6215 p95=2.8558 p99=2.9705 max=3.3357

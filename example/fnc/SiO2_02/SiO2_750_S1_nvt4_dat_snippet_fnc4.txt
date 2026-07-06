@@ -1,0 +1,10 @@
+# RMC_POT dat snippet for FNC=4 / flexible molecule topology
+# Atom type order: Si O
+# Partial order: Si-Si Si-O O-O
+CUT-OFF = 2.400000 1.250000 2.100000
+# FNC=4 means flexible MD-like molecule using bonded potentials from topology.
+# Exact keyword placement depends on the old/free-format dat file being used.
+FNC = 4
+TOPOLOGY = SiO2_750_S1_nvt4_fnc4.top
+# If non-bonded potential is not used, bonded terms contribute to normal chi2.
+# Start with weak angle/bond weights, then tighten after checking acceptance ratio.

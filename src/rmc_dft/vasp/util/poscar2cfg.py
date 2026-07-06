@@ -34,7 +34,9 @@ import numpy as np
 try:
     from x_logger import XLogger
 except Exception as e:
-    pass
+    log_level = "INFO"
+    logging.basicConfig(level=log_level.upper())
+    logger = logging.getLogger(__name__)
 
 
 def contcar2cfg(
