@@ -2,6 +2,22 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.25 nakada
+
+Bug-fix release for the experimental FNC=4 topology generation introduced in v0.4.24.
+
+- Fixed multiple issues in the SiO2 FNC=4 topology generation workflow.
+  - Corrected topology generation based on the actual requirements of RMC_POT rather than a plain GROMACS topology.
+  - Fixed molecule and topology generation logic in `qn_network.py`.
+  - Improved generation of the example script `example/fnc/SiO2_03/make_sio2_qn_fnc.py`.
+  - Corrected inconsistencies found while validating generated topology files with RMC_POT.
+- Updated comments and internal implementation to clarify the differences between GROMACS topology files and RMC_POT topology files.
+
+Notes:
+
+- The FNC=4 topology generation remains experimental.
+- Further validation against the official RMC_POT topology specification is still in progress.
+ 
 ## v0.4.24 nakada
 
 Added experimental support for generating RMC_POT FNC / Qn-network files for SiO2 glass.
