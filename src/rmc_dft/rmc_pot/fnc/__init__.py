@@ -1,16 +1,22 @@
 # -*- coding: utf-8 -*-
-"""RMC_POT 用 FNC / Qn ネットワーク生成補助モジュール。
+"""RMC_POT の FNC / Qn ネットワーク生成補助モジュール。
 
-この package は、RMC_POT でネットワーク系を扱うための汎用前処理だけを持つ。
-既存構造から central-bridge-second 型の Qn ネットワークを解析し、
+この package には、RMC_POT でネットワーク系を扱うための前処理を置く。
+具体的には、既存構造から central-bridge-second 型の Qn ネットワークを解析し、
 FNC=3 用 ``*.fnc`` と FNC=4 用 GROMACS 型 topology を生成する。
 
-ここには SiO2、B2O3、GeO2 などの系固有パラメータを置かない。
-系固有の設定は ``example/fnc`` 以下の JSON に置く。
+設計方針
+--------
+この package は汎用機能だけを持つ。SiO2 固有の値は package 内に置かず、
+``example/fnc/SiO2_03/qn_config_sio2.json`` のような外部設定に置く。
+そのため、ここでは ``sio2.py`` や SiO2 用デフォルト設定を import しない。
 
-通常の入口は ``QnNetworkBuilder`` である。
+主な入口
+--------
+``QnNetworkBuilder`` を使うのが通常の入口である。
 
-Example:
+例::
+
     from rmc_dft.rmc_pot.fnc import QnNetworkBuilder
 
     builder = QnNetworkBuilder.from_poscar(

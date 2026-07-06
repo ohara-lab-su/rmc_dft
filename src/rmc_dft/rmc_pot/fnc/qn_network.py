@@ -19,8 +19,10 @@ Qn として数える。
 * FNC=3 用 ``*.fnc``
     原子対距離を rmin-rmax の範囲に保つ fixed neighbour constraint。
 * FNC=4 用 ``*.top``
-    RMC_POT の flexible MD-like molecule 用 GROMACS 型 topology。
-    Si-O のような bond、O-Si-O / Si-O-Si のような angle を bonded potential として書く。
+    RMC_POT の flexible molecule 用 topology。
+    これは GROMACS の MD 実行用 topology を真似るためのものではなく、
+    RMC_POT が読む最小限の ``[ moleculetype ]``、``[ atoms ]``、``[ bonds ]``、
+    ``[ angles ]`` を書くためのファイルである。
 * ``*_qn.csv``
     central atom ごとの Qn 判定結果。
 * ``*_network_bonds.csv``
@@ -43,9 +45,11 @@ RMC_POT の atom index は、入力構造ファイルの原子順を 1 始まり
 
 注意
 ----
-ここで生成する FNC=4 topology は、GROMACS で古典 MD を実行するための topology ではなく、
-RMC_POT が bonded potential を読むための topology 雛形である。
-力定数や sigma は必ず短い RMC_POT 試行で調整する。
+ここで生成する FNC=4 topology は、GROMACS で古典 MD を実行するための topology ではない。
+RMC_POT が bonded potential を読むために必要な RMC 用 topology である。
+ただし RMC_POT は topology の記法として GROMACS 由来の directive 名を採用しているため、
+``[ atoms ]``、``[ bonds ]``、``[ angles ]`` という名前は残る。
+力定数や sigma は RMC_POT の chi2 寄与の重みそのものなので、短い試行計算で調整する。
 
 このファイルはライブラリ本体であり、CLI は持たない。
 特定系の実行スクリプトは ``example/fnc`` 側に置く。
@@ -655,18 +659,32 @@ def percentile_line(values: Sequence[float]) -> str:
     return text
 
 
+def get_topology_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """RMC_POT topology 用設定を取得する。
+
+    新しい設定名は ``rmc_top`` とする。
+    過去に作成した JSON との互換性のため、``rmc_top`` が無い場合だけ ``fnc4`` を読む。
+    ここで扱う topology は GROMACS MD 用ではなく、RMC_POT の FNC=4 用である。
+    """
+    if "rmc_top" in config:
+        return config["rmc_top"]
+    if "fnc4" in config:
+        return config["fnc4"]
+    raise ConfigError("config に rmc_top がありません。")
+
+
 def build_angles(poscar: PoscarData, config: Dict[str, Any], data: NetworkData) -> List[Tuple[int, int, int, str]]:
     """FNC=4 topology の [ angles ] に書く angle list を作る。
 
-    JSON の ``fnc4.angles`` で source を指定する。現在対応する source は次の通り。
+    JSON の ``rmc_top.angles`` で source を指定する。現在対応する source は次の通り。
 
     * ``bridge_central_bridge``: central を中心にした bridge-central-bridge。例: O-Si-O。
     * ``central_bridge_second``: bridge を中心にした central-bridge-second。例: Si-O-Si。
 
     戻り値の index は 0 始まりで、最後の文字列は angle parameter 名である。
     """
-    fnc4_config = get_required(config, "fnc4")
-    angle_items = fnc4_config.get("angles", [])
+    top_config = get_topology_config(config)
+    angle_items = top_config.get("angles", [])
     angles = []  # type: List[Tuple[int, int, int, str]]
     seen = set()  # type: Set[Tuple[int, int, int, str]]
 
@@ -700,8 +718,8 @@ def build_angles(poscar: PoscarData, config: Dict[str, Any], data: NetworkData) 
 
 def find_angle_parameter(config: Dict[str, Any], angle_name: str) -> Dict[str, Any]:
     """angle 名に対応する FNC=4 angle パラメータを JSON 設定から探す。"""
-    fnc4_config = get_required(config, "fnc4")
-    for item in fnc4_config.get("angles", []):
+    top_config = get_topology_config(config)
+    for item in top_config.get("angles", []):
         name = str(get_required(item, "name"))
         if name == angle_name:
             return item
@@ -709,47 +727,69 @@ def find_angle_parameter(config: Dict[str, Any], angle_name: str) -> Dict[str, A
 
 
 def write_topology(path: str, poscar: PoscarData, config: Dict[str, Any], data: NetworkData) -> None:
-    """RMC_POT FNC=4 用 GROMACS 型 topology を書く。
+    """RMC_POT FNC=4 用 topology を書く。
 
-    この topology は、RMC_POT に bonded potential を読ませるためのファイルである。
-    GROMACS で BKS-MD を走らせるための topology とは目的が違う。
+    ここで書く ``*.top`` は GROMACS で MD を実行するための topology ではない。
+    RMC_POT が FNC=4 で bonded potential を計算するために読む topology である。
 
-    [ atoms ] では、RMC_POT 用の first_RMC_index / second_RMC_index を
-    コメント欄の後ろに書く。ここでは 1 分子として全原子を保持するため、
+    RMC_POT の manual では topology の記法として GROMACS 型 directive 名が使われる。
+    ただし RMC が認識する directive は限定されており、この exporter では
+    Qn ネットワーク保持に必要な次の 5 種類だけを書く。
+
+    * ``[ moleculetype ]``: ネットワーク全体を 1 つの molecule として扱うための名前。
+    * ``[ atoms ]``: topology 内 atom index と RMC configuration 内 atom index の対応。
+    * ``[ bonds ]``: Si-O など、ネットワーク edge に対する harmonic bond。
+    * ``[ angles ]``: O-Si-O や Si-O-Si など、ネットワーク angle に対する harmonic angle。
+    * ``[ system ]`` / ``[ molecules ]``: topology の末尾に必要な system 情報。
+
+    ``[ atoms ]`` の行末にある ``; first_RMC_index second_RMC_index`` は RMC_POT 固有情報である。
+    GROMACS ではコメントだが、RMC_POT はこの情報を使って topology atom と
+    RMC configuration atom を対応付ける。ここでは 1 つの network molecule として書くため、
     first と second は同じ index にしている。
 
-    [ bonds ] には network bond、[ angles ] には JSON で指定した角度項を出力する。
-    force constant や sigma は初期値であり、実際の RMC_POT 試行で調整する。
+    ``[ bonds ]`` と ``[ angles ]`` は「結合がある」という幾何学的な宣言だけではない。
+    RMC_POT は harmonic potential として使うため、平衡値、力定数、sigma が必要である。
+    そのため、topology 用 JSON には最低限 ``bond.length_nm``、``bond.force_kj_mol_nm2``、
+    ``bond.sigma``、および各 angle の ``theta_degree``、``force_kj_mol_rad2``、``sigma`` を置く。
     """
-    fnc4_config = get_required(config, "fnc4")
-    molecule_name = str(fnc4_config.get("molecule_name", "QNNET"))
-    residue_name = str(fnc4_config.get("residue_name", "QNN"))
-    nrexcl = int(fnc4_config.get("nrexcl", 2))
+    top_config = get_topology_config(config)
+
+    molecule_name = str(top_config.get("molecule_name", "QNNET"))
+    residue_name = str(top_config.get("residue_name", "QNN"))
+    nrexcl = int(top_config.get("nrexcl", 2))
 
     masses = config.get("masses", {})
     charges = config.get("charges", {})
-    atom_type_prefix = str(fnc4_config.get("atom_type_prefix", "rmc"))
+    atom_type_prefix = str(top_config.get("atom_type_prefix", ""))
 
-    bond_length_nm = float(fnc4_config.get("bond_length_nm", 0.161))
-    bond_force = float(fnc4_config.get("bond_force_kj_mol_nm2", 10000.0))
-    bond_sigma = float(fnc4_config.get("bond_sigma", 1.0))
+    bond_config = top_config.get("bond", {})
+    bond_length_nm = float(bond_config.get("length_nm", top_config.get("bond_length_nm", 0.161)))
+    bond_force = float(bond_config.get("force_kj_mol_nm2", top_config.get("bond_force_kj_mol_nm2", 10000.0)))
+    bond_sigma = float(bond_config.get("sigma", top_config.get("bond_sigma", 10.0)))
 
     angles = build_angles(poscar, config, data)
     data.angles = angles
 
+    include_name = top_config.get("include", None)
+
     with open(path, "w", encoding="utf-8") as f:
-        f.write("; RMC_POT FNC=4 topology generated by make_qn_network_constraints.py\n")
-        f.write("; Treats the current Qn network as one flexible molecule.\n")
-        f.write("; Check the topology with a short RMC_POT test before production use.\n")
-        f.write("#include \"ffUNKNOWN_READ_PAIRS.itp\"\n\n")
-        f.write("[ moleculetype ]\n")
+        f.write("; RMC_POT FNC=4 topology generated by qn_network.py\n")
+        f.write("; This is an RMC_POT topology, not a GROMACS MD topology.\n")
+        f.write("; The current Qn network is treated as one flexible molecule.\n")
+        f.write("; Tune force constants and sigmas by short RMC_POT test runs.\n")
+        if include_name is not None:
+            f.write("#include \"%s\"\n" % str(include_name))
+        f.write("\n[ moleculetype ]\n")
         f.write("; molname nrexcl\n")
         f.write("%s %d\n\n" % (molecule_name, nrexcl))
 
         f.write("[ atoms ]\n")
         f.write("; nr type resnr residue atom cgnr charge mass ; first_RMC_index second_RMC_index\n")
         for i, label in enumerate(poscar.labels):
-            atom_type = "%s_%s" % (atom_type_prefix, label)
+            if atom_type_prefix:
+                atom_type = "%s_%s" % (atom_type_prefix, label)
+            else:
+                atom_type = label
             charge = 0.0
             if label in charges:
                 charge = float(charges[label])
@@ -762,14 +802,14 @@ def write_topology(path: str, poscar: PoscarData, config: Dict[str, Any], data: 
             ))
 
         f.write("\n[ bonds ]\n")
-        f.write("; i j funct length_nm force_kJ_mol_nm2 ; sigma\n")
+        f.write("; i j funct b_nm kb_kJ_mol_nm2 ; sigma\n")
         for i, j in sorted(data.bond_pairs):
             f.write("%6d %6d 1 %.8f %.8f ; %.8f\n" % (
                 i + 1, j + 1, bond_length_nm, bond_force, bond_sigma
             ))
 
         f.write("\n[ angles ]\n")
-        f.write("; i j k funct theta_deg force_kJ_mol_rad2 ; sigma\n")
+        f.write("; i j k funct theta_deg ktheta_kJ_mol_rad2 ; sigma ; name\n")
         for i, j, k, angle_name in angles:
             param = find_angle_parameter(config, angle_name)
             theta = float(get_required(param, "theta_degree"))
@@ -831,7 +871,7 @@ def write_dat_snippets(prefix: str, config: Dict[str, Any]) -> None:
         f.write("# Atom type order: %s\n" % " ".join(atom_types))
         f.write("# Partial order: %s\n" % " ".join(pair_order))
         f.write("CUT-OFF = %s\n" % " ".join("%.6f" % x for x in cutoff_values))
-        f.write("# FNC=4 means flexible MD-like molecule using bonded potentials from topology.\n")
+        f.write("# FNC=4 means RMC_POT flexible molecule using bonded potentials from topology.\n")
         f.write("# Exact keyword placement depends on the old/free-format dat file being used.\n")
         f.write("FNC = 4\n")
         f.write("TOPOLOGY = %s_fnc4.top\n" % os.path.basename(prefix))
@@ -888,7 +928,7 @@ def write_report(path: str, poscar: PoscarData, config: Dict[str, Any], data: Ne
         f.write("\nNotes\n")
         f.write("-----\n")
         f.write("FNC=3 is a distance-window constraint.\n")
-        f.write("FNC=4 uses bonded potential terms in the generated topology.\n")
+        f.write("FNC=4 uses bonded potential terms in the generated RMC_POT topology.\n")
         f.write("The generated topology treats the current network as one flexible molecule.\n")
         f.write("For production RMC_POT runs, check the .hst output and acceptance ratio, then tune sigmas/force constants.\n")
 
