@@ -18,18 +18,18 @@ Qn として数える。
 ------------
 * FNC=3 用 ``*.fnc``
     原子対距離を rmin-rmax の範囲に保つ fixed neighbour constraint。
-* FNC=4 用 ``*.top``
+* RMC_POT topology 用 ``*.top``
     RMC_POT の flexible molecule 用 topology。
-    これは GROMACS の MD 実行用 topology を真似るためのものではなく、
-    RMC_POT が読む最小限の ``[ moleculetype ]``、``[ atoms ]``、``[ bonds ]``、
-    ``[ angles ]`` を書くためのファイルである。
-    本モジュールでは、初期構造のネットワーク全体を固定する ``write_fnc4_topology`` と、
-    独立分子または独立フラグメントだけを保持する ``write_unit_topology`` を分けている。
+    これは FNC ファイルではない。RMC_POT が bonded potential を読むための
+    最小限の ``[ moleculetype ]``、``[ atoms ]``、``[ bonds ]``、``[ angles ]`` を書く。
+    本モジュールでは、独立分子または独立フラグメントだけを保持する
+    ``write_unit_topology`` を標準とし、初期構造のネットワーク全体を固定する
+    ``write_network_topology`` は明示的に呼んだ場合だけ使う。
 * ``*_qn.csv``
     central atom ごとの Qn 判定結果。
 * ``*_network_bonds.csv``
     検出された network bond 一覧。
-* ``*_dat_snippet_fnc3.txt`` / ``*_dat_snippet_fnc4.txt``
+* ``*_dat_snippet_rmc_fnc3.txt`` / ``*_dat_snippet_rmc_unit_top.txt``
     RMC_POT の dat ファイルへ転記するための補助メモ。
 * ``*_report.txt``
     構造、Qn 分布、FNC 距離分布の確認用 report。
@@ -47,8 +47,10 @@ RMC_POT の atom index は、入力構造ファイルの原子順を 1 始まり
 
 注意
 ----
-ここで生成する FNC=4 topology は、GROMACS で古典 MD を実行するための topology ではない。
+ここで生成する topology は、GROMACS で古典 MD を実行するための topology ではない。
 RMC_POT が bonded potential を読むために必要な RMC 用 topology である。
+RMC_POT の dat では flexible molecule の指定に FNC=4 switch を使うが、
+生成される ``*.top`` 自体は FNC ファイルではない。
 ただし RMC_POT は topology の記法として GROMACS 由来の directive 名を採用しているため、
 ``[ atoms ]``、``[ bonds ]``、``[ angles ]`` という名前は残る。
 力定数や sigma は RMC_POT の chi2 寄与の重みそのものなので、短い試行計算で調整する。
@@ -746,15 +748,11 @@ def get_topology_config(config: Dict[str, Any]) -> Dict[str, Any]:
     """RMC_POT current-network topology 用設定を取得する。
 
     新しい JSON では ``rmc.top.network`` を使う。
-    過去の JSON との互換性のため、``rmc_top`` と ``fnc4`` も読む。
+    flat な旧 JSON 名はここでは読まない。
     """
     top_root = get_top_root_config(config)
     if "network" in top_root:
         return top_root["network"]
-    if "rmc_top" in config:
-        return config["rmc_top"]
-    if "fnc4" in config:
-        return config["fnc4"]
     raise ConfigError("config に rmc.top.network がありません。")
 
 
@@ -802,7 +800,7 @@ def write_force_field_stub(topology_path: str, include_name: str) -> None:
 def build_angles(poscar: PoscarData, config: Dict[str, Any], data: NetworkData) -> List[Tuple[int, int, int, str]]:
     """FNC=4 topology の [ angles ] に書く angle list を作る。
 
-    JSON の ``rmc_top.angles`` で source を指定する。現在対応する source は次の通り。
+    JSON の ``rmc.top.network.angles`` で source を指定する。現在対応する source は次の通り。
 
     * ``bridge_central_bridge``: central を中心にした bridge-central-bridge。例: O-Si-O。
     * ``central_bridge_second``: bridge を中心にした central-bridge-second。例: Si-O-Si。
@@ -949,13 +947,12 @@ def get_unit_topology_config(config: Dict[str, Any]) -> Dict[str, Any]:
     """独立分子・独立フラグメント topology 用設定を取得する。
 
     新しい JSON では ``rmc.top.unit`` を使う。
-    過去の JSON との互換性のため、``rmc_unit_top`` も読む。
+    新しい JSON では ``rmc.top.unit`` を使う。
+    flat な旧 JSON 名はここでは読まない。
     """
     top_root = get_top_root_config(config)
     if "unit" in top_root:
         return top_root["unit"]
-    if "rmc_unit_top" in config:
-        return config["rmc_unit_top"]
     raise ConfigError("config に rmc.top.unit がありません。")
 
 
@@ -995,7 +992,7 @@ def build_independent_unit_molecules(poscar: PoscarData, config: Dict[str, Any])
     * したがって、RMC は unit 間配置を実験データに合わせて探索できる。
     * 個別の Si-O-Si ネットワーク全体を固定しない。
 
-    JSON の ``rmc_unit_top`` で使う主な項目:
+    JSON の ``rmc.top.unit`` で使う主な項目:
 
     * ``central_types``: unit 中心 atom type。例: ["Si"]。
     * ``ligand_types``: unit に含める周辺 atom type。例: ["O"]。
@@ -1005,7 +1002,7 @@ def build_independent_unit_molecules(poscar: PoscarData, config: Dict[str, Any])
 
     注意:
         この方法は「独立分子単位の保持」であり、共有酸素を持つ無限 Si-O-Si network を
-        表現するものではない。共有ネットワークを固定したい場合は ``write_fnc4_topology`` を使う。
+        表現するものではない。共有ネットワークを固定したい場合は ``write_network_topology`` を使う。
     """
     unit_config = get_unit_topology_config(config)
     central_types = unit_config.get("central_types", None)
@@ -1028,14 +1025,14 @@ def build_independent_unit_molecules(poscar: PoscarData, config: Dict[str, Any])
     generate_angles = bool(unit_config.get("generate_angles", True))
 
     if assignment != "nearest_exclusive":
-        raise ConfigError("rmc_unit_top.assignment は nearest_exclusive のみ対応しています。")
+        raise ConfigError("rmc.top.unit.assignment は nearest_exclusive のみ対応しています。")
 
     central_indices = select_indices(poscar.labels, central_types)
     ligand_indices = select_indices(poscar.labels, ligand_types)
     if len(central_indices) == 0:
-        raise ConfigError("rmc_unit_top.central_types に対応する原子がありません。")
+        raise ConfigError("rmc.top.unit.central_types に対応する原子がありません。")
     if len(ligand_indices) == 0:
-        raise ConfigError("rmc_unit_top.ligand_types に対応する原子がありません。")
+        raise ConfigError("rmc.top.unit.ligand_types に対応する原子がありません。")
 
     needs = {}
     assigned = defaultdict(list)  # type: Dict[int, List[int]]
@@ -1222,6 +1219,10 @@ def write_dat_snippets(prefix: str, config: Dict[str, Any]) -> None:
 
     実際の dat ファイルが old fixed format か free format かで書く位置は変わるため、
     ここでは完全な dat ファイルではなく snippet として出力する。
+
+    ファイル名では FNC と topology を混同しない。
+    ``*_rmc_fnc3.fnc`` は FNC ファイルである。
+    ``*_rmc_unit.top`` は topology ファイルであり、FNC ファイルではない。
     """
     atom_types = get_structure_atom_types(config)
     if atom_types is None:
@@ -1246,7 +1247,7 @@ def write_dat_snippets(prefix: str, config: Dict[str, Any]) -> None:
             pair_order.append(key1)
             cutoff_values.append(float(value))
 
-    fnc3_path = prefix + "_dat_snippet_fnc3.txt"
+    fnc3_path = prefix + "_dat_snippet_rmc_fnc3.txt"
     with open(fnc3_path, "w", encoding="utf-8") as f:
         f.write("# RMC_POT dat snippet for FNC=3\n")
         f.write("# Atom type order: %s\n" % " ".join(atom_types))
@@ -1255,18 +1256,18 @@ def write_dat_snippets(prefix: str, config: Dict[str, Any]) -> None:
         f.write("CUT-OFF = %s\n" % " ".join("%.6f" % x for x in cutoff_values))
         f.write("# Fixed neighbour constraint mode. Use the generated .fnc file.\n")
         f.write("# In old fixed-format input this corresponds to fnc=3 and filename below.\n")
-        f.write("FNC = 3 %s_fnc3.fnc\n" % os.path.basename(prefix))
+        f.write("FNC = 3 %s_rmc_fnc3.fnc\n" % os.path.basename(prefix))
 
-    fnc4_path = prefix + "_dat_snippet_fnc4.txt"
-    with open(fnc4_path, "w", encoding="utf-8") as f:
-        f.write("# RMC_POT dat snippet for FNC=4 / flexible molecule topology\n")
+    top_path = prefix + "_dat_snippet_rmc_unit_top.txt"
+    with open(top_path, "w", encoding="utf-8") as f:
+        f.write("# RMC_POT dat snippet for flexible molecule topology\n")
         f.write("# Atom type order: %s\n" % " ".join(atom_types))
         f.write("# Partial order: %s\n" % " ".join(pair_order))
         f.write("CUT-OFF = %s\n" % " ".join("%.6f" % x for x in cutoff_values))
-        f.write("# FNC=4 means RMC_POT flexible molecule using bonded potentials from topology.\n")
+        f.write("# RMC_POT uses FNC=4 switch for flexible molecules. The .top file itself is not an FNC file.\n")
         f.write("# Exact keyword placement depends on the old/free-format dat file being used.\n")
         f.write("FNC = 4\n")
-        f.write("TOPOLOGY = %s_fnc4.top\n" % os.path.basename(prefix))
+        f.write("TOPOLOGY = %s_rmc_unit.top\n" % os.path.basename(prefix))
         f.write("# If non-bonded potential is not used, bonded terms contribute to normal chi2.\n")
         f.write("# Start with weak angle/bond weights, then tighten after checking acceptance ratio.\n")
 
@@ -1309,7 +1310,7 @@ def write_report(path: str, poscar: PoscarData, config: Dict[str, Any], data: Ne
         f.write("bridge-second entries : %d\n" % sum(len(v) for v in data.bridge_second_map.values()))
         f.write("unique bond pairs      : %d\n" % len(data.bond_pairs))
         f.write("FNC=3 pairs            : %d\n" % len(data.fnc_pairs))
-        f.write("FNC=4 angles           : %d\n\n" % len(data.angles))
+        f.write("network topology angles: %d\n\n" % len(data.angles))
 
         f.write("FNC=3 distance statistics\n")
         f.write("-------------------------\n")
@@ -1320,18 +1321,19 @@ def write_report(path: str, poscar: PoscarData, config: Dict[str, Any], data: Ne
         f.write("\nNotes\n")
         f.write("-----\n")
         f.write("FNC=3 is a distance-window constraint.\n")
-        f.write("FNC=4 uses bonded potential terms in the generated RMC_POT topology.\n")
-        f.write("The generated topology treats the current network as one flexible molecule.\n")
+        f.write("RMC_POT topology uses bonded potential terms. The .top file is not an FNC file.\n")
+        f.write("The standard generated topology is the independent-unit topology.\n")
+        f.write("The current-network topology is generated only by an explicit call.\n")
         f.write("For production RMC_POT runs, check the .hst output and acceptance ratio, then tune sigmas/force constants.\n")
 
 
 
 class QnNetworkBuilder(object):
-    """Qn ネットワーク解析と RMC_POT FNC 入力生成をまとめるクラス。
+    """Qn ネットワーク解析と RMC_POT 入力生成をまとめるクラス。
 
     このクラスは、POSCAR/CONTCAR/VASP 形式の構造と JSON 設定から、
     central-bridge-second 型の Qn ネットワークを抽出する。
-    その結果を用いて FNC=3 用 .fnc、FNC=4 用 topology、Qn CSV、
+    その結果を用いて FNC=3 用 .fnc、RMC_POT topology、Qn CSV、
     network bond CSV、report、dat snippet を出力する。
 
     RMC index は入力構造の原子順を 1 始まりにしたものを使う。
@@ -1368,19 +1370,21 @@ class QnNetworkBuilder(object):
         ranges = collect_fnc3_ranges(self.config)
         write_fnc(path, self.poscar.atom_count, self.network.fnc_pairs, ranges, output_title)
 
-    def write_fnc4_topology(self, path: str) -> None:
-        """FNC=4 用の current-network topology ファイルを書く。
+    def write_network_topology(self, path: str) -> None:
+        """current-network topology ファイルを書く。
 
         初期構造から検出した network bond/angle をそのまま保持する強い拘束である。
         初期 network をかなり信じる場合にだけ使う。
+        この ``*.top`` は FNC ファイルではない。
         """
         write_topology(path, self.poscar, self.config, self.network)
 
     def write_unit_topology(self, path: str) -> None:
-        """FNC=4 用の independent-unit topology ファイルを書く。
+        """independent-unit topology ファイルを書く。
 
         unit 内の bond/angle だけを書き、unit 間は結合しない。
         RMC の探索自由度を残したい場合は、current-network topology よりこちらを優先する。
+        この ``*.top`` は FNC ファイルではない。
         """
         write_unit_topology(path, self.poscar, self.config)
 
@@ -1393,11 +1397,16 @@ class QnNetworkBuilder(object):
         write_report(path, self.poscar, self.config, self.network)
 
     def write_all(self, prefix: str) -> None:
-        """標準的な出力一式を書く。"""
-        self.write_fnc3(prefix + "_fnc3.fnc", title=prefix)
+        """標準的な出力一式を書く。
+
+        標準の topology は independent-unit topology とする。
+        current-network 全体を 1 つの molecule として固定する topology は、
+        ``write_network_topology`` を明示的に呼んだ場合だけ作成する。
+        """
+        self.write_fnc3(prefix + "_rmc_fnc3.fnc", title=prefix)
         self.write_qn_csv(prefix + "_qn.csv")
         self.write_network_bonds_csv(prefix + "_network_bonds.csv")
-        self.write_fnc4_topology(prefix + "_fnc4.top")
+        self.write_unit_topology(prefix + "_rmc_unit.top")
         self.write_dat_snippets(prefix)
         self.write_report(prefix + "_report.txt")
 
