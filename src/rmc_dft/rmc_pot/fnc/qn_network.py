@@ -264,6 +264,86 @@ def get_required(config: Dict[str, Any], key: str) -> Any:
     return config[key]
 
 
+def get_structure_atom_types(config: Dict[str, Any]) -> Optional[List[str]]:
+    """POSCAR に元素名行が無い場合に使う atom type 順を取得する。"""
+    structure_config = config.get("structure", {})
+    if "atom_types" in structure_config:
+        return list(structure_config["atom_types"])
+    if "atom_types" in config:
+        return list(config["atom_types"])
+    return None
+
+
+def get_network_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """VASP 構造から Qn network を作るための入力設定を取得する。"""
+    if "network" in config:
+        return config["network"]
+    if "qn" in config:
+        return config["qn"]
+    raise ConfigError("config に network がありません。")
+
+
+def get_rmc_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """RMC_POT 出力用設定を取得する。"""
+    if "rmc" in config:
+        return config["rmc"]
+    return config
+
+
+def get_fnc_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """RMC_POT .fnc 出力用設定を取得する。"""
+    rmc_config = get_rmc_config(config)
+    if "fnc" in rmc_config:
+        return rmc_config["fnc"]
+    if "fnc3" in config:
+        return config["fnc3"]
+    raise ConfigError("config に rmc.fnc がありません。")
+
+
+def get_dat_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """RMC_POT dat snippet 出力用設定を取得する。"""
+    rmc_config = get_rmc_config(config)
+    if "dat" in rmc_config:
+        return rmc_config["dat"]
+    return config
+
+
+def get_top_root_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """RMC_POT .top 出力用設定の root を取得する。"""
+    rmc_config = get_rmc_config(config)
+    if "top" in rmc_config:
+        return rmc_config["top"]
+    return config
+
+
+def get_top_atom_parameter(config: Dict[str, Any], label: str) -> Tuple[float, float]:
+    """[ atoms ] 行へ書く charge と mass を atom type ごとに取得する。
+
+    この値は RMC_POT topology の [ atoms ] 列を埋めるための入力である。
+    現状の exporter は non-bonded potential を有効化しないため、charge は
+    Coulomb 計算の有効化フラグではない。
+    """
+    top_root = get_top_root_config(config)
+    if "atoms" in top_root:
+        atoms_config = top_root["atoms"]
+        if label not in atoms_config:
+            raise ConfigError("rmc.top.atoms に %s がありません。" % label)
+        atom_config = atoms_config[label]
+        charge = float(get_required(atom_config, "charge"))
+        mass = float(get_required(atom_config, "mass"))
+        return charge, mass
+
+    masses = config.get("masses", {})
+    charges = config.get("charges", {})
+    charge = 0.0
+    if label in charges:
+        charge = float(charges[label])
+    mass = 1.0
+    if label in masses:
+        mass = float(masses[label])
+    return charge, mass
+
+
 def pbc_vector(i: int, j: int, frac: np.ndarray, cell: np.ndarray) -> np.ndarray:
     """PBC 下で i から j への最短イメージベクトルを返す。
 
@@ -380,7 +460,7 @@ def build_network(poscar: PoscarData, config: Dict[str, Any]) -> NetworkData:
     first_map の逆写像から作る。これは、すでに決めた Si-O bond network と整合した
     Si-O-Si 判定を行うためのモードである。
     """
-    qn_config = get_required(config, "qn")
+    qn_config = get_network_config(config)
     central_types = get_required(qn_config, "central_types")
     bridge_types = get_required(qn_config, "bridge_types")
     second_types = get_required(qn_config, "second_types")
@@ -500,7 +580,7 @@ def build_fnc3_pairs(poscar: PoscarData, config: Dict[str, Any], data: NetworkDa
 
     結果は ``data.fnc_pairs`` と ``data.fnc_type_names`` に格納する。
     """
-    fnc3_config = get_required(config, "fnc3")
+    fnc3_config = get_fnc_config(config)
     constraints = get_required(fnc3_config, "constraints")
 
     pair_types = {}  # type: Dict[Pair, int]
@@ -548,7 +628,7 @@ def build_fnc3_pairs(poscar: PoscarData, config: Dict[str, Any], data: NetworkDa
 def collect_fnc3_ranges(config: Dict[str, Any]) -> Dict[int, Tuple[float, float]]:
     """FNC=3 type_id ごとの rmin/rmax を JSON 設定から取り出す。"""
     result = {}
-    fnc3_config = get_required(config, "fnc3")
+    fnc3_config = get_fnc_config(config)
     constraints = get_required(fnc3_config, "constraints")
     for item in constraints:
         type_id = int(get_required(item, "type_id"))
@@ -663,18 +743,19 @@ def percentile_line(values: Sequence[float]) -> str:
 
 
 def get_topology_config(config: Dict[str, Any]) -> Dict[str, Any]:
-    """RMC_POT topology 用設定を取得する。
+    """RMC_POT current-network topology 用設定を取得する。
 
-    新しい設定名は ``rmc_top`` とする。
-    過去に作成した JSON との互換性のため、``rmc_top`` が無い場合だけ ``fnc4`` を読む。
-    ここで扱う topology は GROMACS MD 用ではなく、RMC_POT の FNC=4 用である。
+    新しい JSON では ``rmc.top.network`` を使う。
+    過去の JSON との互換性のため、``rmc_top`` と ``fnc4`` も読む。
     """
+    top_root = get_top_root_config(config)
+    if "network" in top_root:
+        return top_root["network"]
     if "rmc_top" in config:
         return config["rmc_top"]
     if "fnc4" in config:
         return config["fnc4"]
-    raise ConfigError("config に rmc_top がありません。")
-
+    raise ConfigError("config に rmc.top.network がありません。")
 
 
 
@@ -756,7 +837,7 @@ def build_angles(poscar: PoscarData, config: Dict[str, Any], data: NetworkData) 
                             angles.append(key)
 
         else:
-            raise ConfigError("未知の fnc4 angle source です: %s" % source)
+            raise ConfigError("未知の rmc.top.network angle source です: %s" % source)
 
     return angles
 
@@ -803,8 +884,6 @@ def write_topology(path: str, poscar: PoscarData, config: Dict[str, Any], data: 
     residue_name = str(top_config.get("residue_name", "QNN"))
     nrexcl = int(top_config.get("nrexcl", 2))
 
-    masses = config.get("masses", {})
-    charges = config.get("charges", {})
     atom_type_prefix = str(top_config.get("atom_type_prefix", ""))
 
     bond_config = top_config.get("bond", {})
@@ -835,12 +914,7 @@ def write_topology(path: str, poscar: PoscarData, config: Dict[str, Any], data: 
                 atom_type = "%s_%s" % (atom_type_prefix, label)
             else:
                 atom_type = label
-            charge = 0.0
-            if label in charges:
-                charge = float(charges[label])
-            mass = 1.0
-            if label in masses:
-                mass = float(masses[label])
+            charge, mass = get_top_atom_parameter(config, label)
             atom_name = "%s%d" % (label, i + 1)
             f.write("%6d %-10s 1 %-6s %-8s %6d % .8f % .8f ; %d %d\n" % (
                 i + 1, atom_type, residue_name, atom_name, i + 1, charge, mass, i + 1, i + 1
@@ -874,17 +948,15 @@ def write_topology(path: str, poscar: PoscarData, config: Dict[str, Any], data: 
 def get_unit_topology_config(config: Dict[str, Any]) -> Dict[str, Any]:
     """独立分子・独立フラグメント topology 用設定を取得する。
 
-    ``rmc_unit_top`` は、RMC_POT の FNC=4 を「ネットワーク全体の固定」ではなく、
-    「独立した分子単位または構造フラグメントの形状保持」として使うための設定である。
-
-    典型例として、SiO2 を完全な Si-O-Si ネットワークとして固定するのではなく、
-    SiO2 あるいは SiO4 などの局所ユニットを独立 molecule として定義する。
-    この場合、RMC ではユニット間の配置や相対関係は動けるため、実験データに合わせる自由度を
-    残しやすい。一方で、ユニット内部の bond/angle は bonded potential により保たれる。
+    新しい JSON では ``rmc.top.unit`` を使う。
+    過去の JSON との互換性のため、``rmc_unit_top`` も読む。
     """
+    top_root = get_top_root_config(config)
+    if "unit" in top_root:
+        return top_root["unit"]
     if "rmc_unit_top" in config:
         return config["rmc_unit_top"]
-    raise ConfigError("config に rmc_unit_top がありません。")
+    raise ConfigError("config に rmc.top.unit がありません。")
 
 
 def _select_unit_ligand_candidates(
@@ -940,10 +1012,10 @@ def build_independent_unit_molecules(poscar: PoscarData, config: Dict[str, Any])
     ligand_types = unit_config.get("ligand_types", None)
 
     if central_types is None:
-        qn_config = config.get("qn", {})
+        qn_config = get_network_config(config)
         central_types = qn_config.get("central_types", [])
     if ligand_types is None:
-        qn_config = config.get("qn", {})
+        qn_config = get_network_config(config)
         ligand_types = qn_config.get("bridge_types", [])
 
     ligand_count = int(get_required(unit_config, "ligand_count"))
@@ -1058,8 +1130,6 @@ def write_unit_topology(path: str, poscar: PoscarData, config: Dict[str, Any]) -
 
     residue_name = str(unit_config.get("residue_name", "UNIT"))
     nrexcl = int(unit_config.get("nrexcl", 2))
-    masses = config.get("masses", {})
-    charges = config.get("charges", {})
     atom_type_prefix = str(unit_config.get("atom_type_prefix", ""))
 
     bond_config = unit_config.get("bond", {})
@@ -1098,12 +1168,7 @@ def write_unit_topology(path: str, poscar: PoscarData, config: Dict[str, Any]) -
                     atom_type = "%s_%s" % (atom_type_prefix, label)
                 else:
                     atom_type = label
-                charge = 0.0
-                if label in charges:
-                    charge = float(charges[label])
-                mass = 1.0
-                if label in masses:
-                    mass = float(masses[label])
+                charge, mass = get_top_atom_parameter(config, label)
                 atom_name = "%s%d" % (label, global_index + 1)
                 rmc_index = global_index + 1
                 f.write("%6d %-10s 1 %-6s %-8s %6d % .8f % .8f ; %d %d\n" % (
@@ -1158,8 +1223,11 @@ def write_dat_snippets(prefix: str, config: Dict[str, Any]) -> None:
     実際の dat ファイルが old fixed format か free format かで書く位置は変わるため、
     ここでは完全な dat ファイルではなく snippet として出力する。
     """
-    atom_types = get_required(config, "atom_types")
-    cutoffs = get_required(config, "hard_sphere_cutoffs")
+    atom_types = get_structure_atom_types(config)
+    if atom_types is None:
+        raise ConfigError("config に structure.atom_types がありません。")
+    dat_config = get_dat_config(config)
+    cutoffs = get_required(dat_config, "hard_sphere_cutoffs")
     pair_order = []
     cutoff_values = []
     # RMC_POT partial order は atom type 順の上三角行列順。
@@ -1222,7 +1290,7 @@ def write_report(path: str, poscar: PoscarData, config: Dict[str, Any], data: Ne
 
         f.write("Qn definition\n")
         f.write("-------------\n")
-        qn_config = get_required(config, "qn")
+        qn_config = get_network_config(config)
         f.write("central_types: %s\n" % " ".join(qn_config["central_types"]))
         f.write("bridge_types : %s\n" % " ".join(qn_config["bridge_types"]))
         f.write("second_types : %s\n" % " ".join(qn_config["second_types"]))
@@ -1280,9 +1348,7 @@ class QnNetworkBuilder(object):
     def from_poscar(cls, poscar_name: str, config_name: str) -> "QnNetworkBuilder":
         """POSCAR/CONTCAR/VASP ファイルと JSON 設定から builder を作る。"""
         config = load_config(config_name)
-        atom_types = None
-        if "atom_types" in config:
-            atom_types = list(config["atom_types"])
+        atom_types = get_structure_atom_types(config)
         poscar = read_poscar(poscar_name, atom_types)
         return cls(poscar, config)
 
