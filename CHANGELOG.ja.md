@@ -2,6 +2,29 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.26 nakada
+
+RMC_POT 用 Qn ネットワーク設定および topology 生成設定を整理した。
+
+- `qn_config_sio2.json`
+  - Qn ネットワーク生成設定と RMC_POT 用 topology 設定の責務を見直した。
+  - topology 関連設定を `top` ツリーへ整理した。
+  - `[ atoms ]` 用の atom 情報を `top.atoms` に集約した。
+  - `charge` および `mass` を atom type ごとに保持する構造へ変更した。
+  - `charge` は topology の `[ atoms ]` 列へ出力する値として整理した。
+  - 不要な設定構造を整理し、設定階層を見直した。
+
+- `qn_network.py`
+  - 新しい JSON 構造へ対応した。
+  - `[ atoms ]` の `charge` および `mass` を `top.atoms` から取得するよう変更した。
+  - topology 生成処理と設定読み込み処理を整理した。
+
+注意:
+
+- 現時点では non-bonded Coulomb ポテンシャルは生成対象として扱っていない。
+- `charge` は `[ atoms ]` 列との互換性を維持するための topology 情報として保持している。
+- RMC_POT における non-bonded potential と `charge` の関係については、今後 User Guide およびソースコードを基に整理・検証を継続する。
+ 
 ## v0.4.25 nakada
 
 v0.4.24 で追加した試験実装の FNC=4 topology 生成機能に対するバグ修正版。

@@ -2,6 +2,29 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.26 nakada
+
+Reorganized the configuration structure for Qn-network generation and RMC_POT topology generation.
+
+- `qn_config_sio2.json`
+  - Separated the responsibilities of Qn-network generation and topology generation.
+  - Reorganized topology-related settings under the `top` section.
+  - Moved `[ atoms ]` parameters into `top.atoms`.
+  - Stored `charge` and `mass` on a per atom-type basis.
+  - Clarified that `charge` is written to the `[ atoms ]` section of the generated topology.
+  - Simplified and reorganized the configuration hierarchy.
+
+- `qn_network.py`
+  - Updated to support the revised JSON structure.
+  - Read `charge` and `mass` from `top.atoms` when generating the `[ atoms ]` section.
+  - Cleaned up topology generation and configuration handling.
+
+Notes:
+
+- Non-bonded Coulomb potential generation is not enabled in the current implementation.
+- `charge` is currently retained only as topology information for compatibility with the `[ atoms ]` section.
+- The relationship between `charge` and the non-bonded potential in RMC_POT will be further verified against the official User Guide and source code.
+ 
 ## v0.4.25 nakada
 
 Bug-fix release for the experimental FNC=4 topology generation introduced in v0.4.24.
