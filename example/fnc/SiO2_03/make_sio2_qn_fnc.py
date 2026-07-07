@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """SiO2 構造から Qn 解析と RMC_POT 用 FNC 入力を作る実行例。
 
-このファイルは example であり、パッケージ本体ではない。
 SiO2 固有の条件は隣の ``qn_config_sio2.json`` に置く。
 
 実行位置はこのファイルと ``qn_config_sio2.json`` がある directory を想定する。

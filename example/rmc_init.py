@@ -137,7 +137,9 @@ def run_rmc_init(
     # rmc_dat.set_exp_range(50, 1091)  # 2026.02.16
     # rmc_dat.set_exp_range(85, 1091)  # 2026.02.16
     # ---- Li3PO4
-    rmc_dat.set_exp_range(85, 771)
+    # rmc_dat.set_exp_range(85, 771)
+    # ---- SiO2,type-A
+    rmc_dat.set_exp_range(1, 588)
 
     # 14 (温度因子)
     # σ（実験データの許容誤差の標準偏差）
