@@ -6,7 +6,7 @@ This module separates three responsibilities:
 
 * VaspStructure: VASP/POSCAR structure data and periodic geometry.
 * QnNetworkAnalysis: network construction, Qn statistics, and analysis output.
-* RmcConstraintWriter: RMC_POT FNC/topology output.
+* RmcConstraintWriter: RMC_POT FNC/topology/DAT-snippet output.
 """
 from __future__ import print_function
 from __future__ import annotations
@@ -270,11 +270,8 @@ class QnNetworkAnalysis(object):
     def load_config(path: str) -> Dict[str, Any]:
         """Qn/FNC 生成用 JSON 設定を読む。
 
-        設定ファイルには atom type 順、Qn network 定義、FNC 距離拘束、
+        設定ファイルには atom type 順、Qn 定義、FNC=3 の距離拘束、
         TOP 用の bond/angle パラメータを置く。
-
-        RMC_POT の *.dat 設定は rmc.py / rmc_init.py 側の責務であり、
-        この JSON では扱わない。
         """
         with open(path, "r", encoding="utf-8") as f:
             config = json.load(f)
@@ -620,71 +617,52 @@ class QnNetworkAnalysis(object):
         )
 
     @staticmethod
+    @staticmethod
     def build_fnc3_pairs(
         poscar: VaspStructure, config: Dict[str, Any], data: QnNetworkAnalysis
     ) -> None:
         """QnNetworkAnalysis から FNC=3 用の原子対リストを作る。
 
-        FNC では TOP と同じ independent unit assignment を使う。
-        ただし TOP が bond / angle potential を書くのに対して、FNC は
-        unit 内の距離拘束だけを書く。
+        FNC の unit は TOP の independent unit と同じ assignment を使う。
+        JSON の ``rmc.fnc.constraints`` では、各 constraint を ``kind`` と
+        ``atom_types`` で明示する。
 
-        ``rmc.fnc.constraints`` の各 constraint は、FNC type の意味を
-        その constraint 自身で明示する。実装名に近い ``source`` ではなく、
-        ``kind`` と ``atom_types`` で定義する。
+        対応する ``kind`` は次の通りである。
 
-        対応する ``kind`` は次の通り。
+        * ``center_neighbor``: unit 内の center-neighbor pair。
+        * ``neighbor_neighbor``: unit 内の neighbor-neighbor pair。
 
-        * ``center_neighbor``:
-          unit の center atom と neighbor atom の pair を登録する。
-          ``atom_types`` は ``[center_type, neighbor_type]`` として読む。
-
-        * ``neighbor_neighbor``:
-          unit 内の neighbor atom 同士の pair を登録する。
-          ``atom_types`` は登録する neighbor-neighbor pair の atom type を表す。
-
-        この方法により、``type_id=1`` が何を意味するかは Python の分岐名ではなく、
-        JSON の constraint 定義だけで読める。
+        各 pair は無向 pair として ``data.fnc_pairs`` に保持する。
+        実際の ``*.fnc`` 出力では、全原子の行を書き、各 constrained pair は一度だけ出力する。
         """
         fnc3_config = QnNetworkAnalysis.get_fnc_config(config)
         constraints = QnNetworkAnalysis.get_required(fnc3_config, "constraints")
 
+        molecules = RmcConstraintWriter.build_independent_unit_molecules(poscar, config)
+
         pair_types = {}  # type: Dict[Pair, int]
         type_names = {}  # type: Dict[int, str]
-        unit_molecules = None  # type: Optional[List[UnitMolecule]]
 
         for item in constraints:
             type_id = int(QnNetworkAnalysis.get_required(item, "type_id"))
             name = str(QnNetworkAnalysis.get_required(item, "name"))
             kind = str(QnNetworkAnalysis.get_required(item, "kind"))
             atom_types = QnNetworkAnalysis.get_fnc_constraint_atom_types(item)
-            type_names[type_id] = name
+            rmin = float(QnNetworkAnalysis.get_required(item, "rmin"))
+            rmax = float(QnNetworkAnalysis.get_required(item, "rmax"))
 
-            if unit_molecules is None:
-                unit_molecules = RmcConstraintWriter.build_independent_unit_molecules(
-                    poscar, config
-                )
+            type_names[type_id] = name
 
             if kind == "center_neighbor":
                 QnNetworkAnalysis.add_unit_center_neighbor_pairs_by_atom_types(
-                    pair_types,
-                    unit_molecules,
-                    poscar,
-                    atom_types,
-                    type_id,
+                    poscar, molecules, pair_types, type_id, atom_types, rmin, rmax
                 )
-
             elif kind == "neighbor_neighbor":
                 QnNetworkAnalysis.add_unit_neighbor_neighbor_pairs_by_atom_types(
-                    pair_types,
-                    unit_molecules,
-                    poscar,
-                    atom_types,
-                    type_id,
+                    poscar, molecules, pair_types, type_id, atom_types, rmin, rmax
                 )
-
             else:
-                raise ConfigError("未知の fnc constraint kind です: %s" % kind)
+                raise ConfigError("未知の FNC constraint kind です: %s" % kind)
 
         typed_pairs = []
         for pair in sorted(pair_types.keys()):
@@ -693,106 +671,161 @@ class QnNetworkAnalysis(object):
         data.fnc_type_names = type_names
 
     @staticmethod
-    def get_fnc_constraint_atom_types(item: Dict[str, Any]) -> List[str]:
-        """FNC constraint の ``atom_types`` を取得する。
+    def get_fnc_constraint_atom_types(item: Dict[str, Any]) -> Tuple[str, str]:
+        """FNC constraint の対象 atom type pair を取得する。
 
-        ``atom_types`` は、その FNC type_id が表す atom pair を JSON 上で
-        明示するためのキーである。たとえば Si-O 距離拘束なら
-        ``["Si", "O"]``、O-O 距離拘束なら ``["O", "O"]`` と書く。
-
-        ここで得た atom type は、実際に unit assignment から生成した pair の
-        原子種と照合する。したがって、JSON に書いた ``atom_types`` は
-        ダミーではなく、FNC pair 生成の検証条件である。
+        JSON では ``atom_types`` に 2 要素の list として書く。
+        例: ``["Si", "O"]``、``["O", "O"]``。
         """
         atom_types = QnNetworkAnalysis.get_required(item, "atom_types")
         if not isinstance(atom_types, list):
-            raise ConfigError("FNC constraint の atom_types は list で指定してください。")
-
+            raise ConfigError("FNC constraint atom_types は list で指定してください。")
         if len(atom_types) != 2:
+            raise ConfigError("FNC constraint atom_types は 2 要素で指定してください。")
+        return (str(atom_types[0]), str(atom_types[1]))
+
+    @staticmethod
+    def check_fnc_pair_atom_types(
+        poscar: VaspStructure, atom_i: int, atom_j: int, atom_types: Tuple[str, str]
+    ) -> bool:
+        """FNC pair の実 atom type が JSON の ``atom_types`` と一致するか判定する。"""
+        label_i = poscar.labels[atom_i]
+        label_j = poscar.labels[atom_j]
+
+        expected = sorted([atom_types[0], atom_types[1]])
+        actual = sorted([label_i, label_j])
+
+        if expected == actual:
+            return True
+        return False
+
+    @staticmethod
+    def check_fnc_pair_distance(
+        poscar: VaspStructure,
+        atom_i: int,
+        atom_j: int,
+        type_id: int,
+        rmin: float,
+        rmax: float,
+    ) -> None:
+        """FNC pair の初期距離が rmin/rmax 範囲内にあることを確認する。"""
+        distance = QnNetworkAnalysis.pbc_distance(
+            atom_i, atom_j, poscar.frac, poscar.cell
+        )
+
+        if distance < rmin or distance > rmax:
             raise ConfigError(
-                "FNC constraint の atom_types は 2 要素で指定してください: %s"
-                % str(atom_types)
+                "FNC pair の初期距離が constraint 範囲外です: "
+                "atom_i=%d atom_j=%d pair=%s-%s type_id=%d "
+                "distance=%.8f rmin=%.8f rmax=%.8f"
+                % (
+                    atom_i + 1,
+                    atom_j + 1,
+                    poscar.labels[atom_i],
+                    poscar.labels[atom_j],
+                    type_id,
+                    distance,
+                    rmin,
+                    rmax,
+                )
             )
 
-        result = []
-        for atom_type in atom_types:
-            result.append(str(atom_type))
+    @staticmethod
+    def add_checked_fnc_pair(
+        poscar: VaspStructure,
+        pair_types: Dict[Pair, int],
+        atom_i: int,
+        atom_j: int,
+        type_id: int,
+        atom_types: Tuple[str, str],
+        rmin: float,
+        rmax: float,
+    ) -> None:
+        """atom type と距離範囲を確認して FNC pair を登録する。"""
+        if not QnNetworkAnalysis.check_fnc_pair_atom_types(
+            poscar, atom_i, atom_j, atom_types
+        ):
+            raise ConfigError(
+                "FNC constraint atom_types と実 atom type が一致しません: "
+                "atom_i=%d atom_j=%d actual=%s-%s expected=%s-%s type_id=%d"
+                % (
+                    atom_i + 1,
+                    atom_j + 1,
+                    poscar.labels[atom_i],
+                    poscar.labels[atom_j],
+                    atom_types[0],
+                    atom_types[1],
+                    type_id,
+                )
+            )
 
-        return result
+        QnNetworkAnalysis.check_fnc_pair_distance(
+            poscar, atom_i, atom_j, type_id, rmin, rmax
+        )
+        QnNetworkAnalysis.add_typed_pair(pair_types, atom_i, atom_j, type_id)
 
     @staticmethod
     def add_unit_center_neighbor_pairs_by_atom_types(
-        pair_types: Dict[Pair, int],
-        unit_molecules: Sequence[UnitMolecule],
         poscar: VaspStructure,
-        atom_types: Sequence[str],
+        molecules: Sequence[UnitMolecule],
+        pair_types: Dict[Pair, int],
         type_id: int,
+        atom_types: Tuple[str, str],
+        rmin: float,
+        rmax: float,
     ) -> None:
-        """unit 内 center-neighbor pair を atom_types 指定で登録する。
+        """unit 内の center-neighbor pair を FNC pair として登録する。
 
-        ``atom_types`` は ``[center_type, neighbor_type]`` として扱う。
-        たとえば ``["Si", "O"]`` なら、unit の center が Si で、
-        neighbor が O の pair だけを FNC type_id として登録する。
+        ``build_independent_unit_molecules`` の unit では local index 0 を center、
+        local index 1 以降を neighbor とする。
         """
-        center_type = atom_types[0]
-        neighbor_type = atom_types[1]
-
-        for molecule_name, atom_indices, bonds, angles in unit_molecules:
-            if len(atom_indices) < 2:
+        for molecule_name, atom_indices, bonds, angles in molecules:
+            if len(atom_indices) <= 1:
                 continue
 
             center = atom_indices[0]
-            center_label = poscar.labels[center]
-            if center_label != center_type:
-                continue
-
-            local_index = 1
-            while local_index < len(atom_indices):
+            for local_index in range(1, len(atom_indices)):
                 neighbor = atom_indices[local_index]
-                neighbor_label = poscar.labels[neighbor]
-                if neighbor_label == neighbor_type:
-                    QnNetworkAnalysis.add_typed_pair(
-                        pair_types, center, neighbor, type_id
-                    )
-                local_index = local_index + 1
+                QnNetworkAnalysis.add_checked_fnc_pair(
+                    poscar,
+                    pair_types,
+                    center,
+                    neighbor,
+                    type_id,
+                    atom_types,
+                    rmin,
+                    rmax,
+                )
 
     @staticmethod
     def add_unit_neighbor_neighbor_pairs_by_atom_types(
-        pair_types: Dict[Pair, int],
-        unit_molecules: Sequence[UnitMolecule],
         poscar: VaspStructure,
-        atom_types: Sequence[str],
+        molecules: Sequence[UnitMolecule],
+        pair_types: Dict[Pair, int],
         type_id: int,
+        atom_types: Tuple[str, str],
+        rmin: float,
+        rmax: float,
     ) -> None:
-        """unit 内 neighbor-neighbor pair を atom_types 指定で登録する。
-
-        ``atom_types`` は unit 内 neighbor 同士の atom pair を表す。
-        たとえば ``["O", "O"]`` なら、unit 内の O-O pair だけを
-        FNC type_id として登録する。pair の向きは持たないため、
-        実際の pair の atom type と ``atom_types`` は sorted して比較する。
-        """
-        expected = sorted([str(atom_types[0]), str(atom_types[1])])
-
-        for molecule_name, atom_indices, bonds, angles in unit_molecules:
-            if len(atom_indices) < 3:
+        """unit 内の neighbor-neighbor pair を FNC pair として登録する。"""
+        for molecule_name, atom_indices, bonds, angles in molecules:
+            if len(atom_indices) <= 2:
                 continue
 
-            local_indices = []
-            local_index = 1
-            while local_index < len(atom_indices):
-                local_indices.append(local_index)
-                local_index = local_index + 1
-
+            local_indices = list(range(1, len(atom_indices)))
             for local_i, local_j in itertools.combinations(local_indices, 2):
-                global_i = atom_indices[local_i]
-                global_j = atom_indices[local_j]
-                actual = sorted([poscar.labels[global_i], poscar.labels[global_j]])
-                if actual == expected:
-                    QnNetworkAnalysis.add_typed_pair(
-                        pair_types, global_i, global_j, type_id
-                    )
-
-    @staticmethod
+                atom_i = atom_indices[local_i]
+                atom_j = atom_indices[local_j]
+                QnNetworkAnalysis.add_checked_fnc_pair(
+                    poscar,
+                    pair_types,
+                    atom_i,
+                    atom_j,
+                    type_id,
+                    atom_types,
+                    rmin,
+                    rmax,
+                )
     def collect_fnc3_ranges(config: Dict[str, Any]) -> Dict[int, Tuple[float, float]]:
         """FNC=3 type_id ごとの rmin/rmax を JSON 設定から取り出す。"""
         result = {}
@@ -804,46 +837,6 @@ class QnNetworkAnalysis(object):
             rmax = float(QnNetworkAnalysis.get_required(item, "rmax"))
             result[type_id] = (rmin, rmax)
         return result
-
-    @staticmethod
-    def build_fnc_neighbours_by_atom(
-        atom_count: int, typed_pairs: Sequence[TypedPair]
-    ) -> Dict[int, List[Tuple[int, int]]]:
-        """FNC 用の atom -> neighbour list を作る。
-
-        ``typed_pairs`` は、既存 VASP 構造に対する unit assignment から得た
-        unit 内の無向 pair である。FNC ファイルでは各 atom 行に、その atom から
-        見た fixed neighbour を書く必要があるため、ここで必ず双方向に展開する。
-
-        たとえば unit が ``Si-O1-O2`` の場合、typed_pairs には
-
-        * Si-O1
-        * Si-O2
-        * O1-O2
-
-        を一度だけ持たせる。ここでは、それを
-
-        * Si -> O1, O2
-        * O1 -> Si, O2
-        * O2 -> Si, O1
-
-        に展開する。縛らない atom は空 list のままとし、``write_fnc`` で
-        ``atom_index 0`` として出力する。
-        """
-        neighbours = defaultdict(list)  # type: Dict[int, List[Tuple[int, int]]]
-
-        for i, j, type_id in typed_pairs:
-            if i < 0 or i >= atom_count:
-                raise ConfigError("FNC pair の atom index が範囲外です: %d" % (i + 1))
-            if j < 0 or j >= atom_count:
-                raise ConfigError("FNC pair の atom index が範囲外です: %d" % (j + 1))
-            if i == j:
-                raise ConfigError("FNC pair に同一 atom が指定されています: %d" % (i + 1))
-
-            neighbours[i].append((j, type_id))
-            neighbours[j].append((i, type_id))
-
-        return neighbours
 
     @staticmethod
     def write_fnc(
@@ -858,9 +851,13 @@ class QnNetworkAnalysis(object):
         ``typed_pairs`` は 0 始まり index で受け取り、ファイル出力時に 1 始まりへ変換する。
         ``ranges`` は FNC type_id -> (rmin, rmax) で、type_id は 1 から連番である必要がある。
         """
-        neighbours = RmcConstraintWriter.build_fnc_neighbours_by_atom(
-            atom_count, typed_pairs
-        )
+        neighbours = defaultdict(list)  # type: Dict[int, List[Tuple[int, int]]]
+        for i, j, type_id in typed_pairs:
+            # RMC_POT の .fnc では全 atom について neighbour_count 行を書くが、
+            # 各 constrained pair 自体は一度だけ書く。
+            # Packmol 由来の既存 FNC と同じく、pair_key で正規化した
+            # 小さい atom index 側に neighbour を保持する。
+            neighbours[i].append((j, type_id))
 
         max_type = 0
         for type_id in ranges.keys():
@@ -871,8 +868,9 @@ class QnNetworkAnalysis(object):
             # RMC_POT の .fnc は、先頭に constraint type ごとの rmin/rmax を書き、
             # その後に各 atom の neighbour index と type_id を並べる。
             f.write("Fixed neighbours constraints (.FNC) file for %s\n" % title)
-            f.write("No. of possible rmin-rmax pairs:\n")
-            f.write("%d\n" % max_type)
+            f.write("\n")
+            f.write(" No. of possible rmin-rmax pairs:\n")
+            f.write(" %d\n" % max_type)
             rmin_values = []
             rmax_values = []
 
@@ -884,7 +882,9 @@ class QnNetworkAnalysis(object):
 
             f.write(" ".join(rmin_values) + "\n")
             f.write(" ".join(rmax_values) + "\n")
-            f.write("%d\n" % atom_count)
+            f.write("\n")
+            f.write(" %d\n" % atom_count)
+            f.write("\n")
             for atom in range(atom_count):
                 items = sorted(neighbours.get(atom, []))
                 f.write("%d %d\n" % (atom + 1, len(items)))
@@ -1095,52 +1095,8 @@ class RmcConstraintWriter(object):
 
 
     def write_rmc_inputs(self, prefix: str) -> None:
-        """RMC_POT 用の FNC/TOP 入力ファイルを書く。
-
-        *.dat は rmc.py / rmc_init.py 側で作成するため、ここでは生成しない。
-        """
         self.write_fnc3(prefix + "_rmc_fnc3.fnc", title=prefix)
         self.write_unit_topology(prefix + "_rmc_unit.top")
-
-    @staticmethod
-    def build_fnc_neighbours_by_atom(
-        atom_count: int, typed_pairs: Sequence[TypedPair]
-    ) -> Dict[int, List[Tuple[int, int]]]:
-        """FNC 用の atom -> neighbour list を作る。
-
-        ``typed_pairs`` は、既存 VASP 構造に対する unit assignment から得た
-        unit 内の無向 pair である。FNC ファイルでは各 atom 行に、その atom から
-        見た fixed neighbour を書く必要があるため、ここで必ず双方向に展開する。
-
-        たとえば unit が ``Si-O1-O2`` の場合、typed_pairs には
-
-        * Si-O1
-        * Si-O2
-        * O1-O2
-
-        を一度だけ持たせる。ここでは、それを
-
-        * Si -> O1, O2
-        * O1 -> Si, O2
-        * O2 -> Si, O1
-
-        に展開する。縛らない atom は空 list のままとし、``write_fnc`` で
-        ``atom_index 0`` として出力する。
-        """
-        neighbours = defaultdict(list)  # type: Dict[int, List[Tuple[int, int]]]
-
-        for i, j, type_id in typed_pairs:
-            if i < 0 or i >= atom_count:
-                raise ConfigError("FNC pair の atom index が範囲外です: %d" % (i + 1))
-            if j < 0 or j >= atom_count:
-                raise ConfigError("FNC pair の atom index が範囲外です: %d" % (j + 1))
-            if i == j:
-                raise ConfigError("FNC pair に同一 atom が指定されています: %d" % (i + 1))
-
-            neighbours[i].append((j, type_id))
-            neighbours[j].append((i, type_id))
-
-        return neighbours
 
     @staticmethod
     def write_fnc(
@@ -1157,8 +1113,11 @@ class RmcConstraintWriter(object):
         """
         neighbours = defaultdict(list)  # type: Dict[int, List[Tuple[int, int]]]
         for i, j, type_id in typed_pairs:
+            # RMC_POT の .fnc では全 atom について neighbour_count 行を書くが、
+            # 各 constrained pair 自体は一度だけ書く。
+            # Packmol 由来の既存 FNC と同じく、pair_key で正規化した
+            # 小さい atom index 側に neighbour を保持する。
             neighbours[i].append((j, type_id))
-            neighbours[j].append((i, type_id))
 
         max_type = 0
         for type_id in ranges.keys():
@@ -1169,8 +1128,9 @@ class RmcConstraintWriter(object):
             # RMC_POT の .fnc は、先頭に constraint type ごとの rmin/rmax を書き、
             # その後に各 atom の neighbour index と type_id を並べる。
             f.write("Fixed neighbours constraints (.FNC) file for %s\n" % title)
-            f.write("No. of possible rmin-rmax pairs:\n")
-            f.write("%d\n" % max_type)
+            f.write("\n")
+            f.write(" No. of possible rmin-rmax pairs:\n")
+            f.write(" %d\n" % max_type)
             rmin_values = []
             rmax_values = []
             for type_id in range(1, max_type + 1):
@@ -1180,7 +1140,9 @@ class RmcConstraintWriter(object):
                 rmax_values.append("%.8f" % ranges[type_id][1])
             f.write(" ".join(rmin_values) + "\n")
             f.write(" ".join(rmax_values) + "\n")
-            f.write("%d\n" % atom_count)
+            f.write("\n")
+            f.write(" %d\n" % atom_count)
+            f.write("\n")
             for atom in range(atom_count):
                 items = sorted(neighbours.get(atom, []))
                 f.write("%d %d\n" % (atom + 1, len(items)))
@@ -1429,32 +1391,30 @@ class RmcConstraintWriter(object):
 
     @staticmethod
     def get_unit_topology_config(config: Dict[str, Any]) -> Dict[str, Any]:
-        """TOP/FNC 共通の独立 unit 設定を取得する。
+        """独立 unit topology 用設定を取得する。
 
-        unit assignment は TOP 固有ではなく、FNC でも同じものを使う。
-        そのため、中心原子・neighbor 原子・割当方法・距離範囲などは
-        ``network.unit`` に置く。
+        unit assignment は TOP と FNC で共通に使うため、``network.unit`` を基準にする。
+        ``rmc.top.unit`` には TOP 出力固有の molecule 名、bond、angle などだけを置く。
 
-        ``rmc.top.unit`` は molecule 名、residue 名、bond/angle potential など、
-        TOP 出力に固有の設定を持つ。戻り値では ``network.unit`` を基準にして、
-        ``rmc.top.unit`` の項目を上書きして返す。
+        戻り値は ``network.unit`` と ``rmc.top.unit`` を結合した dict である。
+        同じ key がある場合は ``rmc.top.unit`` を優先する。
         """
-        result = {}  # type: Dict[str, Any]
-
         network_config = QnNetworkAnalysis.get_network_config(config)
-        if "unit" in network_config:
-            for key, value in network_config["unit"].items():
-                result[key] = value
+        unit_assignment_config = network_config.get("unit", {})
 
         top_root = QnNetworkAnalysis.get_top_root_config(config)
-        if "unit" in top_root:
-            for key, value in top_root["unit"].items():
-                result[key] = value
+        top_unit_config = top_root.get("unit", {})
 
-        if len(result) == 0:
+        merged = {}
+        for key, value in unit_assignment_config.items():
+            merged[key] = value
+        for key, value in top_unit_config.items():
+            merged[key] = value
+
+        if len(merged) == 0:
             raise ConfigError("config に network.unit または rmc.top.unit がありません。")
 
-        return result
+        return merged
 
     @staticmethod
     def _select_unit_neighbor_candidates(
@@ -1497,7 +1457,7 @@ class RmcConstraintWriter(object):
         * したがって、RMC は unit 間配置を実験データに合わせて探索できる。
         * 個別の Si-O-Si ネットワーク全体を固定しない。
 
-        JSON の ``network.unit`` で使う主な unit assignment 項目:
+        JSON の ``rmc.top.unit`` で使う主な項目:
 
         * ``central_types``: unit 中心 atom type。例: ["Si"]。
         * ``neighbor_types``: unit に含める周辺 atom type。例: ["O"]。
@@ -1533,15 +1493,15 @@ class RmcConstraintWriter(object):
 
         if assignment != "nearest_exclusive":
             raise ConfigError(
-                "network.unit.assignment は nearest_exclusive のみ対応しています。"
+                "rmc.top.unit.assignment は nearest_exclusive のみ対応しています。"
             )
 
         central_indices = QnNetworkAnalysis.select_indices(poscar.labels, central_types)
         neighbor_indices = QnNetworkAnalysis.select_indices(poscar.labels, neighbor_types)
         if len(central_indices) == 0:
-            raise ConfigError("network.unit.central_types に対応する原子がありません。")
+            raise ConfigError("rmc.top.unit.central_types に対応する原子がありません。")
         if len(neighbor_indices) == 0:
-            raise ConfigError("network.unit.neighbor_types に対応する原子がありません。")
+            raise ConfigError("rmc.top.unit.neighbor_types に対応する原子がありません。")
 
         needs = {}
         assigned = defaultdict(list)  # type: Dict[int, List[int]]
@@ -1742,6 +1702,7 @@ class RmcConstraintWriter(object):
             f.write("[ molecules ]\n")
             for molecule_name in molecule_names:
                 f.write("%s 1\n" % molecule_name)
+
 
 class QnNetworkBuilder(object):
     """既存の呼び出しを維持するための入口クラス。
