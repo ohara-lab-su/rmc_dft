@@ -260,9 +260,6 @@ class QnNetworkAnalysis(object):
         writer = RmcConstraintWriter(self)
         writer.write_network_topology(path)
 
-    def write_dat_snippets(self, prefix: str) -> None:
-        writer = RmcConstraintWriter(self)
-        writer.write_dat_snippets(prefix)
 
     def write_all(self, prefix: str) -> None:
         writer = RmcConstraintWriter(self)
@@ -273,8 +270,11 @@ class QnNetworkAnalysis(object):
     def load_config(path: str) -> Dict[str, Any]:
         """Qn/FNC 生成用 JSON 設定を読む。
 
-        設定ファイルには atom type 順、hard-sphere cutoff、Qn 定義、
-        FNC=3 の距離拘束、FNC=4 の bond/angle パラメータを置く。
+        設定ファイルには atom type 順、Qn network 定義、FNC 距離拘束、
+        TOP 用の bond/angle パラメータを置く。
+
+        RMC_POT の *.dat 設定は rmc.py / rmc_init.py 側の責務であり、
+        この JSON では扱わない。
         """
         with open(path, "r", encoding="utf-8") as f:
             config = json.load(f)
@@ -328,12 +328,6 @@ class QnNetworkAnalysis(object):
         raise ConfigError("config に rmc.fnc がありません。")
 
     @staticmethod
-    def get_dat_config(config: Dict[str, Any]) -> Dict[str, Any]:
-        """RMC_POT dat snippet 出力用設定を取得する。"""
-        rmc_config = QnNetworkAnalysis.get_rmc_config(config)
-        if "dat" in rmc_config:
-            return rmc_config["dat"]
-        return config
 
     @staticmethod
     def get_top_root_config(config: Dict[str, Any]) -> Dict[str, Any]:
@@ -975,13 +969,14 @@ class RmcConstraintWriter(object):
             path, self.structure, self.config, self.network
         )
 
-    def write_dat_snippets(self, prefix: str) -> None:
-        RmcConstraintWriter.write_dat_snippets_file(prefix, self.config)
 
     def write_rmc_inputs(self, prefix: str) -> None:
+        """RMC_POT 用の FNC/TOP 入力ファイルを書く。
+
+        *.dat は rmc.py / rmc_init.py 側で作成するため、ここでは生成しない。
+        """
         self.write_fnc3(prefix + "_rmc_fnc3.fnc", title=prefix)
         self.write_unit_topology(prefix + "_rmc_unit.top")
-        self.write_dat_snippets(prefix)
 
     @staticmethod
     def write_fnc(
@@ -1568,80 +1563,6 @@ class RmcConstraintWriter(object):
             for molecule_name in molecule_names:
                 f.write("%s 1\n" % molecule_name)
 
-    @staticmethod
-    def write_dat_snippets_file(prefix: str, config: Dict[str, Any]) -> None:
-        """RMC_POT dat ファイルへ転記するための補助 snippet を書く。
-
-        CUT-OFF は RMC_POT の partial order、すなわち atom type 順の上三角順で出力する。
-        例: atom_types が [Si, O] なら Si-Si, Si-O, O-O の順になる。
-
-        実際の dat ファイルが old fixed format か free format かで書く位置は変わるため、
-        ここでは完全な dat ファイルではなく snippet として出力する。
-
-        ファイル名では FNC と topology を混同しない。
-        ``*_rmc_fnc3.fnc`` は FNC ファイルである。
-        ``*_rmc_unit.top`` は topology ファイルであり、FNC ファイルではない。
-        """
-        atom_types = QnNetworkAnalysis.get_structure_atom_types(config)
-        if atom_types is None:
-            raise ConfigError("config に structure.atom_types がありません。")
-        dat_config = QnNetworkAnalysis.get_dat_config(config)
-        cutoffs = QnNetworkAnalysis.get_required(dat_config, "hard_sphere_cutoffs")
-        pair_order = []
-        cutoff_values = []
-        # RMC_POT partial order は atom type 順の上三角行列順。
-        # 例: A, B, C なら A-A, A-B, A-C, B-B, B-C, C-C。
-        for i, type_i in enumerate(atom_types):
-            for j in range(i, len(atom_types)):
-                type_j = atom_types[j]
-                key1 = "%s-%s" % (type_i, type_j)
-                key2 = "%s-%s" % (type_j, type_i)
-                if key1 in cutoffs:
-                    value = cutoffs[key1]
-                elif key2 in cutoffs:
-                    value = cutoffs[key2]
-                else:
-                    raise ConfigError(
-                        "hard_sphere_cutoffs に %s/%s がありません。" % (key1, key2)
-                    )
-                pair_order.append(key1)
-                cutoff_values.append(float(value))
-
-        fnc3_path = prefix + "_dat_snippet_rmc_fnc3.txt"
-        with open(fnc3_path, "w", encoding="utf-8") as f:
-            f.write("# RMC_POT dat snippet for FNC=3\n")
-            f.write("# Atom type order: %s\n" % " ".join(atom_types))
-            f.write("# Partial order: %s\n" % " ".join(pair_order))
-            f.write("# CUT-OFF values in Angstrom, RMC partial order.\n")
-            f.write("CUT-OFF = %s\n" % " ".join("%.6f" % x for x in cutoff_values))
-            f.write("# Fixed neighbour constraint mode. Use the generated .fnc file.\n")
-            f.write(
-                "# In old fixed-format input this corresponds to fnc=3 and filename below.\n"
-            )
-            f.write("FNC = 3 %s_rmc_fnc3.fnc\n" % os.path.basename(prefix))
-
-        top_path = prefix + "_dat_snippet_rmc_unit_top.txt"
-        with open(top_path, "w", encoding="utf-8") as f:
-            f.write("# RMC_POT dat snippet for flexible molecule topology\n")
-            f.write("# Atom type order: %s\n" % " ".join(atom_types))
-            f.write("# Partial order: %s\n" % " ".join(pair_order))
-            f.write("CUT-OFF = %s\n" % " ".join("%.6f" % x for x in cutoff_values))
-            f.write(
-                "# RMC_POT uses FNC=4 switch for flexible molecules. The .top file itself is not an FNC file.\n"
-            )
-            f.write(
-                "# Exact keyword placement depends on the old/free-format dat file being used.\n"
-            )
-            f.write("FNC = 4\n")
-            f.write("TOPOLOGY = %s_rmc_unit.top\n" % os.path.basename(prefix))
-            f.write(
-                "# If non-bonded potential is not used, bonded terms contribute to normal chi2.\n"
-            )
-            f.write(
-                "# Start with weak angle/bond weights, then tighten after checking acceptance ratio.\n"
-            )
-
-
 class QnNetworkBuilder(object):
     """既存の呼び出しを維持するための入口クラス。
 
@@ -1698,9 +1619,6 @@ class QnNetworkBuilder(object):
         writer = RmcConstraintWriter(self.analysis)
         writer.write_network_topology(path)
 
-    def write_dat_snippets(self, prefix: str) -> None:
-        writer = RmcConstraintWriter(self.analysis)
-        writer.write_dat_snippets(prefix)
 
     def write_all(self, prefix: str) -> None:
         writer = RmcConstraintWriter(self.analysis)

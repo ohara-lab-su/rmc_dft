@@ -25,13 +25,6 @@
     "second_use_first_network": true
   },
   "rmc": {
-    "dat": {
-      "hard_sphere_cutoffs": {
-        "Si-Si": 1.4,
-        "Si-O": 1.25,
-        "O-O": 1.4
-      }
-    },
     "fnc": {
       "constraints": [
         {
