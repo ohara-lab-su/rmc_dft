@@ -602,16 +602,28 @@ class QnNetworkAnalysis(object):
     ) -> None:
         """FNC=3 用 typed pair を重複なしで登録する。
 
-        同じ原子対が複数の source から出てきた場合は、type_id が小さいものを優先する。
-        これは、直接結合など優先度の高い拘束を小さい type_id に置く運用を想定している。
+        同じ原子対が同じ type_id で複数回出る場合は重複として無視する。
+        同じ原子対に異なる type_id が割り当てられた場合は、設定または
+        Q network 解析の矛盾として止める。
+
+        FNC の type_id は距離範囲 rmin/rmax と一対一に対応するため、
+        type_id の大小で自動的に優先順位を決めてはいけない。
         """
         key = QnNetworkAnalysis.pair_key(i, j)
-        if key in pair_types:
-            old_type_id = pair_types[key]
-            if type_id < old_type_id:
-                pair_types[key] = type_id
-        else:
+
+        if key not in pair_types:
             pair_types[key] = type_id
+            return
+
+        old_type_id = pair_types[key]
+        if old_type_id == type_id:
+            return
+
+        raise ConfigError(
+            "同一 FNC pair に異なる type_id が割り当てられました: "
+            "atom_i=%d atom_j=%d old_type_id=%d new_type_id=%d"
+            % (i + 1, j + 1, old_type_id, type_id)
+        )
 
     @staticmethod
     def build_fnc3_pairs(

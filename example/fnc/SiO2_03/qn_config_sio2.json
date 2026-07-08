@@ -27,7 +27,7 @@
   "rmc": {
     "dat": {
       "hard_sphere_cutoffs": {
-        "Si-Si": 2.25,
+        "Si-Si": 1.4,
         "Si-O": 1.25,
         "O-O": 2.05
       }
@@ -40,20 +40,6 @@
           "source": "central_bridge_bonds",
           "rmin": 1.45,
           "rmax": 1.85
-        },
-        {
-          "type_id": 2,
-          "name": "central_second_through_bridge",
-          "source": "central_second_through_bridge",
-          "rmin": 2.4,
-          "rmax": 3.5
-        },
-        {
-          "type_id": 3,
-          "name": "bridge_bridge_around_central",
-          "source": "bridge_bridge_around_central",
-          "rmin": 2.1,
-          "rmax": 3.4
         }
       ]
     },
