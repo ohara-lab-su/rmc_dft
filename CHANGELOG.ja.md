@@ -2,6 +2,23 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.28 nakada
+
+Qn network 解析および RMC_POT 入力生成機能の責務を整理し、クラス構成を再設計した。
+
+- `qn_network.py`
+  - `VaspStructure` クラスを追加し、VASP/POSCAR の読み込みおよび構造情報の管理を集約した。
+  - `QnNetworkAnalysis` クラスを追加し、Qn network 構築、解析、統計処理、レポート生成を集約した。
+  - `QnNetworkAnalysis` に `qn.csv`、`network_bonds.csv`、`report.txt` の出力機能を統合した。
+  - `RmcConstraintWriter` クラスを追加し、RMC_POT 用 FNC、TOP、DAT snippet の生成機能を集約した。
+  - クラス外に分散していた解析・出力処理を各クラスへ統合し、責務を整理した。
+  - `QnNetworkBuilder` を互換用ファサードとして再実装し、既存の呼び出し方法を維持した。
+
+- `analyze_sio2_qn.py`
+  - `QnNetworkAnalysis` を利用する解析専用スクリプトへ変更した。
+  - 解析結果のみを出力し、RMC_POT 用 FNC/TOP は生成しないよう整理した。
+  - 入力ファイル名を基準として解析結果を出力するよう変更した。
+
 ## v0.4.27 nakada
 
 RMC_POT 用 topology 生成機能を見直し、標準出力および設定構造を整理した。

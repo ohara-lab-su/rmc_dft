@@ -2,6 +2,23 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.28 nakada
+
+Reorganized the Qn network analysis and RMC_POT input generation workflow by redesigning the class structure.
+
+- `qn_network.py`
+  - Added the `VaspStructure` class to encapsulate VASP/POSCAR loading and structural data management.
+  - Added the `QnNetworkAnalysis` class to consolidate Qn network construction, analysis, statistics, and report generation.
+  - Moved the generation of `qn.csv`, `network_bonds.csv`, and `report.txt` into `QnNetworkAnalysis`.
+  - Added the `RmcConstraintWriter` class to consolidate generation of RMC_POT FNC, topology, and DAT snippet files.
+  - Moved analysis and output routines from scattered module-level functions into their corresponding classes.
+  - Reimplemented `QnNetworkBuilder` as a compatibility facade while preserving the existing public interface.
+
+- `analyze_sio2_qn.py`
+  - Refactored into an analysis-only utility based on `QnNetworkAnalysis`.
+  - Limited the script to analysis outputs without generating RMC_POT FNC or topology files.
+  - Changed the output naming to use the input structure name as the filename prefix.
+
 ## v0.4.27 nakada
 
 Reorganized the RMC_POT topology generation workflow and refined the default output behavior and configuration structure.
