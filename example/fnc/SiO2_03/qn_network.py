@@ -628,8 +628,11 @@ class QnNetworkAnalysis(object):
         JSON の ``fnc3.constraints`` または ``rmc.fnc.constraints`` で source を指定する。
         現在対応する source は次の通り。
 
-        * ``independent_unit_bonds``: ``rmc.top.unit`` と同じ独立 unit 割当から作る unit 内 bond。
-          SiO2 の現在設定では Si 1 個 + O 2 個の unit 内 Si-O のみを FNC に入れる。
+        * ``unit_central_neighbor_bonds``: TOP と共通の unit 割当から作る unit 内 central-neighbor bond。
+          SiO2 の現在設定では Si 1 個 + O 2 個の unit 内 Si-O を FNC に入れる。
+        * ``unit_neighbor_neighbor_edges``: 同じ unit 内の neighbor-neighbor edge。
+          SiO2 の現在設定では O-Si-O 角を距離拘束で近似する O-O edge を FNC に入れる。
+        * ``independent_unit_bonds``: 旧名。``unit_central_neighbor_bonds`` と同じ扱い。
         * ``central_bridge_bonds``: Q network の central-bridge 直接 bond。例: Si-O。
           これは network の全 Si-O 接続を FNC に入れるため、unit FNC とは別用途である。
         * ``bridge_second_bonds``: Q network の bridge-second 直接 bond。例: O-Si。
@@ -653,12 +656,39 @@ class QnNetworkAnalysis(object):
             source = str(QnNetworkAnalysis.get_required(item, "source"))
             type_names[type_id] = name
 
-            if source == "independent_unit_bonds":
+            if source == "unit_central_neighbor_bonds":
                 molecules = RmcConstraintWriter.build_independent_unit_molecules(
                     poscar, config
                 )
                 for molecule_name, atom_indices, bonds, angles in molecules:
                     for local_i, local_j in bonds:
+                        global_i = atom_indices[local_i]
+                        global_j = atom_indices[local_j]
+                        QnNetworkAnalysis.add_typed_pair(
+                            pair_types, global_i, global_j, type_id
+                        )
+
+            elif source == "independent_unit_bonds":
+                molecules = RmcConstraintWriter.build_independent_unit_molecules(
+                    poscar, config
+                )
+                for molecule_name, atom_indices, bonds, angles in molecules:
+                    for local_i, local_j in bonds:
+                        global_i = atom_indices[local_i]
+                        global_j = atom_indices[local_j]
+                        QnNetworkAnalysis.add_typed_pair(
+                            pair_types, global_i, global_j, type_id
+                        )
+
+            elif source == "unit_neighbor_neighbor_edges":
+                molecules = RmcConstraintWriter.build_independent_unit_molecules(
+                    poscar, config
+                )
+                for molecule_name, atom_indices, bonds, angles in molecules:
+                    local_neighbor_indices = list(range(1, len(atom_indices)))
+                    for local_i, local_j in itertools.combinations(
+                        local_neighbor_indices, 2
+                    ):
                         global_i = atom_indices[local_i]
                         global_j = atom_indices[local_j]
                         QnNetworkAnalysis.add_typed_pair(
@@ -1265,16 +1295,32 @@ class RmcConstraintWriter(object):
 
     @staticmethod
     def get_unit_topology_config(config: Dict[str, Any]) -> Dict[str, Any]:
-        """独立分子・独立フラグメント topology 用設定を取得する。
+        """TOP/FNC 共通の独立 unit 設定を取得する。
 
-        新しい JSON では ``rmc.top.unit`` を使う。
-        新しい JSON では ``rmc.top.unit`` を使う。
-        flat な旧 JSON 名はここでは読まない。
+        unit assignment は TOP 固有ではなく、FNC でも同じものを使う。
+        そのため、中心原子・neighbor 原子・割当方法・距離範囲などは
+        ``network.unit`` に置く。
+
+        ``rmc.top.unit`` は molecule 名、residue 名、bond/angle potential など、
+        TOP 出力に固有の設定を持つ。戻り値では ``network.unit`` を基準にして、
+        ``rmc.top.unit`` の項目を上書きして返す。
         """
+        result = {}  # type: Dict[str, Any]
+
+        network_config = QnNetworkAnalysis.get_network_config(config)
+        if "unit" in network_config:
+            for key, value in network_config["unit"].items():
+                result[key] = value
+
         top_root = QnNetworkAnalysis.get_top_root_config(config)
         if "unit" in top_root:
-            return top_root["unit"]
-        raise ConfigError("config に rmc.top.unit がありません。")
+            for key, value in top_root["unit"].items():
+                result[key] = value
+
+        if len(result) == 0:
+            raise ConfigError("config に network.unit または rmc.top.unit がありません。")
+
+        return result
 
     @staticmethod
     def _select_unit_neighbor_candidates(
@@ -1317,7 +1363,7 @@ class RmcConstraintWriter(object):
         * したがって、RMC は unit 間配置を実験データに合わせて探索できる。
         * 個別の Si-O-Si ネットワーク全体を固定しない。
 
-        JSON の ``rmc.top.unit`` で使う主な項目:
+        JSON の ``network.unit`` で使う主な unit assignment 項目:
 
         * ``central_types``: unit 中心 atom type。例: ["Si"]。
         * ``neighbor_types``: unit に含める周辺 atom type。例: ["O"]。
@@ -1353,15 +1399,15 @@ class RmcConstraintWriter(object):
 
         if assignment != "nearest_exclusive":
             raise ConfigError(
-                "rmc.top.unit.assignment は nearest_exclusive のみ対応しています。"
+                "network.unit.assignment は nearest_exclusive のみ対応しています。"
             )
 
         central_indices = QnNetworkAnalysis.select_indices(poscar.labels, central_types)
         neighbor_indices = QnNetworkAnalysis.select_indices(poscar.labels, neighbor_types)
         if len(central_indices) == 0:
-            raise ConfigError("rmc.top.unit.central_types に対応する原子がありません。")
+            raise ConfigError("network.unit.central_types に対応する原子がありません。")
         if len(neighbor_indices) == 0:
-            raise ConfigError("rmc.top.unit.neighbor_types に対応する原子がありません。")
+            raise ConfigError("network.unit.neighbor_types に対応する原子がありません。")
 
         needs = {}
         assigned = defaultdict(list)  # type: Dict[int, List[int]]

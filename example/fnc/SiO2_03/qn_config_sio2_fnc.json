@@ -30,9 +30,16 @@
         {
           "type_id": 1,
           "name": "unit_central_neighbor_bond",
-          "source": "independent_unit_bonds",
+          "source": "unit_central_neighbor_bonds",
           "rmin": 1.45,
           "rmax": 1.85
+        },
+        {
+          "type_id": 2,
+          "name": "unit_neighbor_neighbor_edge",
+          "source": "unit_neighbor_neighbor_edges",
+          "rmin": 2.1,
+          "rmax": 3.4
         }
       ]
     },
