@@ -2,6 +2,32 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.29
+
+### Fixed
+
+- Fixed invalid RMC_POT FNC file generation.
+- Corrected the FNC writer to output the fixed record layout required by the RMC_POT manual, including required blank records in the header.
+- Fixed FNC atom-record generation so generated `.fnc` files are no longer written as an arbitrary neighbor-list dump.
+- Fixed FNC constraint generation to use validated unit-based pairs instead of directly exporting Q-network-wide pairs.
+- Fixed FNC constraint definitions so constraint types are defined by `kind` and `atom_types`, rather than hidden `source` strings.
+
+### Changed
+
+- Reworked FNC generation to use the same independent unit assignment as unit topology generation.
+- Moved shared unit-assignment settings to `network.unit`, while keeping TOP-specific output parameters under `rmc.top.unit`.
+- Renamed internal unit-assignment terminology from `ligand` to `neighbor`.
+- Refactored independent unit construction so it can be shared by TOP and FNC generation.
+- Changed FNC output to preserve generated record order instead of sorting neighbors during output.
+- Reorganized FNC validation logic for atom types and distance ranges.
+- Updated FNC configuration to define constraints explicitly using `kind`, `atom_types`, `rmin`, and `rmax`.
+
+### Removed
+
+- Removed DAT snippet generation from `qn_network.py`.
+- Removed `get_dat_config()`.
+- Removed `write_dat_snippets()` and related DAT snippet writer code.
+ 
 ## v0.4.28 nakada
 
 Reorganized the Qn network analysis and RMC_POT input generation workflow by redesigning the class structure.
