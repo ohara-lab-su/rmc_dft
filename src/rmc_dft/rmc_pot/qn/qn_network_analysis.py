@@ -19,7 +19,6 @@ import numpy as np
 
 from rmc_dft.rmc_pot.qn.config_error import ConfigError
 
-from rmc_dft.rmc_pot.qn.rmc_constraint_writer import RmcConstraintWriter
 from rmc_dft.rmc_pot.qn.vasp_structure import VaspStructure
 
 
@@ -72,7 +71,7 @@ class QnNetworkAnalysis:
     ):
         """VASP 構造ファイルと JSON 設定から QnNetworkAnalysis を作る。"""
         config = cls.load_config(config_name)
-        atom_types = cls.QnNetworkAnalysis.get_structure_atom_types(config)
+        atom_types = cls.get_structure_atom_types(config)
         structure = VaspStructure.read_poscar(poscar_name, atom_types)
         return cls(structure, config)
 
@@ -106,6 +105,8 @@ class QnNetworkAnalysis:
         path: str,
         title: Optional[str] = None,
     ) -> None:
+        from rmc_dft.rmc_pot.qn.rmc_constraint_writer import RmcConstraintWriter
+
         writer = RmcConstraintWriter(self)
         writer.write_fnc3(path, title=title)
 
@@ -113,6 +114,8 @@ class QnNetworkAnalysis:
         self,
         path: str,
     ) -> None:
+        from rmc_dft.rmc_pot.qn.rmc_constraint_writer import RmcConstraintWriter
+
         writer = RmcConstraintWriter(self)
         writer.write_unit_topology(path)
 
@@ -120,6 +123,8 @@ class QnNetworkAnalysis:
         self,
         path: str,
     ) -> None:
+        from rmc_dft.rmc_pot.qn.rmc_constraint_writer import RmcConstraintWriter
+
         writer = RmcConstraintWriter(self)
         writer.write_network_topology(path)
 
@@ -127,6 +132,8 @@ class QnNetworkAnalysis:
         self,
         prefix: str,
     ) -> None:
+        from rmc_dft.rmc_pot.qn.rmc_constraint_writer import RmcConstraintWriter
+
         writer = RmcConstraintWriter(self)
         writer.write_rmc_inputs(prefix)
         self.write_analysis(prefix)
@@ -202,7 +209,6 @@ class QnNetworkAnalysis:
             return config["fnc3"]
         raise ConfigError("config に rmc.fnc がありません。")
 
-    @staticmethod
     @staticmethod
     def get_top_root_config(
         config: Dict[str, Any],
@@ -533,6 +539,8 @@ class QnNetworkAnalysis:
         fnc3_config = QnNetworkAnalysis.get_fnc_config(config)
         constraints = QnNetworkAnalysis.get_required(fnc3_config, "constraints")
 
+        from rmc_dft.rmc_pot.qn.rmc_constraint_writer import RmcConstraintWriter
+
         molecules = RmcConstraintWriter.build_independent_unit_molecules(poscar, config)
 
         pair_types = {}  # type: Dict[Pair, int]
@@ -729,6 +737,7 @@ class QnNetworkAnalysis:
                     rmax,
                 )
 
+    @staticmethod
     def collect_fnc3_ranges(config: Dict[str, Any]) -> Dict[int, Tuple[float, float]]:
         """FNC=3 type_id ごとの rmin/rmax を JSON 設定から取り出す。"""
         result = {}
