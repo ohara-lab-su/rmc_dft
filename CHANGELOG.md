@@ -2,6 +2,27 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.27 nakada
+
+Reorganized the RMC_POT topology generation workflow and refined the default output behavior and configuration structure.
+
+- `qn_network.py`
+  - Refactored the topology generation workflow to clearly separate RMC_POT topology generation from FNC generation.
+  - Restored the independent-unit topology as the default topology output instead of the current-network topology.
+  - Reorganized the output file naming for topology, FNC, and DAT snippet files.
+  - Removed compatibility handling for the legacy JSON configuration and unified the implementation with the new JSON hierarchy.
+  - Updated topology-related messages and report output for consistency.
+
+- `make_sio2_qn_fnc.py`
+  - Removed the dependency on the installed package and enabled standalone execution within the calculation directory.
+  - Removed duplicated topology generation.
+  - Updated the displayed output file names to match the new naming convention.
+
+- `qn_config_sio2.json`
+  - Reorganized the topology configuration structure.
+  - Updated the configuration order to make the independent-unit topology the default configuration.
+  - Added and reorganized topology-related configuration entries.
+
 ## v0.4.26 nakada
 
 Reorganized the configuration structure for Qn-network generation and RMC_POT topology generation.
