@@ -741,7 +741,7 @@ class QnNetworkAnalysis(object):
                 f.write("%d %d\n" % (atom + 1, len(items)))
                 if len(items) > 0:
                     f.write(" ".join(str(item[0] + 1) for item in items) + "\n")
-                    f.write(" ".join(str(item[1] - 1) for item in items) + "\n")
+                    f.write(" ".join(str(item[1]) for item in items) + "\n")
 
     @staticmethod
     def write_qn_csv_file(
@@ -996,8 +996,7 @@ class RmcConstraintWriter(object):
                 f.write("%d %d\n" % (atom + 1, len(items)))
                 if len(items) > 0:
                     f.write(" ".join(str(item[0] + 1) for item in items) + "\n")
-                    # f.write(" ".join(str(item[1]) for item in items) + "\n")
-                    f.write(" ".join(str(item[1] - 1) for item in items) + "\n")
+                    f.write(" ".join(str(item[1]) for item in items) + "\n")
 
     @staticmethod
     def get_topology_config(config: Dict[str, Any]) -> Dict[str, Any]:
