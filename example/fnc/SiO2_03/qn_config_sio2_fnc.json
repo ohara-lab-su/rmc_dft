@@ -36,7 +36,7 @@
       "constraints": [
         {
           "type_id": 1,
-          "name": "unit_central_ligand_bond",
+          "name": "unit_central_neighbor_bond",
           "source": "independent_unit_bonds",
           "rmin": 1.45,
           "rmax": 1.85
@@ -63,10 +63,6 @@
         "central_types": [
           "Si"
         ],
-        "ligand_types": [
-          "O"
-        ],
-        "ligand_count": 2,
         "assignment": "nearest_exclusive",
         "distance_min": 1.2,
         "distance_max": 2.3,
@@ -82,7 +78,11 @@
           "theta_degree": 109.47,
           "force_kj_mol_rad2": 100.0,
           "sigma": 10.0
-        }
+        },
+        "neighbor_types": [
+          "O"
+        ],
+        "neighbor_count": 2
       },
       "network": {
         "molecule_name": "SIO2NET",

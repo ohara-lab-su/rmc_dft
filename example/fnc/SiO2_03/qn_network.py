@@ -1282,26 +1282,26 @@ class RmcConstraintWriter(object):
         raise ConfigError("config に rmc.top.unit がありません。")
 
     @staticmethod
-    def _select_unit_ligand_candidates(
+    def _select_unit_neighbor_candidates(
         poscar: VaspStructure,
         central_indices: Sequence[int],
-        ligand_indices: Sequence[int],
+        neighbor_indices: Sequence[int],
         min_distance: float,
         max_distance: float,
     ) -> List[Tuple[float, int, int]]:
-        """central-ligand 候補を距離順に並べて返す。
+        """central-neighbor 候補を距離順に並べて返す。
 
-        戻り値は ``(distance, central_index, ligand_index)`` の list である。
+        戻り値は ``(distance, central_index, neighbor_index)`` の list である。
         ``build_independent_unit_molecules`` の最近接排他的割当で使う。
         """
         candidates = []
         for central in central_indices:
-            for ligand in ligand_indices:
+            for neighbor in neighbor_indices:
                 distance = QnNetworkAnalysis.pbc_distance(
-                    central, ligand, poscar.frac, poscar.cell
+                    central, neighbor, poscar.frac, poscar.cell
                 )
                 if distance >= min_distance and distance <= max_distance:
-                    candidates.append((distance, central, ligand))
+                    candidates.append((distance, central, neighbor))
         candidates.sort()
         return candidates
 
@@ -1312,7 +1312,7 @@ class RmcConstraintWriter(object):
         """RMC_POT FNC=4 用の独立分子・独立フラグメント一覧を作る。
 
         この関数は、初期構造から検出したネットワーク全体を 1 つの molecule として固定しない。
-        代わりに、central atom と一定数の ligand atom から成る独立 unit を作る。
+        代わりに、central atom と一定数の neighbor atom から成る独立 unit を作る。
         たとえば SiO2 の Packmol 初期配置に対応させるなら、Si 1 個 + O 2 個を 1 unit とする。
 
         重要な設計意図は次である。
@@ -1325,10 +1325,10 @@ class RmcConstraintWriter(object):
         JSON の ``rmc.top.unit`` で使う主な項目:
 
         * ``central_types``: unit 中心 atom type。例: ["Si"]。
-        * ``ligand_types``: unit に含める周辺 atom type。例: ["O"]。
-        * ``ligand_count``: central 1 個あたりに割り当てる ligand 数。SiO2 unit なら 2。
-        * ``distance_min`` / ``distance_max``: 割当候補とする central-ligand 距離範囲。
-        * ``assignment``: 現在は ``nearest_exclusive`` のみ。ligand を複数 unit に重複所属させない。
+        * ``neighbor_types``: unit に含める周辺 atom type。例: ["O"]。
+        * ``neighbor_count``: central 1 個あたりに割り当てる neighbor 数。SiO2 unit なら 2。
+        * ``distance_min`` / ``distance_max``: 割当候補とする central-neighbor 距離範囲。
+        * ``assignment``: 現在は ``nearest_exclusive`` のみ。neighbor を複数 unit に重複所属させない。
 
         注意:
             この方法は「独立分子単位の保持」であり、共有酸素を持つ無限 Si-O-Si network を
@@ -1336,16 +1336,16 @@ class RmcConstraintWriter(object):
         """
         unit_config = RmcConstraintWriter.get_unit_topology_config(config)
         central_types = unit_config.get("central_types", None)
-        ligand_types = unit_config.get("ligand_types", None)
+        neighbor_types = unit_config.get("neighbor_types", None)
 
         if central_types is None:
             qn_config = QnNetworkAnalysis.get_network_config(config)
             central_types = qn_config.get("central_types", [])
-        if ligand_types is None:
+        if neighbor_types is None:
             qn_config = QnNetworkAnalysis.get_network_config(config)
-            ligand_types = qn_config.get("bridge_types", [])
+            neighbor_types = qn_config.get("bridge_types", [])
 
-        ligand_count = int(QnNetworkAnalysis.get_required(unit_config, "ligand_count"))
+        neighbor_count = int(QnNetworkAnalysis.get_required(unit_config, "neighbor_count"))
         min_distance = float(unit_config.get("distance_min", 0.0))
         max_distance = float(unit_config.get("distance_max", 99.0))
         assignment = str(unit_config.get("assignment", "nearest_exclusive"))
@@ -1362,35 +1362,35 @@ class RmcConstraintWriter(object):
             )
 
         central_indices = QnNetworkAnalysis.select_indices(poscar.labels, central_types)
-        ligand_indices = QnNetworkAnalysis.select_indices(poscar.labels, ligand_types)
+        neighbor_indices = QnNetworkAnalysis.select_indices(poscar.labels, neighbor_types)
         if len(central_indices) == 0:
             raise ConfigError("rmc.top.unit.central_types に対応する原子がありません。")
-        if len(ligand_indices) == 0:
-            raise ConfigError("rmc.top.unit.ligand_types に対応する原子がありません。")
+        if len(neighbor_indices) == 0:
+            raise ConfigError("rmc.top.unit.neighbor_types に対応する原子がありません。")
 
         needs = {}
         assigned = defaultdict(list)  # type: Dict[int, List[int]]
         for central in central_indices:
-            needs[central] = ligand_count
+            needs[central] = neighbor_count
 
-        used_ligands = set()  # type: Set[int]
-        candidates = RmcConstraintWriter._select_unit_ligand_candidates(
+        used_neighbors = set()  # type: Set[int]
+        candidates = RmcConstraintWriter._select_unit_neighbor_candidates(
             poscar,
             central_indices,
-            ligand_indices,
+            neighbor_indices,
             min_distance,
             max_distance,
         )
 
-        # 距離が短い central-ligand 候補から順に採用する。
-        # ligand は一度だけ使うので、unit 間で atom を共有しない。
-        for distance, central, ligand in candidates:
-            if ligand in used_ligands:
+        # 距離が短い central-neighbor 候補から順に採用する。
+        # neighbor は一度だけ使うので、unit 間で atom を共有しない。
+        for distance, central, neighbor in candidates:
+            if neighbor in used_neighbors:
                 continue
             if needs[central] <= 0:
                 continue
-            assigned[central].append(ligand)
-            used_ligands.add(ligand)
+            assigned[central].append(neighbor)
+            used_neighbors.add(neighbor)
             needs[central] = needs[central] - 1
 
         missing = []
@@ -1399,8 +1399,8 @@ class RmcConstraintWriter(object):
                 missing.append((central, needs[central]))
         if len(missing) > 0 and not allow_incomplete:
             raise ConfigError(
-                "independent unit 作成で ligand 数が不足しました。"
-                "distance range または ligand_count を見直してください。"
+                "independent unit 作成で neighbor 数が不足しました。"
+                "distance range または neighbor_count を見直してください。"
             )
 
         molecules = []  # type: List[UnitMolecule]
@@ -1408,20 +1408,20 @@ class RmcConstraintWriter(object):
         included_atoms = set()  # type: Set[int]
 
         for central in sorted(central_indices):
-            ligands = sorted(assigned.get(central, []))
+            neighbors = sorted(assigned.get(central, []))
 
             atom_indices = [central]
-            for ligand in ligands:
-                atom_indices.append(ligand)
+            for neighbor in neighbors:
+                atom_indices.append(neighbor)
 
             bonds = []  # type: List[Pair]
-            for local_ligand_index in range(1, len(atom_indices)):
-                bonds.append((0, local_ligand_index))
+            for local_neighbor_index in range(1, len(atom_indices)):
+                bonds.append((0, local_neighbor_index))
 
             angles = []  # type: List[Angle]
             if generate_angles:
-                local_ligand_indices = list(range(1, len(atom_indices)))
-                for local_i, local_k in itertools.combinations(local_ligand_indices, 2):
+                local_neighbor_indices = list(range(1, len(atom_indices)))
+                for local_i, local_k in itertools.combinations(local_neighbor_indices, 2):
                     angles.append((local_i, 0, local_k))
 
             molecule_name = "%s%06d" % (molecule_name_prefix, molecule_index)
