@@ -1,5 +1,5 @@
 {
-  "description": "Qn-network and RMC_POT input settings for Si-O-Si silica glass.",
+  "description": "Qn-network analysis and RMC_POT unit-top/FNC settings for Si-O-Si silica glass.",
   "structure": {
     "atom_types": [
       "Si",
@@ -29,15 +29,15 @@
       "hard_sphere_cutoffs": {
         "Si-Si": 1.4,
         "Si-O": 1.25,
-        "O-O": 2.05
+        "O-O": 1.4
       }
     },
     "fnc": {
       "constraints": [
         {
           "type_id": 1,
-          "name": "central_bridge_bond",
-          "source": "central_bridge_bonds",
+          "name": "unit_central_ligand_bond",
+          "source": "independent_unit_bonds",
           "rmin": 1.45,
           "rmax": 1.85
         }

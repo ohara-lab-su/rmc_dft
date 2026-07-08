@@ -631,14 +631,21 @@ class QnNetworkAnalysis(object):
     ) -> None:
         """QnNetworkAnalysis から FNC=3 用の原子対リストを作る。
 
-        JSON の ``fnc3.constraints`` で source を指定する。現在対応する source は次の通り。
+        JSON の ``fnc3.constraints`` または ``rmc.fnc.constraints`` で source を指定する。
+        現在対応する source は次の通り。
 
-        * ``central_bridge_bonds``: central-bridge の直接 bond。例: Si-O。
-        * ``bridge_second_bonds``: bridge-second の直接 bond。例: O-Si。
+        * ``independent_unit_bonds``: ``rmc.top.unit`` と同じ独立 unit 割当から作る unit 内 bond。
+          SiO2 の現在設定では Si 1 個 + O 2 個の unit 内 Si-O のみを FNC に入れる。
+        * ``central_bridge_bonds``: Q network の central-bridge 直接 bond。例: Si-O。
+          これは network の全 Si-O 接続を FNC に入れるため、unit FNC とは別用途である。
+        * ``bridge_second_bonds``: Q network の bridge-second 直接 bond。例: O-Si。
         * ``central_second_through_bridge``: bridge を介した central-second。例: Si-O-Si の Si-Si。
+          unit FNC では使わない。
         * ``bridge_bridge_around_central``: central 周りの bridge-bridge。例: SiO4 内 O-O。
+          unit FNC では使わない。
 
         結果は ``data.fnc_pairs`` と ``data.fnc_type_names`` に格納する。
+        FNC type_id は RMC_POT の rmin/rmax type_id であり、原子種 pair type ではない。
         """
         fnc3_config = QnNetworkAnalysis.get_fnc_config(config)
         constraints = QnNetworkAnalysis.get_required(fnc3_config, "constraints")
@@ -652,7 +659,19 @@ class QnNetworkAnalysis(object):
             source = str(QnNetworkAnalysis.get_required(item, "source"))
             type_names[type_id] = name
 
-            if source == "central_bridge_bonds":
+            if source == "independent_unit_bonds":
+                molecules = RmcConstraintWriter.build_independent_unit_molecules(
+                    poscar, config
+                )
+                for molecule_name, atom_indices, bonds, angles in molecules:
+                    for local_i, local_j in bonds:
+                        global_i = atom_indices[local_i]
+                        global_j = atom_indices[local_j]
+                        QnNetworkAnalysis.add_typed_pair(
+                            pair_types, global_i, global_j, type_id
+                        )
+
+            elif source == "central_bridge_bonds":
                 for central, bridges in data.first_map.items():
                     for bridge in bridges:
                         QnNetworkAnalysis.add_typed_pair(
