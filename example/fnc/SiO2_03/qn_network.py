@@ -886,7 +886,7 @@ class QnNetworkAnalysis(object):
             f.write(" %d\n" % atom_count)
             f.write("\n")
             for atom in range(atom_count):
-                items = sorted(neighbours.get(atom, []))
+                items = neighbours.get(atom, [])
                 f.write("%d %d\n" % (atom + 1, len(items)))
                 if len(items) > 0:
                     f.write(" ".join(str(item[0] + 1) for item in items) + "\n")
@@ -1144,7 +1144,7 @@ class RmcConstraintWriter(object):
             f.write(" %d\n" % atom_count)
             f.write("\n")
             for atom in range(atom_count):
-                items = sorted(neighbours.get(atom, []))
+                items = neighbours.get(atom, [])
                 f.write("%d %d\n" % (atom + 1, len(items)))
                 if len(items) > 0:
                     f.write(" ".join(str(item[0] + 1) for item in items) + "\n")
