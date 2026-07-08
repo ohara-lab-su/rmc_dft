@@ -40,7 +40,10 @@ from rmc_vasp_init import run_vasp_init
 
 
 if __name__ == "__main__":
-    logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+    logger = XLogger(
+        log_level="debug",
+        logger_name="rmc_vasp_script",
+    )
 
     config = Config("config.yml")
     max_rmc_dft_loop = config.max_rmc_dft_loop

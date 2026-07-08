@@ -97,7 +97,7 @@ class RmcPotDat:
         self._logger = logger or XLogger()
         self._config = config or Config()
         self._cfg_name: Optional[str] = cfg_name or self._config.cfg_name
-        self._logger.info("== Create RmcPotDat()")
+        self._logger.info("[rmc_pot_data] == Create RmcPotDat()")
 
         self._lines: list[_Line] = []
         self._auto_write: bool = auto_write
@@ -105,12 +105,12 @@ class RmcPotDat:
         # 既存の dat を読む
         p = Path(f"{self._cfg_name}.dat")
         if p.exists():
-            self._logger.info(f"load {self._cfg_name}.dat")
+            self._logger.info(f"[rmc_pot_dat] load {self._cfg_name}.dat")
             self.load()
         else:
-            self._logger.info(f"== create *.dat")
-            self._logger.info(f"{self._cfg_name}.dat file not found.")
-            self._logger.info(f"create default dat file")
+            self._logger.info(f"[rmc_pot_dat] == create *.dat")
+            self._logger.info(f"[rmc_pot_dat] {self._cfg_name}.dat file not found.")
+            self._logger.info(f"[rmc_pot_dat] create default dat file")
             self.create_dat_file(str(self._cfg_name))
             self.load()
 
@@ -193,11 +193,11 @@ class RmcPotDat:
 
         if path.exists():
             # raise FileExistsError(f'"{filename}" はすでに存在します')
-            self._logger.error(f'"{filename}" はすでに存在します')
+            self._logger.error(f'[rmc_pot_dat] "{filename}" はすでに存在します')
             return False
 
         path.write_text(DAT_TEMPLATE, encoding="utf-8")
-        self._logger.info(f"Base cfg file を作成しました: {filename}")
+        self._logger.info(f"[rmc_pot_dat] Base cfg file を作成しました: {filename}")
         return True
 
     @staticmethod
@@ -252,7 +252,7 @@ class RmcPotDat:
     # --------------------
     def load(self) -> bool:
         """ファイルを読み込んで内部行リストを構築。"""
-        self._logger.info(f"== load({self._cfg_name}.dat)")
+        self._logger.info(f"[rmc_pot_dat] == load({self._cfg_name}.dat)")
 
         p = Path(f"{self._cfg_name}.dat")
         if not p.exists():
@@ -260,7 +260,7 @@ class RmcPotDat:
             #     f".dat ファイルが見つかりません: {p} (.dat は自動付加されます)"
             # )
             self._logger.info(
-                ".dat ファイルが見つかりません: {p} (.dat は自動付加されます)"
+                "[rmc_pot_dat] .dat ファイルが見つかりません: {p} (.dat は自動付加されます)"
             )
             return False
 
@@ -293,7 +293,7 @@ class RmcPotDat:
         with target.open("w", encoding="utf-8") as f:
             for ln in self._lines:
                 f.write(ln.render())
-        self._logger.info(f"== write({target})")
+        self._logger.info(f"[rmc_pot_dat] == write({target})")
 
     # --------------------
     # 任意行の get / set
@@ -402,7 +402,7 @@ class RmcPotDat:
         auto_write: Optional[bool] = True,
     ) -> None:
         """1 行目 comment を更新。"""
-        self._logger.info(f"set_comment = {comment}")
+        self._logger.info(f"[rmc_pot_dat] set_comment = {comment}")
         self._config.rmc_comment = comment
         self.set_line(1, comment, auto_write=auto_write)
 
@@ -438,7 +438,7 @@ class RmcPotDat:
         auto_write: Optional[bool] = True,
     ) -> None:
         """2 行目 density を更新。"""
-        self._logger.info(f"set_density = {rho}")
+        self._logger.info(f"[rmc_pot_dat] set_density = {rho}")
         self._config.number_density_A3 = float(rho)
         self.set_line(2, rho, auto_write=auto_write)
 
@@ -534,7 +534,7 @@ class RmcPotDat:
                 True の場合は即時書き出し。None はインスタンス既定値に従う。
         """
         seq = list(values)
-        self._logger.info(f"set_cutoffs = {seq}")
+        self._logger.info(f"[rmc_pot_dat] set_cutoffs = {seq}")
         for v in seq:
             if not isinstance(v, (int, float)):
                 raise TypeError(f"cut offs には数値のみを指定してください: {v!r}")
@@ -579,7 +579,7 @@ class RmcPotDat:
                 True の場合即時保存。None の場合はインスタンス既定に従う。
         """
         seq = list(values)
-        self._logger.info(f"set_maximu_moves = {seq}")
+        self._logger.info(f"[rmc_pot_dat] set_maximu_moves = {seq}")
 
         # 各要素が数値であることのみ検査する
         for v in seq:
@@ -626,7 +626,7 @@ class RmcPotDat:
         auto_write: Optional[bool] = True,
     ) -> None:
         """5 行目 r spacing を更新。"""
-        self._logger.info(f"set_r_spacing = {dr}")
+        self._logger.info(f"[rmc_pot_dat] set_r_spacing = {dr}")
         self._config.rmc_r_spacing = float(dr)
         self.set_line(5, dr, auto_write=auto_write)
 
@@ -708,7 +708,7 @@ class RmcPotDat:
                 True なら即時保存、None の場合はインスタンス既定に従う。
         """
         token = self._to_bool_token(use_moveout)
-        self._logger.info(f"set_moveout_option = {token}")
+        self._logger.info(f"[rmc_pot_dat] set_moveout_option = {token}")
         self._config.rmc_moveout_option = bool(use_moveout)
         self.set_line(6, token, auto_write=auto_write)
 
@@ -1025,7 +1025,7 @@ class RmcPotDat:
         if not all(isinstance(v, int) and v in (0, 1) for v in values):
             raise ValueError(f"flags には 0 または 1 のみ指定可能です: {values!r}")
 
-        self._logger.info(f"flags: {values!r}")
+        self._logger.info(f"[rmc_pot_dat] flags: {values!r}")
         self._config.rmc_data_flags = values
         self.set_line(10, [str(v) for v in values], auto_write=auto_write)
 
@@ -1073,7 +1073,7 @@ class RmcPotDat:
         """
         try:
             line = self.get_line(11)
-            self._logger.info(f'== get_exp_filename: "{line}"')
+            self._logger.info(f'[rmc_pot_dat] == get_exp_filename: "{line}"')
             tokens = line.split()
             if tokens:
                 return tokens[0]
@@ -1082,7 +1082,7 @@ class RmcPotDat:
 
         if self._config.rmc_exp_filename is not None:
             self._logger.info(
-                f'== get_exp_filename(from config): "{self._config.rmc_exp_filename}"'
+                f'[rmc_pot_dat] == get_exp_filename(from config): "{self._config.rmc_exp_filename}"'
             )
             return self._config.rmc_exp_filename
 
@@ -1583,9 +1583,7 @@ class RmcPotDat:
             if "No. of possible rmin-rmax pairs" in line:
                 return index
 
-        raise ValueError(
-            f"FNC rmin/rmax ヘッダが見つかりません: {path}"
-        )
+        raise ValueError(f"FNC rmin/rmax ヘッダが見つかりません: {path}")
 
     def get_fnc_distance_ranges(
         self,
@@ -1701,17 +1699,13 @@ class RmcPotDat:
             rmins[type_index - 1] = rmin
             rmaxs[type_index - 1] = rmax
 
-        lines[header_index + 2] = " ".join(
-            self._fmt_number(v) for v in rmins
-        ) + "\n"
-        lines[header_index + 3] = " ".join(
-            self._fmt_number(v) for v in rmaxs
-        ) + "\n"
+        lines[header_index + 2] = " ".join(self._fmt_number(v) for v in rmins) + "\n"
+        lines[header_index + 3] = " ".join(self._fmt_number(v) for v in rmaxs) + "\n"
 
         with path.open("w", encoding="utf-8") as f:
             f.writelines(lines)
 
-        self._logger.info(f"== set_fnc_distance_ranges({path})")
+        self._logger.info(f"[rmc_pot_dat] == set_fnc_distance_ranges({path})")
 
     def get_initial_bin_shift(self) -> int:
         """

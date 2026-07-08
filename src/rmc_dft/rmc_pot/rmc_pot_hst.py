@@ -66,14 +66,17 @@ class RmcPotHst:
         # HST ファイル名は cfg_name を基準に決定する
         if hst_name is not None:
             self._hst_file: str = hst_name
+
         elif cfg_name is not None:
             self._hst_file: str = f"{cfg_name}.hst"
+
         elif config is not None:
             config: Config = Config("config.yaml")
             cfg_name: str = config.cfg_name
             self._hst_file: str = f"{cfg_name}.hst"
+
         else:
-            self._logger.error(f"hst_name or cfg_name not provided")
+            self._logger.error(f"[rmc_pot_hst] hst_name or cfg_name not provided")
             raise NotImplementedError
 
         # 生ログ行と記録行
@@ -99,9 +102,9 @@ class RmcPotHst:
         try:
             with open(self._hst_file, "r") as f:
                 self._lines = f.readlines()
-            self._logger.info(f"Loaded HST: {self._hst_file}")
+            self._logger.info(f"[rmc_pot_hst] Loaded HST: {self._hst_file}")
         except FileNotFoundError:
-            self._logger.warning(f"HST not found: {self._hst_file}")
+            self._logger.warning(f"[rmc_pot_hst] HST not found: {self._hst_file}")
             self._lines = []
 
     # ---------------------------------------------------------------

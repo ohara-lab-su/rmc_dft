@@ -82,10 +82,10 @@ class RmcPotLog:
                 errors="ignore",
             ) as f:
                 self._log_lines = f.readlines()
-            self._logger.info(f"Loaded log file: {self._log_filename}")
+            self._logger.info(f"[rmc_pot_log] Loaded log file: {self._log_filename}")
 
         except Exception as e:
-            self._logger.error(f"Failed to read log file: {e}")
+            self._logger.error(f"[rmc_pot_log] Failed to read log file: {e}")
             self._log_lines = []
 
         # --- ログ再読込時の整合性のため、キャッシュを破棄 ---
@@ -121,30 +121,34 @@ class RmcPotLog:
         """
 
         self._logger.info(
-            "============================================================"
+            "[rmc_pot_log] ============================================================"
         )
-        self._logger.info(" INSPECT scan_rmc_loops (順序ベースの正しい検証)")
         self._logger.info(
-            "============================================================"
+            "[rmc_pot_log] INSPECT scan_rmc_loops (順序ベースの正しい検証)"
+        )
+        self._logger.info(
+            "[rmc_pot_log] ============================================================"
         )
 
         # --- ブロック範囲を取得 ---
         blocks = self._scan_rmc_blocks()
         if block_index < 0 or block_index >= len(blocks):
-            self._logger.info(f"[INSPECT] invalid block_index={block_index}")
+            self._logger.info(
+                f"[rmc_pot_log] [INSPECT] invalid block_index={block_index}"
+            )
             return
 
         b_start, b_end = blocks[block_index]
         if b_end == -1:
             b_end = len(self._log_lines) - 1
 
-        self._logger.info(f"[INSPECT] block range = {b_start} 〜 {b_end}")
+        self._logger.info(f"[rmc_pot_log] [INSPECT] block range = {b_start} 〜 {b_end}")
 
         # --- ループ検出 ---
         loop_starts = []
         last_global_idx = -1  # 前回検出した Global の行番号
 
-        self._logger.info("\n[INSPECT] scanning TOTAL → Global …")
+        self._logger.info("\n[rmc_pot_log] [INSPECT] scanning TOTAL → Global …")
 
         for i in range(b_start, b_end + 1):
             line = self._log_lines[i].rstrip()
@@ -156,7 +160,9 @@ class RmcPotLog:
 
                 # 現在位置 i を開始候補として記録
                 total_idx = i
-                self._logger.info(f"[FOUND TOTAL] line {total_idx}: {line}")
+                self._logger.info(
+                    f"[rmc_pot_log] [FOUND TOTAL] line {total_idx}: {line}"
+                )
 
                 # -------------------------------
                 # STEP 2: total_idx 以降で Global を探す
@@ -167,18 +173,20 @@ class RmcPotLog:
                     line2 = self._log_lines[j].rstrip()
 
                     if "Global chi-squared value" in line2:
-                        self._logger.info(f"    [FOUND GLOBAL] line {j}: {line2}")
+                        self._logger.info(
+                            f"[rmc_pot_log]    [FOUND GLOBAL] line {j}: {line2}"
+                        )
 
                         # 以前検出した Global より後ならば loop として採用
                         if j > last_global_idx:
                             loop_starts.append(total_idx)
                             last_global_idx = j
                             self._logger.info(
-                                f"    [REGISTER LOOP] start={total_idx}, global_at={j}"
+                                f"[rmc_pot_log]    [REGISTER LOOP] start={total_idx}, global_at={j}"
                             )
                         else:
                             self._logger.info(
-                                f"    [SKIP] global {j} は前の global {last_global_idx} より前"
+                                f"[rmc_pot_log]    [SKIP] global {j} は前の global {last_global_idx} より前"
                             )
 
                         found_global = True
@@ -186,27 +194,29 @@ class RmcPotLog:
 
                 if not found_global:
                     self._logger.info(
-                        f"    [SKIP] TOTAL {total_idx} に対応する Global が見つからない"
+                        f"[rmc_pot_log]    [SKIP] TOTAL {total_idx} に対応する Global が見つからない"
                     )
 
-        self._logger.info("\n[INSPECT] loop_starts =", loop_starts)
-        self._logger.info(f"[INSPECT] total loops detected = {len(loop_starts)}")
+        self._logger.info("\n[rmc_pot_log] [INSPECT] loop_starts =", loop_starts)
+        self._logger.info(
+            f"[rmc_pot_log] [INSPECT] total loops detected = {len(loop_starts)}"
+        )
 
         # --- start/end の構造を可視化 ---
-        self._logger.info("\n[INSPECT] constructing loop ranges …")
+        self._logger.info("\n[rmc_pot_log] [INSPECT] constructing loop ranges …")
         for idx, s in enumerate(loop_starts):
             if idx + 1 < len(loop_starts):
                 e = loop_starts[idx + 1] - 1
             else:
                 e = b_end
-            self._logger.info(f"    loop {idx}: start={s}, end={e}")
+            self._logger.info(f"[rmc_pot_log]    loop {idx}: start={s}, end={e}")
 
         self._logger.info(
-            "============================================================"
+            "[rmc_pot_log] ============================================================"
         )
-        self._logger.info(" END INSPECT")
+        self._logger.info("[rmc_pot_log] END INSPECT")
         self._logger.info(
-            "============================================================"
+            "[rmc_pot_log] ============================================================"
         )
 
     def _inspect_moves(self, block_index: int) -> None:
@@ -746,7 +756,7 @@ class RmcPotLog:
         return True
 
     def collect_result(self):
-        self._logger.info("collect_result")
+        self._logger.info("[rmc_pot_log] collect_result")
 
     def backup_result(
         self,
@@ -760,7 +770,8 @@ class RmcPotLog:
             log_dir (str): Directory to copy the log files to.
             cfg_name (str): Name of the configuration file.
         """
-        self._logger.info("== backup_result")
+        self._logger.info("")
+        self._logger.info("[rmc_pot_log] == backup_result")
 
         if not cfg_name:
             cfg_name = self.cfg_name
@@ -769,7 +780,7 @@ class RmcPotLog:
             log_dir = self._config.rmc_log_dir
 
         if not os.path.exists(log_dir):
-            self._logger.info(f"mkdir {log_dir}")
+            self._logger.info(f"[rmc_pot_log] mkdir {log_dir}")
             os.makedirs(log_dir)
 
         files_to_copy = [
@@ -791,6 +802,8 @@ class RmcPotLog:
         for file_name in files_to_copy:
             if os.path.exists(f"{file_name}"):
                 shutil.copy(file_name, log_dir)
-                self._logger.info(f"Copied {file_name} to {log_dir}")
+                self._logger.info(f"[rmc_pot_log] Copied {file_name} to {log_dir}")
             else:
-                self._logger.info(f"{file_name} does not exist, skipping.")
+                self._logger.info(
+                    f"[rmc_pot_log] {file_name} does not exist, skipping."
+                )

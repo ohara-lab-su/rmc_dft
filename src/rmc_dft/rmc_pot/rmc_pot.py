@@ -80,7 +80,8 @@ class RmcPot:
         self._rmc_log: RmcPotLog = rmc_log
 
         # RMC ログクラスに cfg_name を反映
-        self._logger.info(f"== rmc_log.set_cfg_name({cfg_name})")
+        # self._logger.info("")
+        self._logger.info(f"[rmc_pot] == rmc_log.set_cfg_name({cfg_name})")
         self._rmc_log.set_cfg_name(cfg_name)
 
         # ------------------------------------------------------------
@@ -96,7 +97,8 @@ class RmcPot:
             )
 
         self._rmc_dat: RmcPotDat = rmc_dat
-        self._logger.info("== rmc_pot_dat()")
+        # self._logger.info("")
+        self._logger.info("[rmc_pot] == rmc_pot_dat()")
 
     @property
     def rmc_dat(self):
@@ -174,7 +176,8 @@ class RmcPot:
 
         *) 初期の構造変換は誤解が起きやすいので RmcPot クラスでは Preprocess() で勝手にやらないようにする
         """
-        self._logger.info("== preprocess()")
+        # self._logger.info("")
+        self._logger.info("[rmc_pot] == preprocess()")
 
         ##################################################
         # aaa.cfg が存在しないときは止める(構造情報)
@@ -190,7 +193,7 @@ class RmcPot:
 
         # 実行カレント（実行したPythonのパス）を基準にする
         work_dir = os.getcwd()
-        self._logger.info(f"work_dir   = {work_dir}")
+        self._logger.info(f"[rmc_pot] work_dir   = {work_dir}")
 
         ##################################################
         # Config から element_info を取得
@@ -207,10 +210,12 @@ class RmcPot:
         # RmcPotDat から実験データのファイル名を取得(実験データ)
         exp_name = self._rmc_dat.get_exp_filename()
 
-        self._logger.info(f"== get_exp_name: {exp_name}")
+        # self._logger.info("")
+        self._logger.info(f"[rmc_pot] == get_exp_name: {exp_name}")
         exp_name_path = os.path.join(work_dir, exp_name)
-        self._logger.info(f"target_exp_name_path = {exp_name_path}")
-        self._logger.info(f".")
+
+        self._logger.info(f"[rmc_pot] target_exp_name_path = {exp_name_path}")
+        self._logger.info(f"[rmc_pot] .")
 
         # ファイルの存在チェック
         if not os.path.exists(exp_name_path):
@@ -244,21 +249,22 @@ class RmcPot:
             bool:
 
         """
-        self._logger.info(f"== postprocess()")
+        self._logger.info("")
+        self._logger.info(f"[rmc_pot] == postprocess()")
 
         if log_dir is None:
             log_dir = self._config.rmc_log_dir
-        self._logger.info(f"log_dir(RMC) = {log_dir}")
+        self._logger.info(f"[rmc_pot] log_dir(RMC) = {log_dir}")
 
         if cfg_name is None:
             cfg_name = self._cfg_name
-        self._logger.info(f"cfg_name = {cfg_name}")
+        self._logger.info(f"[rmc_pot] cfg_name = {cfg_name}")
 
         if element_info is None:
             # element_info = "label.txt"
             element_info = self._config.element_info
 
-        self._logger.info(f"element_info = {element_info}")
+        self._logger.info(f"[rmc_pot] element_info = {element_info}")
 
         # DATA-collect
         self._rmc_log.collect_result()
@@ -271,7 +277,8 @@ class RmcPot:
 
         # RMC_POT 結果から、POSCAR (VASP4 style) 作成
         # --> xxx.vasp
-        self._logger.info(f"== cfg2poscar({cfg_name}.vasp)")
+        # self._logger.info("")
+        self._logger.info(f"[rmc_pot] == cfg2poscar({cfg_name}.vasp)")
         self.cfg2poscar(
             cfg_name=cfg_name,
             vasp_name=cfg_name,
@@ -296,6 +303,168 @@ class RmcPot:
 
         return True
 
+    def check_fnc_cutoff_consistency(self, cfg_name: Optional[str] = None) -> bool:
+        """
+        RMC_POT 実行前に、*.fnc の rmin と *.dat の hard-sphere cutoff の
+        整合性を確認する。
+
+        SiO2 用の現在の FNC type 対応：
+            fnc_type=1: Si-O
+            fnc_type=2: Si-Si
+            fnc_type=3: O-O
+
+        *.dat の cutoff 順：
+            cutoffs[0]: Si-Si
+            cutoffs[1]: Si-O
+            cutoffs[2]: O-O
+        """
+        if cfg_name is None:
+            cfg_name = self._cfg_name
+
+        dat_path = "%s.dat" % cfg_name
+        fnc_path = "%s.fnc" % cfg_name
+
+        if not os.path.exists(fnc_path):
+            self._logger.info(
+                "[rmc_pot] FNC file not found. skip FNC/cutoff check: %s" % fnc_path
+            )
+            return True
+
+        if not os.path.exists(dat_path):
+            self._logger.error("[rmc_pot] **Error**: DAT file not found: %s" % dat_path)
+            return False
+
+        cutoffs = self._read_dat_cutoffs(dat_path)
+        fnc_rmin = self._read_fnc_rmin_values(fnc_path)
+
+        if len(cutoffs) < 3:
+            self._logger.error(
+                "[rmc_pot] **Error**: cutoffs could not be read correctly from %s"
+                % dat_path
+            )
+            return False
+
+        if len(fnc_rmin) == 0:
+            self._logger.error(
+                "[rmc_pot] **Error**: FNC rmin values could not be read from %s"
+                % fnc_path
+            )
+            return False
+
+        cutoff_map = {
+            1: cutoffs[1],
+            2: cutoffs[0],
+            3: cutoffs[2],
+        }
+
+        ok = True
+
+        for type_id in sorted(fnc_rmin.keys()):
+            rmin = fnc_rmin[type_id]
+
+            if type_id not in cutoff_map:
+                self._logger.error(
+                    "[rmc_pot] **Error**: FNC/cutoff map is not defined: "
+                    "fnc_type=%d" % type_id
+                )
+                ok = False
+                continue
+
+            cutoff = cutoff_map[type_id]
+
+            if rmin <= cutoff:
+                self._logger.error(
+                    "[rmc_pot] **Error**: FNC/cutoff inconsistency: "
+                    "fnc_type=%d rmin=%.8f <= cutoff=%.8f" % (type_id, rmin, cutoff)
+                )
+                ok = False
+                continue
+
+            self._logger.info(
+                "[rmc_pot] FNC/cutoff check: "
+                "fnc_type=%d rmin=%.8f > cutoff=%.8f" % (type_id, rmin, cutoff)
+            )
+
+        if not ok:
+            self._logger.error("[rmc_pot] Stop before RMC_POT run.")
+            return False
+
+        self._logger.info("[rmc_pot] FNC/cutoff consistency check: OK")
+        return True
+
+    @staticmethod
+    def _read_dat_cutoffs(dat_path: str) -> List[float]:
+        """
+        *.dat の cut offs 行から cutoff 値を読む。
+        """
+        values = []
+
+        with open(dat_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if "cut offs" not in line:
+                    continue
+
+                text = line.split("!")[0]
+                words = text.split()
+
+                for word in words:
+                    try:
+                        value = float(word)
+                    except ValueError:
+                        continue
+                    values.append(value)
+
+                break
+
+        return values
+
+    @staticmethod
+    def _read_fnc_rmin_values(fnc_path: str) -> Dict[int, float]:
+        """
+        *.fnc の rmin 行を読む。
+
+        qn_network.py の write_fnc() が出す形式：
+            No. of possible rmin-rmax pairs:
+            N
+            rmin_1 rmin_2 ...
+            rmax_1 rmax_2 ...
+        """
+        with open(fnc_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        index = 0
+        while index < len(lines):
+            line = lines[index]
+            if "No. of possible rmin-rmax pairs" in line:
+                break
+            index += 1
+
+        if index >= len(lines):
+            return {}
+
+        count_line_index = index + 1
+        rmin_line_index = index + 2
+
+        if rmin_line_index >= len(lines):
+            return {}
+
+        try:
+            count = int(lines[count_line_index].strip())
+        except ValueError:
+            return {}
+
+        words = lines[rmin_line_index].split()
+        if len(words) < count:
+            return {}
+
+        result = {}
+        type_id = 1
+        while type_id <= count:
+            result[type_id] = float(words[type_id - 1])
+            type_id += 1
+
+        return result
+
     def run(
         self,
         cfg_name: Optional[str] = None,
@@ -315,11 +484,11 @@ class RmcPot:
         """
         if cfg_name is None:
             cfg_name = self._cfg_name
-        self._logger.info(f"== run(cfg_name={cfg_name})")
+        self._logger.info(f"[rmc_pot] == run(cfg_name={cfg_name})")
 
         # --- ログ出力準備 ---
         log_filename = f"{cfg_name}.log"
-        self._logger.info(f"log_filename = {cfg_name}.log")
+        self._logger.info(f"[rmc_pot] log_filename = {cfg_name}.log")
 
         if save_stdout:
             f = open(log_filename, "w", encoding="utf-8")
@@ -362,7 +531,7 @@ class RmcPot:
                 proc.wait()
 
             except subprocess.CalledProcessError as e:
-                self._logger.error(f"**Error**: {e}")
+                self._logger.error(f"[rmc_pot] **Error**: {e}")
                 sys.exit(-1)
             finally:
                 if f is not None:
@@ -410,7 +579,11 @@ class RmcPot:
         Returns:
 
         """
-        return ensure_vasp5_format(poscar_name, element_info, logger=logger)
+        return ensure_vasp5_format(
+            poscar_name,
+            element_info,
+            logger=logger,
+        )
 
     def cfg2poscar(
         self,
@@ -434,8 +607,8 @@ class RmcPot:
         if vasp_name is None:
             vasp_name = cfg_name
 
-        self._logger.info(f"cfg_name  = {cfg_name}")
-        self._logger.info(f"vasp_name = {vasp_name}")
+        self._logger.info(f"[rmc_pot] cfg_name  = {cfg_name}")
+        self._logger.info(f"[rmc_pot] vasp_name = {vasp_name}")
 
         cfg2poscar(
             cfg_name=cfg_name,

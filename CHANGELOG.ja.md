@@ -2,6 +2,32 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.29 nakada
+
+### 修正
+
+- RMC_POT 用 FNC ファイル生成が不正だった問題を修正。
+- RMC_POT マニュアルで要求される固定レコード形式に従い、ヘッダ部の空レコードを含めて `.fnc` 出力形式を修正。
+- FNC atom record を任意の隣接リストとして出力していた問題を修正。
+- Q-network 全体の pair をそのまま FNC に流すのではなく、unit に基づく検証済み pair から FNC 拘束を生成するよう修正。
+- FNC constraint type を隠れた `source` 文字列ではなく、`kind` と `atom_types` で明示するよう修正。
+
+### 変更
+
+- FNC 生成を、unit topology 生成と同じ independent unit assignment を使う形に変更。
+- TOP と FNC で共通に使う unit assignment 設定を `network.unit` に移し、TOP 固有の出力設定を `rmc.top.unit` に残す構成へ変更。
+- unit assignment の内部用語を `ligand` から `neighbor` に変更。
+- independent unit 構築処理を、TOP 生成と FNC 生成で共有できる形に整理。
+- FNC 出力時に neighbor をソートせず、生成されたレコード順を保持するよう変更。
+- FNC の原子種チェックおよび距離範囲チェックの処理を整理。
+- FNC 設定を `kind`、`atom_types`、`rmin`、`rmax` による明示的な constraint 定義へ変更。
+
+### 削除
+
+- `qn_network.py` から DAT スニペット生成機能を削除。
+- `get_dat_config()` を削除。
+- `write_dat_snippets()` および関連する DAT スニペット出力処理を削除。
+ 
 ## v0.4.28 nakada
 
 Qn network 解析および RMC_POT 入力生成機能の責務を整理し、クラス構成を再設計した。

@@ -42,7 +42,7 @@ class RmcPotFit:
             self._config = config or Config()
             self._cfg_name: Optional[str] = cfg_name or self._config.cfg_name
             self.filename: str = f"{cfg_name}.fit"
-        self._logger.info(f"== fit filename = {fit_name}")
+        self._logger.info(f"[rmc_pot_fit] == fit filename = {fit_name}")
 
         # データ格納
         self.Q: List[float] = []
@@ -71,13 +71,13 @@ class RmcPotFit:
         if filename is None:
             filename = self.filename
 
-        self._logger.info(f"== read_fit({filename})")
+        self._logger.info(f"[rmc_pot_fit] == read_fit({filename})")
 
         try:
             with open(self.filename, "r") as f:
                 lines = f.readlines()
         except FileNotFoundError:
-            self._logger.error(f"file not found: {filename}")
+            self._logger.error(f"[rmc_pot_fit] file not found: {filename}")
             return False
 
         # データブロックは "Total F(Q)" 以降に並ぶため、それを探す
