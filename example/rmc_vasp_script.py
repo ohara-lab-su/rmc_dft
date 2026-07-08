@@ -11,6 +11,11 @@ import sys
 import shutil
 import subprocess
 
+# ----- QnNetworkBuilder
+from rmc_dft.rmc_pot.qn import QnNetworkBuilder
+
+# ----------------------
+
 from rmc_dft import (
     Config,
     Vasp,
@@ -164,6 +169,17 @@ if __name__ == "__main__":
                 msg=f"{msg_vasp}",
                 logger=logger,
             )
+
+            # ----- make aaa.top -----------------
+            builder = QnNetworkBuilder.from_poscar(
+                poscar_name=f"{config.cfg_name}.vasp",
+                config_name=f"{config.cfg_name}.json",
+            )
+            builder.write_all(f"{config.cfg_name}")
+            shutil.copyfile(f"{config.cfg_name}_rmc_fnc3.fnc", f"{config.cfg_name}.fnc")
+            shutil.copyfile(f"{config.cfg_name}_rmc_unit.top", f"{config.cfg_name}.top")
+            # ------------------------------------
+
             # 富岳対応 (キャッシュ対策)
             subprocess.run(["sleep", "5"], check=True)
             subprocess.run(["ls", "-la", "./"], check=True)

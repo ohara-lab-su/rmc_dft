@@ -791,12 +791,19 @@ class RmcPotLog:
             f"{cfg_name}0.cfg",
             f"{cfg_name}.sq",
             f"{cfg_name}.dat",
-            f"{cfg_name}.fnc",
             f"{cfg_name}.hst",
             f"{cfg_name}.ppcf",
             f"{cfg_name}.fit",
             f"{cfg_name}.pfq",
             f"{cfg_name}.log",
+            # FNC
+            f"{cfg_name}.top",
+            f"{cfg_name}.fnc",
+            f"{cfg_name}_qn.csv",
+            f"{cfg_name}_network_bonds.csv",
+            f"{cfg_name}_report.txt",
+            f"ffUNKNOWN_READ_PAIRS.itp",
+            f"qn_config.json",
         ]
 
         for file_name in files_to_copy:

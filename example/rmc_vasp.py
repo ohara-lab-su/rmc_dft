@@ -93,7 +93,7 @@ def run_vasp(
         ret = vasp.postprocess(
             log_dir=log_dir_vasp,
             cfg_name=config.cfg_name,
-        )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg
+        )  # BACKUP(loop番号き), CONTCAR --> POSCAR, aaa.cfg, aaa.vasp
         if not ret:
             logger.error("**Error**: vasp postprocess failed")
             sys.exit(-1)

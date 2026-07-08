@@ -1,0 +1,129 @@
+{
+  "description": "Qn-network analysis and RMC_POT unit-top/FNC settings for Si-O-Si silica glass.",
+  "structure": {
+    "atom_types": [
+      "Si",
+      "O"
+    ]
+  },
+  "network": {
+    "central_types": [
+      "Si"
+    ],
+    "bridge_types": [
+      "O"
+    ],
+    "second_types": [
+      "Si"
+    ],
+    "first_min": 1.2,
+    "first_max": 1.9,
+    "first_mode": "nearest",
+    "first_nearest_n": 4,
+    "second_min": 1.2,
+    "second_max": 1.9,
+    "second_use_first_network": true,
+    "unit": {
+      "central_types": [
+        "Si"
+      ],
+      "neighbor_types": [
+        "O"
+      ],
+      "neighbor_count": 2,
+      "assignment": "nearest_exclusive",
+      "distance_min": 1.2,
+      "distance_max": 2.3,
+      "allow_incomplete": true,
+      "include_unassigned_atoms": true
+    }
+  },
+  "rmc": {
+    "fnc": {
+      "constraints": [
+        {
+          "type_id": 1,
+          "name": "unit_Si-O",
+          "rmin": 1.45,
+          "rmax": 1.85,
+          "kind": "center_neighbor",
+          "atom_types": [
+            "Si",
+            "O"
+          ],
+          "description": "Unit assignment で選ばれた center-neighbor pair を FNC 距離拘束にする。SiO2 では unit 内 Si-O に対応する。"
+        },
+        {
+          "type_id": 2,
+          "name": "unit_O-O",
+          "rmin": 2.1,
+          "rmax": 3.4,
+          "kind": "neighbor_neighbor",
+          "atom_types": [
+            "O",
+            "O"
+          ],
+          "description": "Unit assignment で同じ unit に入った neighbor-neighbor pair を FNC 距離拘束にする。SiO2 では unit 内 O-O に対応し、O-Si-O 角の形を距離で近似する。"
+        }
+      ]
+    },
+    "top": {
+      "atoms": {
+        "Si": {
+          "charge": 0.0,
+          "mass": 28.0855
+        },
+        "O": {
+          "charge": 0.0,
+          "mass": 15.999
+        }
+      },
+      "unit": {
+        "molecule_name": "SIO2U",
+        "residue_name": "SIO2",
+        "nrexcl": 2,
+        "force_field_include": "ffUNKNOWN_READ_PAIRS.itp",
+        "atom_type_prefix": "",
+        "generate_angles": true,
+        "bond": {
+          "length_nm": 0.161,
+          "force_kj_mol_nm2": 10000.0,
+          "sigma": 10.0
+        },
+        "angle": {
+          "theta_degree": 109.47,
+          "force_kj_mol_rad2": 100.0,
+          "sigma": 10.0
+        }
+      },
+      "network": {
+        "molecule_name": "SIO2NET",
+        "residue_name": "SIO2",
+        "nrexcl": 2,
+        "force_field_include": "ffUNKNOWN_READ_PAIRS.itp",
+        "atom_type_prefix": "rmc",
+        "bond": {
+          "length_nm": 0.161,
+          "force_kj_mol_nm2": 10000.0,
+          "sigma": 10.0
+        },
+        "angles": [
+          {
+            "name": "O-Si-O",
+            "source": "bridge_central_bridge",
+            "theta_degree": 109.47,
+            "force_kj_mol_rad2": 100.0,
+            "sigma": 10.0
+          },
+          {
+            "name": "Si-O-Si",
+            "source": "central_bridge_second",
+            "theta_degree": 144.0,
+            "force_kj_mol_rad2": 30.0,
+            "sigma": 20.0
+          }
+        ]
+      }
+    }
+  }
+}
