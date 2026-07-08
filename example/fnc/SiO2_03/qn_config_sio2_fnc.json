@@ -50,7 +50,8 @@
           "atom_types": [
             "Si",
             "O"
-          ]
+          ],
+          "description": "Unit assignment で選ばれた center-neighbor pair を FNC 距離拘束にする。SiO2 では unit 内 Si-O に対応する。"
         },
         {
           "type_id": 2,
@@ -61,7 +62,8 @@
           "atom_types": [
             "O",
             "O"
-          ]
+          ],
+          "description": "Unit assignment で同じ unit に入った neighbor-neighbor pair を FNC 距離拘束にする。SiO2 では unit 内 O-O に対応し、O-Si-O 角の形を距離で近似する。"
         }
       ]
     },

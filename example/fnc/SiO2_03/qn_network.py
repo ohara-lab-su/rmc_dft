@@ -6,7 +6,7 @@ This module separates three responsibilities:
 
 * VaspStructure: VASP/POSCAR structure data and periodic geometry.
 * QnNetworkAnalysis: network construction, Qn statistics, and analysis output.
-* RmcConstraintWriter: RMC_POT FNC/topology/DAT-snippet output.
+* RmcConstraintWriter: RMC_POT FNC/topology output.
 """
 from __future__ import print_function
 from __future__ import annotations
@@ -793,71 +793,6 @@ class QnNetworkAnalysis(object):
                     )
 
     @staticmethod
-    def add_unit_center_neighbor_pairs(
-        pair_types: Dict[Pair, int],
-        unit_molecules: Sequence[UnitMolecule],
-        poscar: VaspStructure,
-        center_types: Sequence[str],
-        neighbor_types: Sequence[str],
-        type_id: int,
-    ) -> None:
-        """unit 内 center-neighbor pair を FNC type として登録する。
-
-        TOP の independent unit assignment で得た molecule を使い、
-        local index 0 を center、local index 1 以降を neighbor として扱う。
-        constraint に書かれた center_types / neighbor_types と実際の原子種が
-        一致する pair だけを登録する。
-        """
-        for molecule_name, atom_indices, bonds, angles in unit_molecules:
-            if len(atom_indices) < 2:
-                continue
-            center = atom_indices[0]
-            center_label = poscar.labels[center]
-            if center_label not in center_types:
-                continue
-            local_index = 1
-            while local_index < len(atom_indices):
-                neighbor = atom_indices[local_index]
-                neighbor_label = poscar.labels[neighbor]
-                if neighbor_label in neighbor_types:
-                    QnNetworkAnalysis.add_typed_pair(
-                        pair_types, center, neighbor, type_id
-                    )
-                local_index = local_index + 1
-
-    @staticmethod
-    def add_unit_neighbor_neighbor_pairs(
-        pair_types: Dict[Pair, int],
-        unit_molecules: Sequence[UnitMolecule],
-        poscar: VaspStructure,
-        neighbor_types: Sequence[str],
-        type_id: int,
-    ) -> None:
-        """unit 内 neighbor-neighbor pair を FNC type として登録する。
-
-        TOP の O-Si-O angle に対応する幾何拘束を、FNC では O-O 距離拘束として
-        表す。local index 1 以降を neighbor として扱い、constraint に書かれた
-        neighbor_types と一致する atom だけで pair を作る。
-        """
-        for molecule_name, atom_indices, bonds, angles in unit_molecules:
-            if len(atom_indices) < 3:
-                continue
-            local_neighbor_indices = []
-            local_index = 1
-            while local_index < len(atom_indices):
-                atom_index = atom_indices[local_index]
-                atom_label = poscar.labels[atom_index]
-                if atom_label in neighbor_types:
-                    local_neighbor_indices.append(local_index)
-                local_index = local_index + 1
-            for local_i, local_j in itertools.combinations(local_neighbor_indices, 2):
-                global_i = atom_indices[local_i]
-                global_j = atom_indices[local_j]
-                QnNetworkAnalysis.add_typed_pair(
-                    pair_types, global_i, global_j, type_id
-                )
-
-    @staticmethod
     def collect_fnc3_ranges(config: Dict[str, Any]) -> Dict[int, Tuple[float, float]]:
         """FNC=3 type_id ごとの rmin/rmax を JSON 設定から取り出す。"""
         result = {}
@@ -869,6 +804,46 @@ class QnNetworkAnalysis(object):
             rmax = float(QnNetworkAnalysis.get_required(item, "rmax"))
             result[type_id] = (rmin, rmax)
         return result
+
+    @staticmethod
+    def build_fnc_neighbours_by_atom(
+        atom_count: int, typed_pairs: Sequence[TypedPair]
+    ) -> Dict[int, List[Tuple[int, int]]]:
+        """FNC 用の atom -> neighbour list を作る。
+
+        ``typed_pairs`` は、既存 VASP 構造に対する unit assignment から得た
+        unit 内の無向 pair である。FNC ファイルでは各 atom 行に、その atom から
+        見た fixed neighbour を書く必要があるため、ここで必ず双方向に展開する。
+
+        たとえば unit が ``Si-O1-O2`` の場合、typed_pairs には
+
+        * Si-O1
+        * Si-O2
+        * O1-O2
+
+        を一度だけ持たせる。ここでは、それを
+
+        * Si -> O1, O2
+        * O1 -> Si, O2
+        * O2 -> Si, O1
+
+        に展開する。縛らない atom は空 list のままとし、``write_fnc`` で
+        ``atom_index 0`` として出力する。
+        """
+        neighbours = defaultdict(list)  # type: Dict[int, List[Tuple[int, int]]]
+
+        for i, j, type_id in typed_pairs:
+            if i < 0 or i >= atom_count:
+                raise ConfigError("FNC pair の atom index が範囲外です: %d" % (i + 1))
+            if j < 0 or j >= atom_count:
+                raise ConfigError("FNC pair の atom index が範囲外です: %d" % (j + 1))
+            if i == j:
+                raise ConfigError("FNC pair に同一 atom が指定されています: %d" % (i + 1))
+
+            neighbours[i].append((j, type_id))
+            neighbours[j].append((i, type_id))
+
+        return neighbours
 
     @staticmethod
     def write_fnc(
@@ -883,10 +858,9 @@ class QnNetworkAnalysis(object):
         ``typed_pairs`` は 0 始まり index で受け取り、ファイル出力時に 1 始まりへ変換する。
         ``ranges`` は FNC type_id -> (rmin, rmax) で、type_id は 1 から連番である必要がある。
         """
-        neighbours = defaultdict(list)  # type: Dict[int, List[Tuple[int, int]]]
-        for i, j, type_id in typed_pairs:
-            neighbours[i].append((j, type_id))
-            neighbours[j].append((i, type_id))
+        neighbours = RmcConstraintWriter.build_fnc_neighbours_by_atom(
+            atom_count, typed_pairs
+        )
 
         max_type = 0
         for type_id in ranges.keys():
@@ -1127,6 +1101,46 @@ class RmcConstraintWriter(object):
         """
         self.write_fnc3(prefix + "_rmc_fnc3.fnc", title=prefix)
         self.write_unit_topology(prefix + "_rmc_unit.top")
+
+    @staticmethod
+    def build_fnc_neighbours_by_atom(
+        atom_count: int, typed_pairs: Sequence[TypedPair]
+    ) -> Dict[int, List[Tuple[int, int]]]:
+        """FNC 用の atom -> neighbour list を作る。
+
+        ``typed_pairs`` は、既存 VASP 構造に対する unit assignment から得た
+        unit 内の無向 pair である。FNC ファイルでは各 atom 行に、その atom から
+        見た fixed neighbour を書く必要があるため、ここで必ず双方向に展開する。
+
+        たとえば unit が ``Si-O1-O2`` の場合、typed_pairs には
+
+        * Si-O1
+        * Si-O2
+        * O1-O2
+
+        を一度だけ持たせる。ここでは、それを
+
+        * Si -> O1, O2
+        * O1 -> Si, O2
+        * O2 -> Si, O1
+
+        に展開する。縛らない atom は空 list のままとし、``write_fnc`` で
+        ``atom_index 0`` として出力する。
+        """
+        neighbours = defaultdict(list)  # type: Dict[int, List[Tuple[int, int]]]
+
+        for i, j, type_id in typed_pairs:
+            if i < 0 or i >= atom_count:
+                raise ConfigError("FNC pair の atom index が範囲外です: %d" % (i + 1))
+            if j < 0 or j >= atom_count:
+                raise ConfigError("FNC pair の atom index が範囲外です: %d" % (j + 1))
+            if i == j:
+                raise ConfigError("FNC pair に同一 atom が指定されています: %d" % (i + 1))
+
+            neighbours[i].append((j, type_id))
+            neighbours[j].append((i, type_id))
+
+        return neighbours
 
     @staticmethod
     def write_fnc(

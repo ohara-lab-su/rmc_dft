@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 """SiO2 構造から Qn 解析と RMC_POT 用 FNC 入力を作る実行例。
 
-SiO2 固有の条件は隣の ``qn_config_sio2.json`` に置く。
+SiO2 固有の条件は隣の ``qn_config_sio2_fnc.json`` に置く。
 
-実行位置はこのファイルと ``qn_config_sio2.json`` がある directory を想定する。
+実行位置はこのファイルと ``qn_config_sio2_fnc.json`` がある directory を想定する。
 入力構造 ``SiO2_750_S1_nvt4.vasp`` も同じ directory に置く。
 
 作成される主なファイル:
@@ -22,7 +22,7 @@ from qn_network import QnNetworkBuilder
 def main() -> None:
     """SiO2 用 JSON 設定を使って標準出力一式を作成する。"""
     poscar_name = "SiO2_750_S1_nvt4.vasp"
-    config_name = "qn_config_sio2.json"
+    config_name = "qn_config_sio2_fnc.json"
     prefix = "SiO2_750_S1_nvt4"
 
     builder = QnNetworkBuilder.from_poscar(
