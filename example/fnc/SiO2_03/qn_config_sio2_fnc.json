@@ -22,24 +22,46 @@
     "first_nearest_n": 4,
     "second_min": 1.2,
     "second_max": 1.9,
-    "second_use_first_network": true
+    "second_use_first_network": true,
+    "unit": {
+      "central_types": [
+        "Si"
+      ],
+      "neighbor_types": [
+        "O"
+      ],
+      "neighbor_count": 2,
+      "assignment": "nearest_exclusive",
+      "distance_min": 1.2,
+      "distance_max": 2.3,
+      "allow_incomplete": true,
+      "include_unassigned_atoms": true
+    }
   },
   "rmc": {
     "fnc": {
       "constraints": [
         {
           "type_id": 1,
-          "name": "unit_central_neighbor_bond",
-          "source": "unit_central_neighbor_bonds",
+          "name": "unit_Si-O",
           "rmin": 1.45,
-          "rmax": 1.85
+          "rmax": 1.85,
+          "kind": "center_neighbor",
+          "atom_types": [
+            "Si",
+            "O"
+          ]
         },
         {
           "type_id": 2,
-          "name": "unit_neighbor_neighbor_edge",
-          "source": "unit_neighbor_neighbor_edges",
+          "name": "unit_O-O",
           "rmin": 2.1,
-          "rmax": 3.4
+          "rmax": 3.4,
+          "kind": "neighbor_neighbor",
+          "atom_types": [
+            "O",
+            "O"
+          ]
         }
       ]
     },
@@ -60,14 +82,6 @@
         "nrexcl": 2,
         "force_field_include": "ffUNKNOWN_READ_PAIRS.itp",
         "atom_type_prefix": "",
-        "central_types": [
-          "Si"
-        ],
-        "assignment": "nearest_exclusive",
-        "distance_min": 1.2,
-        "distance_max": 2.3,
-        "allow_incomplete": true,
-        "include_unassigned_atoms": true,
         "generate_angles": true,
         "bond": {
           "length_nm": 0.161,
@@ -78,11 +92,7 @@
           "theta_degree": 109.47,
           "force_kj_mol_rad2": 100.0,
           "sigma": 10.0
-        },
-        "neighbor_types": [
-          "O"
-        ],
-        "neighbor_count": 2
+        }
       },
       "network": {
         "molecule_name": "SIO2NET",
