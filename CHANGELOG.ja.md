@@ -2,6 +2,27 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.27 nakada
+
+RMC_POT 用 topology 生成機能を見直し、標準出力および設定構造を整理した。
+
+- `qn_network.py`
+  - RMC_POT topology と FNC の役割が明確になるよう、topology 関連の命名および内部処理を整理した。
+  - 標準 topology を current-network topology から independent-unit topology に戻した。
+  - topology、FNC、DAT snippet の出力ファイル名を整理した。
+  - 旧 JSON 設定との互換処理を削除し、新しい JSON 構造へ統一した。
+  - report およびメッセージ中の topology 表記を整理した。
+
+- `make_sio2_qn_fnc.py`
+  - パッケージへ依存しない単体実行構成へ変更した。
+  - 重複していた topology 出力を削除した。
+  - 新しい出力ファイル名に合わせて表示内容を整理した。
+
+- `qn_config_sio2.json`
+  - topology 設定の構成を整理した。
+  - independent-unit topology を標準構成として扱うよう設定順を見直した。
+  - topology 用設定項目を追加・整理した。
+
 ## v0.4.26 nakada
 
 RMC_POT 用 Qn ネットワーク設定および topology 生成設定を整理した。

@@ -10,14 +10,13 @@ SiO2 固有の条件は隣の ``qn_config_sio2.json`` に置く。
 作成される主なファイル:
     * ``SiO2_750_S1_nvt4_qn.csv``
     * ``SiO2_750_S1_nvt4_network_bonds.csv``
-    * ``SiO2_750_S1_nvt4_fnc3.fnc``
-    * ``SiO2_750_S1_nvt4_fnc4.top``
-    * ``SiO2_750_S1_nvt4_unit.top``
+    * ``SiO2_750_S1_nvt4_rmc_fnc3.fnc``
+    * ``SiO2_750_S1_nvt4_rmc_unit.top``
     * ``SiO2_750_S1_nvt4_report.txt``
 """
 from __future__ import print_function
 
-from rmc_dft.rmc_pot.fnc import QnNetworkBuilder
+from qn_network import QnNetworkBuilder
 
 
 def main() -> None:
@@ -31,12 +30,10 @@ def main() -> None:
         config_name=config_name,
     )
     builder.write_all(prefix)
-    builder.write_unit_topology(prefix + "_unit.top")
 
     print("Qn counts:", builder.get_qn_counts())
-    print("created:", prefix + "_fnc3.fnc")
-    print("created:", prefix + "_fnc4.top")
-    print("created:", prefix + "_unit.top")
+    print("created:", prefix + "_rmc_fnc3.fnc")
+    print("created:", prefix + "_rmc_unit.top")
     print("created:", prefix + "_qn.csv")
     print("created:", prefix + "_report.txt")
 

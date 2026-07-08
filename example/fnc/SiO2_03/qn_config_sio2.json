@@ -1,5 +1,5 @@
 {
-  "description": "Qn network construction and RMC_POT FNC/TOP generation settings for Si-O-Si silica glass.",
+  "description": "Qn-network and RMC_POT input settings for Si-O-Si silica glass.",
   "structure": {
     "atom_types": [
       "Si",
@@ -68,10 +68,41 @@
           "mass": 15.999
         }
       },
+      "unit": {
+        "molecule_name": "SIO2U",
+        "residue_name": "SIO2",
+        "nrexcl": 2,
+        "force_field_include": "ffUNKNOWN_READ_PAIRS.itp",
+        "atom_type_prefix": "",
+        "central_types": [
+          "Si"
+        ],
+        "ligand_types": [
+          "O"
+        ],
+        "ligand_count": 2,
+        "assignment": "nearest_exclusive",
+        "distance_min": 1.2,
+        "distance_max": 2.3,
+        "allow_incomplete": true,
+        "include_unassigned_atoms": true,
+        "generate_angles": true,
+        "bond": {
+          "length_nm": 0.161,
+          "force_kj_mol_nm2": 10000.0,
+          "sigma": 10.0
+        },
+        "angle": {
+          "theta_degree": 109.47,
+          "force_kj_mol_rad2": 100.0,
+          "sigma": 10.0
+        }
+      },
       "network": {
         "molecule_name": "SIO2NET",
         "residue_name": "SIO2",
         "nrexcl": 2,
+        "force_field_include": "ffUNKNOWN_READ_PAIRS.itp",
         "atom_type_prefix": "rmc",
         "bond": {
           "length_nm": 0.161,
@@ -94,35 +125,6 @@
             "sigma": 20.0
           }
         ]
-      },
-      "unit": {
-        "molecule_name": "SIO2U",
-        "residue_name": "SIO2",
-        "nrexcl": 2,
-        "atom_type_prefix": "",
-        "central_types": [
-          "Si"
-        ],
-        "ligand_types": [
-          "O"
-        ],
-        "ligand_count": 2,
-        "assignment": "nearest_exclusive",
-        "distance_min": 1.2,
-        "distance_max": 2.3,
-        "allow_incomplete": true,
-        "generate_angles": true,
-        "bond": {
-          "length_nm": 0.161,
-          "force_kj_mol_nm2": 10000.0,
-          "sigma": 10.0
-        },
-        "angle": {
-          "theta_degree": 109.47,
-          "force_kj_mol_rad2": 100.0,
-          "sigma": 10.0
-        },
-        "include_unassigned_atoms": true
       }
     }
   }
