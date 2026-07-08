@@ -27,9 +27,9 @@
   "rmc": {
     "dat": {
       "hard_sphere_cutoffs": {
-        "Si-Si": 2.4,
+        "Si-Si": 2.25,
         "Si-O": 1.25,
-        "O-O": 2.1
+        "O-O": 2.05
       }
     },
     "fnc": {

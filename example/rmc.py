@@ -80,9 +80,9 @@ def run_rmc(
     # ---------------------------
 
     if msg:
-        logger.info(f"=============== RMC(RMC_POT) {msg} ============")
+        logger.info(f"[rmc] =============== RMC(RMC_POT) {msg} ============")
     else:
-        logger.info(f"=============== RMC(RMC_POT) ============")
+        logger.info(f"[rmc] =============== RMC(RMC_POT) ============")
 
     # auto converge-loop
     # (デフォルト auto_converge = False)
@@ -92,10 +92,18 @@ def run_rmc(
         rmc_dir = next_log_dir_name("rmc")
         ##################
 
-        logger.info("")
-        logger.info(f"rmc_dir = {rmc_dir}")
+        # logger.info("")
+        logger.info(f"[rmc] rmc_dir = {rmc_dir}")
 
         rmc.preprocess()  # check inputfile
+
+        # cutoff と FNC の矛盾チェック
+        if not rmc.check_fnc_cutoff_consistency(
+            cfg_name=config.cfg_name,
+        ):
+            logger.error("**Error**: FNC and cutoff are inconsistent.")
+            return False
+
         # rmc.run(cfg_name=config.cfg_name)
         rmc.run()
 
@@ -127,7 +135,7 @@ def run_rmc(
                 cfg_name=config.cfg_name,
                 element_info=config.element_info,
             )  # backup(loop番号つき), cfg --> xxx.vasp
-        logger.info("end")
+        logger.info("[rmc] end")
 
         # auto_converge True: なんか失敗した
         if loop == -1:
@@ -138,11 +146,11 @@ def run_rmc(
         # auto_converge True: 収束してないので繰り返す
         elif loop is None:
             logger.info("")
-            logger.info("RMC is NOT converged.")
-            logger.info("Continue RMC loop.")
+            logger.info("[rmc] RMC is NOT converged.")
+            logger.info("[rmc] Continue RMC loop.")
             logger.info("")
-            logger.info("=====================")
-            logger.info("=====================")
+            logger.info("[rmc] =====================")
+            logger.info("[rmc] =====================")
             logger.info("")
             continue
 
@@ -156,23 +164,26 @@ def run_rmc(
     chi2_set1 = hst.get_chi2_set1(loop)
     acc = hst.get_accepted_per_tried(loop)
 
-    logger.info("====================")
-    logger.info("RMC is converged.")
-    logger.info(f"  loop index           = {loop}")
-    logger.info(f"  generated            = {generated}")
-    logger.info(f"  chi2_tot             = {chi2_tot:.6e}")
-    logger.info(f"  chi2/F(Q)_set#1      = {chi2_set1:.6e}")
-    logger.info(f"  accepted/tried       = {acc:.6e}")
+    logger.info(f"[rmc] ====================")
+    logger.info(f"[rmc] RMC is converged.")
+    logger.info(f"[rmc]   loop index           = {loop}")
+    logger.info(f"[rmc]   generated            = {generated}")
+    logger.info(f"[rmc]   chi2_tot             = {chi2_tot:.6e}")
+    logger.info(f"[rmc]   chi2/F(Q)_set#1      = {chi2_set1:.6e}")
+    logger.info(f"[rmc]   accepted/tried       = {acc:.6e}")
 
-    logger.info("END of RMC")
-    logger.info("")
+    logger.info(f"[rmc] END of RMC")
+    logger.info(f"")
     return True
 
 
 if __name__ == "__main__":
     from rmc_init import run_rmc_init
 
-    logger_ = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+    logger_ = XLogger(
+        log_level="debug",
+        logger_name="rmc.py",
+    )
     config_ = Config("config.yml")
     msg_ = None
 

@@ -88,7 +88,8 @@ def run_rmc_init(
 
     # --- SiO2 (test)
     # peak Si-Si:2.7-2.70, Si-O:1.5-1.55, O-O: 2.3-2.4
-    rmc_dat.set_cutoffs([2.40, 1.25, 2.10])  # Si-Si, Si-O, O-O
+    # rmc_dat.set_cutoffs([2.40, 1.25, 2.10])  # Si-Si, Si-O, O-O
+    rmc_dat.set_cutoffs([2.25, 1.25, 2.05])  # Si-Si, Si-O, O-O
 
     # 4 行目：maximum moves（1 回の移動での最大変位量）を設定する
     # --- FeSiB, Li3PO4
@@ -152,8 +153,8 @@ def run_rmc_init(
 
     # 23 行目
     # aaa.fnc を aaa.cfg / aaa.dat と同じ basename 側に置いて使う
-    # rmc_dat.set_fnc_switch(3)
-    rmc_dat.set_fnc_switch(4)
+    rmc_dat.set_fnc_switch(3)
+    # rmc_dat.set_fnc_switch(4)
 
     # FNC ファイルの距離範囲を RMC 実行前に変更する。
     # 作成時は、packmol_util つかっていたらそれで、初期設定はされている

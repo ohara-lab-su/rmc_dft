@@ -13,7 +13,7 @@
 # number_density_A3: 0.09119 # 数密度 packmol/RMC
 # number_density_A3: 0.0915 # 数密度 packmol/RMC
 # element_info: ["Fe", "Si", "B"] # packmol/構造変換
-# element_info: ["Si", "O"] # packmol/構造変換
+element_info: ["Si", "O"] # packmol/構造変換
 # element_info: "label.txt" # VASP4(Rmc.cfg) type --> VASP5 type
 
 max_rmc_dft_loop: 10

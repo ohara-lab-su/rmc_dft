@@ -83,7 +83,7 @@ class Vasp:
         """
         self._logger = logger or XLogger()
         self._config: Config = config or Config()
-        self._logger.info("== create Vasp()")
+        self._logger.info("[vasp] == create Vasp()")
 
         # INCAR/KPOINTS/
         self.incar_name: str = incar_name
@@ -142,11 +142,11 @@ class Vasp:
         # self.job_cmd = job_cmd
 
         self._logger.info(f"")
-        self._logger.info(f"dft_bin={self.dft_bin}")
-        self._logger.info(f"mpi_cmd={self.mpi_cmd}")
-        self._logger.info(f"mpi_flag={self.mpi_flag}")
-        self._logger.info(f"num_procs={self.num_procs}")
-        self._logger.info(f"job_cmd={self.job_cmd}")
+        self._logger.info(f"[vasp] dft_bin={self.dft_bin}")
+        self._logger.info(f"[vasp] mpi_cmd={self.mpi_cmd}")
+        self._logger.info(f"[vasp] mpi_flag={self.mpi_flag}")
+        self._logger.info(f"[vasp] num_procs={self.num_procs}")
+        self._logger.info(f"[vasp] job_cmd={self.job_cmd}")
         self._logger.info(f"")
 
         # --- VaspLog() instance ---
@@ -265,7 +265,7 @@ class Vasp:
         Returns:
 
         """
-        self._logger.info(f"== init()")
+        self._logger.info(f"[vasp] == init()")
 
         # if cfg_name is None:
         #     cfg_name = self._vasp_name
@@ -304,21 +304,23 @@ class Vasp:
         Returns:
             bool:
         """
-        self._logger.info("== preprocess()")
+        self._logger.info("[vasp] == preprocess()")
         if vasp_name is None:
             vasp_name = self._vasp_name
 
         # 実行カレントを基準にする
         work_dir = os.getcwd()
-        self._logger.info(f"work_dir = {work_dir}")
+        self._logger.info(f"[vasp] work_dir = {work_dir}")
 
         for filename in ["INCAR", "KPOINTS", "POTCAR", "POSCAR"]:
             target_path = os.path.join(work_dir, filename)
-            self._logger.info(f"target_path = {target_path}")
+            self._logger.info(f"[vasp] target_path = {target_path}")
 
             # 入力ファイル存在チェック
             if not os.path.exists(target_path):
-                self._logger.error(f"**Error**: {target_path} が見つかりません。")
+                self._logger.error(
+                    f"[vasp] **Error**: {target_path} が見つかりません。"
+                )
                 sys.exit(-1)
 
         return True
@@ -344,15 +346,15 @@ class Vasp:
         Returns:
             bool:
         """
-        self._logger.info("== postprocess()")
+        self._logger.info("[vasp] == postprocess()")
 
         if log_dir is None:
             log_dir = self._config.dft_log_dir
-        self._logger.info(f"log_dir(VASP)={log_dir})")
+        self._logger.info(f"[vasp] log_dir(VASP)={log_dir})")
 
         if cfg_name is None:
             cfg_name = self._config.cfg_name
-        self._logger.info(f"cfg_name={cfg_name})")
+        self._logger.info(f"[vasp] cfg_name={cfg_name})")
 
         # DATA-collect
         self._vasp_log.collect_result()
@@ -362,7 +364,7 @@ class Vasp:
 
         if (not os.path.exists("CONTCAR")) or os.path.getsize("CONTCAR") == 0:
             self._logger.error(
-                "**Error**: CONTCAR が存在しないか空です。VASP 計算が未完了です。"
+                "[vasp] **Error**: CONTCAR が存在しないか空です。VASP 計算が未完了です。"
             )
             return False
 
@@ -370,7 +372,7 @@ class Vasp:
         shutil.copyfile("CONTCAR", "POSCAR")
 
         # CONTCAR -> CFG
-        self._logger.info(f"== contcar2cfg(cfg_name={cfg_name}.cfg)")
+        self._logger.info(f"[vasp] == contcar2cfg(cfg_name={cfg_name}.cfg)")
         self.contcar2cfg(cfg_name=cfg_name)
 
         return True
@@ -416,7 +418,7 @@ class Vasp:
         Returns:
             bool: 正しく終わったデー
         """
-        self._logger.info(f"=== run(mode={mode}) ===")
+        self._logger.info(f"[vasp] === run(mode={mode}) ===")
 
         # すべてのモードで共通の環境変数を定義
         env = os.environ.copy()
@@ -428,7 +430,7 @@ class Vasp:
             mode = self._config.run_mode
 
         if mode == "local":
-            self._logger.info(f"== local mpi mode")
+            self._logger.info(f"[vasp] == local mpi mode")
             # MPI build された vasp を local で動かすためのもの (infinibandを使わない)
             env["FI_PROVIDER"] = "tcp"
             env["I_MPI_FABRICS"] = "shm:tcp"
@@ -437,18 +439,18 @@ class Vasp:
             # cmd = [self.dft_bin]
             # cmd = ["mpirun", "-np", "1", f"{self.dft_bin}"]
             if self.dft_bin is None:
-                self._logger.error("**Error**: dft_bin が未設定です。")
+                self._logger.error("[vasp] **Error**: dft_bin が未設定です。")
                 return False
 
             dft_bin: str = self.dft_bin
             cmd: List[str] = ["mpirun", "-np", "1", dft_bin]
 
         elif mode == "mpi":
-            self._logger.info(f"== mpi mode")
-            self._logger.info(f"mpi_cmd = {self.mpi_cmd}")
-            self._logger.info(f"mpi_flag = {self.mpi_flag}")
-            self._logger.info(f"dft_bin = {self.dft_bin}")
-            self._logger.info(f"num_procs = {self.num_procs}")
+            self._logger.info(f"[vasp] == mpi mode")
+            self._logger.info(f"[vasp] mpi_cmd = {self.mpi_cmd}")
+            self._logger.info(f"[vasp] mpi_flag = {self.mpi_flag}")
+            self._logger.info(f"[vasp] dft_bin = {self.dft_bin}")
+            self._logger.info(f"[vasp] num_procs = {self.num_procs}")
 
             cmd = [self.mpi_cmd]
 
@@ -461,20 +463,20 @@ class Vasp:
             cmd.append(f"{self.dft_bin}")
 
         elif mode == "job":
-            self._logger.info(f"== job mode")
+            self._logger.info(f"[vasp] == job mode")
             if not job_cmd:
                 job_cmd = self.job_cmd
             cmd = [job_cmd]
 
         else:
             # raise ValueError(f"**Error**: 未知の mode: {mode}")
-            self._logger.error(f"**Error**: 未知の mode: {mode}")
+            self._logger.error(f"[vasp] **Error**: 未知の mode: {mode}")
             return False
 
         # dft_bin がパス上に存在するか確認
         if mode != "job":
             if self.dft_bin is None:
-                self._logger.error("**Error**: dft_bin が未設定です。")
+                self._logger.error("[vasp] **Error**: dft_bin が未設定です。")
                 sys.exit(1)
 
             dft_bin: str = self.dft_bin
@@ -490,18 +492,20 @@ class Vasp:
 
             if not dft_bin_found:
                 self._logger.error(
-                    f"**Error**: {dft_bin} が見つかりません。PATHを確認してください。"
+                    f"[vasp] **Error**: {dft_bin} が見つかりません。PATHを確認してください。"
                 )
                 sys.exit(1)
 
-        self._logger.info(f"move = {mode}")
+        self._logger.info(f"[vasp] move = {mode}")
         # self._logger.info(f"env = {json.dumps(env, indent=2)}")
-        self._logger.info(f"cmd = {cmd}")
+        self._logger.info(f"[vasp] cmd = {cmd}")
 
         cmd_args: List[str] = []
         for cmd_item in cmd:
             if cmd_item is None:
-                self._logger.error("**Error**: 実行コマンドに None が含まれています。")
+                self._logger.error(
+                    "[vasp] **Error**: 実行コマンドに None が含まれています。"
+                )
                 return False
 
             cmd_args.append(cmd_item)
@@ -509,12 +513,12 @@ class Vasp:
         try:
             subprocess.run(cmd_args, check=True, env=env)
         except subprocess.CalledProcessError as e:
-            self._logger.error(f"**Error**: {e}")
-            self._logger.error("  VASP実行中にエラーが発生")
-            self._logger.error("  --> 距離が近すぎることで電子密度がおかい>")
-            self._logger.error("  --> 行列問題の解法で転けたとか")
+            self._logger.error(f"[vasp] **Error**: {e}")
+            self._logger.error(f"[vasp]   VASP実行中にエラーが発生")
+            self._logger.error(f"[vasp]   --> 距離が近すぎることで電子密度がおかい>")
+            self._logger.error(f"[vasp]   --> 行列問題の解法で転けたとか")
             self._logger.error(
-                f"強制STOP ではなくて、そのままRMC側に戻して、ハンドリングする"
+                f"[vasp] 強制STOP ではなくて、そのままRMC側に戻して、ハンドリングする"
             )
             # sys.exit(1)
             return False
@@ -569,7 +573,11 @@ class Vasp:
     ) -> bool:
         if element_info is None:
             element_info = self._config.element_info
-        return ensure_vasp5_format(poscar_name, element_info, logger=logger)
+        return ensure_vasp5_format(
+            poscar_name,
+            element_info,
+            logger=logger,
+        )
 
     @staticmethod
     def make_potential(
@@ -623,7 +631,7 @@ class Vasp:
         if cfg_name is None:
             cfg_name: str = str(self._config.cfg_name)
 
-        self._logger.info(f"== contcar2cfg({cfg_name})")
+        self._logger.info(f"[vasp] == contcar2cfg({cfg_name})")
         contcar2cfg(cfg_name)
         return True
 
@@ -641,7 +649,7 @@ class Vasp:
         Returns:
             bool: 正しく終わったデー
         """
-        self._logger.info(f"== poscar2cfg({cfg_name})")
+        self._logger.info(f"[vasp] == poscar2cfg({cfg_name})")
         # xdatcar2poscar(cfg_name)
         return poscar2cfg(cfg_name)
 
@@ -661,7 +669,7 @@ class Vasp:
         if vasp_name is None:
             vasp_name = self._config.vasp_name
 
-        self._logger.info(f"== xdatcar2poscar(vasp_name={vasp_name})")
+        self._logger.info(f"[vasp] == xdatcar2poscar(vasp_name={vasp_name})")
         return xdatcar2poscar(str(vasp_name))
 
     @staticmethod
