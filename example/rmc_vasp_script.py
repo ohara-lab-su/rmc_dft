@@ -42,6 +42,7 @@ from rmc_init import run_rmc_init
 from rmc import run_rmc
 from rmc_vasp import run_vasp
 from rmc_vasp_init import run_vasp_init
+from rmc_vasp_init_safe import run_vasp_init_safe
 
 
 if __name__ == "__main__":
@@ -97,6 +98,7 @@ if __name__ == "__main__":
     vasp_kpoints = VaspKpoints(config=config, logger=logger)
 
     i = 0
+    vasp_step = 0
     for i in range(start_loop, start_loop + max_rmc_dft_loop):
         # for i in range(start_loop, max_rmc_dft_loop):
         # ------------------- RMC ------------------------
@@ -145,13 +147,17 @@ if __name__ == "__main__":
         # ------------------- DFT ------------------------
         if start_mode == "VASP":
 
-            # VASP の INPUT を毎回作る/KPOINTS/POTCARは一回だけ作る)
-            run_vasp_init(
-                config,
-                vasp_incar=vasp_incar,
-                vasp_kpoints=vasp_kpoints,
-                logger=logger,
-            )
+            vasp_step += 1
+
+            if vasp_step == 1:
+                # VASP の INPUT を毎回作る/KPOINTS/POTCARは一回だけ作る)
+                run_vasp_init_safe(
+                    config,
+                    vasp_incar=vasp_incar,
+                    vasp_kpoints=vasp_kpoints,
+                    logger=logger,
+                )
+
             # 富岳対応 (キャッシュ対策)
             subprocess.run(["sleep", "5"], check=True)
             subprocess.run(["ls", "-la", "./"], check=True)
