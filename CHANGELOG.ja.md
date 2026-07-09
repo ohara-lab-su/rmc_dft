@@ -2,6 +2,19 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.31 nakada
+
+### ドキュメント
+
+- RMC の `top` / `fnc` 生成に関する総合マニュアルを追加。
+- Qn ネットワーク解析モジュールの設計方針および処理フローを文書化。
+- Qn 関連クラスの役割・責務・連携方法を整理して解説。
+- 原子ネットワーク解析から RMC 用 `top` / `fnc` ファイル生成までの処理を解説。
+- RMC_POT の `top` / `fnc` ファイルの目的・役割・基本書式について整理して解説。
+- ネットワーク構造解析、Qn 解析、および Force Constraint 生成との関係を解説。
+- 現実装の適用範囲を整理し、SiO₂ 固有の部分と他のネットワーク形成材料へ再利用可能な部分を明確化。
+- 他材料への拡張を考慮した設計方針および実装上の考察を追加。
+ 
 ## v0.4.30 nakada
 
 ### 変更

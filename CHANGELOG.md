@@ -2,6 +2,19 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.31 nakada
+
+### Documentation
+
+- Added a comprehensive manual for RMC `top` / `fnc` generation.
+- Documented the design and workflow of the new Qn network analysis module.
+- Added explanations of the architecture and responsibilities of each Qn-related class.
+- Documented how atomic networks are analyzed and converted into RMC `top` and `fnc` files.
+- Added an overview of the RMC_POT `top` / `fnc` file formats, including their purposes and basic syntax.
+- Explained the relationship between network topology, Qn analysis, and force-constraint generation.
+- Added descriptions of the applicability and limitations of the current implementation, including SiO₂-specific assumptions and reusable components for other network-forming materials.
+- Added examples and implementation notes for future extension to other material systems.
+ 
 ## v0.4.30 nakada
 
 ### Changed
