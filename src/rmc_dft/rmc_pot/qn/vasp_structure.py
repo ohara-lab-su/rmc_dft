@@ -1,18 +1,6 @@
-import csv
-import itertools
-import json
 import math
-import os
-from pathlib import Path
-from collections import Counter
-from collections import defaultdict
-from typing import Any
-from typing import Dict
-from typing import Iterable
 from typing import List
 from typing import Optional
-from typing import Sequence
-from typing import Set
 from typing import Tuple
 
 import numpy as np
@@ -95,8 +83,11 @@ class VaspStructure(object):
         scale = float(lines[1].split()[0])
         cell_rows = []
         for i in range(2, 5):
+            tokens = lines[i].split()
+            if len(tokens) < 3:
+                raise ConfigError("POSCAR の格子ベクトル行が 3 成分未満です。")
             row = []
-            for token in lines[i].split()[:3]:
+            for token in tokens[:3]:
                 row.append(float(token))
             cell_rows.append(row)
         cell = np.array(cell_rows, dtype=float) * scale
@@ -138,14 +129,22 @@ class VaspStructure(object):
             coord_mode = lines[coord_mode_index + 1].lower()
             start = coord_mode_index + 2
 
+        if not coord_mode.startswith("d") and not coord_mode.startswith("c"):
+            raise ConfigError(
+                "POSCAR の座標形式は Direct または Cartesian である必要があります。"
+            )
+
         total = sum(counts)
         if len(lines) < start + total:
             raise ConfigError("座標行の数が不足しています。")
 
         coords = []
         for i in range(total):
+            tokens = lines[start + i].split()
+            if len(tokens) < 3:
+                raise ConfigError("POSCAR の座標行が 3 成分未満です。")
             row = []
-            for token in lines[start + i].split()[:3]:
+            for token in tokens[:3]:
                 row.append(float(token))
             coords.append(row)
         frac_or_cart = np.array(coords, dtype=float)
@@ -154,8 +153,9 @@ class VaspStructure(object):
         if coord_mode.startswith("d"):
             frac = frac_or_cart.copy()
         else:
+            cart = frac_or_cart * scale
             inv_cell = np.linalg.inv(cell)
-            frac = frac_or_cart.dot(inv_cell)
+            frac = cart.dot(inv_cell)
 
         labels = []
         for atom_type, count in zip(atom_types, counts):

@@ -2,17 +2,13 @@ import csv
 import itertools
 import json
 import math
-import os
-from pathlib import Path
 from collections import Counter
 from collections import defaultdict
 from typing import Any
 from typing import Dict
-from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Sequence
-from typing import Set
 from typing import Tuple
 
 import numpy as np
@@ -68,7 +64,7 @@ class QnNetworkAnalysis:
         cls,
         poscar_name: str,
         config_name: str,
-    ):
+    ) -> "QnNetworkAnalysis":
         """VASP 構造ファイルと JSON 設定から QnNetworkAnalysis を作る。"""
         config = cls.load_config(config_name)
         atom_types = cls.get_structure_atom_types(config)
