@@ -15,6 +15,8 @@ cp ~/zaiene_dev/rmc_dft/example/rmc.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_init.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_vasp.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_init.py ./
+cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_init_normal.py ./
+cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_init_safe.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script.py ./
 # cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script_edit.py ./
 # cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script_restart.py ./
