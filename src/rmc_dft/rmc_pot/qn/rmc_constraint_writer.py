@@ -14,11 +14,6 @@ from rmc_dft.rmc_pot.qn.qn_network_analysis import QnNetworkAnalysis
 from rmc_dft.rmc_pot.qn.vasp_structure import VaspStructure
 
 
-Pair = Tuple[int, int]
-TypedPair = Tuple[int, int, int]
-Angle = Tuple[int, int, int]
-UnitMolecule = Tuple[str, List[int], List[Pair], List[Angle]]
-
 
 class RmcConstraintWriter:
     """QnNetworkAnalysis の解析結果から RMC_POT 用 FNC/topology を出力するクラス。"""
@@ -70,7 +65,7 @@ class RmcConstraintWriter:
     def write_fnc(
         path: str,
         atom_count: int,
-        typed_pairs: Sequence[TypedPair],
+        typed_pairs: Sequence[Tuple[int, int, int]],
         ranges: Dict[int, Tuple[float, float]],
         title: str,
     ) -> None:
@@ -428,7 +423,7 @@ class RmcConstraintWriter:
     def build_independent_unit_molecules(
         poscar: VaspStructure,
         config: Dict[str, Any],
-    ) -> List[UnitMolecule]:
+    ) -> List[Tuple[str, List[int], List[Tuple[int, int]], List[Tuple[int, int, int]]]]:
         """RMC_POT FNC=4 用の独立分子・独立フラグメント一覧を作る。
 
         この関数は、初期構造から検出したネットワーク全体を 1 つの molecule として固定しない。
@@ -529,7 +524,7 @@ class RmcConstraintWriter:
                 "distance range または neighbor_count を見直してください。"
             )
 
-        molecules = []  # type: List[UnitMolecule]
+        molecules = []  # type: List[Tuple[str, List[int], List[Tuple[int, int]], List[Tuple[int, int, int]]]]
         molecule_index = 1
         included_atoms = set()  # type: Set[int]
 
@@ -540,11 +535,11 @@ class RmcConstraintWriter:
             for neighbor in neighbors:
                 atom_indices.append(neighbor)
 
-            bonds = []  # type: List[Pair]
+            bonds = []  # type: List[Tuple[int, int]]
             for local_neighbor_index in range(1, len(atom_indices)):
                 bonds.append((0, local_neighbor_index))
 
-            angles = []  # type: List[Angle]
+            angles = []  # type: List[Tuple[int, int, int]]
             if generate_angles:
                 local_neighbor_indices = list(range(1, len(atom_indices)))
                 for local_i, local_k in itertools.combinations(

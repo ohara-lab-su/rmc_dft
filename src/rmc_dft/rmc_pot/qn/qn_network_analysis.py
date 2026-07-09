@@ -14,14 +14,8 @@ from typing import Tuple
 import numpy as np
 
 from rmc_dft.rmc_pot.qn.config_error import ConfigError
-
 from rmc_dft.rmc_pot.qn.vasp_structure import VaspStructure
 
-
-Pair = Tuple[int, int]
-TypedPair = Tuple[int, int, int]
-Angle = Tuple[int, int, int]
-UnitMolecule = Tuple[str, List[int], List[Pair], List[Angle]]
 
 
 class QnNetworkAnalysis:
@@ -296,7 +290,7 @@ class QnNetworkAnalysis:
     def pair_key(
         i: int,
         j: int,
-    ) -> Pair:
+    ) -> Tuple[int, int]:
         """原子対を順序に依存しない key に正規化する。
 
         FNC=3 の距離拘束や topology の bond は i-j と j-i を同一視する。
@@ -482,7 +476,7 @@ class QnNetworkAnalysis:
 
     @staticmethod
     def add_typed_pair(
-        pair_types: Dict[Pair, int],
+        pair_types: Dict[Tuple[int, int], int],
         i: int,
         j: int,
         type_id: int,
@@ -539,7 +533,7 @@ class QnNetworkAnalysis:
 
         molecules = RmcConstraintWriter.build_independent_unit_molecules(poscar, config)
 
-        pair_types = {}  # type: Dict[Pair, int]
+        pair_types = {}  # type: Dict[Tuple[int, int], int]
         type_names = {}  # type: Dict[int, str]
 
         for item in constraints:
@@ -638,7 +632,7 @@ class QnNetworkAnalysis:
     @staticmethod
     def add_checked_fnc_pair(
         poscar: VaspStructure,
-        pair_types: Dict[Pair, int],
+        pair_types: Dict[Tuple[int, int], int],
         atom_i: int,
         atom_j: int,
         type_id: int,
@@ -672,8 +666,8 @@ class QnNetworkAnalysis:
     @staticmethod
     def add_unit_center_neighbor_pairs_by_atom_types(
         poscar: VaspStructure,
-        molecules: Sequence[UnitMolecule],
-        pair_types: Dict[Pair, int],
+        molecules: Sequence[Tuple[str, List[int], List[Tuple[int, int]], List[Tuple[int, int, int]]]],
+        pair_types: Dict[Tuple[int, int], int],
         type_id: int,
         atom_types: Tuple[str, str],
         rmin: float,
@@ -705,8 +699,8 @@ class QnNetworkAnalysis:
     @staticmethod
     def add_unit_neighbor_neighbor_pairs_by_atom_types(
         poscar: VaspStructure,
-        molecules: Sequence[UnitMolecule],
-        pair_types: Dict[Pair, int],
+        molecules: Sequence[Tuple[str, List[int], List[Tuple[int, int]], List[Tuple[int, int, int]]]],
+        pair_types: Dict[Tuple[int, int], int],
         type_id: int,
         atom_types: Tuple[str, str],
         rmin: float,
@@ -751,7 +745,7 @@ class QnNetworkAnalysis:
     def write_fnc(
         path: str,
         atom_count: int,
-        typed_pairs: Sequence[TypedPair],
+        typed_pairs: Sequence[Tuple[int, int, int]],
         ranges: Dict[int, Tuple[float, float]],
         title: str,
     ) -> None:
@@ -860,7 +854,7 @@ class QnNetworkAnalysis:
     @staticmethod
     def summarize_distances(
         poscar: VaspStructure,
-        typed_pairs: Sequence[TypedPair],
+        typed_pairs: Sequence[Tuple[int, int, int]],
     ) -> Dict[int, List[float]]:
         """FNC type_id ごとに現在構造での実距離を集計する。"""
         result = defaultdict(list)  # type: Dict[int, List[float]]

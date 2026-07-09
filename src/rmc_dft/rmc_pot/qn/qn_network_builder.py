@@ -1,18 +1,10 @@
 from typing import Any
 from typing import Dict
-from typing import List
 from typing import Optional
-from typing import Tuple
 
 from rmc_dft.rmc_pot.qn.qn_network_analysis import QnNetworkAnalysis
 from rmc_dft.rmc_pot.qn.rmc_constraint_writer import RmcConstraintWriter
 from rmc_dft.rmc_pot.qn.vasp_structure import VaspStructure
-
-
-Pair = Tuple[int, int]
-TypedPair = Tuple[int, int, int]
-Angle = Tuple[int, int, int]
-UnitMolecule = Tuple[str, List[int], List[Pair], List[Angle]]
 
 
 class QnNetworkBuilder:
