@@ -371,6 +371,9 @@ class Vasp:
         # CONTCAR -> POSCAR
         shutil.copyfile("CONTCAR", "POSCAR")
 
+        # POSCAR -> cfg_name.vasp
+        shutil.copyfile("POSCAR", f"{cfg_name}.vasp")
+
         # CONTCAR -> CFG
         self._logger.info(f"[vasp] == contcar2cfg(cfg_name={cfg_name}.cfg)")
         self.contcar2cfg(cfg_name=cfg_name)

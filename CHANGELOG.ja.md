@@ -2,6 +2,33 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.30 nakada
+
+### 変更
+
+- `qn_network.py` に集約していた Qn network 解析および RMC_POT 拘束生成処理を、モジュール側の `rmc_dft.rmc_pot.qn` パッケージへ移動。
+- Qn 関連処理をクラス単位でファイル分割。
+  - `vasp_structure.py`
+  - `qn_network_analysis.py`
+  - `rmc_constraint_writer.py`
+  - `qn_network_builder.py`
+  - `config_error.py`
+- `VaspStructure`、`QnNetworkAnalysis`、`RmcConstraintWriter`、`QnNetworkBuilder` の責務を整理。
+- `QnNetworkBuilder` を、既存の `qn_network.py` 相当の処理を呼び出すためのファサードとして整理。
+- `rmc_vasp_script.py` に、VASP 後処理で更新された構造から RMC_POT 用 Qn topology / FNC を生成する処理を追加。
+- RMC-DFT 連携時の Qn topology / FNC 出力名を `aaa.top` / `aaa.fnc` に統一。
+- 単体スクリプト用の一時的な prefix 付きファイル名から、RMC-DFT 実行時に使うファイル名へコピーする処理を整理。
+- `conv_cfg2poscar.py` の引数処理を整理。
+  - `conv_cfg2poscar aaa Si,O` では、`cfg_name=aaa`、`element_info=["Si", "O"]` として扱う。
+  - `conv_cfg2poscar xxxx.yml` では、`rmc_dft.config.Config` から `cfg_name` と `element_info` を取得する。
+
+### 修正
+
+- `QnNetworkAnalysis.from_poscar()` 内のクラス参照ミスを修正。
+- `build_network()` で `bridge_second_map` に bridge が存在しない場合に `KeyError` が発生する可能性を修正。
+- Qn 関連モジュール内の循環 import を修正。
+- Qn topology / FNC 生成処理の I/F を維持したまま、内部実装のみを調整。
+ 
 ## v0.4.29 nakada
 
 ### 修正

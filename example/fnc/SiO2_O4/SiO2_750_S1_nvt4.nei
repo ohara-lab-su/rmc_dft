@@ -1,0 +1,93 @@
+ Output from NEXTTO
+ TITLE
+ Random configuration                                                            
+ Coordination number distributions
+
+ Central particle:     1
+ Distance:  1.800A
+ Coordination number distributions
+ BARCHART
+ CURVES
+   6 2
+           0         250           0
+           1           0           0
+           2           0           0
+           3           0           0
+           4           0         249
+           5           0           1
+ Coordination numbers:
+  0.0000000E+00   4.004000    
+
+ Central particle:     2
+ Distance:  1.800A
+ Coordination number distributions
+ BARCHART
+ CURVES
+   4 2
+           0           0         500
+           1           0           0
+           2         499           0
+           3           1           0
+ Coordination numbers:
+   2.002000      0.0000000E+00
+ ENDGROUP
+ 
+ Warren-Cowley parameter distributions
+
+ Central particle:     1
+ Distance:  1.800A
+ Warren-Cowley parameter distributions
+ CURVES
+  21 1
+  -1.000000      0.0000000E+00
+ -0.9000000      0.0000000E+00
+ -0.8000000      0.0000000E+00
+ -0.7000000      0.0000000E+00
+ -0.6000000      0.0000000E+00
+ -0.5000000       1.000000    
+ -0.4000000      0.0000000E+00
+ -0.3000000      0.0000000E+00
+ -0.2000000      0.0000000E+00
+ -0.1000000      0.0000000E+00
+  0.0000000E+00  0.0000000E+00
+  0.1000000      0.0000000E+00
+  0.2000000      0.0000000E+00
+  0.3000000      0.0000000E+00
+  0.4000000      0.0000000E+00
+  0.5000000      0.0000000E+00
+  0.6000000      0.0000000E+00
+  0.7000000      0.0000000E+00
+  0.8000000      0.0000000E+00
+  0.9000000      0.0000000E+00
+   1.000000      0.0000000E+00
+ Warren-Cowley order parameters:
+ -0.5000000    
+
+ Central particle:     2
+ Distance:  1.800A
+ Warren-Cowley parameter distributions
+ CURVES
+  21 1
+  -1.000000      0.0000000E+00
+ -0.9000000      0.0000000E+00
+ -0.8000000      0.0000000E+00
+ -0.7000000      0.0000000E+00
+ -0.6000000      0.0000000E+00
+ -0.5000000      0.0000000E+00
+ -0.4000000      0.0000000E+00
+ -0.3000000      0.0000000E+00
+ -0.2000000      0.0000000E+00
+ -0.1000000      0.0000000E+00
+  0.0000000E+00  0.0000000E+00
+  0.1000000      0.0000000E+00
+  0.2000000      0.0000000E+00
+  0.3000000      0.0000000E+00
+  0.4000000      0.0000000E+00
+  0.5000000      0.0000000E+00
+  0.6000000      0.0000000E+00
+  0.7000000      0.0000000E+00
+  0.8000000      0.0000000E+00
+  0.9000000      0.0000000E+00
+   1.000000      0.0000000E+00
+ Warren-Cowley order parameters:
+  -2.000000    

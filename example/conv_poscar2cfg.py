@@ -26,7 +26,10 @@ from x_logger import XLogger
 
 
 if __name__ == "__main__":
-    logger = XLogger(log_level="debug", logger_name="rmc_vasp_run")
+    logger = XLogger(
+        log_level="debug",
+        logger_name="conv_poscar2cfg",
+    )
     config = None
 
     # ---------------------------------------------

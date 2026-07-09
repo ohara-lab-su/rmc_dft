@@ -9,31 +9,37 @@ cp ~/zaiene_dev/rmc_dft/example/check_vasp_distance.py ./
 cp ~/zaiene_dev/rmc_dft/example/check_rmc_chi.py ./
 cp ~/zaiene_dev/rmc_dft/example/check_rmc_finalized.py ./
 #
+#######################################################
+cp ~/zaiene_dev/rmc_dft/example/config.yml ./
 cp ~/zaiene_dev/rmc_dft/example/rmc.py ./
+cp ~/zaiene_dev/rmc_dft/example/rmc_init.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_vasp.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_init.py ./
 cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script.py ./
 # cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script_edit.py ./
-cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script_restart.py ./
+# cp ~/zaiene_dev/rmc_dft/example/rmc_vasp_script_restart.py ./
+#######################################################
 #
-cp ~/zaiene_dev/rmc_dft/example/RMC_DFT_dft_run.py ./
+# cp ~/zaiene_dev/rmc_dft/example/RMC_DFT_dft_run.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/conv_poscar2cfg.py ./
 cp ~/zaiene_dev/rmc_dft/example/conv_cfg2poscar.py ./
 cp ~/zaiene_dev/rmc_dft/example/diff_incar.py ./
 #
-cp ~/zaiene_dev/rmc_dft/example/make_cell_size.py ./
-cp ~/zaiene_dev/rmc_dft/example/make_amorphous.py ./
+######################################
+# cp ~/zaiene_dev/rmc_dft/example/make_cell_size.py ./
+# cp ~/zaiene_dev/rmc_dft/example/make_amorphous.py ./
 cp ~/zaiene_dev/rmc_dft/example/make_number_density.py ./
 cp ~/zaiene_dev/rmc_dft/example/make_log_dirname.py ./
+######################################
 #
 cp ~/zaiene_dev/rmc_dft/example/job_hpcs2024_node1.sh ./
 cp ~/zaiene_dev/rmc_dft/example/job_hpcs2024_node2.sh ./
 #
-cp ~/zaiene_dev/rmc_dft/example/data_edit_dat.py ./
-cp ~/zaiene_dev/rmc_dft/example/data_edit_incar.py ./
-cp ~/zaiene_dev/rmc_dft/example/data_edit_kpoints.py ./
-cp ~/zaiene_dev/rmc_dft/example/data_edit_potcar.py ./
+# cp ~/zaiene_dev/rmc_dft/example/data_edit_dat.py ./
+# cp ~/zaiene_dev/rmc_dft/example/data_edit_incar.py ./
+# cp ~/zaiene_dev/rmc_dft/example/data_edit_kpoints.py ./
+# cp ~/zaiene_dev/rmc_dft/example/data_edit_potcar.py ./
 #
 cp ~/zaiene_dev/rmc_dft/example/plot_fit.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_hst.py ./
@@ -48,7 +54,9 @@ cp ~/zaiene_dev/rmc_dft/example/plot_multi_hst.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_multi_energy.py ./
 cp ~/zaiene_dev/rmc_dft/example/plot_multi_converge.py ./
 #
-cp ~/zaiene_dev/rmc_dft/example/make_amorphous.py ./
-cp ~/zaiene_dev/rmc_dft/example/make_number_density.py ./
-cp ~/zaiene_dev/rmc_dft/example/make_cell_size.py ./
+################################## Qn
+cp ~/zaiene_dev/rmc_dft/example/make_qn.py ./
+cp ~/zaiene_dev/rmc_dft/example/qn_config.json ./
+####################################
 
+chmod u+x *.py
