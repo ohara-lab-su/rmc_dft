@@ -1,7 +1,6 @@
+#!/usr/bin/env python
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 import math
-from typing import List
-from typing import Optional
-
 import numpy as np
 
 from rmc_dft.rmc_pot.qn.config_error import ConfigError

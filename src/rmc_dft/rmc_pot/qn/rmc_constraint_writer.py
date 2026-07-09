@@ -1,18 +1,14 @@
+# /usr/bin/env python
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 import itertools
 import os
+
 from pathlib import Path
 from collections import defaultdict
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Sequence
-from typing import Tuple
 
 from rmc_dft.rmc_pot.qn.config_error import ConfigError
 from rmc_dft.rmc_pot.qn.qn_network_analysis import QnNetworkAnalysis
 from rmc_dft.rmc_pot.qn.vasp_structure import VaspStructure
-
 
 
 class RmcConstraintWriter:
@@ -524,7 +520,9 @@ class RmcConstraintWriter:
                 "distance range または neighbor_count を見直してください。"
             )
 
-        molecules = []  # type: List[Tuple[str, List[int], List[Tuple[int, int]], List[Tuple[int, int, int]]]]
+        molecules = (
+            []
+        )  # type: List[Tuple[str, List[int], List[Tuple[int, int]], List[Tuple[int, int, int]]]]
         molecule_index = 1
         included_atoms = set()  # type: Set[int]
 

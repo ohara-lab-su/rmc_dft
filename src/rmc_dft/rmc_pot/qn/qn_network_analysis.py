@@ -1,21 +1,15 @@
-import csv
+#!/usr/bin/env python
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 import itertools
 import json
 import math
-from collections import Counter
-from collections import defaultdict
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Sequence
-from typing import Tuple
+from collections import Counter, defaultdict
+import csv
 
 import numpy as np
 
 from rmc_dft.rmc_pot.qn.config_error import ConfigError
 from rmc_dft.rmc_pot.qn.vasp_structure import VaspStructure
-
 
 
 class QnNetworkAnalysis:
@@ -455,7 +449,7 @@ class QnNetworkAnalysis:
             qn_value = 0
             for bridge in bridges:
                 second_hits = []
-                for second in bridge_second_map[bridge]:
+                for second in bridge_second_map.get(bridge, []):
                     if second == central:
                         continue
                     second_hits.append(second)
@@ -666,7 +660,9 @@ class QnNetworkAnalysis:
     @staticmethod
     def add_unit_center_neighbor_pairs_by_atom_types(
         poscar: VaspStructure,
-        molecules: Sequence[Tuple[str, List[int], List[Tuple[int, int]], List[Tuple[int, int, int]]]],
+        molecules: Sequence[
+            Tuple[str, List[int], List[Tuple[int, int]], List[Tuple[int, int, int]]]
+        ],
         pair_types: Dict[Tuple[int, int], int],
         type_id: int,
         atom_types: Tuple[str, str],
@@ -699,7 +695,9 @@ class QnNetworkAnalysis:
     @staticmethod
     def add_unit_neighbor_neighbor_pairs_by_atom_types(
         poscar: VaspStructure,
-        molecules: Sequence[Tuple[str, List[int], List[Tuple[int, int]], List[Tuple[int, int, int]]]],
+        molecules: Sequence[
+            Tuple[str, List[int], List[Tuple[int, int]], List[Tuple[int, int, int]]]
+        ],
         pair_types: Dict[Tuple[int, int], int],
         type_id: int,
         atom_types: Tuple[str, str],

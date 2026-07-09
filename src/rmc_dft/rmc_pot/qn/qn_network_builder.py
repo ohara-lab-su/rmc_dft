@@ -1,6 +1,5 @@
-from typing import Any
-from typing import Dict
-from typing import Optional
+#!/usr/bin/env python
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from rmc_dft.rmc_pot.qn.qn_network_analysis import QnNetworkAnalysis
 from rmc_dft.rmc_pot.qn.rmc_constraint_writer import RmcConstraintWriter

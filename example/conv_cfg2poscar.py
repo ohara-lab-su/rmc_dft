@@ -2,38 +2,40 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 
-cfg2poscar を動かすだけ
-"""
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
-import os
-import sys
-import argparse
+cfg2poscar を動かすだけ。
 
-from rmc_dft import (
-    Config,
-    Vasp,
-    VaspIncar,
-    VaspKpoints,
-    VaspOutcar,
-    VaspLog,
-    RmcPot,
-    RmcPotLog,
-    RmcPotDat,
-    RmcPotFit,
-    RmcPotPpcf,
-)
-from rmc_dft.util import poscar2cfg
+Usage:
+    conv_cfg2poscar.py aaa Si,O
+    conv_cfg2poscar.py config.yml
+"""
+import sys
+
+from rmc_dft.config import Config
+from rmc_dft import RmcPot, RmcPotLog
 from x_logger import XLogger
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """CFG を POSCAR へ変換する。"""
+    if len(sys.argv) == 3:
+        # 引数が２つのとき
+        cfg_name = sys.argv[1]
+        element_info = sys.argv[2].split(",")
 
-    logger = XLogger(log_level="debug", logger_name="rmc_run")
+    elif len(sys.argv) == 2:
+        # 引数が1つのとき
+        config = Config(sys.argv[1])
+        cfg_name = config.cfg_name
+        element_info = config.element_info
+    else:
+        raise ValueError(
+            "Usage: conv_cfg2poscar.py aaa Si,O  または  conv_cfg2poscar.py config.yml"
+        )
 
-    cfg_name = "aaa"
-    # element_info = "label.txt" # kobayashi-method
-    element_info = ["Fe", "Si", "B"]  # normal-method
-
+    logger = XLogger(
+        log_level="debug",
+        logger_name="conv_cfg2poscar",
+    )
     rmc_log = RmcPotLog(
         cfg_name=cfg_name,
         logger=logger,
@@ -43,10 +45,11 @@ if __name__ == "__main__":
         cfg_name=cfg_name,
         logger=logger,
     )
-
-    # CFG to POSCAR
-    # rmc.cfg2poscar(cfg_name=cfg_name)
     rmc.cfg2poscar(
         cfg_name=cfg_name,
         element_info=element_info,
     )
+
+
+if __name__ == "__main__":
+    main()
