@@ -30,14 +30,16 @@ def main() -> None:
         poscar_name=poscar_name,
         config_name=config_name,
     )
-    builder.write_all(cfg_name)
+    if builder.analysis.fnc_error is not None:
+        print("FNC3 warning:", builder.analysis.fnc_error)
+
+    builder.write_unit_topology(cfg_name + "_rmc_unit.top")
+    builder.write_analysis(cfg_name)
 
     # shutil.copyfile("POSCAR", f"{poscar_name}")
     shutil.copyfile(f"{cfg_name}_rmc_unit.top", f"{cfg_name}.top")
-    shutil.copyfile(f"{cfg_name}_rmc_fnc3.fnc", f"{cfg_name}.fnc")
 
     print("Qn counts:", builder.get_qn_counts())
-    print("created:", cfg_name + "_rmc_fnc3.fnc")
     print("created:", cfg_name + "_rmc_unit.top")
     print("created:", cfg_name + "_qn.csv")
     print("created:", cfg_name + "_report.txt")

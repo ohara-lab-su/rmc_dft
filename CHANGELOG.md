@@ -2,6 +2,16 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.32 nakada
+
+### Added
+
+- Added fault-tolerant handling for FNC pair generation during Qn network construction.
+- Qn topology generation no longer aborts when an FNC pair does not satisfy the configured distance constraints.
+- FNC pair generation errors are captured and reported as warnings instead of terminating the entire build process.
+- Enabled generation of topology and network analysis outputs even when FNC pair generation fails.
+- `make_qn.py` now reports FNC generation failures while continuing to generate all available outputs.
+ 
 ## v0.4.31 nakada
 
 ### Documentation

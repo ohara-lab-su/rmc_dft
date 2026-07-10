@@ -32,11 +32,17 @@ class QnNetworkAnalysis:
         self.bond_pairs = set()
         self.fnc_pairs = []
         self.fnc_type_names = {}
+        self.fnc_error = None
         self.angles = []
 
         if structure is not None and config is not None:
             data = QnNetworkAnalysis.build_network(structure, config)
-            QnNetworkAnalysis.build_fnc3_pairs(structure, config, data)
+            try:
+                QnNetworkAnalysis.build_fnc3_pairs(structure, config, data)
+            except ConfigError as exc:
+                self.fnc_error = str(exc)
+                data.fnc_pairs = []
+                data.fnc_type_names = {}
             self.first_map = data.first_map
             self.bridge_second_map = data.bridge_second_map
             self.qn_by_central = data.qn_by_central
@@ -938,6 +944,9 @@ class QnNetworkAnalysis:
             )
             f.write("unique bond pairs      : %d\n" % len(data.bond_pairs))
             f.write("FNC=3 pairs            : %d\n" % len(data.fnc_pairs))
+            fnc_error = getattr(data, "fnc_error", None)
+            if fnc_error is not None:
+                f.write("FNC=3 error            : %s\n" % fnc_error)
             f.write("network topology angles: %d\n\n" % len(data.angles))
 
             f.write("FNC=3 distance statistics\n")

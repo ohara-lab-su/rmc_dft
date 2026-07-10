@@ -2,6 +2,16 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.32 nakada
+
+### 追加
+
+- Qn ネットワーク構築時における FNC pair 生成の耐障害性を追加しました。
+- FNC pair が設定された距離制約を満たさない場合でも、Qn トポロジ生成全体を中断しないようにしました。
+- FNC pair の生成エラーは例外終了ではなく警告として扱い、処理を継続するようにしました。
+- FNC pair の生成に失敗した場合でも、トポロジおよびネットワーク解析結果を生成できるようにしました。
+- `make_qn.py` は FNC 生成失敗時に警告を表示し、生成可能な出力を継続して作成するようになりました。
+
 ## v0.4.31 nakada
 
 ### ドキュメント
