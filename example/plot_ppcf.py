@@ -21,15 +21,13 @@ def plot_ppcf(
         if target_dir is not None:
             os.chdir(target_dir)
 
-        indices = [0, 1, 2, 3, 4, 5]
-        labels = ["g11(r)", "g12(r)", "g13(r)", "g22(r)", "g23(r)", "g33(r)"]
-
         reader = RmcPotPpcf(cfg_name=cfg_name)
         reader.load()
 
         r = reader.get_r()
+        labels = reader.get_labels()
 
-        for idx, lbl in zip(indices, labels):
+        for idx, lbl in enumerate(labels):
             gij = reader.get_single(idx)
             plt.plot(r, gij, label=lbl)
 

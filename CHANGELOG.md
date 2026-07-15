@@ -2,6 +2,23 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.34
+
+### Added
+- Added support for PPCF files with an arbitrary number of atom types.
+- Automatically detect the number of atom types from the PPCF header.
+- Automatically determine the number of partial PPCFs using `N(N+1)/2`.
+
+### Changed
+- Updated `plot_ppcf.py` to automatically plot all available partial PPCFs.
+- Updated `plot_ppcf2.py` to automatically generate the required subplot layout.
+- Partial PPCF labels (`g11`, `g12`, ... `gnn`) are now generated automatically.
+
+### Fixed
+- Removed the previous implementation that assumed exactly three atom types.
+- Fixed PPCF loading for two-component systems.
+- Improved error handling when no valid PPCF data can be read.
+ 
 ## v0.4.33 nakada
 
 ### Fixed

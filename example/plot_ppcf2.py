@@ -3,6 +3,7 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 """
+import math
 import os
 from typing import Optional, List
 import matplotlib.pyplot as plt
@@ -20,24 +21,33 @@ def plot_ppcf(
         if target_dir is not None:
             os.chdir(target_dir)
 
-        indices: List[int] = [0, 1, 2, 3, 4, 5]
-        labels: List[str] = ["g11(r)", "g12(r)", "g13(r)", "g22(r)", "g23(r)", "g33(r)"]
-
         reader = RmcPotPpcf(cfg_name=cfg_name)
         reader.load()
 
         r = reader.get_r()
+        labels: List[str] = reader.get_labels()
 
-        # 6 枚のサブプロット（縦 3 × 横 2）
-        fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(8, 10))
+        n_plots = len(labels)
+        ncols = 2
+        nrows = math.ceil(n_plots / ncols)
+
+        fig, axes = plt.subplots(
+            nrows=nrows,
+            ncols=ncols,
+            figsize=(8, 3.3 * nrows),
+            squeeze=False,
+        )
         axes = axes.flatten()
 
-        for ax, idx, lbl in zip(axes, indices, labels):
+        for idx, lbl in enumerate(labels):
             gij = reader.get_single(idx)
-            ax.plot(r, gij)
-            ax.set_title(lbl)
-            ax.set_xlabel("r (Å)")
-            ax.set_ylabel("g(r)")
+            axes[idx].plot(r, gij)
+            axes[idx].set_title(lbl)
+            axes[idx].set_xlabel("r (Å)")
+            axes[idx].set_ylabel("g(r)")
+
+        for idx in range(n_plots, len(axes)):
+            axes[idx].set_visible(False)
 
         plt.tight_layout()
         plt.show()
