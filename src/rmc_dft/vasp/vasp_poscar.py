@@ -69,7 +69,9 @@ class VaspPoscar:
 
         # element (VASP5以上ならば必ず存在する)
         # 元素記号のリスト
-        self._elements: List[str] = lines[5].split()
+        self._elements: List[str] = [
+            element.split("/", 1)[0] for element in lines[5].split()
+        ]
 
         # atomic number
         self._elements_index = list(map(int, lines[6].split()))
