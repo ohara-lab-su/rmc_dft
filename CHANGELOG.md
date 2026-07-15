@@ -2,6 +2,14 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.4.33 nakada
+
+### Fixed
+
+- Added support for POTCAR identifier suffixes in VASP 6 POSCAR/CONTCAR files (e.g. `Si/xxxxxxxxxxxx`).
+- Normalized element names when reading POSCAR files, converting `Si/xxxxxxxxxxxx` → `Si` and `O/xxxxxxxxxxxx` → `O`.
+- Fixed Qn network analysis (`make_qn`) after VASP restart so that the standard RMC→DFT workflow and restart workflow both handle VASP 6 POSCAR files correctly.
+
 ## v0.4.32 nakada
 
 ### Added

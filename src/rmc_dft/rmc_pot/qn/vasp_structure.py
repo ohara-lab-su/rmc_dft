@@ -96,7 +96,9 @@ class VaspStructure(object):
             has_symbol_line = True
 
         if has_symbol_line:
-            atom_types = tokens5
+            atom_types = []
+            for token in tokens5:
+                atom_types.append(token.split("/", 1)[0])
             count_tokens = lines[6].split()
             coord_mode_index = 7
         else:

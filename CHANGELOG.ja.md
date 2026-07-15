@@ -2,6 +2,14 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.4.33 (2026-07-15)
+
+## 修正
+
+- VASP 6 の POSCAR/CONTCAR に含まれる POTCAR 識別子付き元素名（例: `Si/xxxxxxxxxxxx`）に対応。
+- POSCAR 読み込み時に元素名を正規化し、`Si/xxxxxxxxxxxx` → `Si`、`O/xxxxxxxxxxxx` → `O` として扱うよう修正。
+- RMC→DFT の通常フローに加え、VASP restart 後の Qn ネットワーク解析 (`make_qn`) が正常に動作するよう改善。
+ 
 ## v0.4.32 nakada
 
 ### 追加
