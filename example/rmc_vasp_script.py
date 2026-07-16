@@ -177,14 +177,14 @@ if __name__ == "__main__":
             )
 
             # ----- make aaa.top -----------------
-            builder = QnNetworkBuilder.from_poscar(
-                poscar_name=f"{config.cfg_name}.vasp",
-                # config_name=f"{config.cfg_name}.json",
-                config_name=f"qn_config.json",
-            )
-            builder.write_all(f"{config.cfg_name}")
-            shutil.copyfile(f"{config.cfg_name}_rmc_fnc3.fnc", f"{config.cfg_name}.fnc")
-            shutil.copyfile(f"{config.cfg_name}_rmc_unit.top", f"{config.cfg_name}.top")
+            # builder = QnNetworkBuilder.from_poscar(
+            #     poscar_name=f"{config.cfg_name}.vasp",
+            #     # config_name=f"{config.cfg_name}.json",
+            #     config_name=f"qn_config.json",
+            # )
+            # builder.write_all(f"{config.cfg_name}")
+            # shutil.copyfile(f"{config.cfg_name}_rmc_fnc3.fnc", f"{config.cfg_name}.fnc")
+            # shutil.copyfile(f"{config.cfg_name}_rmc_unit.top", f"{config.cfg_name}.top")
             # ------------------------------------
 
             # 富岳対応 (キャッシュ対策)
