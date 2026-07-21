@@ -2463,4 +2463,873 @@ class RmcPotDatFree:
         """33 行目（スレッド数）を設定する。"""
         self.set_line(33, str(int(value)), auto_write=auto_write)
 
-RmcPotDatFree = RmcPotDat
+    def _resolve_auto_write(self, auto_write: Optional[bool]) -> bool:
+        """自動書き込みの実行可否を決定する。
+
+        Args:
+            auto_write: メソッド呼び出し単位の自動書き込み指定。
+                ``None`` の場合はインスタンスの ``auto_write`` 設定を使う。
+
+        Returns:
+            書き込みを実行する場合は ``True``、実行しない場合は ``False``。
+        """
+        if auto_write is None:
+            return self._auto_write
+        return auto_write
+
+    @staticmethod
+    def _normalize_sigma_mode(mode: str) -> str:
+        """sigma 指定方式を正規化する。
+
+        Args:
+            mode: ``normal``、``master``、``scalable`` のいずれか。
+
+        Returns:
+            小文字へ正規化した sigma 指定方式。
+
+        Raises:
+            ValueError: 未対応の指定方式が与えられた場合。
+        """
+        normalized = str(mode).strip().lower()
+        allowed = {
+            "normal",
+            "master",
+            "scalable",
+        }
+        if normalized not in allowed:
+            raise ValueError(
+                "sigma_mode は 'normal'、'master'、'scalable' "
+                "のいずれかで指定してください。"
+            )
+        return normalized
+
+    @classmethod
+    def _sigma_keyword(
+        cls,
+        base_keyword: str,
+        sigma_mode: str,
+    ) -> str:
+        """sigma 指定方式に対応する自由形式キーワードを返す。
+
+        Args:
+            base_keyword: 通常 sigma 用の基本キーワード。
+            sigma_mode: ``normal``、``master``、``scalable`` のいずれか。
+
+        Returns:
+            自由形式 ``*.dat`` へ書き込むキーワード。
+        """
+        mode = cls._normalize_sigma_mode(sigma_mode)
+        if mode == "master":
+            return f"{base_keyword}-MASTER"
+        if mode == "scalable":
+            return f"{base_keyword}-SCALABLE"
+        return base_keyword
+
+    @staticmethod
+    def _validate_positive_atom_type(
+        atom_type: int,
+        argument_name: str,
+    ) -> int:
+        """RMC 原子タイプ番号を検証する。
+
+        Args:
+            atom_type: 1 始まりの RMC 原子タイプ番号。
+            argument_name: 例外メッセージへ表示する引数名。
+
+        Returns:
+            検証済みの整数値。
+
+        Raises:
+            ValueError: 原子タイプ番号が 1 未満の場合。
+        """
+        value = int(atom_type)
+        if value < 1:
+            raise ValueError(f"{argument_name} は 1 以上で指定してください。")
+        return value
+
+    @staticmethod
+    def _validate_distance_range(
+        minimum: Union[int, float],
+        maximum: Union[int, float],
+        argument_name: str,
+    ) -> Tuple[float, float]:
+        """距離範囲を検証する。
+
+        Args:
+            minimum: 距離範囲の下限。単位は Å。
+            maximum: 距離範囲の上限。単位は Å。
+            argument_name: 例外メッセージへ表示する範囲名。
+
+        Returns:
+            ``(minimum, maximum)`` の浮動小数点数タプル。
+
+        Raises:
+            ValueError: 下限が負、または上限が下限以下の場合。
+        """
+        minimum_value = float(minimum)
+        maximum_value = float(maximum)
+
+        if minimum_value < 0.0:
+            raise ValueError(f"{argument_name} の下限は 0 以上で指定してください.")
+        if maximum_value <= minimum_value:
+            raise ValueError(
+                f"{argument_name} の上限は下限より大きくしてください."
+            )
+        return minimum_value, maximum_value
+
+    def get_qn_constraints(self) -> List[Dict[str, Any]]:
+        """自由形式 ``[ SNC ]`` の Qn 制約を取得する。
+
+        Returns:
+            Qn 制約ごとの辞書を格納したリスト。各辞書は次を含む。
+
+            - ``central_type``: 中心原子の RMC タイプ番号
+            - ``first_neighbor_type``: 第一近接原子の RMC タイプ番号
+            - ``first_neighbor_range``: 第一近接距離範囲 ``(min, max)`` [Å]
+            - ``second_neighbors``: 第二近接タイプと距離範囲のリスト
+            - ``coordination_number``: 目標 Qn の n
+            - ``fraction``: 制約を満たす中心原子の目標割合
+            - ``sigma``: 重みパラメータ
+            - ``sigma_mode``: ``normal``、``master``、``scalable``
+
+        Raises:
+            ValueError: 必須キーワードが欠落している場合、または値の個数が
+                マニュアルの ``[ SNC ]`` 形式と一致しない場合。
+
+        Notes:
+            Qn 制約は第二近接制約である。中心タイプ ``i`` が第一近接タイプ
+            ``j`` を n 個持ち、各第一近接を介して指定タイプの第二近接が
+            存在する状態を、指定割合の中心原子へ課す。
+        """
+        constraints: List[Dict[str, Any]] = []
+        sections = self._find_sections("SNC")
+
+        for section_index, section in enumerate(sections):
+            central_values = section.get("CTYPE_FTYPE_FROM_TO", [])
+            if len(central_values) != 1:
+                raise ValueError(
+                    f"[SNC] index={section_index}: "
+                    "CTYPE_FTYPE_FROM_TO は 1 行必要です。"
+                )
+
+            central_tokens = central_values[0].split()
+            if len(central_tokens) != 4:
+                raise ValueError(
+                    f"[SNC] index={section_index}: "
+                    "CTYPE_FTYPE_FROM_TO は 4 値必要です。"
+                )
+
+            second_values = section.get("STYPE_FROM_TO", [])
+            if not second_values:
+                raise ValueError(
+                    f"[SNC] index={section_index}: "
+                    "STYPE_FROM_TO は 1 行以上必要です。"
+                )
+
+            second_neighbors: List[Dict[str, Any]] = []
+            for second_value in second_values:
+                second_tokens = second_value.split()
+                if len(second_tokens) != 3:
+                    raise ValueError(
+                        f"[SNC] index={section_index}: "
+                        "STYPE_FROM_TO は 3 値必要です。"
+                    )
+                second_neighbors.append(
+                    {
+                        "atom_type": int(second_tokens[0]),
+                        "minimum": float(second_tokens[1]),
+                        "maximum": float(second_tokens[2]),
+                    }
+                )
+
+            sigma_key = ""
+            sigma_mode = ""
+            candidate_keys = [
+                ("COORDNUM_FRACT_SIGMA", "normal"),
+                ("COORDNUM_FRACT_SIGMA-MASTER", "master"),
+                ("COORDNUM_FRACT_SIGMA-SCALABLE", "scalable"),
+            ]
+            for candidate_key, candidate_mode in candidate_keys:
+                values = section.get(candidate_key, [])
+                if values:
+                    if sigma_key:
+                        raise ValueError(
+                            f"[SNC] index={section_index}: "
+                            "sigma 指定は 1 種類だけ使用してください。"
+                        )
+                    sigma_key = candidate_key
+                    sigma_mode = candidate_mode
+
+            if not sigma_key:
+                raise ValueError(
+                    f"[SNC] index={section_index}: "
+                    "COORDNUM_FRACT_SIGMA 系キーワードが必要です。"
+                )
+
+            sigma_values = section[sigma_key]
+            if len(sigma_values) != 1:
+                raise ValueError(
+                    f"[SNC] index={section_index}: "
+                    f"{sigma_key} は 1 行必要です。"
+                )
+
+            sigma_tokens = sigma_values[0].split()
+            if len(sigma_tokens) != 3:
+                raise ValueError(
+                    f"[SNC] index={section_index}: "
+                    f"{sigma_key} は 3 値必要です。"
+                )
+
+            constraint = {
+                "central_type": int(central_tokens[0]),
+                "first_neighbor_type": int(central_tokens[1]),
+                "first_neighbor_range": (
+                    float(central_tokens[2]),
+                    float(central_tokens[3]),
+                ),
+                "second_neighbors": second_neighbors,
+                "coordination_number": int(sigma_tokens[0]),
+                "fraction": float(sigma_tokens[1]),
+                "sigma": float(sigma_tokens[2]),
+                "sigma_mode": sigma_mode,
+            }
+            constraints.append(constraint)
+
+        return constraints
+
+    def add_qn_constraint(
+        self,
+        central_type: int,
+        first_neighbor_type: int,
+        first_neighbor_minimum: Union[int, float],
+        first_neighbor_maximum: Union[int, float],
+        second_neighbors: Sequence[
+            Tuple[int, Union[int, float], Union[int, float]]
+        ],
+        coordination_number: int,
+        fraction: Union[int, float],
+        sigma: Union[int, float],
+        *,
+        sigma_mode: str = "normal",
+        auto_write: Optional[bool] = None,
+    ) -> int:
+        """Qn 第二近接制約を新しい ``[ SNC ]`` セクションとして追加する。
+
+        Args:
+            central_type: 中心原子の RMC タイプ番号。
+            first_neighbor_type: 第一近接原子の RMC タイプ番号。
+            first_neighbor_minimum: 中心-第一近接距離の下限 [Å]。
+            first_neighbor_maximum: 中心-第一近接距離の上限 [Å]。
+            second_neighbors: 第二近接原子ごとの
+                ``(atom_type, minimum, maximum)``。距離は第一近接原子から
+                第二近接原子までの範囲 [Å]。
+            coordination_number: 目標 Qn の n。
+            fraction: 制約を満たす中心原子の目標割合。0 以上 1 以下。
+            sigma: 制約の重みパラメータ。
+            sigma_mode: ``normal``、``master``、``scalable`` のいずれか。
+            auto_write: 更新後に ``*.dat`` を保存するかどうか。
+
+        Returns:
+            追加した ``[ SNC ]`` セクションの 0 始まりインデックス。
+
+        Raises:
+            ValueError: 原子タイプ、距離範囲、割合、sigma、または第二近接指定が
+                不正な場合。
+
+        Notes:
+            出力する必須キーワードは次の3種類である。
+
+            - ``CTYPE_FTYPE_FROM_TO``
+            - 1 行以上の ``STYPE_FROM_TO``
+            - ``COORDNUM_FRACT_SIGMA`` 系のいずれか1つ
+        """
+        central_value = self._validate_positive_atom_type(
+            central_type,
+            "central_type",
+        )
+        first_value = self._validate_positive_atom_type(
+            first_neighbor_type,
+            "first_neighbor_type",
+        )
+        first_minimum, first_maximum = self._validate_distance_range(
+            first_neighbor_minimum,
+            first_neighbor_maximum,
+            "first_neighbor_range",
+        )
+
+        if not second_neighbors:
+            raise ValueError("second_neighbors は 1 件以上必要です。")
+
+        coordination_value = int(coordination_number)
+        if coordination_value < 0:
+            raise ValueError("coordination_number は 0 以上で指定してください。")
+
+        fraction_value = float(fraction)
+        if fraction_value < 0.0 or fraction_value > 1.0:
+            raise ValueError("fraction は 0 以上 1 以下で指定してください。")
+
+        sigma_value = float(sigma)
+        if sigma_value <= 0.0:
+            raise ValueError("sigma は 0 より大きい値を指定してください。")
+
+        section_index = self.add_section("SNC")
+        section = self._find_sections("SNC")[section_index]
+
+        section["CTYPE_FTYPE_FROM_TO"] = [
+            self._fmt_sequence(
+                [
+                    central_value,
+                    first_value,
+                    first_minimum,
+                    first_maximum,
+                ]
+            )
+        ]
+
+        section["STYPE_FROM_TO"] = []
+        for atom_type, minimum, maximum in second_neighbors:
+            second_type = self._validate_positive_atom_type(
+                atom_type,
+                "second_neighbor atom_type",
+            )
+            second_minimum, second_maximum = self._validate_distance_range(
+                minimum,
+                maximum,
+                "second_neighbor_range",
+            )
+            section["STYPE_FROM_TO"].append(
+                self._fmt_sequence(
+                    [
+                        second_type,
+                        second_minimum,
+                        second_maximum,
+                    ]
+                )
+            )
+
+        sigma_key = self._sigma_keyword(
+            "COORDNUM_FRACT_SIGMA",
+            sigma_mode,
+        )
+        section[sigma_key] = [
+            self._fmt_sequence(
+                [
+                    coordination_value,
+                    fraction_value,
+                    sigma_value,
+                ]
+            )
+        ]
+
+        self._logger.info(
+            "[rmc_pot_dat_free] add_qn_constraint: "
+            f"index={section_index}, Q{coordination_value}"
+        )
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+        return section_index
+
+    def set_qn_constraint(
+        self,
+        index: int,
+        central_type: int,
+        first_neighbor_type: int,
+        first_neighbor_minimum: Union[int, float],
+        first_neighbor_maximum: Union[int, float],
+        second_neighbors: Sequence[
+            Tuple[int, Union[int, float], Union[int, float]]
+        ],
+        coordination_number: int,
+        fraction: Union[int, float],
+        sigma: Union[int, float],
+        *,
+        sigma_mode: str = "normal",
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """既存の Qn 第二近接制約を置き換える。
+
+        Args:
+            index: 置換対象の ``[ SNC ]`` セクション番号。
+            central_type: 中心原子の RMC タイプ番号。
+            first_neighbor_type: 第一近接原子の RMC タイプ番号。
+            first_neighbor_minimum: 中心-第一近接距離の下限 [Å]。
+            first_neighbor_maximum: 中心-第一近接距離の上限 [Å]。
+            second_neighbors: 第二近接タイプと距離範囲。
+            coordination_number: 目標 Qn の n。
+            fraction: 制約を満たす中心原子の目標割合。
+            sigma: 制約の重みパラメータ。
+            sigma_mode: sigma 指定方式。
+            auto_write: 更新後に保存するかどうか。
+
+        Raises:
+            IndexError: 指定した ``[ SNC ]`` セクションが存在しない場合。
+        """
+        sections = self._find_sections("SNC")
+        if index < 0 or index >= len(sections):
+            raise IndexError(f"SNC セクション index={index} は存在しません。")
+
+        self.remove_section("SNC", index)
+        new_index = self.add_qn_constraint(
+            central_type=central_type,
+            first_neighbor_type=first_neighbor_type,
+            first_neighbor_minimum=first_neighbor_minimum,
+            first_neighbor_maximum=first_neighbor_maximum,
+            second_neighbors=second_neighbors,
+            coordination_number=coordination_number,
+            fraction=fraction,
+            sigma=sigma,
+            sigma_mode=sigma_mode,
+            auto_write=False,
+        )
+
+        if new_index != index:
+            moved_section = self._find_sections("SNC")[new_index]
+            section_position = -1
+            count = -1
+            for position, (name, values) in enumerate(self._sections):
+                if name == "SNC":
+                    count += 1
+                    if values is moved_section:
+                        section_position = position
+                        break
+
+            if section_position >= 0:
+                name, values = self._sections.pop(section_position)
+                target_position = len(self._sections)
+                count = -1
+                for position, (current_name, _) in enumerate(self._sections):
+                    if current_name == "SNC":
+                        count += 1
+                        if count == index:
+                            target_position = position
+                            break
+                self._sections.insert(target_position, (name, values))
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def remove_qn_constraint(
+        self,
+        index: int,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """指定した Qn 第二近接制約を削除する。
+
+        Args:
+            index: 削除対象の ``[ SNC ]`` セクション番号。
+            auto_write: 更新後に保存するかどうか。
+        """
+        self.remove_section("SNC", index)
+        self._logger.info(
+            f"[rmc_pot_dat_free] remove_qn_constraint: index={index}"
+        )
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def clear_qn_constraints(
+        self,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """すべての Qn 第二近接制約を削除する。
+
+        Args:
+            auto_write: 更新後に保存するかどうか。
+        """
+        retained_sections: List[Tuple[str, Dict[str, List[str]]]] = []
+        for name, values in self._sections:
+            if name != "SNC":
+                retained_sections.append((name, values))
+        self._sections = retained_sections
+
+        self._logger.info("[rmc_pot_dat_free] clear_qn_constraints")
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def _validate_aenet_compatibility(self) -> None:
+        """AENET と明示的に共存不可の自由形式セクションを検査する。
+
+        Raises:
+            ValueError: 非結合・結合ポテンシャル、局所不変性、非周期境界条件、
+                または flexible molecule 設定が既に存在する場合。
+
+        Notes:
+            ANN は他の potential と併用できず、local invariance および
+            non-periodic boundary conditions とも併用できない。
+            coordination constraint、cosine constraint は削除しない。
+            SNC についてマニュアルに明示的な併用禁止記述がないため、
+            このメソッドでは自動的に拒否しない。
+        """
+        incompatible_sections = [
+            "NBPOT",
+            "BPOT",
+            "LOCINV",
+            "NOPER",
+        ]
+        for section_name in incompatible_sections:
+            if self._find_sections(section_name):
+                raise ValueError(
+                    "AENET と共存できないセクションがあります: "
+                    f"[{section_name}]"
+                )
+
+        fnc_type = self._first_value("GENERAL", "FNC-TYPE", "NONE")
+        fnc_tokens = fnc_type.split()
+        if fnc_tokens:
+            if fnc_tokens[0].upper() == "FLEXIBLE":
+                raise ValueError(
+                    "AENET は FNC-TYPE=FLEXIBLE と併用できません。"
+                )
+
+    def get_aenet_settings(self) -> Optional[Dict[str, Any]]:
+        """自由形式 ``[ AENET ]`` の ANN ポテンシャル設定を取得する。
+
+        Returns:
+            ``[ AENET ]`` が存在しない場合は ``None``。存在する場合は、
+            potential ファイル、cutoff、原子別エネルギー出力、計算間隔、
+            sigma 指定を格納した辞書。
+
+        Raises:
+            ValueError: 必須 ``IND_ANN-FILE_TYPE-NAME`` または sigma 指定が
+                欠落している場合。
+        """
+        sections = self._find_sections("AENET")
+        if not sections:
+            return None
+        if len(sections) > 1:
+            raise ValueError("[AENET] セクションは 1 つだけ指定できます。")
+
+        section = sections[0]
+        potential_values = section.get("IND_ANN-FILE_TYPE-NAME", [])
+        if not potential_values:
+            raise ValueError(
+                "[AENET] IND_ANN-FILE_TYPE-NAME は 1 行以上必要です。"
+            )
+
+        potentials: List[Dict[str, Any]] = []
+        for value in potential_values:
+            tokens = value.split()
+            if len(tokens) < 2 or len(tokens) > 3:
+                raise ValueError(
+                    "IND_ANN-FILE_TYPE-NAME は "
+                    "atom_type filename [type_name] の形式です。"
+                )
+
+            item: Dict[str, Any] = {
+                "atom_type": int(tokens[0]),
+                "filename": tokens[1],
+                "type_name": None,
+            }
+            if len(tokens) == 3:
+                item["type_name"] = tokens[2]
+            potentials.append(item)
+
+        sigma_key = ""
+        sigma_mode = ""
+        candidate_keys = [
+            ("SIGMA", "normal"),
+            ("SIGMA-MASTER", "master"),
+            ("SIGMA-SCALABLE", "scalable"),
+        ]
+        for candidate_key, candidate_mode in candidate_keys:
+            values = section.get(candidate_key, [])
+            if values:
+                if sigma_key:
+                    raise ValueError(
+                        "[AENET] sigma 指定は 1 種類だけ使用してください。"
+                    )
+                sigma_key = candidate_key
+                sigma_mode = candidate_mode
+
+        if not sigma_key:
+            raise ValueError(
+                "[AENET] SIGMA、SIGMA-MASTER、SIGMA-SCALABLE "
+                "のいずれかが必要です。"
+            )
+
+        settings: Dict[str, Any] = {
+            "potentials": potentials,
+            "cutoff": None,
+            "write_atomic_energy": False,
+            "aenet_step": 5,
+            "sigma": float(section[sigma_key][0].split()[0]),
+            "sigma_mode": sigma_mode,
+        }
+
+        cutoff_values = section.get("CUTOFF-AENET", [])
+        if cutoff_values:
+            settings["cutoff"] = float(cutoff_values[0].split()[0])
+
+        write_values = section.get("WRITE-ATOMIC-ENERGY", [])
+        if write_values:
+            write_token = self._bool_int(write_values[0])
+            if write_token == "1":
+                settings["write_atomic_energy"] = True
+
+        step_values = section.get("AENET-STEP", [])
+        if step_values:
+            settings["aenet_step"] = int(float(step_values[0].split()[0]))
+
+        return settings
+
+    def set_aenet_potential(
+        self,
+        potentials: Sequence[Tuple[int, str, Optional[str]]],
+        sigma: Union[int, float],
+        *,
+        sigma_mode: str = "normal",
+        cutoff: Optional[Union[int, float]] = None,
+        write_atomic_energy: bool = False,
+        aenet_step: int = 5,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """AENET の ANN ポテンシャル設定を作成または置換する。
+
+        Args:
+            potentials: 原子タイプごとの
+                ``(atom_type, filename, type_name)``。
+                ``type_name`` を省略する場合は ``None`` を指定する。
+            sigma: ANN potential の chi-square 寄与を重み付けする sigma。
+            sigma_mode: ``normal``、``master``、``scalable`` のいずれか。
+            cutoff: ANN potential の cutoff [Å]。``None`` の場合は
+                potential ファイルに格納された値を使用する。
+            write_atomic_energy: 個々の原子エネルギーを ``*.en`` へ出力するか。
+            aenet_step: ANN potential を再計算するシミュレーション間隔。
+                マニュアル記載の既定値は 5。
+            auto_write: 更新後に保存するかどうか。
+
+        Raises:
+            ValueError: potential 指定が空、値が不正、または AENET と共存不可の
+                セクションが存在する場合。
+
+        Notes:
+            ``IND_ANN-FILE_TYPE-NAME`` は原子タイプごとに複数行出力する。
+            ``type_name`` を ``None`` にした場合、RMC_POT は
+            ``[ GENERAL ]`` の ``CHEMICAL-SYMBOLS`` から元素記号を抽出する。
+        """
+        self._validate_aenet_compatibility()
+
+        if not potentials:
+            raise ValueError("potentials は 1 件以上必要です。")
+
+        sigma_value = float(sigma)
+        if sigma_value <= 0.0:
+            raise ValueError("sigma は 0 より大きい値を指定してください。")
+
+        step_value = int(aenet_step)
+        if step_value < 1:
+            raise ValueError("aenet_step は 1 以上で指定してください。")
+
+        cutoff_value: Optional[float] = None
+        if cutoff is not None:
+            cutoff_value = float(cutoff)
+            if cutoff_value <= 0.0:
+                raise ValueError("cutoff は 0 より大きい値を指定してください。")
+
+        retained_sections: List[Tuple[str, Dict[str, List[str]]]] = []
+        for name, values in self._sections:
+            if name != "AENET":
+                retained_sections.append((name, values))
+        self._sections = retained_sections
+
+        section: Dict[str, List[str]] = {}
+        section["IND_ANN-FILE_TYPE-NAME"] = []
+
+        seen_types = set()
+        for atom_type, filename, type_name in potentials:
+            atom_type_value = self._validate_positive_atom_type(
+                atom_type,
+                "AENET atom_type",
+            )
+            if atom_type_value in seen_types:
+                raise ValueError(
+                    "AENET の atom_type は重複指定できません: "
+                    f"{atom_type_value}"
+                )
+            seen_types.add(atom_type_value)
+
+            filename_value = str(filename).strip()
+            if not filename_value:
+                raise ValueError("AENET potential filename は空にできません。")
+
+            tokens = [
+                str(atom_type_value),
+                filename_value,
+            ]
+            if type_name is not None:
+                type_name_value = str(type_name).strip()
+                if not type_name_value:
+                    raise ValueError(
+                        "type_name は文字列または None で指定してください。"
+                    )
+                tokens.append(type_name_value)
+
+            section["IND_ANN-FILE_TYPE-NAME"].append(" ".join(tokens))
+
+        if cutoff_value is not None:
+            section["CUTOFF-AENET"] = [
+                self._fmt_number(cutoff_value)
+            ]
+
+        if write_atomic_energy:
+            section["WRITE-ATOMIC-ENERGY"] = ["1"]
+        else:
+            section["WRITE-ATOMIC-ENERGY"] = ["0"]
+
+        section["AENET-STEP"] = [str(step_value)]
+
+        sigma_key = self._sigma_keyword("SIGMA", sigma_mode)
+        section[sigma_key] = [self._fmt_number(sigma_value)]
+
+        self._sections.append(("AENET", section))
+        self._logger.info(
+            "[rmc_pot_dat_free] set_aenet_potential: "
+            f"potential_count={len(potentials)}"
+        )
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def add_aenet_potential_file(
+        self,
+        atom_type: int,
+        filename: str,
+        type_name: Optional[str] = None,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """既存の ``[ AENET ]`` へ原子タイプ別 potential ファイルを追加する。
+
+        Args:
+            atom_type: 1 始まりの RMC 原子タイプ番号。
+            filename: AENET で学習済みの ANN potential ファイル名。
+            type_name: AENET へ渡す原子タイプ名または元素記号。
+                ``None`` の場合は ``CHEMICAL-SYMBOLS`` から抽出させる。
+            auto_write: 更新後に保存するかどうか。
+
+        Raises:
+            ValueError: ``[ AENET ]`` が未設定、原子タイプが重複、
+                または値が不正な場合。
+        """
+        settings = self.get_aenet_settings()
+        if settings is None:
+            raise ValueError(
+                "AENET が未設定です。先に set_aenet_potential() を実行してください。"
+            )
+
+        atom_type_value = self._validate_positive_atom_type(
+            atom_type,
+            "AENET atom_type",
+        )
+
+        for item in settings["potentials"]:
+            if item["atom_type"] == atom_type_value:
+                raise ValueError(
+                    "AENET の atom_type は重複指定できません: "
+                    f"{atom_type_value}"
+                )
+
+        section = self._find_sections("AENET")[0]
+        filename_value = str(filename).strip()
+        if not filename_value:
+            raise ValueError("AENET potential filename は空にできません。")
+
+        tokens = [
+            str(atom_type_value),
+            filename_value,
+        ]
+        if type_name is not None:
+            type_name_value = str(type_name).strip()
+            if not type_name_value:
+                raise ValueError(
+                    "type_name は文字列または None で指定してください。"
+                )
+            tokens.append(type_name_value)
+
+        section["IND_ANN-FILE_TYPE-NAME"].append(" ".join(tokens))
+        self._logger.info(
+            "[rmc_pot_dat_free] add_aenet_potential_file: "
+            f"atom_type={atom_type_value}"
+        )
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def remove_aenet_potential_file(
+        self,
+        atom_type: int,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """指定原子タイプの AENET potential ファイル設定を削除する。
+
+        Args:
+            atom_type: 削除する RMC 原子タイプ番号。
+            auto_write: 更新後に保存するかどうか。
+
+        Raises:
+            ValueError: ``[ AENET ]`` が未設定、対象原子タイプが存在しない、
+                または削除により必須設定が空になる場合。
+        """
+        sections = self._find_sections("AENET")
+        if not sections:
+            raise ValueError("AENET は設定されていません。")
+
+        section = sections[0]
+        values = section.get("IND_ANN-FILE_TYPE-NAME", [])
+        atom_type_value = int(atom_type)
+
+        retained_values: List[str] = []
+        removed = False
+        for value in values:
+            tokens = value.split()
+            if tokens:
+                current_type = int(tokens[0])
+                if current_type == atom_type_value:
+                    removed = True
+                    continue
+            retained_values.append(value)
+
+        if not removed:
+            raise ValueError(
+                "指定した AENET atom_type は存在しません: "
+                f"{atom_type_value}"
+            )
+        if not retained_values:
+            raise ValueError(
+                "最後の AENET potential は削除できません。"
+                "AENET 全体を削除する場合は clear_aenet_potential() を使用してください。"
+            )
+
+        section["IND_ANN-FILE_TYPE-NAME"] = retained_values
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def clear_aenet_potential(
+        self,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """``[ AENET ]`` セクションと ANN potential 設定を削除する。
+
+        Args:
+            auto_write: 更新後に保存するかどうか。
+        """
+        retained_sections: List[Tuple[str, Dict[str, List[str]]]] = []
+        for name, values in self._sections:
+            if name != "AENET":
+                retained_sections.append((name, values))
+        self._sections = retained_sections
+
+        self._logger.info("[rmc_pot_dat_free] clear_aenet_potential")
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+
+RmcPotDat = RmcPotDatFree
