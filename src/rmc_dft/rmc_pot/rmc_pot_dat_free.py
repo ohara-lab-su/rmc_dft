@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""RMC_POT 自由形式 *.dat 用クラス。
+"""RMC_POT 自由形式 ``*.dat`` の読み書き機能。
 
-既存の固定形式 RmcPotDat と同じ公開 I/F を維持し、内部では自由形式 #003 を扱う。
+固定形式版 ``RmcPotDat`` と同じ公開 I/F を維持しながら、内部では
+``#002`` または ``#003`` の自由形式セクションとキーを扱う。
+物理的な行番号ではなく、互換項目番号を自由形式キーへ対応付ける。
 """
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
@@ -11,7 +13,17 @@ from x_logger import XLogger
 
 
 class RmcPotDatFree:
-    """既存の固定形式 RmcPotDat と同じ公開 I/F で自由形式 *.dat を読み書きする。"""
+    """固定形式版と同じ公開 I/F で自由形式 ``*.dat`` を扱う。
+
+    Attributes:
+        直接公開する属性はない。設定値は既存の getter/setter または
+        自由形式固有の ``get()``, ``set()``, ``add()`` を通して操作する。
+
+    Notes:
+        固定形式版のメソッド名、引数、戻り値との互換性を維持する。
+        一方、ファイル上の実体は ``[ SECTION ]`` と ``KEY = VALUE`` であり、
+        固定形式の物理行へは依存しない。
+    """
 
     _FNC_TO_FREE = {
         0: "NONE",
@@ -31,6 +43,22 @@ class RmcPotDatFree:
         auto_write: bool = True,
         version: str = "#003",
     ) -> None:
+        """自由形式 RMC_POT 入力ファイル編集クラスを初期化する。
+
+        Args:
+            config: RMC_DFT 全体設定。省略時は新しい ``Config`` を使用する。
+            logger: ログ出力に使用する ``XLogger``。省略時は新規作成する。
+            cfg_name: 読み書きする ``*.dat`` の拡張子を除いた名前。
+                省略時は ``config.cfg_name`` を使用する。
+            auto_write: setter 実行後に自動保存する既定動作。
+            version: 自由形式ファイル先頭へ書く形式識別子。
+                ``#002`` または ``#003`` を想定する。
+
+        Notes:
+            固定形式版 ``RmcPotDat`` と同じ公開 I/F を維持するため、
+            行番号ベースの操作は自由形式のセクション名とキーへ内部変換する。
+            既存ファイルがなければ自由形式の初期ファイルを生成して読み込む。
+        """
         self._logger = logger or XLogger()
         self._config = config or Config()
         self._cfg_name = cfg_name or self._config.cfg_name
@@ -98,6 +126,19 @@ class RmcPotDatFree:
             self.write()
 
     def create_dat_file(self, basename: str) -> bool:
+        """自由形式の初期 ``*.dat`` ファイルを作成する。
+
+        Args:
+            basename: 出力ファイル名から ``.dat`` を除いた部分。
+
+        Returns:
+            新規作成した場合は ``True``。同名ファイルが既に存在する場合は
+            上書きせず ``False`` を返す。
+
+        Notes:
+            初期値は ``[ GENERAL ]`` セクションへ自由形式のキーとして設定する。
+            固定形式テンプレートの物理的な行配置には依存しない。
+        """
         path = Path(f"{basename}.dat")
         if path.exists():
             self._logger.error(f'[rmc_pot_dat_free] "{path}" はすでに存在します')
@@ -125,8 +166,21 @@ class RmcPotDatFree:
 
     @staticmethod
     def _to_bool_token(v: Union[bool, str]) -> str:
+        """真偽入力を固定形式互換の論理トークンへ変換する。
+
+        Args:
+            v: ``bool`` または真偽を表す文字列。
+
+        Returns:
+            ``".true."`` または ``".false."``。
+
+        Raises:
+            ValueError: 入力を真偽値として解釈できない場合。
+        """
         if isinstance(v, bool):
-            return ".true." if v else ".false."
+            if v:
+                return ".true."
+            return ".false."
         value = str(v).strip().lower()
         if value in {".true.", "true", "t", "1", "yes", "y"}:
             return ".true."
@@ -136,15 +190,49 @@ class RmcPotDatFree:
 
     @staticmethod
     def _fmt_number(x: Union[int, float]) -> str:
+        """数値を RMC_POT 入力用の文字列へ整形する。
+
+        Args:
+            x: 整形する整数または浮動小数点数。
+
+        Returns:
+            不要な末尾ゼロを抑えた数値文字列。
+
+        Notes:
+            整数値として表現できる浮動小数点数は整数表記へ変換する。
+            それ以外は有効桁数を保ちながら過度な指数表記を避ける。
+        """
         if isinstance(x, int) or (isinstance(x, float) and x.is_integer()):
             return str(int(x))
         return f"{float(x):.12g}"
 
     @classmethod
     def _fmt_sequence(cls, seq: Sequence[Union[int, float]]) -> str:
+        """数値列を RMC_POT 入力用の空白区切り文字列へ整形する。
+
+        Args:
+            seq: 整形する数値列。
+
+        Returns:
+            各要素を ``_fmt_number()`` で整形した空白区切り文字列。
+        """
         return " ".join(cls._fmt_number(value) for value in seq)
 
     def load(self) -> bool:
+        """現在の ``cfg_name`` に対応する自由形式ファイルを読み込む。
+
+        Returns:
+            ファイルを読み込めた場合は ``True``。対象ファイルが存在しない場合は
+            ``False`` を返す。
+
+        Raises:
+            ValueError: ファイルが空、形式識別子が不正、またはセクション外に
+                キー値が記述されている場合。
+
+        Notes:
+            ``[ SECTION ]`` と ``KEY = VALUE`` を解析し、同一キーの複数出現を
+            値リストとして保持する。継続行は直前のキー値へ連結する。
+        """
         path = Path(f"{self._cfg_name}.dat")
         if not path.exists():
             self._logger.info(f"[rmc_pot_dat_free] .dat ファイルが見つかりません: {path}")
@@ -187,10 +275,32 @@ class RmcPotDatFree:
         return True
 
     def write(self, out_name: Optional[str] = None) -> None:
-        base = self._cfg_name if out_name is None else out_name
+        """保持している自由形式データを ``*.dat`` へ書き出す。
+
+        Args:
+            out_name: 出力ファイル名から ``.dat`` を除いた部分。
+                省略時は現在の ``cfg_name`` を使用する。
+
+        Notes:
+            セクションの並び、キーの並び、同一キーの値順を内部表現の順序どおり
+            出力する。
+        """
+        if out_name is None:
+            base = self._cfg_name
+        else:
+            base = out_name
         self._write_path(Path(f"{base}.dat"))
 
     def _write_path(self, path: Path) -> None:
+        """指定パスへ自由形式データを書き出す。
+
+        Args:
+            path: 出力先の ``Path``。
+
+        Notes:
+            先頭に形式識別子を出力し、その後へ各セクションと
+            ``KEY = VALUE`` を順番に出力する。
+        """
         output = [self._version, ""]
         for name, values in self._sections:
             output.append(f"[ {name} ]")
@@ -202,6 +312,18 @@ class RmcPotDatFree:
         self._logger.info(f"[rmc_pot_dat_free] == write({path})")
 
     def get_line(self, line_no_1based: int) -> str:
+        """固定形式互換の項目番号から値を取得する。
+
+        Args:
+            line_no_1based: 固定形式版 I/F で使用する 1 始まりの項目番号。
+
+        Returns:
+            対応する自由形式キーから復元した文字列。
+
+        Notes:
+            実ファイルの物理行を参照するメソッドではない。
+            互換項目番号を自由形式セクションへ変換する仮想 I/F である。
+        """
         return self._virtual_line(line_no_1based)
 
     def set_line(
@@ -211,22 +333,65 @@ class RmcPotDatFree:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """固定形式互換の項目番号を使って自由形式の値を更新する。
+
+        Args:
+            line_no_1based: 固定形式版 I/F で使用する 1 始まりの項目番号。
+            value: 設定する文字列、数値、真偽値、または数値列。
+            auto_write: ``True`` なら更新直後に保存する。``None`` の場合は
+                インスタンスの既定値を使用する。
+
+        Notes:
+            実ファイルの物理行を書き換えるのではなく、項目番号に対応する
+            自由形式のセクションとキーを更新する。
+        """
         text = self._coerce_value(value)
         self._apply_virtual_line(line_no_1based, text)
-        do_write = self._auto_write if auto_write is None else auto_write
+        if auto_write is None:
+            do_write = self._auto_write
+        else:
+            do_write = auto_write
         if do_write:
             self.write()
 
     def _index(self, line_no_1based: int) -> int:
+        """固定形式互換の項目番号を検証して 0 始まりへ変換する。
+
+        Args:
+            line_no_1based: 1 から 33 までの互換項目番号。
+
+        Returns:
+            0 始まりへ変換した番号。
+
+        Raises:
+            IndexError: 指定番号が互換範囲外の場合。
+        """
         if line_no_1based < 1 or line_no_1based > 33:
             raise IndexError(f"行番号が範囲外です: {line_no_1based} (全 33 行相当)")
         return line_no_1based - 1
 
     def _find_sections(self, name: str) -> List[Dict[str, List[str]]]:
+        """指定名と一致する全セクションを取得する。
+
+        Args:
+            name: 大文字小文字を区別しないセクション名。
+
+        Returns:
+            出現順を維持したセクション辞書のリスト。
+        """
         upper = name.upper()
         return [values for section_name, values in self._sections if section_name == upper]
 
     def _first_section(self, name: str, create: bool = False) -> Dict[str, List[str]]:
+        """指定名の最初のセクションを取得する。
+
+        Args:
+            name: 対象セクション名。
+            create: 存在しない場合に新規セクションを作成するかどうか。
+
+        Returns:
+            最初のセクション辞書。未存在かつ ``create=False`` の場合は空辞書。
+        """
         found = self._find_sections(name)
         if found:
             return found[0]
@@ -237,14 +402,45 @@ class RmcPotDatFree:
         return values
 
     def _first_value(self, section: str, key: str, default: str = "") -> str:
+        """指定セクション・キーの最初の値を取得する。
+
+        Args:
+            section: セクション名。
+            key: キー名。
+            default: 値が存在しない場合に返す文字列。
+
+        Returns:
+            最初に登録された値、または ``default``。
+        """
         values = self._first_section(section).get(key.upper(), [])
-        return values[0] if values else default
+        if values:
+            return values[0]
+        return default
 
     def _set_value(self, section: str, key: str, value: Any) -> None:
+        """指定セクションのキーを単一値で設定する。
+
+        Args:
+            section: セクション名。
+            key: キー名。
+            value: 保存する値。
+
+        Notes:
+            対象セクションが存在しない場合は作成し、同一キーの既存値は
+            単一要素の値リストで置き換える。
+        """
         target = self._first_section(section, create=True)
         target[key.upper()] = [str(value)]
 
     def _first_exp(self, create: bool = False) -> Dict[str, List[str]]:
+        """最初の ``[ EXP ]`` セクションを取得する。
+
+        Args:
+            create: 存在しない場合に新規作成するかどうか。
+
+        Returns:
+            最初の実験データセクション。未存在かつ ``create=False`` の場合は空辞書。
+        """
         sections = self._find_sections("EXP")
         if sections:
             return sections[0]
@@ -255,6 +451,11 @@ class RmcPotDatFree:
         return values
 
     def _exp_type_counts(self) -> Tuple[int, int, int, int]:
+        """実験データ種別ごとの ``[ EXP ]`` セクション数を数える。
+
+        Returns:
+            ``(GR, ND, XRD, EXAFS)`` の順に格納した件数。
+        """
         counts = {"GR": 0, "ND": 0, "XRD": 0, "EXAFS": 0}
         for exp in self._find_sections("EXP"):
             exp_type = exp.get("TYPE", [""])[0].upper()
@@ -263,9 +464,66 @@ class RmcPotDatFree:
         return counts["GR"], counts["ND"], counts["XRD"], counts["EXAFS"]
 
     def _virtual_line(self, line_no: int) -> str:
+        """自由形式データから固定形式互換の項目値を構成する。
+
+        Args:
+            line_no: 固定形式版 I/F の 1 始まり項目番号。
+
+        Returns:
+            固定形式版 getter が期待する文字列表現。
+
+        Notes:
+            ``[ GENERAL ]``、最初の ``[ EXP ]``、制約セクション数、
+            potential セクションの有無を対応する互換値へ変換する。
+        """
         self._index(line_no)
         general = self._first_section("GENERAL")
         exp = self._first_exp()
+
+        # 固定形式互換 I/F の 11～18 番項目は、最初の [ EXP ] セクションへ対応付ける。
+        # [ EXP ] が存在しない場合は、固定形式版と同じ型で既定値を返す。
+        if exp:
+            exp_datafile = exp.get("DATAFILE", [""])[0]
+            exp_point_range = exp.get("POINT-RANGE", [""])[0]
+            exp_scale = exp.get("SCALE", ["1"])[0]
+            exp_sigma = exp.get("SIGMA", ["1"])[0]
+            exp_use_rfactor = self._bool_line(
+                exp.get("USE-RFACTOR", ["0"])[0]
+            )
+            exp_renorm = self._bool_line(
+                exp.get("RENORM", ["0"])[0]
+            )
+            exp_read_coeffs = self._bool_line(
+                exp.get("READ-COEFFS", ["0"])[0]
+            )
+            exp_compton_supr_coeff = self._bool_line(
+                exp.get("COMPTON-SUPR-COEFF", ["0"])[0]
+            )
+        else:
+            exp_datafile = ""
+            exp_point_range = ""
+            exp_scale = "1"
+            exp_sigma = "1"
+            exp_use_rfactor = ".false."
+            exp_renorm = ".false."
+            exp_read_coeffs = ".false."
+            exp_compton_supr_coeff = ".false."
+
+        # 自由形式では potential の有無をセクションの存在で判断する。
+        # 固定形式互換 I/F では従来どおり "0" または "1" を返す。
+        has_potential = False
+        if self._find_sections("NBPOT"):
+            has_potential = True
+        if self._find_sections("BPOT"):
+            has_potential = True
+        if self._find_sections("AENET"):
+            has_potential = True
+
+        if has_potential:
+            potential_flag = "1"
+        else:
+            potential_flag = "0"
+
         mapping = {
             1: self._first_value("GENERAL", "TITLE", ""),
             2: self._first_value("GENERAL", "NDENS", "0"),
@@ -277,18 +535,18 @@ class RmcPotDatFree:
             8: self._first_value("GENERAL", "PRINT-STEP", "10000"),
             9: f'{self._first_value("GENERAL", "RUN-TIME", "300")} {self._first_value("GENERAL", "SAVE-TIME", "2")}',
             10: " ".join(str(value) for value in self._exp_type_counts()),
-            11: exp.get("DATAFILE", [""])[0] if exp else "",
-            12: exp.get("POINT-RANGE", [""])[0] if exp else "",
-            13: exp.get("SCALE", ["1"])[0] if exp else "1",
-            14: exp.get("SIGMA", ["1"])[0] if exp else "1",
-            15: self._bool_line(exp.get("USE-RFACTOR", ["0"])[0]) if exp else ".false.",
-            16: self._bool_line(exp.get("RENORM", ["0"])[0]) if exp else ".false.",
-            17: self._bool_line(exp.get("READ-COEFFS", ["0"])[0]) if exp else ".false.",
-            18: self._bool_line(exp.get("COMPTON-SUPR-COEFF", ["0"])[0]) if exp else ".false.",
+            11: exp_datafile,
+            12: exp_point_range,
+            13: exp_scale,
+            14: exp_sigma,
+            15: exp_use_rfactor,
+            16: exp_renorm,
+            17: exp_read_coeffs,
+            18: exp_compton_supr_coeff,
             19: str(len(self._find_sections("COS"))),
             20: str(len(self._find_sections("COORD"))),
             21: str(len(self._find_sections("AVCOORD"))),
-            22: "1" if self._find_sections("NBPOT") or self._find_sections("BPOT") or self._find_sections("AENET") else "0",
+            22: potential_flag,
             23: self._fnc_free_to_fixed(self._first_value("GENERAL", "FNC-TYPE", "NONE")),
             24: self._first_value("GENERAL", "BIN-SHIFT", "0"),
             25: self._first_value("GENERAL", "XMAX-FACTOR", "1"),
@@ -300,6 +558,16 @@ class RmcPotDatFree:
         return mapping.get(line_no, self._compat_values.get(line_no, "0"))
 
     def _apply_virtual_line(self, line_no: int, text: str) -> None:
+        """固定形式互換の項目値を自由形式データへ反映する。
+
+        Args:
+            line_no: 固定形式版 I/F の 1 始まり項目番号。
+            text: 自由形式へ反映する文字列。
+
+        Notes:
+            対応する項目はセクションとキーへ変換する。自由形式に直接対応する
+            キーがない互換項目は ``_compat_values`` に保持する。
+        """
         self._index(line_no)
         if line_no == 1:
             self._set_value("GENERAL", "TITLE", text)
@@ -337,7 +605,10 @@ class RmcPotDatFree:
             exp[key] = [text]
         elif line_no == 23:
             tokens = text.split()
-            mode = int(float(tokens[0])) if tokens else 0
+            if tokens:
+                mode = int(float(tokens[0]))
+            else:
+                mode = 0
             free = self._FNC_TO_FREE.get(mode)
             if free is None:
                 raise ValueError(f"未対応の FNC switch です: {mode}")
@@ -359,6 +630,15 @@ class RmcPotDatFree:
             self._compat_values[line_no] = text
 
     def _set_exp_flags(self, flags: Sequence[int]) -> None:
+        """固定形式の実験データフラグを ``[ EXP ]`` 群へ反映する。
+
+        Args:
+            flags: ``GR``, ``ND``, ``XRD``, ``EXAFS`` の有効状態を表す整数列。
+
+        Notes:
+            有効な種別だけを残し、既存の同種セクションは内容を保持する。
+            対象種別が未作成の場合は必要最低限のキーを持つセクションを作成する。
+        """
         types = ["GR", "ND", "XRD", "EXAFS"]
         existing = self._find_sections("EXP")
         preserved = []
@@ -368,7 +648,13 @@ class RmcPotDatFree:
         for flag, exp_type in zip(flags, types):
             if not flag:
                 continue
-            match = next((value for value in existing if value.get("TYPE", [""])[0].upper() == exp_type), None)
+            match = None
+            for value in existing:
+                current_type = value.get("TYPE", [""])[0].upper()
+                if current_type == exp_type:
+                    match = value
+                    break
+
             if match is None:
                 match = {"TYPE": [exp_type], "DATAFILE": [""], "POINT-RANGE": ["1 1"], "SIGMA": ["1"]}
             preserved.append(("EXP", match))
@@ -376,19 +662,64 @@ class RmcPotDatFree:
 
     @staticmethod
     def _bool_int(value: Any) -> str:
+        """真偽入力を自由形式で使用する ``0`` または ``1`` へ変換する。
+
+        Args:
+            value: 真偽値として解釈する値。
+
+        Returns:
+            真と解釈した場合は ``"1"``、それ以外は ``"0"``。
+        """
         token = str(value).strip().lower()
-        return "1" if token in {"1", "true", ".true.", "yes", "y", "t"} else "0"
+        if token in {"1", "true", ".true.", "yes", "y", "t"}:
+            return "1"
+        return "0"
 
     @staticmethod
     def _bool_line(value: Any) -> str:
-        return ".true." if RmcPotDat._bool_int(value) == "1" else ".false."
+        """自由形式の真偽値を固定形式互換トークンへ変換する。
+
+        Args:
+            value: ``0``、``1``、または真偽を表す文字列。
+
+        Returns:
+            ``".true."`` または ``".false."``。
+        """
+        bool_value = RmcPotDatFree._bool_int(value)
+        if bool_value == "1":
+            return ".true."
+        return ".false."
 
     def _fnc_free_to_fixed(self, value: str) -> str:
+        """自由形式の ``FNC-TYPE`` を固定形式互換表現へ変換する。
+
+        Args:
+            value: ``NONE``、``NORMAL``、``ADJUST``、``MOVE-IN``、
+                ``FLEXIBLE`` のいずれかと追加オプション。
+
+        Returns:
+            FNC 番号と追加オプションを空白で連結した文字列。
+        """
         tokens = value.split()
-        mode = self._FREE_TO_FNC.get(tokens[0].upper(), 0) if tokens else 0
+        if tokens:
+            mode = self._FREE_TO_FNC.get(tokens[0].upper(), 0)
+        else:
+            mode = 0
         return " ".join([str(mode)] + tokens[1:])
 
     def set(self, section: str, key: str, value: Any, index: int = 0) -> None:
+        """自由形式の指定キーを単一値で設定する。
+
+        Args:
+            section: セクション名。
+            key: キー名。
+            value: 設定する値。
+            index: 同名セクションが複数ある場合の 0 始まり位置。
+
+        Notes:
+            指定位置までセクションが存在しない場合は必要数を追加する。
+            既存の同一キー値は置き換える。
+        """
         sections = self._find_sections(section)
         while len(sections) <= index:
             values: Dict[str, List[str]] = {}
@@ -397,6 +728,17 @@ class RmcPotDatFree:
         sections[index][key.upper()] = [self._coerce_value(value)]
 
     def add(self, section: str, key: str, value: Any, index: int = 0) -> None:
+        """自由形式の指定キーへ値を追加する。
+
+        Args:
+            section: セクション名。
+            key: キー名。
+            value: 追加する値。
+            index: 同名セクションが複数ある場合の 0 始まり位置。
+
+        Notes:
+            既存値は保持し、同じキーの値リスト末尾へ追加する。
+        """
         sections = self._find_sections(section)
         while len(sections) <= index:
             values: Dict[str, List[str]] = {}
@@ -405,24 +747,64 @@ class RmcPotDatFree:
         sections[index].setdefault(key.upper(), []).append(self._coerce_value(value))
 
     def get(self, section: str, key: str, index: int = 0, default: Optional[str] = None) -> Optional[str]:
+        """自由形式の指定キーから最初の値を取得する。
+
+        Args:
+            section: セクション名。
+            key: キー名。
+            index: 同名セクションが複数ある場合の 0 始まり位置。
+            default: セクションまたはキーが存在しない場合の戻り値。
+
+        Returns:
+            最初の値、または ``default``。
+        """
         sections = self._find_sections(section)
         if index >= len(sections):
             return default
         values = sections[index].get(key.upper(), [])
-        return values[0] if values else default
+        if values:
+            return values[0]
+        return default
 
     def get_all(self, section: str, key: str, index: int = 0) -> List[str]:
+        """自由形式の指定キーに登録された全値を取得する。
+
+        Args:
+            section: セクション名。
+            key: キー名。
+            index: 同名セクションが複数ある場合の 0 始まり位置。
+
+        Returns:
+            登録順を維持した値リスト。対象が存在しない場合は空リスト。
+        """
         sections = self._find_sections(section)
         if index >= len(sections):
             return []
         return list(sections[index].get(key.upper(), []))
 
     def add_section(self, section: str) -> int:
+        """空の自由形式セクションを末尾へ追加する。
+
+        Args:
+            section: 追加するセクション名。
+
+        Returns:
+            追加した同名セクションの 0 始まり位置。
+        """
         values: Dict[str, List[str]] = {}
         self._sections.append((section.upper(), values))
         return len(self._find_sections(section)) - 1
 
     def remove_section(self, section: str, index: int = 0) -> None:
+        """指定位置の自由形式セクションを削除する。
+
+        Args:
+            section: セクション名。
+            index: 同名セクションが複数ある場合の 0 始まり位置。
+
+        Raises:
+            IndexError: 指定したセクション位置が存在しない場合。
+        """
         count = -1
         for position, (name, _) in enumerate(self._sections):
             if name == section.upper():
@@ -433,16 +815,42 @@ class RmcPotDatFree:
         raise IndexError(f"{section} セクション index={index} は存在しません。")
 
     def remove(self, section: str, key: str, index: int = 0) -> None:
+        """指定セクションからキーと全値を削除する。
+
+        Args:
+            section: セクション名。
+            key: 削除するキー名。
+            index: 同名セクションが複数ある場合の 0 始まり位置。
+
+        Notes:
+            対象セクションまたはキーが存在しない場合は何も変更しない。
+        """
         sections = self._find_sections(section)
         if index >= len(sections):
             return
         sections[index].pop(key.upper(), None)
 
     def section_count(self, section: str) -> int:
+        """指定名の自由形式セクション数を返す。
+
+        Args:
+            section: セクション名。
+
+        Returns:
+            同名セクションの件数。
+        """
         return len(self._find_sections(section))
 
 
     def set_cfg_name(self, cfg_name: str) -> None:
+        """読み書き対象の構成名を変更する。
+
+        Args:
+            cfg_name: ``.dat`` を除いた新しい構成名。
+
+        Notes:
+            クラス内部の名前と ``Config.cfg_name`` を同時に更新する。
+        """
         self._cfg_name = cfg_name
         self._config.cfg_name = cfg_name
 
@@ -458,7 +866,9 @@ class RmcPotDatFree:
             ".true." もしくは ".false."
         """
         if isinstance(v, bool):
-            return ".true." if v else ".false."
+            if v:
+                return ".true."
+            return ".false."
         s = str(v).strip().lower()
         if s in (".true.", "true", "t", "1", "yes", "y"):
             return ".true."
@@ -1618,7 +2028,9 @@ class RmcPotDatFree:
         int 入力は RMC_POT の生番号指定として扱い、bool より優先してその番号を使う。
         """
         if isinstance(value, bool):
-            return 1 if value else 0
+            if value:
+                return 1
+            return 0
 
         mode = int(value)
         if mode < 0 or mode > 4:
@@ -1637,7 +2049,12 @@ class RmcPotDatFree:
             if not s:
                 return []
             return s.split()
-        return [str(v).strip() for v in opt if str(v).strip()]
+        options: List[str] = []
+        for value in opt:
+            option = str(value).strip()
+            if option:
+                options.append(option)
+        return options
 
     def set_fnc_switch(
         self,
