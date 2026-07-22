@@ -37,6 +37,7 @@ def run_rmc_init(
     config: Config,
     rmc_dat: Optional[RmcPotDat] = None,
     *,
+    use_free_format: bool = False,
     logger: Optional[Any] = None,
 ) -> bool:
     """
@@ -46,7 +47,11 @@ def run_rmc_init(
         logger = XLogger()
 
     if rmc_dat is None:
-        rmc_dat = RmcPotDat(config=config, logger=logger)
+        rmc_dat = RmcPotDat(
+            config=config,
+            logger=logger,
+            use_free_format=use_free_format,
+        )
 
     ######################################
     # パラメーター調整
@@ -161,6 +166,10 @@ def run_rmc_init(
     #
     # aaa.top を使用する場合:
     # rmc_dat.set_fnc_switch(4)
+
+    # 自由形式フォーマットだと element 情報が必須となる
+    element_info = config.element_info
+    rmc_dat.set_element_info(element_info)
 
     # ------------------------------------------------------------------
     # SiO2 Qn / SNC constraint

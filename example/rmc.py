@@ -194,8 +194,18 @@ if __name__ == "__main__":
     # poscar2cfg(cfg_name=config.cfg_name)#
     # ---------------------------
 
+    use_free_format_ = True
+
     rmc_log_ = RmcPotLog(cfg_name=config_.cfg_name, logger=logger_)
-    rmc_dat_ = RmcPotDat(config=config_, logger=logger_)
+
+    # 実行バイナリが _ADVANCED_GEOM_CONST を有効に置く必要がある
+    # make AGC=0
+    # が必要となる
+    rmc_dat_ = RmcPotDat(
+        config=config_,
+        logger=logger_,
+        use_free_format=use_free_format_,
+    )
 
     # ini パラメーターでをここで作り、config や *.dat を上書きする
     run_rmc_init(

@@ -90,7 +90,16 @@ if __name__ == "__main__":
     stop_mode = "VASP"
 
     # 1. RMC 関連インスタンスは RMC-DFT loop で毎回作った方がハンドリングしやすいのでここでは作らん
-    rmc_dat = RmcPotDat(config=config, logger=logger)
+    use_free_format = True
+
+    # 実行バイナリが _ADVANCED_GEOM_CONST を有効に置く必要がある
+    # make AGC=0
+    # が必要となる
+    rmc_dat = RmcPotDat(
+        config=config,
+        logger=logger,
+        use_free_format=use_free_format,
+    )
 
     # 2. VASP 関係インスタンス
     vasp_log = VaspLog(logger=logger)

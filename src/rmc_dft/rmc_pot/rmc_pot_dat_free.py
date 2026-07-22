@@ -15,6 +15,10 @@ from x_logger import XLogger
 class RmcPotDatFree:
     """固定形式版と同じ公開 I/F で自由形式 ``*.dat`` を扱う。
 
+    # 実行バイナリが _ADVANCED_GEOM_CONST を有効に置く必要がある
+    # make AGC=0
+    # が必要となる
+
     Attributes:
         直接公開する属性はない。設定値は既存の getter/setter または
         自由形式固有の ``get()``, ``set()``, ``add()`` を通して操作する。
@@ -246,7 +250,9 @@ class RmcPotDatFree:
         """
         path = Path(f"{self._cfg_name}.dat")
         if not path.exists():
-            self._logger.info(f"[rmc_pot_dat_free] .dat ファイルが見つかりません: {path}")
+            self._logger.info(
+                f"[rmc_pot_dat_free] .dat ファイルが見つかりません: {path}"
+            )
             return False
         raw_lines = path.read_text(encoding="utf-8").splitlines()
         if not raw_lines:
@@ -394,7 +400,9 @@ class RmcPotDatFree:
             出現順を維持したセクション辞書のリスト。
         """
         upper = name.upper()
-        return [values for section_name, values in self._sections if section_name == upper]
+        return [
+            values for section_name, values in self._sections if section_name == upper
+        ]
 
     def _first_section(self, name: str, create: bool = False) -> Dict[str, List[str]]:
         """指定名の最初のセクションを取得する。
@@ -501,15 +509,9 @@ class RmcPotDatFree:
             exp_point_range = exp.get("POINT-RANGE", [""])[0]
             exp_scale = exp.get("SCALE", ["1"])[0]
             exp_sigma = exp.get("SIGMA", ["1"])[0]
-            exp_use_rfactor = self._bool_line(
-                exp.get("USE-RFACTOR", ["0"])[0]
-            )
-            exp_renorm = self._bool_line(
-                exp.get("RENORM", ["0"])[0]
-            )
-            exp_read_coeffs = self._bool_line(
-                exp.get("READ-COEFFS", ["0"])[0]
-            )
+            exp_use_rfactor = self._bool_line(exp.get("USE-RFACTOR", ["0"])[0])
+            exp_renorm = self._bool_line(exp.get("RENORM", ["0"])[0])
+            exp_read_coeffs = self._bool_line(exp.get("READ-COEFFS", ["0"])[0])
             exp_compton_supr_coeff = self._bool_line(
                 exp.get("COMPTON-SUPR-COEFF", ["0"])[0]
             )
@@ -609,8 +611,13 @@ class RmcPotDatFree:
         elif 11 <= line_no <= 18:
             exp = self._first_exp(create=True)
             key_map = {
-                11: "DATAFILE", 12: "POINT-RANGE", 13: "SCALE", 14: "SIGMA",
-                15: "USE-RFACTOR", 16: "RENORM", 17: "READ-COEFFS",
+                11: "DATAFILE",
+                12: "POINT-RANGE",
+                13: "SCALE",
+                14: "SIGMA",
+                15: "USE-RFACTOR",
+                16: "RENORM",
+                17: "READ-COEFFS",
                 18: "COMPTON-SUPR-COEFF",
             }
             key = key_map[line_no]
@@ -641,9 +648,7 @@ class RmcPotDatFree:
             else:
                 free = self._FNC_TO_FREE.get(mode)
                 if free is None:
-                    raise ValueError(
-                        f"未対応の FNC switch です: {mode}"
-                    )
+                    raise ValueError(f"未対応の FNC switch です: {mode}")
                 value_tokens = [free]
                 value_tokens.extend(options)
                 self._set_value(
@@ -693,7 +698,12 @@ class RmcPotDatFree:
                     break
 
             if match is None:
-                match = {"TYPE": [exp_type], "DATAFILE": [""], "POINT-RANGE": ["1 1"], "SIGMA": ["1"]}
+                match = {
+                    "TYPE": [exp_type],
+                    "DATAFILE": [""],
+                    "POINT-RANGE": ["1 1"],
+                    "SIGMA": ["1"],
+                }
             preserved.append(("EXP", match))
         self._sections = preserved
 
@@ -802,7 +812,9 @@ class RmcPotDatFree:
             sections = self._find_sections(section)
         sections[index].setdefault(key.upper(), []).append(self._coerce_value(value))
 
-    def get(self, section: str, key: str, index: int = 0, default: Optional[str] = None) -> Optional[str]:
+    def get(
+        self, section: str, key: str, index: int = 0, default: Optional[str] = None
+    ) -> Optional[str]:
         """自由形式の指定キーから最初の値を取得する。
 
         Args:
@@ -838,6 +850,10 @@ class RmcPotDatFree:
             return []
         return list(sections[index].get(key.upper(), []))
 
+    # -------------------------------
+    # 個別メソッド
+    # -------------------------------
+
     def initialize_sections(
         self,
         section: str,
@@ -863,9 +879,7 @@ class RmcPotDatFree:
         if not section_name:
             raise ValueError("section は空にできません。")
 
-        retained_sections: List[
-            Tuple[str, Dict[str, List[str]]]
-        ] = []
+        retained_sections: List[Tuple[str, Dict[str, List[str]]]] = []
 
         for name, values in self._sections:
             if name != section_name:
@@ -874,8 +888,7 @@ class RmcPotDatFree:
         self._sections = retained_sections
 
         self._logger.info(
-            "[rmc_pot_dat_free] initialize_sections: "
-            f"section={section_name}"
+            "[rmc_pot_dat_free] initialize_sections: " f"section={section_name}"
         )
 
         if self._resolve_auto_write(auto_write):
@@ -965,7 +978,6 @@ class RmcPotDatFree:
         """
         return len(self._find_sections(section))
 
-
     def set_cfg_name(self, cfg_name: str) -> None:
         """読み書き対象の構成名を変更する。
 
@@ -977,6 +989,30 @@ class RmcPotDatFree:
         """
         self._cfg_name = cfg_name
         self._config.cfg_name = cfg_name
+
+    def set_element_info(
+        self,
+        element_info: Sequence[str],
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """原子タイプ順の元素記号を設定する。"""
+        symbols = [str(element).strip() for element in element_info]
+
+        if not symbols:
+            raise ValueError("element_info は1件以上必要です。")
+
+        if any(not symbol for symbol in symbols):
+            raise ValueError("element_info に空の元素記号は指定できません。")
+
+        self._set_value(
+            "GENERAL",
+            "CHEMICAL-SYMBOLS",
+            " ".join(symbols),
+        )
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     @staticmethod
     def _to_bool_token(v: Union[bool, str]) -> str:
@@ -2145,10 +2181,7 @@ class RmcPotDatFree:
 
         mode = self._FREE_TO_FNC.get(tokens[0].upper())
         if mode is None:
-            raise ValueError(
-                "未対応の FNC-TYPE です: "
-                f"{tokens[0]}"
-            )
+            raise ValueError("未対応の FNC-TYPE です: " f"{tokens[0]}")
         return mode
 
     def get_fnc_options(self) -> List[str]:
@@ -2361,8 +2394,7 @@ class RmcPotDatFree:
             top_path = Path(f"{self._cfg_name}.top")
             if not top_path.exists():
                 raise FileNotFoundError(
-                    "topology mode に必要なファイルがありません: "
-                    f"{top_path}"
+                    "topology mode に必要なファイルがありません: " f"{top_path}"
                 )
 
     def _resolve_fnc_path(
@@ -2837,9 +2869,7 @@ class RmcPotDatFree:
         if minimum_value < 0.0:
             raise ValueError(f"{argument_name} の下限は 0 以上で指定してください.")
         if maximum_value <= minimum_value:
-            raise ValueError(
-                f"{argument_name} の上限は下限より大きくしてください."
-            )
+            raise ValueError(f"{argument_name} の上限は下限より大きくしてください.")
         return minimum_value, maximum_value
 
     def get_qn_constraints(self) -> List[Dict[str, Any]]:
@@ -2934,15 +2964,13 @@ class RmcPotDatFree:
             sigma_values = section[sigma_key]
             if len(sigma_values) != 1:
                 raise ValueError(
-                    f"[SNC] index={section_index}: "
-                    f"{sigma_key} は 1 行必要です。"
+                    f"[SNC] index={section_index}: " f"{sigma_key} は 1 行必要です。"
                 )
 
             sigma_tokens = sigma_values[0].split()
             if len(sigma_tokens) != 3:
                 raise ValueError(
-                    f"[SNC] index={section_index}: "
-                    f"{sigma_key} は 3 値必要です。"
+                    f"[SNC] index={section_index}: " f"{sigma_key} は 3 値必要です。"
                 )
 
             constraint = {
@@ -2968,9 +2996,7 @@ class RmcPotDatFree:
         first_neighbor_type: int,
         first_neighbor_minimum: Union[int, float],
         first_neighbor_maximum: Union[int, float],
-        second_neighbors: Sequence[
-            Tuple[int, Union[int, float], Union[int, float]]
-        ],
+        second_neighbors: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
         coordination_number: int,
         fraction: Union[int, float],
         sigma: Union[int, float],
@@ -3103,9 +3129,7 @@ class RmcPotDatFree:
         first_neighbor_type: int,
         first_neighbor_minimum: Union[int, float],
         first_neighbor_maximum: Union[int, float],
-        second_neighbors: Sequence[
-            Tuple[int, Union[int, float], Union[int, float]]
-        ],
+        second_neighbors: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
         coordination_number: int,
         fraction: Union[int, float],
         sigma: Union[int, float],
@@ -3188,9 +3212,7 @@ class RmcPotDatFree:
             auto_write: 更新後に保存するかどうか。
         """
         self.remove_section("SNC", index)
-        self._logger.info(
-            f"[rmc_pot_dat_free] remove_qn_constraint: index={index}"
-        )
+        self._logger.info(f"[rmc_pot_dat_free] remove_qn_constraint: index={index}")
         if self._resolve_auto_write(auto_write):
             self.write()
 
@@ -3235,14 +3257,11 @@ class RmcPotDatFree:
         for section_name in incompatible_sections:
             if self._find_sections(section_name):
                 raise ValueError(
-                    "AENET と共存できないセクションがあります: "
-                    f"[{section_name}]"
+                    "AENET と共存できないセクションがあります: " f"[{section_name}]"
                 )
 
         if self._find_sections("BPOT"):
-            raise ValueError(
-                "AENET は [ BPOT ] topology mode と併用できません。"
-            )
+            raise ValueError("AENET は [ BPOT ] topology mode と併用できません。")
 
     def get_aenet_settings(self) -> Optional[Dict[str, Any]]:
         """自由形式 ``[ AENET ]`` の ANN ポテンシャル設定を取得する。
@@ -3265,9 +3284,7 @@ class RmcPotDatFree:
         section = sections[0]
         potential_values = section.get("IND_ANN-FILE_TYPE-NAME", [])
         if not potential_values:
-            raise ValueError(
-                "[AENET] IND_ANN-FILE_TYPE-NAME は 1 行以上必要です。"
-            )
+            raise ValueError("[AENET] IND_ANN-FILE_TYPE-NAME は 1 行以上必要です。")
 
         potentials: List[Dict[str, Any]] = []
         for value in potential_values:
@@ -3306,8 +3323,7 @@ class RmcPotDatFree:
 
         if not sigma_key:
             raise ValueError(
-                "[AENET] SIGMA、SIGMA-MASTER、SIGMA-SCALABLE "
-                "のいずれかが必要です。"
+                "[AENET] SIGMA、SIGMA-MASTER、SIGMA-SCALABLE " "のいずれかが必要です。"
             )
 
         settings: Dict[str, Any] = {
@@ -3406,8 +3422,7 @@ class RmcPotDatFree:
             )
             if atom_type_value in seen_types:
                 raise ValueError(
-                    "AENET の atom_type は重複指定できません: "
-                    f"{atom_type_value}"
+                    "AENET の atom_type は重複指定できません: " f"{atom_type_value}"
                 )
             seen_types.add(atom_type_value)
 
@@ -3430,9 +3445,7 @@ class RmcPotDatFree:
             section["IND_ANN-FILE_TYPE-NAME"].append(" ".join(tokens))
 
         if cutoff_value is not None:
-            section["CUTOFF-AENET"] = [
-                self._fmt_number(cutoff_value)
-            ]
+            section["CUTOFF-AENET"] = [self._fmt_number(cutoff_value)]
 
         if write_atomic_energy:
             section["WRITE-ATOMIC-ENERGY"] = ["1"]
@@ -3488,8 +3501,7 @@ class RmcPotDatFree:
         for item in settings["potentials"]:
             if item["atom_type"] == atom_type_value:
                 raise ValueError(
-                    "AENET の atom_type は重複指定できません: "
-                    f"{atom_type_value}"
+                    "AENET の atom_type は重複指定できません: " f"{atom_type_value}"
                 )
 
         section = self._find_sections("AENET")[0]
@@ -3504,9 +3516,7 @@ class RmcPotDatFree:
         if type_name is not None:
             type_name_value = str(type_name).strip()
             if not type_name_value:
-                raise ValueError(
-                    "type_name は文字列または None で指定してください。"
-                )
+                raise ValueError("type_name は文字列または None で指定してください。")
             tokens.append(type_name_value)
 
         section["IND_ANN-FILE_TYPE-NAME"].append(" ".join(tokens))
@@ -3555,8 +3565,7 @@ class RmcPotDatFree:
 
         if not removed:
             raise ValueError(
-                "指定した AENET atom_type は存在しません: "
-                f"{atom_type_value}"
+                "指定した AENET atom_type は存在しません: " f"{atom_type_value}"
             )
         if not retained_values:
             raise ValueError(

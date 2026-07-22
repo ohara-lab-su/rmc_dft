@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 from rmc_dft.config import Config
-from rmc_pot_dat_free import RmcPotDatFree
-from rmc_pot_dat_fixed import RmcPotDatFixed
+from rmc_dft.rmc_pot.rmc_pot_dat_free import RmcPotDatFree
+from rmc_dft.rmc_pot.rmc_pot_dat_fixed import RmcPotDatFixed
 from x_logger import XLogger
 
 
