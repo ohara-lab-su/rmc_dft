@@ -170,20 +170,20 @@ class RmcPot:
 
     def preprocess(self) -> bool:
         """
-        RMC_POT の実行前に必要な入力ファイルを検査する。
+         RMC_POT の実行前に必要な入力ファイルを検査する。
 
         このコードを動かすときは RMC_POT 入力が揃っている前提とする
-        1. 実験プロファイル（例: fesi04_smbt-rmc.txt）が実行カレントに存在しないときは止める
-        2. label.txt が存在しないと止める
+         1. 実験プロファイル（例: fesi04_smbt-rmc.txt）が実行カレントに存在しないときは止める
+         2. label.txt が存在しないと止める
 
-        *) 初期の構造変換は誤解が起きやすいので RmcPot クラスでは Preprocess() で勝手にやらないようにする
+         *) 初期の構造変換は誤解が起きやすいので RmcPot クラスでは Preprocess() で勝手にやらないようにする
 
 
-        Returns:
-            bool:
-                必要な入力ファイルがすべて存在し、実験データファイル名を
-                正常に取得できた場合は ``True``。
-                入力不足または設定不正の場合は ``False``。
+         Returns:
+             bool:
+                 必要な入力ファイルがすべて存在し、実験データファイル名を
+                 正常に取得できた場合は ``True``。
+                 入力不足または設定不正の場合は ``False``。
         """
         self._logger.info("[rmc_pot] == preprocess()")
 
@@ -219,7 +219,6 @@ class RmcPot:
             if not os.path.exists(label_name_path):
                 self._logger.error(f"**Error**: {label_name_path} が見つかりません。")
                 return False
-                # sys.exit(-1)
 
         ##################################################
         # RmcPotDat から実験データのファイル名を取得(実験データ)
