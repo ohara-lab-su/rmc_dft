@@ -2,6 +2,7 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+
 # v0.5.0
 
 ## 追加
@@ -22,6 +23,22 @@
   - 既存の VASP POSCAR 構造から Si 原子の Qn 分布を解析。
   - Q4/Q3/Q2 に加え、検出されたその他の Qn 状態も表示。
   - 設定した第一近接・第二近接距離範囲では、いずれの Qn にも該当しない Si 原子を別途表示。
+
+## v0.4.34
+
+### Added
+- PPCF 解析を任意の原子種数に対応。
+- PPCF ファイルヘッダーから原子種数を自動取得するよう改善。
+- 部分 PPCF 数を `N(N+1)/2` から自動判定するよう変更。
+
+### Changed
+- `plot_ppcf.py` を原子種数に応じて全ての部分 PPCF を自動プロットするよう改善。
+- `plot_ppcf2.py` を原子種数に応じてサブプロット数を自動生成するよう改善。
+- PPCF ラベル (`g11`, `g12`, ... `gnn`) を自動生成するよう変更。
+
+### Fixed
+- 3 原子種固定実装を廃止し、2 原子種系の PPCF を正しく読み込めるよう修正。
+- PPCF データが読み込めなかった場合に、原因が分かる例外を出力するよう改善。
 
 
 # v0.4.33 (2026-07-15)

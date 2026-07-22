@@ -24,6 +24,18 @@
   - Reports Si atoms that do not satisfy any Qn state under the configured first- and second-neighbour distance ranges.
 
 
+## v0.4.34
+
+### Added
+- Added support for PPCF files with an arbitrary number of atom types.
+- Automatically detect the number of atom types from the PPCF header.
+- Automatically determine the number of partial PPCFs using `N(N+1)/2`.
+
+### Changed
+- Updated `plot_ppcf.py` to automatically plot all available partial PPCFs.
+- Updated `plot_ppcf2.py` to automatically generate the required subplot layout.
+- Partial PPCF labels (`g11`, `g12`, ... `gnn`) are now generated automatically.
+
 ## v0.4.33 nakada
 
 ### Fixed

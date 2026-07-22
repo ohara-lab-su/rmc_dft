@@ -59,6 +59,7 @@ cp ~/zaiene_dev/rmc_dft/example/plot_multi_converge.py ./
 ################################## Qn
 cp ~/zaiene_dev/rmc_dft/example/make_qn.py ./
 cp ~/zaiene_dev/rmc_dft/example/qn_config.json ./
+cp ~/zaiene_dev/rmc_dft/example/show_qn_ratio.py ./
 ####################################
 
 chmod u+x *.py

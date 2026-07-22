@@ -32,8 +32,10 @@ class RmcPotPpcf:
         self._cfg_name = cfg_name
         self.filename: str = f"{cfg_name}.ppcf"
 
+        self.n_atom_types: int = 0
+        self.n_partial_ppcf: int = 0
         self.r: np.ndarray = np.array([])
-        self.gij: np.ndarray = np.array([])  # shape = (N_bins, 6)
+        self.gij: np.ndarray = np.empty((0, 0))
 
     def load(self) -> None:
         data_start = False
@@ -42,17 +44,37 @@ class RmcPotPpcf:
 
         with open(self.filename, "r") as f:
             for line in f:
+                stripped_line = line.strip()
+
+                if stripped_line.endswith("number of atom types"):
+                    parts = stripped_line.split()
+                    self.n_atom_types = int(parts[0])
+                    self.n_partial_ppcf = (
+                        self.n_atom_types * (self.n_atom_types + 1) // 2
+                    )
+
                 if data_start:
-                    parts = line.strip().split()
-                    if len(parts) != 7:
+                    parts = stripped_line.split()
+                    expected_columns = self.n_partial_ppcf + 1
+                    if len(parts) != expected_columns:
                         continue
                     r_value = float(parts[0])
                     gij_values = tuple(float(v) for v in parts[1:])
                     r_list.append(r_value)
                     gij_list.append(gij_values)
 
-                if line.strip().startswith("r value"):
+                if stripped_line.startswith("r value"):
+                    if self.n_atom_types <= 0:
+                        raise ValueError(
+                            f"The number of atom types could not be read from "
+                            f"{self.filename}."
+                        )
                     data_start = True
+
+        if not gij_list:
+            raise ValueError(
+                f"PPCF data could not be read from {self.filename}."
+            )
 
         self.r = np.array(r_list)
         self.gij = np.array(gij_list)
@@ -65,6 +87,15 @@ class RmcPotPpcf:
 
     def get_single(self, index: int) -> np.ndarray:
         """
-        index : 0=g11, 1=g12, 2=g13, 3=g22, 4=g23, 5=g33
+        Return one partial g_ij(r) selected by its zero-based index.
         """
         return self.gij[:, index]
+
+    def get_labels(self) -> List[str]:
+        labels: List[str] = []
+
+        for i in range(1, self.n_atom_types + 1):
+            for j in range(i, self.n_atom_types + 1):
+                labels.append(f"g{i}{j}(r)")
+
+        return labels
