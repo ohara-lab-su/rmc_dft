@@ -6,7 +6,6 @@
 It is based on Structure Analysis Environment package ( 
 https://github.com/shimane-dev/sae.git ).
 
-
 ## Requirements
 ### VASP
 VASP need to be installed.
