@@ -24,13 +24,13 @@ from rmc_dft import (
     RmcPot,
     RmcPotLog,
     # RmcPotDat,  # fixed-format *.dat
+    RmcPotDatFree,
     RmcPotFit,
     RmcPotHst,
     RmcPotPpcf,
 )
 from rmc_dft.util import poscar2cfg
 from rmc_dft.util import next_log_dir_name as next_log_dir_name
-from rmc_dft.rmc_pot.rmc_pot_dat_free import RmcPotDatFree
 from x_logger import XLogger
 
 
@@ -47,6 +47,7 @@ def run_rmc_init(
         logger = XLogger()
 
     if rmc_dat is None:
+        # rmc_dat = RmcPotDat(config=config, logger=logger)
         rmc_dat = RmcPotDatFree(config=config, logger=logger)
 
     ######################################

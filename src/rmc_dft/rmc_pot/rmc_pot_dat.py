@@ -1942,3 +1942,19 @@ class _Line:
             return f"{value_part} ! {self.comment.strip()}\n"
         # コメントがなかった行は値のみ
         return f"{self.value.rstrip()}\n"
+
+
+class RmcPotDat:
+    """
+    Facade class that selects the fixed-format or free-format implementation.
+    """
+
+    def __init__(self, *args, free_format: bool = False, **kwargs):
+        if free_format:
+            from .rmc_pot_dat_free import RmcPotDatFree
+            self._impl = RmcPotDatFree(*args, **kwargs)
+        else:
+            self._impl = RmcPotDatFixed(*args, **kwargs)
+
+    def __getattr__(self, name):
+        return getattr(self._impl, name)

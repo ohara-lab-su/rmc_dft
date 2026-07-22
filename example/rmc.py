@@ -23,13 +23,14 @@ from rmc_dft import (
     VaspLog,
     RmcPot,
     RmcPotLog,
-    RmcPotDat,
+    # RmcPotDat,
     RmcPotFit,
     RmcPotHst,
     RmcPotPpcf,
 )
 from rmc_dft.util import poscar2cfg
 from rmc_dft.util import next_log_dir_name as next_log_dir_name
+from rmc_dft.rmc_pot.rmc_pot_dat_free import RmcPotDatFree
 from x_logger import XLogger
 
 
@@ -37,7 +38,8 @@ def run_rmc(
     config: Config,
     *,
     rmc_log: Optional[RmcPotLog] = None,
-    rmc_dat: Optional[RmcPotDat] = None,
+    # rmc_dat: Optional[RmcPotDat] = None,
+    rmc_dat: Optional[RmcPotDatFree] = None,
     rmc_pot: Optional[RmcPot] = None,
     auto_converge: Optional[bool] = False,
     postprocess: Optional[bool] = True,
@@ -195,7 +197,8 @@ if __name__ == "__main__":
     # ---------------------------
 
     rmc_log_ = RmcPotLog(cfg_name=config_.cfg_name, logger=logger_)
-    rmc_dat_ = RmcPotDat(config=config_, logger=logger_)
+    # rmc_dat_ = RmcPotDat(config=config_, logger=logger_)
+    rmc_dat_ = RmcPotDatFree(config=config_, logger=logger_)
 
     # ini パラメーターでをここで作り、config や *.dat を上書きする
     run_rmc_init(
