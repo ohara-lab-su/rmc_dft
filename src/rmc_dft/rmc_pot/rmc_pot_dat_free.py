@@ -11,38 +11,17 @@ from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 from rmc_dft.config import Config
 from x_logger import XLogger
 
-
 FREE_DAT_TEMPLATE: str = """{version}
 
 [ GENERAL ]
-TITLE = FeSiB
-NDENS = 0.0915
-CUT-OFF = 2.3 2.1 2 2.3 2.1 2
-MAX-MOVES = 0.1 0.1 0.1
+TITLE = System
+NDENS = 0.08
+CUT-OFF = 2.0
+MAX-MOVES = 0.1
 R-SPACING = 0.025
-MOVEOUT = 0
-COLL-NUMBER = 0
-PRINT-STEP = 5000
-RUN-TIME = 0.2
-SAVE-TIME = 0
+PRINT-STEP = 1000
+RUN-TIME = 1.0 0
 FNC-TYPE = NONE
-BIN-SHIFT = 0
-XMAX-FACTOR = 1
-HST_BUFFSIZE = 200
-HST-STEP-FACTOR = 10
-RELOAD = 0
-THREADS = 4
-
-[ EXP ]
-TYPE = XRD
-DATAFILE = test.xsq
-POINT-RANGE = 1 290
-SCALE = 1.0
-SIGMA = 5E-3
-USE-RFACTOR = 0
-RENORM = 1
-READ-COEFFS = 0
-COMPTON-SUPR-COEFF = 0
 """
 
 
