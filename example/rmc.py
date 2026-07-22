@@ -95,7 +95,11 @@ def run_rmc(
         # logger.info("")
         logger.info(f"[rmc] rmc_dir = {rmc_dir}")
 
-        rmc.preprocess()  # check inputfile
+        if not rmc.preprocess():
+            logger.error(
+                "**Error**: RMC_POT input validation failed."
+            )
+            return False
 
         # cutoff と FNC の矛盾チェック
         if not rmc.check_fnc_cutoff_consistency(

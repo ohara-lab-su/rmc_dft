@@ -168,28 +168,38 @@ class RmcPot:
         """
         pass
 
-    def preprocess(self) -> None:
+    def preprocess(self) -> bool:
         """
+        RMC_POT の実行前に必要な入力ファイルを検査する。
+
         このコードを動かすときは RMC_POT 入力が揃っている前提とする
         1. 実験プロファイル（例: fesi04_smbt-rmc.txt）が実行カレントに存在しないときは止める
         2. label.txt が存在しないと止める
 
         *) 初期の構造変換は誤解が起きやすいので RmcPot クラスでは Preprocess() で勝手にやらないようにする
+
+
+        Returns:
+            bool:
+                必要な入力ファイルがすべて存在し、実験データファイル名を
+                正常に取得できた場合は ``True``。
+                入力不足または設定不正の場合は ``False``。
         """
-        # self._logger.info("")
         self._logger.info("[rmc_pot] == preprocess()")
 
         ##################################################
         # aaa.cfg が存在しないときは止める(構造情報)
         if not os.path.exists(f"{self._cfg_name}.cfg"):
             self._logger.error(f"**Error**: {self._cfg_name}.cfg が見つかりません。")
-            sys.exit(-1)
+            return False
+            # sys.exit(-1)
 
         ##################################################
         # aaa.dat が存在しないときは止める(INPUT)
         if not os.path.exists(f"{self._cfg_name}.dat"):
             self._logger.error(f"**Error**: {self._cfg_name}.dat が見つかりません。")
-            sys.exit(-1)
+            return False
+            # sys.exit(-1)
 
         # 実行カレント（実行したPythonのパス）を基準にする
         work_dir = os.getcwd()
@@ -201,26 +211,43 @@ class RmcPot:
 
         if isinstance(label_name, str):
             # ファイル名として扱う
-            exp_name_path = os.path.join(work_dir, label_name)
-            if not os.path.exists(exp_name_path):
-                self._logger.error(f"**Error**: {exp_name_path} が見つかりません。")
-                sys.exit(-1)
+            label_name_path = os.path.join(
+                work_dir,
+                label_name,
+            )
+
+            if not os.path.exists(label_name_path):
+                self._logger.error(f"**Error**: {label_name_path} が見つかりません。")
+                return False
+                # sys.exit(-1)
 
         ##################################################
         # RmcPotDat から実験データのファイル名を取得(実験データ)
         exp_name = self._rmc_dat.get_exp_filename()
 
-        # self._logger.info("")
+        if exp_name is False:
+            self._logger.error(
+                "[rmc_pot] **Error**: " "実験データファイル名を取得できません。"
+            )
+            return False
+            # sys.exit(-1)
+
         self._logger.info(f"[rmc_pot] == get_exp_name: {exp_name}")
-        exp_name_path = os.path.join(work_dir, exp_name)
+
+        exp_name_path = os.path.join(
+            work_dir,
+            exp_name,
+        )
 
         self._logger.info(f"[rmc_pot] target_exp_name_path = {exp_name_path}")
-        self._logger.info(f"[rmc_pot] .")
+        self._logger.info("[rmc_pot] .")
 
         # ファイルの存在チェック
         if not os.path.exists(exp_name_path):
             self._logger.error(f"**Error**: {exp_name_path} が見つかりません。")
-            sys.exit(-1)
+            return False
+
+        return True
 
     def postprocess(
         self,
