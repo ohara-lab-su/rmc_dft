@@ -43,6 +43,40 @@ def run_vasp_init_safe(
         logger = XLogger()
 
     # ------------------
+    # make KPOINTS
+    # 存在しないなら作る
+    # ------------------
+    if not os.path.exists("KPOINTS"):
+        logger.info("== make KPOINTS")
+
+        if vasp_kpoints is None:
+            vasp_kpoints = VaspKpoints(config=config, logger=logger)
+
+        vasp_kpoints.set_mode("Monkhorst-Pack")
+        vasp_kpoints.set_grid(1, 1, 1)
+        vasp_kpoints.set_shift(0, 0, 0)
+
+    # ------------------
+    # make POTCAR
+    # 存在しないなら作る
+    # ------------------
+    if not os.path.exists("POTCAR"):
+        logger.info("== make POTCAR")
+        vasp_potcar = VaspPotcarBuilder("~/potpaw_PBE.64", logger=logger)
+        # elements = ["Fe", "Si", "B"]
+        elements = config.element_info
+
+        if isinstance(elements, str):  # もし、label.txt とかの str ならば、
+            with open(elements) as f:
+                elements = f.readline().strip().split()
+
+        vasp_potcar.build(elements, poscar_name="POTCAR")
+
+        # 富岳対応 (キャッシュ対策)
+        subprocess.run(["sleep", "10"], check=True)
+        subprocess.run(["ls", "-la", "./"], check=True)
+
+    # ------------------
     # make INCAR
     # ------------------
     if vasp_incar is None:
