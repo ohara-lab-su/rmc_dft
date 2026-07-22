@@ -1724,67 +1724,46 @@ class RmcPotDatFree:
         self._config.rmc_data_flags = values
         self.set_line(10, [str(v) for v in values], auto_write=auto_write)
 
-    def get_exp_filename(self) -> str:
+    def get_exp_filename(self) -> Union[str, bool]:
         """
-        11 行目（実験データファイル名）を返す（旧来固定フォーマット）。
+        最初の [ EXP ] セクションに設定された実験データファイル名を取得します。
+
+        Returns:
+            str:
+                [ EXP ] セクションの DATAFILE に設定された実験データファイル名。
+            bool:
+                False（[ EXP ] セクションが存在しない、DATAFILE が存在しない、
+                または DATAFILE が空の場合）。
 
         Notes:
-            - .dat ファイルの 10 行目には、
-              g(r), neutron S(Q), X-ray F(Q), EXAFS χ(k) の順に
-              4 つの整数が並びます。これらは各データ種のブロック数を表し、
-              0 は「そのデータ種のブロックが無い」ことを意味します。
-
-            - 11 行目以降には、ブロック数が 1 以上のデータ種だけが
-              上記の順番で並びます。各データ種について 2 行が 1 ブロックで、
-              1 行目が実験データファイル名、
-              2 行目が使用点範囲（開始・終了の 2 整数）です。
-
-            - このメソッドは、そのうち最初のブロック（= 11 行目）に書かれている
-              実験データファイル名だけを返します。
-              例えば 10 行目が ``0 0 1 0`` の場合、11 行目は X-ray F(Q) 用の
-              実験データファイル名になります。
-
-            - 実験データファイル（.dat が参照する外部ファイル）のフォーマットは
-              次のように固定されています。
-              1 行目: データ点数 N（整数）
-              2 行目: タイトル行（任意文字列）
-              3 行目以降: データ点列
-
-            - データ点列の列構成はデータ種ごとに次のようになります。
-              g(r)        : r, g(r)（2 列）
-              neutron S(Q): Q, S(Q)（2 列）
-              X-ray F(Q)  : Q, F(Q), c_αβ が M 本（2+M 列）
-              EXAFS χ(k)  : k, χ(k)（2 列）
-
-            - X-ray F(Q) の場合、c_αβ の本数 M は
-              ``M = ntypes * (ntypes + 1) / 2`` で決まります。
-              c_αβ の並び順（いわゆる RMC 順）は
-              11, 12, 13, …, 22, 23, …, 33 のような上三角の順序です。
-
-            - 典型的な列構成の例として、
-              5 列のファイルは 2 元系（Q, F(Q), c11, c12, c22）、
-              8 列のファイルは 3 元系（Q, F(Q), c11, c12, c13, c22, c23, c33）
-              に対応します。
+            - 自由形式 (*.dat) では実験データは [ EXP ] セクションで定義されます。
+            - DATAFILE キーには実験データファイル名を指定します。
+            - このメソッドは最初の [ EXP ] セクションだけを対象とします。
+            - 実験データファイル自体の形式は RMC_POT の仕様に従います。
+              g(r)、neutron S(Q)、X-ray F(Q)、EXAFS χ(k) など、
+              TYPE の指定に応じたデータファイルを参照します。
         """
-        try:
-            line = self.get_line(11)
-            self._logger.info(f'[rmc_pot_dat_free] == get_exp_filename: "{line}"')
-            tokens = line.split()
-            if tokens:
-                return tokens[0]
-        except IndexError:
-            pass
+        exp = self._first_exp()
 
-        if self._config.rmc_exp_filename is not None:
-            self._logger.info(
-                f'[rmc_pot_dat_free] == get_exp_filename(from config): "{self._config.rmc_exp_filename}"'
-            )
-            return self._config.rmc_exp_filename
+        if exp is None:
+            self._logger.error("[rmc_pot_dat_free] [ EXP ] section not found.")
+            return False
 
-        raise ValueError(
-            "実験データファイル名が未設定です。"
-            " .dat の 11 行目にもなく、config.rmc_exp_filename も None です。"
-        )
+        datafiles = exp.get("DATAFILE")
+
+        if not datafiles:
+            self._logger.error("[rmc_pot_dat_free] DATAFILE not found.")
+            return False
+
+        filename = datafiles[0].strip()
+
+        self._logger.info(f'[rmc_pot_dat_free] == get_exp_filename: "{filename}"')
+
+        if not filename:
+            self._logger.error("[rmc_pot_dat_free] DATAFILE is empty.")
+            return False
+
+        return filename
 
     def set_exp_filename(
         self,
