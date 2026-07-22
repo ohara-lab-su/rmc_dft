@@ -3,6 +3,10 @@
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
 
+# v0.5.1
+
+- bugfix
+
 # v0.5.0
 
 ## 追加

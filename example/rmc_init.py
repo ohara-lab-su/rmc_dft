@@ -23,7 +23,7 @@ from rmc_dft import (
     VaspLog,
     RmcPot,
     RmcPotLog,
-    RmcPotDat,
+    RmcPotDat,  # fixed-format *.dat
     RmcPotFit,
     RmcPotHst,
     RmcPotPpcf,
@@ -37,6 +37,7 @@ def run_rmc_init(
     config: Config,
     rmc_dat: Optional[RmcPotDat] = None,
     *,
+    use_free_format: bool = False,
     logger: Optional[Any] = None,
 ) -> bool:
     """
@@ -46,7 +47,11 @@ def run_rmc_init(
         logger = XLogger()
 
     if rmc_dat is None:
-        rmc_dat = RmcPotDat(config=config, logger=logger)
+        rmc_dat = RmcPotDat(
+            config=config,
+            logger=logger,
+            use_free_format=use_free_format,
+        )
 
     ######################################
     # パラメーター調整
@@ -152,10 +157,65 @@ def run_rmc_init(
     # rmc_dat.set_sigma_factor(1e-7)
     rmc_dat.set_sigma_factor(0.05)
 
-    # 23 行目
-    # aaa.fnc を aaa.cfg / aaa.dat と同じ basename 側に置いて使う
+    # FNC / topology を使用する場合だけ、次のどちらかを有効にする。
+    # 何も呼ばなければ、自由形式側の初期値は FNC-TYPE=NONE であり、
+    # [ BPOT ] も作成されないため、FNC も topology も使用しない。
+    #
+    # aaa.fnc を使用する場合:
     # rmc_dat.set_fnc_switch(3)
-    rmc_dat.set_fnc_switch(4)
+    #
+    # aaa.top を使用する場合:
+    # rmc_dat.set_fnc_switch(4)
+
+    # 自由形式フォーマットだと element 情報が必須となる
+    element_info = config.element_info
+    rmc_dat.set_element_info(element_info)
+
+    # ------------------------------------------------------------------
+    # SiO2 Qn / SNC constraint
+    # ------------------------------------------------------------------
+    # SNC を使用しない場合は、この initialize_qn_constraints() と
+    # 3個の add_qn_constraint() 呼び出しをまとめてコメントアウトする。
+    #
+    # Q4/Q3/Q2 は、それぞれ独立した [ SNC ] セクションとして出力される。
+    # fraction は全中心 Si に対する目標割合で、百分率ではなく 0～1 で指定する。
+    rmc_dat.initialize_qn_constraints()
+
+    # Q5 = 0.2 %
+    rmc_dat.add_qn_constraint(
+        central_type=1,
+        first_neighbor_type=2,
+        first_neighbor_minimum=1.40,
+        first_neighbor_maximum=1.90,
+        second_neighbors=[(1, 1.40, 1.90)],
+        coordination_number=5,
+        fraction=0.002,
+        sigma=1.0,
+    )
+
+    # Q4 = 99.4 %
+    rmc_dat.add_qn_constraint(
+        central_type=1,
+        first_neighbor_type=2,
+        first_neighbor_minimum=1.40,
+        first_neighbor_maximum=1.90,
+        second_neighbors=[(1, 1.40, 1.90)],
+        coordination_number=4,
+        fraction=0.994,
+        sigma=1.0,
+    )
+
+    # Q3 = 0.4 %
+    rmc_dat.add_qn_constraint(
+        central_type=1,
+        first_neighbor_type=2,
+        first_neighbor_minimum=1.40,
+        first_neighbor_maximum=1.90,
+        second_neighbors=[(1, 1.40, 1.90)],
+        coordination_number=3,
+        fraction=0.004,
+        sigma=1.0,
+    )
 
     # FNC ファイルの距離範囲を RMC 実行前に変更する。
     # 作成時は、packmol_util つかっていたらそれで、初期設定はされている

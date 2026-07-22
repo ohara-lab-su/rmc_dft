@@ -95,7 +95,11 @@ def run_rmc(
         # logger.info("")
         logger.info(f"[rmc] rmc_dir = {rmc_dir}")
 
-        rmc.preprocess()  # check inputfile
+        if not rmc.preprocess():
+            logger.error(
+                "**Error**: RMC_POT input validation failed."
+            )
+            return False
 
         # cutoff と FNC の矛盾チェック
         if not rmc.check_fnc_cutoff_consistency(
@@ -105,7 +109,9 @@ def run_rmc(
             return False
 
         # rmc.run(cfg_name=config.cfg_name)
-        rmc.run()
+        if not rmc.run():
+            logger.error("**Error**: RMC_POT execution failed.")
+            return False
 
         # インスタンス生成時にログ読み込みする
         hst = RmcPotHst(cfg_name=f"{config.cfg_name}")  # sample.cfg → sample.hst
@@ -194,8 +200,18 @@ if __name__ == "__main__":
     # poscar2cfg(cfg_name=config.cfg_name)#
     # ---------------------------
 
+    use_free_format_ = True
+
     rmc_log_ = RmcPotLog(cfg_name=config_.cfg_name, logger=logger_)
-    rmc_dat_ = RmcPotDat(config=config_, logger=logger_)
+
+    # 実行バイナリが _ADVANCED_GEOM_CONST を有効に置く必要がある
+    # make AGC=0
+    # が必要となる
+    rmc_dat_ = RmcPotDat(
+        config=config_,
+        logger=logger_,
+        use_free_format=use_free_format_,
+    )
 
     # ini パラメーターでをここで作り、config や *.dat を上書きする
     run_rmc_init(

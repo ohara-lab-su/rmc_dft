@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """RMC_POT 自由形式 ``*.dat`` の読み書き機能。
 
-固定形式版 ``RmcPotDat`` と同じ公開 I/F を維持しながら、内部では
-``#002`` または ``#003`` の自由形式セクションとキーを扱う。
-物理的な行番号ではなく、互換項目番号を自由形式キーへ対応付ける。
+``#002`` または ``#003`` で始まる自由形式ファイルを、セクションと
+キーワードを単位として読み書きする。物理行番号には依存しない。
 """
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
@@ -11,18 +10,37 @@ from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 from rmc_dft.config import Config
 from x_logger import XLogger
 
+FREE_DAT_TEMPLATE: str = """{version}
+
+[ GENERAL ]
+TITLE = System
+NDENS = 0.08
+CUT-OFF = 2.0
+MAX-MOVES = 0.1
+R-SPACING = 0.025
+PRINT-STEP = 1000
+RUN-TIME = 1.0 0
+FNC-TYPE = NONE
+
+[ EXP ]
+TYPE = XRD
+"""
+
 
 class RmcPotDatFree:
-    """固定形式版と同じ公開 I/F で自由形式 ``*.dat`` を扱う。
+    """RMC_POT 自由形式 ``*.dat`` をセクション／キーワード単位で扱う。
+
+    # 実行バイナリが _ADVANCED_GEOM_CONST を有効に置く必要がある
+    # make AGC=0
+    # が必要となる
 
     Attributes:
         直接公開する属性はない。設定値は既存の getter/setter または
         自由形式固有の ``get()``, ``set()``, ``add()`` を通して操作する。
 
     Notes:
-        固定形式版のメソッド名、引数、戻り値との互換性を維持する。
-        一方、ファイル上の実体は ``[ SECTION ]`` と ``KEY = VALUE`` であり、
-        固定形式の物理行へは依存しない。
+        ファイル上の実体である ``[ SECTION ]`` と ``KEY = VALUE`` を
+        そのまま内部表現として保持する。
     """
 
     _FNC_TO_FREE = {
@@ -30,7 +48,6 @@ class RmcPotDatFree:
         1: "NORMAL",
         2: "ADJUST",
         3: "MOVE-IN",
-        4: "FLEXIBLE",
     }
     _FREE_TO_FNC = {value: key for key, value in _FNC_TO_FREE.items()}
 
@@ -55,9 +72,16 @@ class RmcPotDatFree:
                 ``#002`` または ``#003`` を想定する。
 
         Notes:
-            固定形式版 ``RmcPotDat`` と同じ公開 I/F を維持するため、
-            行番号ベースの操作は自由形式のセクション名とキーへ内部変換する。
-            既存ファイルがなければ自由形式の初期ファイルを生成して読み込む。
+            自由形式のセクション名とキーワードを直接読み書きする。
+
+            ``<cfg_name>.dat`` が存在する場合は、その自由形式ファイルを読み込み、
+            先頭行の ``#002`` または ``#003`` を以後の出力形式として維持する。
+            ファイルが存在しない場合だけ、``version`` で指定した形式の
+            デフォルト ``*.dat`` を新規作成する。
+
+            ``auto_write=True`` の場合、各 setter は更新直後に ``*.dat`` へ
+            反映する。複数設定をまとめて反映したい場合だけ、
+            インスタンスまたは各メソッドで ``auto_write=False`` を指定する。
         """
         self._logger = logger or XLogger()
         self._config = config or Config()
@@ -65,7 +89,6 @@ class RmcPotDatFree:
         self._auto_write = auto_write
         self._version = version
         self._sections: List[Tuple[str, Dict[str, List[str]]]] = []
-        self._compat_values: Dict[int, str] = {}
 
         path = Path(f"{self._cfg_name}.dat")
         if path.exists():
@@ -137,36 +160,24 @@ class RmcPotDatFree:
 
         Notes:
             初期値は ``[ GENERAL ]`` セクションへ自由形式のキーとして設定する。
-            固定形式テンプレートの物理的な行配置には依存しない。
+            物理的な行配置には依存しない。
+
+            初期状態では ``FNC-TYPE = NONE`` とし、``[ BPOT ]`` を作成しない。
+            したがって ``set_fnc_switch()`` を呼ばなければ、FNC も topology も
+           使用しない自由形式 ``*.dat`` になる。
         """
         path = Path(f"{basename}.dat")
         if path.exists():
             self._logger.error(f'[rmc_pot_dat_free] "{path}" はすでに存在します')
             return False
-        self._sections = [("GENERAL", {})]
-        self._set_value("GENERAL", "TITLE", "")
-        self._set_value("GENERAL", "NDENS", "0.0915")
-        self._set_value("GENERAL", "CUT-OFF", "2.3 2.1 2 2.3 2.1 2")
-        self._set_value("GENERAL", "MAX-MOVES", "0.1 0.1 0.1")
-        self._set_value("GENERAL", "R-SPACING", "0.025")
-        self._set_value("GENERAL", "MOVEOUT", "0")
-        self._set_value("GENERAL", "COLL-NUMBER", "0")
-        self._set_value("GENERAL", "PRINT-STEP", "5000")
-        self._set_value("GENERAL", "RUN-TIME", "0.2")
-        self._set_value("GENERAL", "SAVE-TIME", "0")
-        self._set_value("GENERAL", "FNC-TYPE", "NONE")
-        self._set_value("GENERAL", "BIN-SHIFT", "0")
-        self._set_value("GENERAL", "XMAX-FACTOR", "1")
-        self._set_value("GENERAL", "HST_BUFFSIZE", "200")
-        self._set_value("GENERAL", "HST-STEP-FACTOR", "10")
-        self._set_value("GENERAL", "RELOAD", "0")
-        self._set_value("GENERAL", "THREADS", "4")
-        self._write_path(path)
+        default_input = FREE_DAT_TEMPLATE.format(version=self._version)
+        path.write_text(default_input, encoding="utf-8")
+        self._logger.info(f"[rmc_pot_dat_free] default dat file を作成しました: {path}")
         return True
 
     @staticmethod
     def _to_bool_token(v: Union[bool, str]) -> str:
-        """真偽入力を固定形式互換の論理トークンへ変換する。
+        """真偽入力をRMC_POT の論理トークンへ変換する。
 
         Args:
             v: ``bool`` または真偽を表す文字列。
@@ -235,7 +246,9 @@ class RmcPotDatFree:
         """
         path = Path(f"{self._cfg_name}.dat")
         if not path.exists():
-            self._logger.info(f"[rmc_pot_dat_free] .dat ファイルが見つかりません: {path}")
+            self._logger.info(
+                f"[rmc_pot_dat_free] .dat ファイルが見つかりません: {path}"
+            )
             return False
         raw_lines = path.read_text(encoding="utf-8").splitlines()
         if not raw_lines:
@@ -289,6 +302,9 @@ class RmcPotDatFree:
             base = self._cfg_name
         else:
             base = out_name
+        self.validate_mode_configuration(
+            check_input_files=False,
+        )
         self._write_path(Path(f"{base}.dat"))
 
     def _write_path(self, path: Path) -> None:
@@ -311,65 +327,6 @@ class RmcPotDatFree:
         path.write_text("\n".join(output).rstrip() + "\n", encoding="utf-8")
         self._logger.info(f"[rmc_pot_dat_free] == write({path})")
 
-    def get_line(self, line_no_1based: int) -> str:
-        """固定形式互換の項目番号から値を取得する。
-
-        Args:
-            line_no_1based: 固定形式版 I/F で使用する 1 始まりの項目番号。
-
-        Returns:
-            対応する自由形式キーから復元した文字列。
-
-        Notes:
-            実ファイルの物理行を参照するメソッドではない。
-            互換項目番号を自由形式セクションへ変換する仮想 I/F である。
-        """
-        return self._virtual_line(line_no_1based)
-
-    def set_line(
-        self,
-        line_no_1based: int,
-        value: Union[str, int, float, Sequence[Union[int, float]], bool],
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """固定形式互換の項目番号を使って自由形式の値を更新する。
-
-        Args:
-            line_no_1based: 固定形式版 I/F で使用する 1 始まりの項目番号。
-            value: 設定する文字列、数値、真偽値、または数値列。
-            auto_write: ``True`` なら更新直後に保存する。``None`` の場合は
-                インスタンスの既定値を使用する。
-
-        Notes:
-            実ファイルの物理行を書き換えるのではなく、項目番号に対応する
-            自由形式のセクションとキーを更新する。
-        """
-        text = self._coerce_value(value)
-        self._apply_virtual_line(line_no_1based, text)
-        if auto_write is None:
-            do_write = self._auto_write
-        else:
-            do_write = auto_write
-        if do_write:
-            self.write()
-
-    def _index(self, line_no_1based: int) -> int:
-        """固定形式互換の項目番号を検証して 0 始まりへ変換する。
-
-        Args:
-            line_no_1based: 1 から 33 までの互換項目番号。
-
-        Returns:
-            0 始まりへ変換した番号。
-
-        Raises:
-            IndexError: 指定番号が互換範囲外の場合。
-        """
-        if line_no_1based < 1 or line_no_1based > 33:
-            raise IndexError(f"行番号が範囲外です: {line_no_1based} (全 33 行相当)")
-        return line_no_1based - 1
-
     def _find_sections(self, name: str) -> List[Dict[str, List[str]]]:
         """指定名と一致する全セクションを取得する。
 
@@ -380,7 +337,11 @@ class RmcPotDatFree:
             出現順を維持したセクション辞書のリスト。
         """
         upper = name.upper()
-        return [values for section_name, values in self._sections if section_name == upper]
+        found: List[Dict[str, List[str]]] = []
+        for section_name, values in self._sections:
+            if section_name == upper:
+                found.append(values)
+        return found
 
     def _first_section(self, name: str, create: bool = False) -> Dict[str, List[str]]:
         """指定名の最初のセクションを取得する。
@@ -463,203 +424,6 @@ class RmcPotDatFree:
                 counts[exp_type] += 1
         return counts["GR"], counts["ND"], counts["XRD"], counts["EXAFS"]
 
-    def _virtual_line(self, line_no: int) -> str:
-        """自由形式データから固定形式互換の項目値を構成する。
-
-        Args:
-            line_no: 固定形式版 I/F の 1 始まり項目番号。
-
-        Returns:
-            固定形式版 getter が期待する文字列表現。
-
-        Notes:
-            ``[ GENERAL ]``、最初の ``[ EXP ]``、制約セクション数、
-            potential セクションの有無を対応する互換値へ変換する。
-        """
-        self._index(line_no)
-        general = self._first_section("GENERAL")
-        exp = self._first_exp()
-
-        # 固定形式互換 I/F の 11～18 番項目は、最初の [ EXP ] セクションへ対応付ける。
-        # [ EXP ] が存在しない場合は、固定形式版と同じ型で既定値を返す。
-        if exp:
-            exp_datafile = exp.get("DATAFILE", [""])[0]
-            exp_point_range = exp.get("POINT-RANGE", [""])[0]
-            exp_scale = exp.get("SCALE", ["1"])[0]
-            exp_sigma = exp.get("SIGMA", ["1"])[0]
-            exp_use_rfactor = self._bool_line(
-                exp.get("USE-RFACTOR", ["0"])[0]
-            )
-            exp_renorm = self._bool_line(
-                exp.get("RENORM", ["0"])[0]
-            )
-            exp_read_coeffs = self._bool_line(
-                exp.get("READ-COEFFS", ["0"])[0]
-            )
-            exp_compton_supr_coeff = self._bool_line(
-                exp.get("COMPTON-SUPR-COEFF", ["0"])[0]
-            )
-        else:
-            exp_datafile = ""
-            exp_point_range = ""
-            exp_scale = "1"
-            exp_sigma = "1"
-            exp_use_rfactor = ".false."
-            exp_renorm = ".false."
-            exp_read_coeffs = ".false."
-            exp_compton_supr_coeff = ".false."
-
-        # 自由形式では potential の有無をセクションの存在で判断する。
-        # 固定形式互換 I/F では従来どおり "0" または "1" を返す。
-        has_potential = False
-        if self._find_sections("NBPOT"):
-            has_potential = True
-        if self._find_sections("BPOT"):
-            has_potential = True
-        if self._find_sections("AENET"):
-            has_potential = True
-
-        if has_potential:
-            potential_flag = "1"
-        else:
-            potential_flag = "0"
-
-        mapping = {
-            1: self._first_value("GENERAL", "TITLE", ""),
-            2: self._first_value("GENERAL", "NDENS", "0"),
-            3: self._first_value("GENERAL", "CUT-OFF", ""),
-            4: self._first_value("GENERAL", "MAX-MOVES", ""),
-            5: self._first_value("GENERAL", "R-SPACING", "0.1"),
-            6: self._bool_line(self._first_value("GENERAL", "MOVEOUT", "0")),
-            7: self._first_value("GENERAL", "COLL-NUMBER", "0"),
-            8: self._first_value("GENERAL", "PRINT-STEP", "10000"),
-            9: f'{self._first_value("GENERAL", "RUN-TIME", "300")} {self._first_value("GENERAL", "SAVE-TIME", "2")}',
-            10: " ".join(str(value) for value in self._exp_type_counts()),
-            11: exp_datafile,
-            12: exp_point_range,
-            13: exp_scale,
-            14: exp_sigma,
-            15: exp_use_rfactor,
-            16: exp_renorm,
-            17: exp_read_coeffs,
-            18: exp_compton_supr_coeff,
-            19: str(len(self._find_sections("COS"))),
-            20: str(len(self._find_sections("COORD"))),
-            21: str(len(self._find_sections("AVCOORD"))),
-            22: potential_flag,
-            23: self._fnc_free_to_fixed(self._first_value("GENERAL", "FNC-TYPE", "NONE")),
-            24: self._first_value("GENERAL", "BIN-SHIFT", "0"),
-            25: self._first_value("GENERAL", "XMAX-FACTOR", "1"),
-            27: self._first_value("GENERAL", "HST_BUFFSIZE", "0"),
-            28: self._first_value("GENERAL", "HST-STEP-FACTOR", "1"),
-            30: self._first_value("GENERAL", "RELOAD", "0"),
-            33: self._first_value("GENERAL", "THREADS", "1"),
-        }
-        return mapping.get(line_no, self._compat_values.get(line_no, "0"))
-
-    def _apply_virtual_line(self, line_no: int, text: str) -> None:
-        """固定形式互換の項目値を自由形式データへ反映する。
-
-        Args:
-            line_no: 固定形式版 I/F の 1 始まり項目番号。
-            text: 自由形式へ反映する文字列。
-
-        Notes:
-            対応する項目はセクションとキーへ変換する。自由形式に直接対応する
-            キーがない互換項目は ``_compat_values`` に保持する。
-        """
-        self._index(line_no)
-        if line_no == 1:
-            self._set_value("GENERAL", "TITLE", text)
-        elif line_no == 2:
-            self._set_value("GENERAL", "NDENS", text)
-        elif line_no == 3:
-            self._set_value("GENERAL", "CUT-OFF", text)
-        elif line_no == 4:
-            self._set_value("GENERAL", "MAX-MOVES", text)
-        elif line_no == 5:
-            self._set_value("GENERAL", "R-SPACING", text)
-        elif line_no == 6:
-            self._set_value("GENERAL", "MOVEOUT", self._bool_int(text))
-        elif line_no == 7:
-            self._set_value("GENERAL", "COLL-NUMBER", text)
-        elif line_no == 8:
-            self._set_value("GENERAL", "PRINT-STEP", text)
-        elif line_no == 9:
-            tokens = text.split()
-            self._set_value("GENERAL", "RUN-TIME", tokens[0])
-            if len(tokens) > 1:
-                self._set_value("GENERAL", "SAVE-TIME", tokens[1])
-        elif line_no == 10:
-            self._set_exp_flags([int(float(v)) for v in text.split()[:4]])
-        elif 11 <= line_no <= 18:
-            exp = self._first_exp(create=True)
-            key_map = {
-                11: "DATAFILE", 12: "POINT-RANGE", 13: "SCALE", 14: "SIGMA",
-                15: "USE-RFACTOR", 16: "RENORM", 17: "READ-COEFFS",
-                18: "COMPTON-SUPR-COEFF",
-            }
-            key = key_map[line_no]
-            if line_no >= 15:
-                text = self._bool_int(text)
-            exp[key] = [text]
-        elif line_no == 23:
-            tokens = text.split()
-            if tokens:
-                mode = int(float(tokens[0]))
-            else:
-                mode = 0
-            free = self._FNC_TO_FREE.get(mode)
-            if free is None:
-                raise ValueError(f"未対応の FNC switch です: {mode}")
-            value = " ".join([free] + tokens[1:])
-            self._set_value("GENERAL", "FNC-TYPE", value)
-        elif line_no == 24:
-            self._set_value("GENERAL", "BIN-SHIFT", text)
-        elif line_no == 25:
-            self._set_value("GENERAL", "XMAX-FACTOR", text)
-        elif line_no == 27:
-            self._set_value("GENERAL", "HST_BUFFSIZE", text)
-        elif line_no == 28:
-            self._set_value("GENERAL", "HST-STEP-FACTOR", text)
-        elif line_no == 30:
-            self._set_value("GENERAL", "RELOAD", text)
-        elif line_no == 33:
-            self._set_value("GENERAL", "THREADS", text)
-        else:
-            self._compat_values[line_no] = text
-
-    def _set_exp_flags(self, flags: Sequence[int]) -> None:
-        """固定形式の実験データフラグを ``[ EXP ]`` 群へ反映する。
-
-        Args:
-            flags: ``GR``, ``ND``, ``XRD``, ``EXAFS`` の有効状態を表す整数列。
-
-        Notes:
-            有効な種別だけを残し、既存の同種セクションは内容を保持する。
-            対象種別が未作成の場合は必要最低限のキーを持つセクションを作成する。
-        """
-        types = ["GR", "ND", "XRD", "EXAFS"]
-        existing = self._find_sections("EXP")
-        preserved = []
-        for name, values in self._sections:
-            if name != "EXP":
-                preserved.append((name, values))
-        for flag, exp_type in zip(flags, types):
-            if not flag:
-                continue
-            match = None
-            for value in existing:
-                current_type = value.get("TYPE", [""])[0].upper()
-                if current_type == exp_type:
-                    match = value
-                    break
-
-            if match is None:
-                match = {"TYPE": [exp_type], "DATAFILE": [""], "POINT-RANGE": ["1 1"], "SIGMA": ["1"]}
-            preserved.append(("EXP", match))
-        self._sections = preserved
-
     @staticmethod
     def _bool_int(value: Any) -> str:
         """真偽入力を自由形式で使用する ``0`` または ``1`` へ変換する。
@@ -677,7 +441,7 @@ class RmcPotDatFree:
 
     @staticmethod
     def _bool_line(value: Any) -> str:
-        """自由形式の真偽値を固定形式互換トークンへ変換する。
+        """自由形式の真偽値を論理トークンへ変換する。
 
         Args:
             value: ``0``、``1``、または真偽を表す文字列。
@@ -690,8 +454,27 @@ class RmcPotDatFree:
             return ".true."
         return ".false."
 
+    def _fnc_compat_line(self) -> str:
+        """自由形式の FNC 状態を数値表現へ変換する。
+
+        Returns:
+            FNC 0～4 と option を表す文字列。
+        """
+        if self._find_sections("BPOT"):
+            options = self.get_fnc_options()
+            tokens = ["4"]
+            tokens.extend(options)
+            return " ".join(tokens)
+
+        fnc_value = self._first_value(
+            "GENERAL",
+            "FNC-TYPE",
+            "NONE",
+        )
+        return self._fnc_free_to_fixed(fnc_value)
+
     def _fnc_free_to_fixed(self, value: str) -> str:
-        """自由形式の ``FNC-TYPE`` を固定形式互換表現へ変換する。
+        """自由形式の ``FNC-TYPE`` を数値表現へ変換する。
 
         Args:
             value: ``NONE``、``NORMAL``、``ADJUST``、``MOVE-IN``、
@@ -746,7 +529,9 @@ class RmcPotDatFree:
             sections = self._find_sections(section)
         sections[index].setdefault(key.upper(), []).append(self._coerce_value(value))
 
-    def get(self, section: str, key: str, index: int = 0, default: Optional[str] = None) -> Optional[str]:
+    def get(
+        self, section: str, key: str, index: int = 0, default: Optional[str] = None
+    ) -> Optional[str]:
         """自由形式の指定キーから最初の値を取得する。
 
         Args:
@@ -782,6 +567,70 @@ class RmcPotDatFree:
             return []
         return list(sections[index].get(key.upper(), []))
 
+    # -------------------------------
+    # 個別メソッド
+    # -------------------------------
+
+    def initialize_sections(
+        self,
+        section: str,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """指定名のセクションをすべて削除して未設定状態へ戻す。
+
+        Args:
+            section: 初期化するセクション名。
+            auto_write: 初期化後に ``*.dat`` を保存するかどうか。
+                ``None`` の場合はインスタンスの ``auto_write`` 設定を使う。
+
+        Notes:
+            ``[ SNC ]``、``[ EXP ]``、``[ COS ]`` など、同じ名前の
+            セクションを複数記述できる項目を作り直す前に使用する。
+
+            空のセクションは作成しない。既存の同名セクションをすべて削除し、
+            次の高水準 setter または add メソッドが完全なセクションを
+            一つずつ追加できる状態にする。
+        """
+        section_name = str(section).strip().upper()
+        if not section_name:
+            raise ValueError("section は空にできません。")
+
+        retained_sections: List[Tuple[str, Dict[str, List[str]]]] = []
+
+        for name, values in self._sections:
+            if name != section_name:
+                retained_sections.append((name, values))
+
+        self._sections = retained_sections
+
+        self._logger.info(
+            "[rmc_pot_dat_free] initialize_sections: " f"section={section_name}"
+        )
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def initialize_qn_constraints(
+        self,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """すべての Qn/SNC 制約を削除して再設定前の状態へ戻す。
+
+        Args:
+            auto_write: 初期化後に ``*.dat`` を保存するかどうか。
+                ``None`` の場合はインスタンスの ``auto_write`` 設定を使う。
+
+        Notes:
+            Q4、Q3、Q2 などを一式として作り直す場合に最初に呼び出す。
+            既存の ``[ SNC ]`` を残したまま追加し続けることを防ぐ。
+        """
+        self.initialize_sections(
+            "SNC",
+            auto_write=auto_write,
+        )
+
     def add_section(self, section: str) -> int:
         """空の自由形式セクションを末尾へ追加する。
 
@@ -790,6 +639,11 @@ class RmcPotDatFree:
 
         Returns:
             追加した同名セクションの 0 始まり位置。
+
+        Notes:
+            内部構築用の低水準メソッドであり、自動書き込みは行わない。
+            必須キーを持たない空セクションを一時的に作るためである。
+            通常は ``add_qn_constraint()`` などの高水準メソッドを使用する。
         """
         values: Dict[str, List[str]] = {}
         self._sections.append((section.upper(), values))
@@ -841,7 +695,6 @@ class RmcPotDatFree:
         """
         return len(self._find_sections(section))
 
-
     def set_cfg_name(self, cfg_name: str) -> None:
         """読み書き対象の構成名を変更する。
 
@@ -853,6 +706,30 @@ class RmcPotDatFree:
         """
         self._cfg_name = cfg_name
         self._config.cfg_name = cfg_name
+
+    def set_element_info(
+        self,
+        element_info: Sequence[str],
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """原子タイプ順の元素記号を設定する。"""
+        symbols = [str(element).strip() for element in element_info]
+
+        if not symbols:
+            raise ValueError("element_info は1件以上必要です。")
+
+        if any(not symbol for symbol in symbols):
+            raise ValueError("element_info に空の元素記号は指定できません。")
+
+        self._set_value(
+            "GENERAL",
+            "CHEMICAL-SYMBOLS",
+            " ".join(symbols),
+        )
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     @staticmethod
     def _to_bool_token(v: Union[bool, str]) -> str:
@@ -930,8 +807,8 @@ class RmcPotDatFree:
         return cls._fmt_sequence(seq)
 
     def get_comment(self) -> str:
-        """1 行目 comment を str で返す。"""
-        return str(self.get_line(1).split()[0])
+        """``[ GENERAL ]`` の ``TITLE`` を返す。"""
+        return self._first_value("GENERAL", "TITLE", "")
 
     def set_comment(
         self,
@@ -939,35 +816,26 @@ class RmcPotDatFree:
         *,
         auto_write: Optional[bool] = True,
     ) -> None:
-        """1 行目 comment を更新。"""
+        """``[ GENERAL ]`` の ``TITLE`` を設定する。"""
         self._logger.info(f"[rmc_pot_dat_free] set_comment = {comment}")
         self._config.rmc_comment = comment
-        self.set_line(1, comment, auto_write=auto_write)
+        self._set_value("GENERAL", "TITLE", comment)
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
-    def get_density(self) -> float:
-        """
-        2 行目 density を float で返す。
-
-        Notes:
-            例)
-            0.0842566414       ! number densit
-
-            - 系の数密度（number density） 単位は原子数 / Å^3。
-            - cfg ファイル中の原子数とシミュレーションボックス体積の
-              関係で一致させる必要がある（二重定義）
-        """
-        # return float(self.get_line(2).split()[0])
+    def get_density(self) -> Union[float, bool]:
+        """``[ GENERAL ]`` の ``NDENS`` を返す。"""
+        value = self._first_value("GENERAL", "NDENS", "")
+        if not value:
+            self._logger.error("[rmc_pot_dat_free] NDENS が未設定です")
+            return False
         try:
-            return float(self.get_line(2).split()[0])
-
-        except (IndexError, ValueError):
-            if self._config.number_density_A3 is not None:
-                return float(self._config.number_density_A3)
-
-            raise ValueError(
-                "number density が未設定です。"
-                " .dat の 2 行目にもなく、config.number_density_A3 も None です。"
+            return float(value)
+        except ValueError:
+            self._logger.error(
+                f"[rmc_pot_dat_free] NDENS が数値ではありません: {value}"
             )
+            return False
 
     def set_density(
         self,
@@ -975,130 +843,66 @@ class RmcPotDatFree:
         *,
         auto_write: Optional[bool] = True,
     ) -> None:
-        """2 行目 density を更新。"""
+        """``[ GENERAL ]`` の ``NDENS`` を設定する。"""
         self._logger.info(f"[rmc_pot_dat_free] set_density = {rho}")
         self._config.number_density_A3 = float(rho)
-        self.set_line(2, rho, auto_write=auto_write)
+        self._set_value("GENERAL", "NDENS", self._fmt_number(rho))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
-    def get_cutoffs(self) -> List[Union[int, float]]:
+    def get_cutoffs(self) -> List[Union[int, float, str]]:
+        """``[ GENERAL ]`` の ``CUT-OFF`` を RMC 順で返す。
+
+        ``CUT-OFF`` は数値列のほか、自由形式で認められる ``MIN`` または
+        ``MIN-ALL`` を取れる。
         """
-        3 行目 cut offs を (c1, c2, c3) で返す。
-
-        例)
-        1 1 1 1 1 1 ! cut offs
-
-        - 説明: 原子種ごとのカットオフ距離（またはカットオフの有無フラグ）を指定するフィールド。
-        - 実務上: 多くの実装では「最低許容距離（min separation）」や「ペアごとの距離カットオフ」を指定。
-                 型の数 (ntypes) に応じた個数を並べる必要がある
-        - 並びは3元型の場合、11,12,13,22,23,33となっている
-        - n元型の場合、11,12,13,14, ... , 1n, 22, 23,...,2n, 33, 34, ..., 3n, ..., nn となる
-        """
-        toks = self.get_line(3).split()
-        try:
-            return [tok for tok in toks]
-        except ValueError as exc:
-            raise ValueError(f"cut offs 行に数値以外の値があります: {toks!r}") from exc
+        value = self._first_value("GENERAL", "CUT-OFF", "")
+        if not value:
+            return []
+        values: List[Union[int, float, str]] = []
+        for token in value.split():
+            try:
+                number = float(token)
+            except ValueError:
+                values.append(token)
+                continue
+            if number.is_integer():
+                values.append(int(number))
+            else:
+                values.append(number)
+        return values
 
     def set_cutoffs(
         self,
-        values: Sequence[Union[int, float]],
+        values: Union[str, Sequence[Union[int, float]]],
         *,
         auto_write: Optional[bool] = True,
     ) -> None:
+        """``[ GENERAL ]`` の ``CUT-OFF`` を設定する。
+
+        数値列は RMC 順で指定する。自由形式固有の自動決定を使う場合は
+        ``"MIN"`` または ``"MIN-ALL"`` を指定する。
         """
-        3 行目 cut offs を更新。可変長対応。
-        それ以上原子同士が近づかない距離
+        if isinstance(values, str):
+            value_text = values.strip().upper()
+        else:
+            value_text = self._fmt_sequence(values)
+            self._config.rmc_cutoffs = list(values)
+        self._logger.info(f"[rmc_pot_dat_free] set_cutoffs = {value_text}")
+        self._set_value("GENERAL", "CUT-OFF", value_text)
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
-        Notes:
-            Fe Si B の３つのときは 6つのパターンが生まれる
-
-            Fe–Fe
-            Fe–Si
-            Fe–B
-            Si–Si
-            Si–B
-            B–B
-
-            6つが必要
-
-            cutoff の与え方（固定フォーマット版 RMC_POT の厳密仕様）:
-
-                cutoff は「原子種の組み合わせごと」に 1 つずつ値を並べる。
-                原子種数を ntypes とすると、必要となる cutoff の数は
-
-                    ntypes * (ntypes + 1) / 2
-
-                である。
-
-                並べる順序は RMC_POT 固定フォーマットの既定順で、以下のように
-                “11, 12, 13, …, 22, 23, …, 33, …” のような三角行列形式で並べる。
-
-            例1:
-                3 元系（Fe, Si, B）の場合（ntypes = 3）
-
-                必要な cutoff は 6 個：
-                    11, 12, 13, 22, 23, 33
-
-                set_cutoffs へ渡すリストは次のように 6 要素で指定する：
-
-                    set_cutoffs([c11, c12, c13, c22, c23, c33])
-
-                実際の実行例：
-
-                    set_cutoffs([2.3, 2.1, 2.0, 2.3, 2.1, 2.0])
-
-            例2:
-                2 元系（A, B）の場合（ntypes = 2）
-
-                必要な cutoff は 3 個：
-                    11, 12, 22
-
-                set_cutoffs([c11, c12, c22])
-
-            注意:
-                - cutoff の個数は必ず ntypes*(ntypes+1)/2 と一致させること。
-                - 固定フォーマット版 RMC_POT ではこの並びと個数が崩れると、
-                  直後の行（maximum moves 等）の読み込み位置がずれ、実行時エラーになる。
-                - 可変長の free-format (#003) ではこの限りではないが、
-                  本クラスは固定フォーマット互換を前提としている。
-
-        Args:
-            values (Sequence[Union[int|float]]):
-                上記の定義に従い、原子種組み合わせごとの cutoff を並べたリスト。
-                原子種ごとのカットオフ距離リストを指定する。
-                要素数は ntypes に応じて可変（3 要素に限定しない）
-
-            auto_write (bool | None):
-                True の場合は即時書き出し。None はインスタンス既定値に従う。
-        """
-        seq = list(values)
-        self._logger.info(f"[rmc_pot_dat_free] set_cutoffs = {seq}")
-        for v in seq:
-            if not isinstance(v, (int, float)):
-                raise TypeError(f"cut offs には数値のみを指定してください: {v!r}")
-
-        self._config.rmc_cutoffs = seq
-
-        # set_line はコメントを保持したまま値部を置換する
-        self.set_line(3, seq, auto_write=auto_write)
-
-    def get_max_moves(self) -> Tuple[float, float]:
-        """
-        4 行目 maximum moves を (m1, m2) で返す。
-
-        Notes:
-            例)
-            0.01 0.01 0.01   ! maximum moves
-
-            - 説明: 原子移動の最大振幅（1 回の move での最大変位）を指定します。複数値が並んでいる場合はタイプごと、
-                   または移動タイプごとの設定になっていることがある。単位は Å。
-            - 備考: 値が小さいほど受理率が高くなるがサンプリング効率は落ちます
-                   調整して受理率を 20–50% 程度に保つのが一般的
-        """
-        toks = self.get_line(4).split()
-        if len(toks) < 2:
-            raise ValueError(f"maximum moves 行の要素数が不足: {toks!r}")
-        return float(toks[0]), float(toks[1])
+    def get_max_moves(self) -> List[float]:
+        """``[ GENERAL ]`` の ``MAX-MOVES`` を返す。"""
+        value = self._first_value("GENERAL", "MAX-MOVES", "")
+        if not value:
+            return []
+        try:
+            return [float(token) for token in value.split()]
+        except ValueError:
+            self._logger.error(f"[rmc_pot_dat_free] MAX-MOVES が不正です: {value}")
+            return []
 
     def set_maximum_moves(
         self,
@@ -1106,332 +910,72 @@ class RmcPotDatFree:
         *,
         auto_write: Optional[bool] = True,
     ) -> None:
-        """
-        4 行目 maximum moves を可変長で更新する。
-
-        Args:
-            values (Sequence[Union[int, float]]):
-                任意個数の maximum move 値。順序はそのまま書き込み。
-
-            auto_write (bool | None):
-                True の場合即時保存。None の場合はインスタンス既定に従う。
-        """
-        seq = list(values)
-        self._logger.info(f"[rmc_pot_dat_free] set_maximu_moves = {seq}")
-
-        # 各要素が数値であることのみ検査する
-        for v in seq:
-            if not isinstance(v, (int, float)):
-                raise ValueError(f"maximum moves には数値のみ指定してください: {v!r}")
-
-        self._config.rmc_max_moves = seq
-
-        # 4 行目へそのまま書き込む
-        self.set_line(4, seq, auto_write=auto_write)
+        """``[ GENERAL ]`` の ``MAX-MOVES`` を設定する。"""
+        sequence = list(values)
+        self._config.rmc_max_moves = sequence
+        self._set_value("GENERAL", "MAX-MOVES", self._fmt_sequence(sequence))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def get_r_spacing(self) -> float:
-        """
-        5 行目 r spacing を float で返す。i
-        近接分布関数 g(r) のビン幅（r の刻み幅）。単位は Å。
-        RMC の g(r) や部分 g(r) を計算する際、距離 r の空間を等間隔に区切ってヒストグラムを作成します。
-        この ビン間隔（dr） を指定するのが R-SPACING
-
-        Notes:
-            例:
-                0.025        ! r spacing
-
-                - 備考: 小さいほど解像度は上がるが計算負荷が増える
-        """
-        try:
-            toks = self.get_line(5).split()
-            if toks:
-                return float(toks[0])
-        except (IndexError, ValueError):
-            pass
-
-        if self._config.rmc_r_spacing is not None:
-            return float(self._config.rmc_r_spacing)
-
-        raise ValueError(
-            "r spacing が未設定です。"
-            " .dat の 5 行目にもなく、config.rmc_r_spacing も None です。"
-        )
+        """``[ GENERAL ]`` の ``R-SPACING`` を返す。"""
+        value = self._first_value("GENERAL", "R-SPACING", "0.0")
+        return float(value)
 
     def set_r_spacing(
-        self,
-        dr: Union[int, float],
-        *,
-        auto_write: Optional[bool] = True,
+        self, dr: Union[int, float], *, auto_write: Optional[bool] = True
     ) -> None:
-        """5 行目 r spacing を更新。"""
-        self._logger.info(f"[rmc_pot_dat_free] set_r_spacing = {dr}")
+        """``[ GENERAL ]`` の ``R-SPACING`` を設定する。"""
         self._config.rmc_r_spacing = float(dr)
-        self.set_line(5, dr, auto_write=auto_write)
+        self._set_value("GENERAL", "R-SPACING", self._fmt_number(dr))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def get_moveout_option(self) -> bool:
-        """
-        6 行目（whether to use moveout option）を取得する。
-
-        Notes:
-            内容:
-                - RMC 計算において「moveout オプション」を使用するかどうかを指定するブール値。
-                  moveout オプションは、原子のランダム移動試行時に追加的な処理を行う機能であり、
-                  一般的には「移動後の局所最適化」や「過大な変位の制限」を目的とする
-
-            マニュアル定義:
-                - ラベル: “whether to use moveout option”
-                - 型: 論理値（.true. / .false.）
-                - 意味:
-                    - .true.  : moveout 処理を有効化。
-                                → 原子移動試行のたびに補助的な判定・制約が加わる。
-                    - .false. : moveout 処理を無効化。
-                                → 通常の RMC 移動アルゴリズムを使用。
-                - 挙動の詳細は実装依存（例: moveout モジュール内で距離閾値チェックを行うなど）。
-
-            例:
-                .true.   ! whether to use moveout option
-                    → moveout 処理を有効化（制約付き移動を実施）。
-                .false.  ! whether to use moveout option
-                    → 通常のランダム移動。
-
-        Returns:
-            bool: moveout オプションを有効化している場合は True、無効なら False。
-        """
-        try:
-            token = self.get_line(6).strip().lower()
-            if token in (".true.", "true", "t", "1", "yes", "y"):
-                return True
-            if token in (".false.", "false", "f", "0", "no", "n"):
-                return False
-        except IndexError:
-            pass
-
-        if self._config.rmc_moveout_option is not None:
-            return bool(self._config.rmc_moveout_option)
-
-        raise ValueError(
-            "moveout option が未設定です。"
-            " .dat の 6 行目にもなく、config.rmc_moveout_option も None です。"
-        )
+        """``[ GENERAL ]`` の ``MOVEOUT`` を返す。"""
+        value = self._first_value("GENERAL", "MOVEOUT", "0")
+        return self._bool_int(value) == "1"
 
     def set_moveout_option(
-        self,
-        use_moveout: bool,
-        *,
-        auto_write: Optional[bool] = True,
+        self, use_moveout: bool, *, auto_write: Optional[bool] = True
     ) -> None:
-        """
-        6 行目（whether to use moveout option）を更新する。
-
-        Notes:
-            内容:
-                - moveout オプションを有効化するかどうかを設定する。
-                  moveout は RMC における原子移動の特殊処理オプションであり、
-                  一般には「移動後の拘束条件」「局所最適化ステップ」「排他領域判定」などを伴う。
-
-            指定方法:
-                - True  → .true. を書き込み、有効化。
-                - False → .false. を書き込み、無効化。
-
-            例:
-                set_moveout_option(True)
-                    → moveout 処理を有効にする。
-                set_moveout_option(False)
-                    → moveout 処理を無効にする。
-
-        Args:
-            use_moveout (bool):
-                moveout オプションを有効化する場合は True、無効化する場合は False。
-            auto_write (bool | None):
-                True なら即時保存、None の場合はインスタンス既定に従う。
-        """
-        token = self._to_bool_token(use_moveout)
-        self._logger.info(f"[rmc_pot_dat_free] set_moveout_option = {token}")
+        """``[ GENERAL ]`` の ``MOVEOUT`` を設定する。"""
         self._config.rmc_moveout_option = bool(use_moveout)
-        self.set_line(6, token, auto_write=auto_write)
+        self._set_value("GENERAL", "MOVEOUT", self._bool_int(use_moveout))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def get_num_config_to_collect(self) -> int:
-        """
-        7 行目（number of configuration to collect）を取得する。
-
-        Notes:
-            内容:
-                - RMC 実行中に「構成（configuration）」をどの程度の頻度で収集するかを指定する。
-                  ここでいう configuration とは、特定ステップ時点の原子配置を指す。
-                  解析や平均化、統計処理に利用するため、指定回数ぶんを記録できる。
-
-            マニュアル定義:
-                - ラベル: “number of configuration to collect”
-                - 単位: 個数（整数）
-                - 意味:
-                    RMC 計算中に「収集用構成」を保存する数。
-                    この値が 0 の場合、多くの実装では「構成を収集しない」または
-                    「最終構成のみを保存」として扱われる。
-
-            典型的な設定例:
-                0     ! number of configuration to collect
-                    → 構成を収集せず、最終結果のみを出力。
-                10    ! number of configuration to collect
-                    → 全実行中に 10 構成を等間隔で保存。
-                100   ! number of configuration to collect
-                    → 100 構成を収集（より細かい統計解析に利用）。
-
-            備考:
-                - 保存間隔は RMC_POT 内部で自動的に均等分配される。
-                - このパラメータは出力用ヒストグラムや g(r) 平均化などに影響を与える。
-
-        Returns:
-            int: 収集する構成数。
-        """
-        tokens = self.get_line(7).split()
-        if not tokens:
-            raise ValueError("7 行目が空です。")
-        try:
-            return int(float(tokens[0]))
-        except ValueError as exc:
-            raise ValueError(f"7 行目に整数以外の値があります: {tokens!r}") from exc
+        """``[ GENERAL ]`` の ``COLL-NUMBER`` を返す。"""
+        value = self._first_value("GENERAL", "COLL-NUMBER", "0")
+        return int(float(value))
 
     def set_num_config_to_collect(
-        self,
-        num_config: int,
-        *,
-        auto_write: Optional[bool] = True,
+        self, value: int, *, auto_write: Optional[bool] = True
     ) -> None:
-        """
-        7 行目（number of configuration to collect）を更新する。
-
-        Notes:
-            内容:
-                - RMC 実行中にどのくらいの頻度で「構成（configuration）」を保存するかを指定する。
-                  これは構造平均化や g(r) 平均などの統計解析に使う複数構成を得るための設定。
-
-            指定方法:
-                - 0 の場合:
-                    → 構成を収集しないか、最終構成のみを保存。
-                - 正の整数値:
-                    → 指定数の構成を収集。
-                      RMC_POT はシミュレーション全体を等間隔に分割して収集ステップを決定する。
-
-            例:
-                set_num_config_to_collect(0)
-                    → 収集しない（最終構成のみ）。
-                set_num_config_to_collect(20)
-                    → 全体で 20 構成を等間隔で保存。
-
-        Args:
-            num_config (int):
-                収集する構成数（0 以上の整数）
-            auto_write (bool | None):
-                True の場合は即時保存。None の場合はインスタンス既定に従う。
-        """
-        if num_config < 0:
-            raise ValueError(f"num_config は 0 以上を指定してください: {num_config}")
-
-        self.set_line(7, str(int(num_config)), auto_write=auto_write)
+        """``[ GENERAL ]`` の ``COLL-NUMBER`` を設定する。"""
+        self._set_value("GENERAL", "COLL-NUMBER", str(int(value)))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def get_print_interval(self) -> int:
-        """
-        8 行目（step for printing）を取得する。
-
-        Notes:
-            内容:
-                - RMC_POT の計算進行中、標準出力やログファイルに
-                  エネルギー・受理率・コスト関数などの経過情報を
-                  どの間隔で出力するかを指定するステップ数。
-
-            マニュアル定義:
-                - ラベル: “step for printing”
-                - 意味: RMC の実行ループ中で何ステップごとに
-                        計算状況（χ²値、受理率、平均変位など）を表示するか。
-                - 値の単位: ステップ数（整数）
-                - 0 または負値: 無効（出力を行わない、もしくは既定間隔を使用）
-
-            例:
-                5000  ! step for printing
-                → 5000 ステップごとに進行情報を出力。
-                100   ! step for printing
-                → 100 ステップごとに頻繁に出力。
-                0     ! step for printing
-                → 出力を抑止または既定間隔に従う。
-
-        Returns:
-            int: ログ出力間隔（ステップ数単位）
-        """
-        tokens = self.get_line(8).split()
-        if not tokens:
-            raise ValueError("8 行目が空です。")
-        try:
-            return int(float(tokens[0]))
-        except ValueError as exc:
-            raise ValueError(f"8 行目に整数以外の値があります: {tokens!r}") from exc
+        """``[ GENERAL ]`` の ``PRINT-STEP`` を返す。"""
+        value = self._first_value("GENERAL", "PRINT-STEP", "0")
+        return int(float(value))
 
     def set_print_interval(
-        self,
-        interval_step: int,
-        *,
-        auto_write: Optional[bool] = True,
+        self, value: int, *, auto_write: Optional[bool] = True
     ) -> None:
-        """
-        8 行目（step for printing）を更新する。
-
-        Notes:
-            内容:
-                - 計算経過を標準出力やログに記録する間隔を指定する。
-                  値は「ステップ数」で指定し、0 の場合は無効または既定値使用。
-
-            例:
-                5000 → 5000 ステップごとに出力。
-                100  → 100 ステップごとに出力。
-                0    → 出力を抑止。
-
-        Args:
-            interval_step (int):
-                出力間隔（ステップ数単位）
-            auto_write (bool | None):
-                True の場合は即時保存。None の場合はインスタンス既定値に従う。
-        """
-        if interval_step < 0:
-            raise ValueError(
-                f"interval_step は 0 以上を指定してください: {interval_step}"
-            )
-        self.set_line(8, str(int(interval_step)), auto_write=auto_write)
+        """``[ GENERAL ]`` の ``PRINT-STEP`` を設定する。"""
+        self._set_value("GENERAL", "PRINT-STEP", str(int(value)))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def get_time_and_save(self) -> Tuple[float, int]:
-        """
-        9 行目（time limit, step for saving）を取得する。
-
-        Notes:
-            内容:
-                - 9 行目は、計算の停止条件と出力間隔を設定する 2 つの値からなる。
-                  RMC_POT マニュアルでは「time limit, step for saving」と定義されている。
-
-                  (1) time limit:
-                      - 計算の最大実行時間（単位: 分）
-                      - 経過時間がこの値を超えると自動停止する。
-                      - 0 の場合は無効（時間制限なし）
-
-                  (2) step for saving:
-                      - RMC 計算の進行中、どの間隔で現在構造などをファイルに保存するか。
-                      - ステップ数単位で指定（例: 5000 → 5000 ステップごとに保存）
-                      - 0 の場合は無効（または既定間隔に従う）
-
-            例:
-                0.2 0   ! time limit, step for saving
-                → 最大 0.2 分（12 秒）で終了、保存間隔は無効
-                60 500  ! time limit, step for saving
-                → 60 分で停止、500 ステップごとに保存
-
-        Returns:
-            tuple[float, int]:
-                (time_limit_min, save_interval_step)
-        """
-        toks = self.get_line(9).split()
-        if len(toks) < 2:
-            raise ValueError(f"9 行目の要素数が不足しています: {toks!r}")
-        try:
-            return float(toks[0]), int(float(toks[1]))
-        except ValueError as exc:
-            raise ValueError(f"9 行目に数値以外の値があります: {toks!r}") from exc
+        """``[ GENERAL ]`` の ``RUN-TIME`` と ``SAVE-TIME`` を返す。"""
+        run_time = self._first_value("GENERAL", "RUN-TIME", "0")
+        save_time = self._first_value("GENERAL", "SAVE-TIME", "0")
+        return float(run_time), int(float(save_time))
 
     def set_time_and_save(
         self,
@@ -1440,579 +984,408 @@ class RmcPotDatFree:
         *,
         auto_write: Optional[bool] = True,
     ) -> None:
-        """
-        9 行目（time limit, step for saving）を更新する。
-
-        Notes:
-            内容:
-                - time limit:
-                    計算の最大実行時間（分単位, float）。
-                    0 の場合は時間制限なし。
-                - step for saving:
-                    結果ファイルを出力するステップ間隔（整数ステップ）。
-                    0 の場合は自動保存を無効化。
-
-            例:
-                (60, 1000)
-                → 最大 60 分で停止、1000 ステップごとに結果保存。
-                (0, 0)
-                → 両方無効化（時間制限も保存間隔も設定しない）。
-
-        Args:
-            time_limit_min (float): 最大実行時間（単位: 分）
-            save_interval_step (float): 保存ステップ時間
-            auto_write (bool | None): True で即時保存。None は既定に従う。
-        """
-        if time_limit_min < 0:
-            raise ValueError(
-                f"time_limit_min は 0 以上を指定してください: {time_limit_min}"
-            )
-        if save_interval_step < 0:
-            raise ValueError(
-                f"save_interval_step は 0 以上を指定してください: {save_interval_step}"
-            )
-
-        values = [self._fmt_number(time_limit_min), str(float(save_interval_step))]
+        """``[ GENERAL ]`` の ``RUN-TIME`` と ``SAVE-TIME`` を設定する。"""
         self._config.rmc_time_and_save = (
             float(time_limit_min),
             int(save_interval_step),
         )
-        self.set_line(9, values, auto_write=auto_write)
+        self._set_value("GENERAL", "RUN-TIME", self._fmt_number(time_limit_min))
+        self._set_value("GENERAL", "SAVE-TIME", self._fmt_number(save_interval_step))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def get_data_flags(self) -> Tuple[int, int, int, int]:
+        """``[ EXP ]`` の ``TYPE`` からデータ種別ごとの件数を返す。
+
+        戻り値の順序は ``GR``, ``ND``, ``XRD``, ``EXAFS``。
         """
-        10 行目（g(r), neutron, x-ray, EXAFS の出力フラグ）を取得する。
-
-        Notes:
-            各整数は、その物理量の計算・出力を行うかどうかを指定する。
-
-            順序は常に以下で固定される（RMC_POT マニュアル II.E 節より）:
-                1. g(r) の計算フラグ
-                2. neutron S(Q) の計算フラグ
-                3. X-ray F(Q) の計算フラグ
-                4. EXAFS χ(k) の計算フラグ
-
-            仕様:
-                - 0: 無効（そのデータ種を出力・比較しない）
-                - 1: 有効（そのデータ種を出力・比較する）
-
-            例:
-                0 0 1 0  ! g(r), neutron, x-ray, EXAFS
-                → g(r)=0, neutron=0, x-ray=1, EXAFS=0
-                → X線データのみ出力・比較対象とする設定。
-
-        Returns:
-            tuple[int, int, int, int]:
-                (gr_flag, neutron_flag, xray_flag, exafs_flag)
-        """
-        try:
-            tokens = self.get_line(10).split()
-            if len(tokens) >= 4:
-                return tuple(int(v) for v in tokens[:4])  # type: ignore[return-value]
-        except (IndexError, ValueError):
-            pass
-
-        if self._config.rmc_data_flags is not None:
-            return tuple(int(v) for v in self._config.rmc_data_flags[:4])  # type: ignore[return-value]
-
-        raise ValueError(
-            "data flags が未設定です。"
-            " .dat の 10 行目にもなく、config.rmc_data_flags も None です。"
-        )
+        return self._exp_type_counts()
 
     def set_data_flags(
-        self,
-        flags: Sequence[int],
-        *,
-        auto_write: Optional[bool] = True,
-    ) -> None:
-        """
-        10 行目（g(r), neutron, x-ray, EXAFS の出力フラグ）を更新する。
+        self, flags: Sequence[int], *, auto_write: Optional[bool] = True
+    ) -> bool:
+        """指定されたデータ種別の ``[ EXP ]`` セクションを残す。
 
-        Notes:
-            内容:
-                - 10 行目は、4 つの整数値で各データ種の出力可否を指定する。
-                  順序は固定:
-                    (1) g(r)
-                    (2) neutron S(Q)
-                    (3) X-ray F(Q)
-                    (4) EXAFS χ(k)
-                - 各値の意味:
-                    0: 無効（出力・比較を行わない）
-                    1: 有効（出力・比較を行う）
-
-            例:
-                (0, 0, 1, 0)
-                [0, 0, 1, 0]
-                → g(r)=off, neutron=off, X-ray=on, EXAFS=off
-                  → X線 F(Q) のみを比較対象に設定。
-
-        Args:
-            flags (Sequence[int]):
-                (gr_flag, neutron_flag, xray_flag, exafs_flag) を表す長さ 4 の列。
-                tuple でも list でもよい。
-            auto_write (bool | None):
-                True なら即時保存。None の場合はインスタンス既定に従う。
+        新しい ``[ EXP ]`` は ``TYPE`` だけを持つ。``DATAFILE`` などの必須値を
+        空文字やダミー値で補完しない。
         """
         values = list(flags)
-
         if len(values) != 4:
-            raise ValueError(
-                f"flags は 4 要素 (g(r), neutron, x-ray, EXAFS) が必要です: {values!r}"
-            )
-        if not all(isinstance(v, int) and v in (0, 1) for v in values):
-            raise ValueError(f"flags には 0 または 1 のみ指定可能です: {values!r}")
-
-        self._logger.info(f"[rmc_pot_dat_free] flags: {values!r}")
+            self._logger.error("[rmc_pot_dat_free] flags は4要素で指定してください")
+            return False
+        for value in values:
+            if value not in (0, 1):
+                self._logger.error(
+                    "[rmc_pot_dat_free] flags は0または1で指定してください"
+                )
+                return False
+        types = ["GR", "ND", "XRD", "EXAFS"]
+        existing = self._find_sections("EXP")
+        non_exp_sections = []
+        for section_name, section_values in self._sections:
+            if section_name != "EXP":
+                non_exp_sections.append((section_name, section_values))
+        selected_exp_sections = []
+        for flag, exp_type in zip(values, types):
+            if flag == 0:
+                continue
+            selected = None
+            for exp in existing:
+                current_type = exp.get("TYPE", [""])[0].upper()
+                if current_type == exp_type:
+                    selected = exp
+                    break
+            if selected is None:
+                selected = {"TYPE": [exp_type]}
+            selected_exp_sections.append(("EXP", selected))
+        self._sections = non_exp_sections + selected_exp_sections
         self._config.rmc_data_flags = values
-        self.set_line(10, [str(v) for v in values], auto_write=auto_write)
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return True
 
-    def get_exp_filename(self) -> str:
+    def get_exp_filename(self) -> Union[str, bool]:
         """
-        11 行目（実験データファイル名）を返す（旧来固定フォーマット）。
+        最初の [ EXP ] セクションに設定された実験データファイル名を取得します。
+
+        Returns:
+            str:
+                [ EXP ] セクションの DATAFILE に設定された実験データファイル名。
+            bool:
+                False（[ EXP ] セクションが存在しない、DATAFILE が存在しない、
+                または DATAFILE が空の場合）。
 
         Notes:
-            - .dat ファイルの 10 行目には、
-              g(r), neutron S(Q), X-ray F(Q), EXAFS χ(k) の順に
-              4 つの整数が並びます。これらは各データ種のブロック数を表し、
-              0 は「そのデータ種のブロックが無い」ことを意味します。
-
-            - 11 行目以降には、ブロック数が 1 以上のデータ種だけが
-              上記の順番で並びます。各データ種について 2 行が 1 ブロックで、
-              1 行目が実験データファイル名、
-              2 行目が使用点範囲（開始・終了の 2 整数）です。
-
-            - このメソッドは、そのうち最初のブロック（= 11 行目）に書かれている
-              実験データファイル名だけを返します。
-              例えば 10 行目が ``0 0 1 0`` の場合、11 行目は X-ray F(Q) 用の
-              実験データファイル名になります。
-
-            - 実験データファイル（.dat が参照する外部ファイル）のフォーマットは
-              次のように固定されています。
-              1 行目: データ点数 N（整数）
-              2 行目: タイトル行（任意文字列）
-              3 行目以降: データ点列
-
-            - データ点列の列構成はデータ種ごとに次のようになります。
-              g(r)        : r, g(r)（2 列）
-              neutron S(Q): Q, S(Q)（2 列）
-              X-ray F(Q)  : Q, F(Q), c_αβ が M 本（2+M 列）
-              EXAFS χ(k)  : k, χ(k)（2 列）
-
-            - X-ray F(Q) の場合、c_αβ の本数 M は
-              ``M = ntypes * (ntypes + 1) / 2`` で決まります。
-              c_αβ の並び順（いわゆる RMC 順）は
-              11, 12, 13, …, 22, 23, …, 33 のような上三角の順序です。
-
-            - 典型的な列構成の例として、
-              5 列のファイルは 2 元系（Q, F(Q), c11, c12, c22）、
-              8 列のファイルは 3 元系（Q, F(Q), c11, c12, c13, c22, c23, c33）
-              に対応します。
+            - 自由形式 (*.dat) では実験データは [ EXP ] セクションで定義されます。
+            - DATAFILE キーには実験データファイル名を指定します。
+            - このメソッドは最初の [ EXP ] セクションだけを対象とします。
+            - 実験データファイル自体の形式は RMC_POT の仕様に従います。
+              g(r)、neutron S(Q)、X-ray F(Q)、EXAFS χ(k) など、
+              TYPE の指定に応じたデータファイルを参照します。
         """
-        try:
-            line = self.get_line(11)
-            self._logger.info(f'[rmc_pot_dat_free] == get_exp_filename: "{line}"')
-            tokens = line.split()
-            if tokens:
-                return tokens[0]
-        except IndexError:
-            pass
+        exp = self._first_exp()
 
-        if self._config.rmc_exp_filename is not None:
-            self._logger.info(
-                f'[rmc_pot_dat_free] == get_exp_filename(from config): "{self._config.rmc_exp_filename}"'
-            )
-            return self._config.rmc_exp_filename
+        if exp is None:
+            self._logger.error("[rmc_pot_dat_free] [ EXP ] section not found.")
+            return False
 
-        raise ValueError(
-            "実験データファイル名が未設定です。"
-            " .dat の 11 行目にもなく、config.rmc_exp_filename も None です。"
-        )
+        datafiles = exp.get("DATAFILE")
+
+        if not datafiles:
+            self._logger.error("[rmc_pot_dat_free] DATAFILE not found.")
+            return False
+
+        filename = datafiles[0].strip()
+
+        self._logger.info(f'[rmc_pot_dat_free] == get_exp_filename: "{filename}"')
+
+        if not filename:
+            self._logger.error("[rmc_pot_dat_free] DATAFILE is empty.")
+            return False
+
+        return filename
 
     def set_exp_filename(
-        self,
-        path: Union[str, Path],
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """
-        11 行目（実験データファイル名）を更新する（旧来固定フォーマット）。
+        self, path: Union[str, Path], *, auto_write: Optional[bool] = None
+    ) -> bool:
+        """最初の ``[ EXP ]`` の ``DATAFILE`` を設定する。"""
+        exp = self._first_exp()
+        if not exp:
+            self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
+            return False
+        filename = str(Path(path))
+        exp["DATAFILE"] = [filename]
+        self._config.rmc_exp_filename = filename
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return True
 
-        Notes:
-            .dat 側の決まり（旧来固定）:
-                - 10 行目の順序は常に:
-                    g(r), neutron S(Q), X-ray F(Q), EXAFS χ(k)
-                - 11 行目は、上記で有効な最初のブロックが X-ray の場合には
-                  その「ファイル名行」となる（例: `0 0 1 0`）。
-                  本メソッドは **11 行目のみ** を対象として文字列を書き換える。
-
-            実験データファイルの中身（確認用の定義）
-                - 1 行目: N（整数）
-                - 2 行目: タイトル（任意。数値としては読まれない）
-                - 3 行目以降（厳密定義）:
-                  - g(r)        : r, g(r)                                         （2 列）
-                  - neutron S(Q): Q, S(Q)                                         （2 列）
-                  - X-ray F(Q)  : Q, F(Q), c_αβ × M（RMC 順, M = ntypes*(ntypes+1)/2）
-                  - EXAFS χ(k)  : k, χ(k)                                         （2 列）
-
-        Args:
-            path: 実験データファイルへのパス（相対・絶対いずれも可）。
-            auto_write: True の場合は即時保存。None の場合はインスタンス既定に従う。
-        """
-        self._config.rmc_exp_filename = str(Path(path))
-        self.set_line(11, str(Path(path)), auto_write=auto_write)
-
-    def get_exp_range(self) -> Tuple[int, int]:
-        """
-        12 行目（実験データの読み込み範囲）を取得する。
-
-        Notes:
-            - 旧来固定フォーマットでは、
-              11 行目が実験データファイル名、
-              12 行目が読み込み範囲を表す 2 つの整数になっています。
-
-            - 12 行目の 2 つの整数は、
-              「開始インデックス」と「終了インデックス」を 1 始まり（inclusive）で指定します。
-              対象は実験データファイルの「データ本体行」であり、
-              1 行目の点数 N、2 行目のタイトル行は含みません。
-
-            - 範囲指定の例:
-              ``1 290`` → データ本体の 1〜290 行を利用
-              ``1 991`` → データ本体の 1〜991 行を利用
-                          （実データ点数 N を超える指定は推奨されません）
-
-            - 終了インデックスが実データ点数 N を超えた場合の挙動は
-              RMC_POT の版に依存する可能性があります。
-              このメソッド自身は読み取りのみを行い、範囲の検査や補正は行いません。
-        """
-        try:
-            toks = self.get_line(12).split()
-            # 12 行目は 2 つの整数のみである必要
-            if len(toks) == 2:
-                start = int(float(toks[0]))
-                end = int(float(toks[1]))
-                if start >= 1 and end >= start:
-                    return start, end
-
-        except (IndexError, ValueError):
-            pass
-
-        if self._config.rmc_exp_range is not None:
-            return (
-                int(self._config.rmc_exp_range[0]),
-                int(self._config.rmc_exp_range[1]),
+    def get_exp_range(self) -> Union[Tuple[int, int], bool]:
+        """最初の ``[ EXP ]`` の ``POINT-RANGE`` を返す。"""
+        exp = self._first_exp()
+        if not exp:
+            self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
+            return False
+        values = exp.get("POINT-RANGE", [])
+        if not values:
+            self._logger.error("[rmc_pot_dat_free] POINT-RANGE がありません")
+            return False
+        tokens = values[0].split()
+        if len(tokens) != 2:
+            self._logger.error(
+                f"[rmc_pot_dat_free] POINT-RANGE が不正です: {values[0]}"
             )
-
-        raise ValueError(
-            "実験データ範囲が未設定です。"
-            " .dat の 12 行目にもなく、config.rmc_exp_range も None です。"
-        )
+            return False
+        try:
+            return int(tokens[0]), int(tokens[1])
+        except ValueError:
+            self._logger.error(
+                f"[rmc_pot_dat_free] POINT-RANGE が不正です: {values[0]}"
+            )
+            return False
 
     def set_exp_range(
-        self,
-        start: int,
-        end: int,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """
-        12 行目（実験データの読み込み範囲）を更新する。
-
-        Notes:
-            【書式（旧来固定フォーマット）】
-            - 2 整数のみ（1 始まり・inclusive）
-              ・start: 開始インデックス（>=1）
-              ・end  : 終了インデックス（>= start）
-
-            【推奨運用】
-            - 実験データファイル 1 行目の点数 N を参照し、end を N 以下に揃えること。
-
-        Args:
-            start (int): 1 始まりの開始行（inclusive, >=1）
-            end (int):   1 始まりの終了行（inclusive, >=start）
-            auto_write (bool | None): True で即時保存。None はインスタンス既定に従う。
-        """
+        self, start: int, end: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
+        """最初の ``[ EXP ]`` の ``POINT-RANGE`` を設定する。"""
         if start < 1 or end < start:
-            raise ValueError(f"範囲が不正です: start={start}, end={end}")
-
-        # 厳密に「2 トークンのみ」を書き込む
+            self._logger.error(
+                f"[rmc_pot_dat_free] POINT-RANGE が不正です: {start} {end}"
+            )
+            return False
+        exp = self._first_exp()
+        if not exp:
+            self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
+            return False
+        exp["POINT-RANGE"] = [f"{int(start)} {int(end)}"]
         self._config.rmc_exp_range = (int(start), int(end))
-        self.set_line(12, f"{int(start)} {int(end)}", auto_write=auto_write)
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return True
 
-    def get_scale_factor(self) -> float:
-        """
-        13 行目（scale factor）を取得する。
-
-        Notes:
-            - 実験 S(Q) や F(Q) に対してスケールを合わせるための係数。
-              シミュレーション出力を実験データと正規化するために使用される。
-            - 一般的な初期値は 1.0。
-
-        Returns:
-            float: スケーリング因子。
-        """
-        return float(self.get_line(13).split()[0])
+    def get_scale_factor(self) -> bool:
+        """自由形式に汎用 ``SCALE`` キーはないため ``False`` を返す。"""
+        self._logger.error(
+            "[rmc_pot_dat_free] 自由形式 [ EXP ] に汎用 SCALE キーはありません"
+        )
+        return False
 
     def set_scale_factor(
-        self,
-        value: float,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """
-        13 行目（scale factor）を設定する。
-
-        Args:
-            value (float): スケーリング因子。
-            auto_write (bool | None): True で即時保存。
-        """
-        self.set_line(13, self._fmt_number(value), auto_write=auto_write)
-
-    def get_sigma_factor(self) -> float:
-        """
-        14 行目（standard deviation / temperature factor）を取得する。
-
-        Notes:
-            - メトロポリス法で使用する標準偏差 σ（温度因子）を表す。
-            - マニュアルでは “standard deviation” と記載されており、
-              サンプルでは「5E-3 0」や「5E-3 1」のように 2 つの値を取る場合がある。
-              ここでは先頭値 σ のみを返す。
-
-        Returns:
-            float: 標準偏差（σ）。
-        """
-        try:
-            toks = self.get_line(14).split()
-            if toks:
-                return float(toks[0])
-        except (IndexError, ValueError):
-            pass
-
-        if self._config.rmc_sigma_factor is not None:
-            return float(self._config.rmc_sigma_factor)
-
-        raise ValueError(
-            "sigma factor が未設定です。"
-            " .dat の 14 行目にもなく、config.rmc_sigma_factor も None です。"
+        self, value: float, *, auto_write: Optional[bool] = None
+    ) -> bool:
+        """自由形式に汎用 ``SCALE`` キーはないため設定しない。"""
+        self._logger.error(
+            "[rmc_pot_dat_free] 自由形式 [ EXP ] に汎用 SCALE キーはありません"
         )
+        return False
+
+    def get_sigma_factor(self) -> Union[float, bool]:
+        """最初の ``[ EXP ]`` の ``SIGMA`` を返す。"""
+        exp = self._first_exp()
+        if not exp:
+            return False
+        values = exp.get("SIGMA", [])
+        if not values:
+            return False
+        try:
+            return float(values[0].split()[0])
+        except ValueError:
+            self._logger.error(f"[rmc_pot_dat_free] SIGMA が不正です: {values[0]}")
+            return False
 
     def set_sigma_factor(
-        self,
-        sigma: float,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """
-        14 行目（standard deviation / temperature factor）を設定する。
-
-        Args:
-            sigma (float): 標準偏差（σ）。
-            auto_write (bool | None): True で即時保存。
-        """
+        self, sigma: float, *, auto_write: Optional[bool] = None
+    ) -> bool:
+        """最初の ``[ EXP ]`` の ``SIGMA`` を設定する。"""
+        exp = self._first_exp()
+        if not exp:
+            self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
+            return False
+        exp["SIGMA"] = [self._fmt_number(sigma)]
         self._config.rmc_sigma_factor = float(sigma)
-        self.set_line(14, self._fmt_number(sigma), auto_write=auto_write)
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return True
 
     def get_flag_15(self) -> bool:
-        """
-        15 行目（boolean flag 1）を取得する。
+        """最初の ``[ EXP ]`` の ``USE-RFACTOR`` を返す。"""
+        exp = self._first_exp()
+        if not exp:
+            return False
+        values = exp.get("USE-RFACTOR", ["0"])
+        return self._bool_int(values[0]) == "1"
 
-        Notes:
-            - ブール値 (.true./.false.)。
-              通常は S(Q) のバックグラウンド補正や平滑化の有無を指定する。
-
-        Returns:
-            bool: True の場合は有効化。
-        """
-        return self.get_line(15).strip().lower().startswith(".t")
-
-    def set_flag_15(
-        self,
-        value: bool,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """15 行目（boolean flag 1）を設定する。"""
-        self.set_line(15, self._to_bool_token(value), auto_write=auto_write)
+    def set_flag_15(self, value: bool, *, auto_write: Optional[bool] = None) -> bool:
+        """最初の ``[ EXP ]`` の ``USE-RFACTOR`` を設定する。"""
+        exp = self._first_exp()
+        if not exp:
+            self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
+            return False
+        exp["USE-RFACTOR"] = [self._bool_int(value)]
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return True
 
     def get_flag_16(self) -> bool:
-        """
-        16 行目（boolean flag 2）を取得する。
+        """最初の ``[ EXP ]`` の ``RENORM`` を返す。"""
+        exp = self._first_exp()
+        if not exp:
+            return False
+        values = exp.get("RENORM", ["0"])
+        return self._bool_int(values[0]) == "1"
 
-        Notes:
-            - ブール値 (.true./.false.)。
-              データ重み付けを行うかどうかを示すことが多い。
-
-        Returns:
-            bool: True の場合は有効化。
-        """
-        return self.get_line(16).strip().lower().startswith(".t")
-
-    def set_flag_16(
-        self,
-        value: bool,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """16 行目（boolean flag 2）を設定する。"""
-        self.set_line(16, self._to_bool_token(value), auto_write=auto_write)
+    def set_flag_16(self, value: bool, *, auto_write: Optional[bool] = None) -> bool:
+        """最初の ``[ EXP ]`` の ``RENORM`` を設定する。"""
+        exp = self._first_exp()
+        if not exp:
+            self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
+            return False
+        exp["RENORM"] = [self._bool_int(value)]
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return True
 
     def get_flag_17(self) -> bool:
-        """
-        17 行目（boolean flag 3）を取得する。
+        """最初の ``[ EXP ]`` の ``READ-COEFFS`` を返す。"""
+        exp = self._first_exp()
+        if not exp:
+            return False
+        values = exp.get("READ-COEFFS", ["0"])
+        return self._bool_int(values[0]) == "1"
 
-        Notes:
-            - ブール値 (.true./.false.)。
-              追加オプション（誤差正規化・スムージングなど）を制御する場合がある。
-
-        Returns:
-            bool: True の場合は有効化。
-        """
-        return self.get_line(17).strip().lower().startswith(".t")
-
-    def set_flag_17(
-        self,
-        value: bool,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """17 行目（boolean flag 3）を設定する。"""
-        self.set_line(17, self._to_bool_token(value), auto_write=auto_write)
+    def set_flag_17(self, value: bool, *, auto_write: Optional[bool] = None) -> bool:
+        """最初の ``[ EXP ]`` の ``READ-COEFFS`` を設定する。"""
+        exp = self._first_exp()
+        if not exp:
+            self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
+            return False
+        exp["READ-COEFFS"] = [self._bool_int(value)]
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return True
 
     def get_flag_18(self) -> bool:
-        """
-        18 行目（boolean flag 4）を取得する。
+        """最初の ``[ EXP ]`` の ``COMPTON-SUPR-COEFF`` を返す。"""
+        exp = self._first_exp()
+        if not exp:
+            return False
+        values = exp.get("COMPTON-SUPR-COEFF", ["0"])
+        return self._bool_int(values[0]) == "1"
 
-        Notes:
-            - ブール値 (.true./.false.)。
-              一般的に、データ処理や誤差解析の補助機能をオン/オフする。
-
-        Returns:
-            bool: True の場合は有効化。
-        """
-        return self.get_line(18).strip().lower().startswith(".t")
-
-    def set_flag_18(
-        self,
-        value: bool,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """18 行目（boolean flag 4）を設定する。"""
-        self.set_line(18, self._to_bool_token(value), auto_write=auto_write)
+    def set_flag_18(self, value: bool, *, auto_write: Optional[bool] = None) -> bool:
+        """最初の ``[ EXP ]`` の ``COMPTON-SUPR-COEFF`` を設定する。"""
+        exp = self._first_exp()
+        if not exp:
+            self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
+            return False
+        exp["COMPTON-SUPR-COEFF"] = [self._bool_int(value)]
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return True
 
     def get_angle_constraint_count(self) -> int:
-        """
-        19 行目（number of cos. distr of bond angles constraint）を取得する。
-
-        Notes:
-            - ボンド角度分布に基づく制約数。
-              0 の場合、角度分布制約を適用しない。
-
-        Returns:
-            int: 角度制約数。
-        """
-        return int(float(self.get_line(19).split()[0]))
+        """``[ COS ]`` セクション数を返す。"""
+        return len(self._find_sections("COS"))
 
     def set_angle_constraint_count(
-        self,
-        value: int,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """19 行目（角度制約数）を設定する。"""
-        self.set_line(19, str(int(value)), auto_write=auto_write)
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
+        """自由形式では制約数を独立設定できないため設定しない。"""
+        current = len(self._find_sections("COS"))
+        if int(value) == current:
+            return True
+        self._logger.error(
+            "[rmc_pot_dat_free] 自由形式では [ COS ] の個数はセクション実体から決まります"
+        )
+        return False
 
     def get_coord_constraint_count(self) -> int:
-        """
-        20 行目（number of coordination constraints）を取得する。
-
-        Note:
-            - 配位数に基づく制約の数。
-              0 の場合は適用しない。
-
-        Returns:
-            int: 配位数制約の数。
-        """
-        return int(float(self.get_line(20).split()[0]))
+        """``[ COORD ]`` セクション数を返す。"""
+        return len(self._find_sections("COORD"))
 
     def set_coord_constraint_count(
-        self,
-        value: int,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """20 行目（配位数制約数）を設定する。"""
-        self.set_line(20, str(int(value)), auto_write=auto_write)
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
+        """自由形式では制約数を独立設定できないため設定しない。"""
+        current = len(self._find_sections("COORD"))
+        if int(value) == current:
+            return True
+        self._logger.error(
+            "[rmc_pot_dat_free] 自由形式では [ COORD ] の個数はセクション実体から決まります"
+        )
+        return False
 
     def get_avg_coord_constraint_count(self) -> int:
-        """
-        21 行目（number of average coordination constraints）を取得する。
-
-        Note:
-            - 平均配位数に関する制約数。
-              0 の場合は制約なし。
-
-        Returns:
-            int: 平均配位数制約の数。
-        """
-        return int(float(self.get_line(21).split()[0]))
+        """``[ AVCOORD ]`` セクション数を返す。"""
+        return len(self._find_sections("AVCOORD"))
 
     def set_avg_coord_constraint_count(
-        self,
-        value: int,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """21 行目（平均配位数制約数）を設定する。"""
-        self.set_line(21, str(int(value)), auto_write=auto_write)
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
+        """自由形式では制約数を独立設定できないため設定しない。"""
+        current = len(self._find_sections("AVCOORD"))
+        if int(value) == current:
+            return True
+        self._logger.error(
+            "[rmc_pot_dat_free] 自由形式では [ AVCOORD ] の個数はセクション実体から決まります"
+        )
+        return False
 
     def get_potential_flag(self) -> int:
-        """
-        22 行目（potential flag）を取得する。
-
-        Note:
-            - ポテンシャル使用のフラグまたは選択番号。
-              0 の場合はポテンシャル未使用。
-
-        Returns:
-            int: ポテンシャルフラグ。
-        """
-        return int(float(self.get_line(22).split()[0]))
+        """potential セクションが存在する場合に ``1``、なければ ``0`` を返す。"""
+        for section in ("NBPOT", "BPOT", "AENET", "TABPOT"):
+            if self._find_sections(section):
+                return 1
+        return 0
 
     def set_potential_flag(
-        self,
-        value: int,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """22 行目（ポテンシャルフラグ）を設定する。"""
-        self.set_line(22, str(int(value)), auto_write=auto_write)
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
+        """自由形式では potential 種別をセクションで指定するため設定しない。"""
+        current = self.get_potential_flag()
+        if int(value) == current:
+            return True
+        self._logger.error(
+            "[rmc_pot_dat_free] 自由形式では [ NBPOT ]、[ BPOT ]、[ AENET ]、[ TABPOT ] を設定してください"
+        )
+        return False
 
     def get_fnc_switch(self) -> int:
-        """
-        23 行目（FNC switch）の先頭番号を取得する。
-
-        Note:
-            - 0: FNC なし
-            - 1: 通常 FNC。初期構造が FNC 距離範囲内にあることを要求する。
-            - 2: FNC 距離範囲を初期構造に合わせて調整して開始する。
-            - 3: 範囲外ペアを許して開始し、範囲内へ近づく move を受理する。
-            - 4: flexible molecule / bonded potential。通常 FNC ではなく topology を使う。
+        """FNC または ``[ BPOT ]`` の状態を数値で取得する。
 
         Returns:
-            int: FNC switch の先頭番号。
+            0 から 4 の状態番号。
+
+            - 0: FNC なし、かつ ``[ BPOT ]`` なし
+            - 1: ``FNC-TYPE = NORMAL``
+            - 2: ``FNC-TYPE = ADJUST``
+            - 3: ``FNC-TYPE = MOVE-IN``
+            - 4: ``[ BPOT ]`` による flexible molecule / topology mode
+
+        Notes:
+            ``FNC-TYPE`` が存在しない場合も ``NONE`` として扱う。
+            ``[ BPOT ]`` が存在しない場合は topology mode ではない。
+
+            自由形式では ``FNC-TYPE`` に 4 または ``FLEXIBLE`` は存在しない。
+            topology を使う flexible molecule mode は ``[ BPOT ]`` の存在で判定する。
         """
-        return int(float(self.get_line(23).split()[0]))
+        if self._find_sections("BPOT"):
+            return 4
+
+        fnc_type = self._first_value(
+            "GENERAL",
+            "FNC-TYPE",
+            "NONE",
+        )
+        tokens = fnc_type.split()
+        if not tokens:
+            return 0
+
+        mode = self._FREE_TO_FNC.get(tokens[0].upper())
+        if mode is None:
+            raise ValueError("未対応の FNC-TYPE です: " f"{tokens[0]}")
+        return mode
 
     def get_fnc_options(self) -> List[str]:
-        """
-        23 行目（FNC switch）の先頭番号以降のオプションを取得する。
+        """FNC / topology option を取得する。
 
         Returns:
-            List[str]: 例: ["-D_FF_OPLS", "-D_FLEX", "-DORI_ANGLE"]
+            FNC 1～3 では ``FNC-TYPE`` の追加トークンを返す。
+            topology mode では ``[ BPOT ]`` の ``COMP-OPTION`` を返す。
         """
-        toks = self.get_line(23).split()
-        return toks[1:]
+        mode = self.get_fnc_switch()
+
+        if mode == 4:
+            section = self._first_section("BPOT")
+            return list(section.get("COMP-OPTION", []))
+
+        fnc_type = self._first_value(
+            "GENERAL",
+            "FNC-TYPE",
+            "NONE",
+        )
+        tokens = fnc_type.split()
+        return tokens[1:]
 
     @staticmethod
     def _coerce_fnc_switch_value(
@@ -2064,41 +1437,147 @@ class RmcPotDatFree:
         keep_existing_opt: bool = True,
         auto_write: Optional[bool] = None,
     ) -> None:
-        """
-        23 行目（FNC switch）を設定する。
+        """FNC または topology mode を設定する。
 
         Args:
-            value: True/False または RMC_POT の FNC switch 番号。
-                True は 1、False は 0 に変換する。
-                int を渡した場合は、その番号指定を最優先する。
-            opt: FNC switch 番号の後ろに付ける追加オプション。
-                例: "-D_FF_OPLS -D_FLEX -DORI_ANGLE -DORI_BOND"
-            keep_existing_opt: opt が None の場合に、既存行の追加オプションを保持する。
-                ただし value が bool の場合は通常の有効/無効操作なので保持しない。
-            auto_write: True 指定で即時保存。None の場合はインスタンス既定に従う。
+            value: ``False``/``True`` または 0～4 の状態番号。
+            opt: FNC の追加トークン、または mode 4 の ``COMP-OPTION``。
+            keep_existing_opt: ``opt`` 省略時に既存 option を保持するか。
+            auto_write: 設定後に直ちに保存するか。
 
-        Examples:
-            set_fnc_switch(True)
-                -> "1"
-            set_fnc_switch(False)
-                -> "0"
-            set_fnc_switch(3)
-                -> "3"
-            set_fnc_switch(4, opt="-D_FF_OPLS -D_FLEX -DORI_ANGLE -DORI_BOND")
-                -> "4 -D_FF_OPLS -D_FLEX -DORI_ANGLE -DORI_BOND"
+        Raises:
+            ValueError: FNC 1～3 と ``[ BPOT ]`` を同時指定した場合。
+
+        Notes:
+            自由形式では FNC 1～3 は ``[ GENERAL ]`` の ``FNC-TYPE`` で指定する。
+            flexible molecule mode は
+            ``FNC-TYPE`` ではなく ``[ BPOT ]`` の存在で指定する。
         """
         is_bool_input = isinstance(value, bool)
         mode = self._coerce_fnc_switch_value(value)
 
+        options: List[str] = []
         if opt is not None:
             options = self._coerce_fnc_options(opt)
-        elif keep_existing_opt and not is_bool_input:
-            options = self.get_fnc_options()
         else:
-            options = []
+            if keep_existing_opt:
+                if not is_bool_input:
+                    options = self.get_fnc_options()
 
-        tokens = [str(mode)] + options
-        self.set_line(23, " ".join(tokens), auto_write=auto_write)
+        if mode == 4:
+            self._set_value(
+                "GENERAL",
+                "FNC-TYPE",
+                "NONE",
+            )
+
+            bpot = self._first_section(
+                "BPOT",
+                create=True,
+            )
+            if options:
+                bpot["COMP-OPTION"] = list(options)
+
+        else:
+            if mode in {1, 2, 3}:
+                if self._find_sections("BPOT"):
+                    raise ValueError(
+                        "自由形式では FNC 1～3 と [ BPOT ] topology mode "
+                        "を同時に使用できません。"
+                    )
+
+            if mode == 0:
+                retained_sections = []
+                for name, values in self._sections:
+                    if name != "BPOT":
+                        retained_sections.append((name, values))
+                self._sections = retained_sections
+
+            free_mode = self._FNC_TO_FREE[mode]
+            tokens = [free_mode]
+            tokens.extend(options)
+            self._set_value(
+                "GENERAL",
+                "FNC-TYPE",
+                " ".join(tokens),
+            )
+
+        self.validate_mode_configuration(
+            check_input_files=False,
+        )
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def validate_mode_configuration(
+        self,
+        *,
+        check_input_files: bool = False,
+    ) -> None:
+        """自由形式の mode 指定と入力ファイルを検証する。
+
+        Args:
+            check_input_files: ``True`` の場合、mode が要求する
+                ``*.fnc`` または ``*.top`` の存在も確認する。
+
+        Raises:
+            ValueError: 排他的な mode が同時に設定されている場合。
+            FileNotFoundError: 必要な外部入力ファイルが存在しない場合。
+
+        Notes:
+            ``[ SNC ]`` は ``*.dat`` 内の制約セクションであり、
+            外部 ``*.snc`` 入力ファイルを選択する mode ではない。
+        """
+        fnc_type = self._first_value(
+            "GENERAL",
+            "FNC-TYPE",
+            "NONE",
+        )
+        fnc_tokens = fnc_type.split()
+
+        fnc_mode = "NONE"
+        if fnc_tokens:
+            fnc_mode = fnc_tokens[0].upper()
+
+        allowed_fnc_modes = {
+            "NONE",
+            "NORMAL",
+            "ADJUST",
+            "MOVE-IN",
+        }
+        if fnc_mode not in allowed_fnc_modes:
+            raise ValueError(
+                "自由形式の FNC-TYPE は NONE、NORMAL、ADJUST、"
+                "MOVE-IN のいずれかです。"
+            )
+
+        has_bpot = bool(self._find_sections("BPOT"))
+        if has_bpot:
+            if fnc_mode != "NONE":
+                raise ValueError(
+                    "[ BPOT ] topology mode と FNC-TYPE=NORMAL/ADJUST/"
+                    "MOVE-IN は同時に使用できません。"
+                )
+
+        if self._find_sections("AENET"):
+            self._validate_aenet_compatibility()
+
+        if not check_input_files:
+            return
+
+        if fnc_mode != "NONE":
+            fnc_path = Path(f"{self._cfg_name}.fnc")
+            if not fnc_path.exists():
+                raise FileNotFoundError(
+                    f"FNC mode に必要なファイルがありません: {fnc_path}"
+                )
+
+        if has_bpot:
+            top_path = Path(f"{self._cfg_name}.top")
+            if not top_path.exists():
+                raise FileNotFoundError(
+                    "topology mode に必要なファイルがありません: " f"{top_path}"
+                )
 
     def _resolve_fnc_path(
         self,
@@ -2253,215 +1732,141 @@ class RmcPotDatFree:
         self._logger.info(f"[rmc_pot_dat_free] == set_fnc_distance_ranges({path})")
 
     def get_initial_bin_shift(self) -> int:
-        """
-        24 行目（initial bin shift）を取得する。
-
-        Note:
-            - g(r) 等のヒストグラム初期シフト値。
-              0 はシフトなし。
-
-        Returns:
-            int: 初期ビンシフト。
-        """
-        return int(float(self.get_line(24).split()[0]))
+        """``[ GENERAL ]`` の ``BIN-SHIFT`` を返す。"""
+        value = self._first_value("GENERAL", "BIN-SHIFT", "0")
+        return int(float(value))
 
     def set_initial_bin_shift(
-        self,
-        value: int,
-        *,
-        auto_write: Optional[bool] = None,
+        self, value: int, *, auto_write: Optional[bool] = None
     ) -> None:
-        """24 行目（initial bin shift）を設定する。"""
-        self.set_line(24, str(int(value)), auto_write=auto_write)
+        """``[ GENERAL ]`` の ``BIN-SHIFT`` を設定する。"""
+        self._set_value("GENERAL", "BIN-SHIFT", str(int(value)))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def get_xmax_used(self) -> float:
-        """
-        25 行目（xmax used in the run）を取得する。
+        """``[ GENERAL ]`` の ``XMAX-FACTOR`` を返す。"""
+        value = self._first_value("GENERAL", "XMAX-FACTOR", "1.0")
+        return float(value)
 
-        Note:
-            - g(r) 等の計算に用いる最大 r 値。
-              スケール因子的に使われることもある。
-
-        Returns:
-            float: xmax の値。
-        """
-        return float(self.get_line(25).split()[0])
-
-    def set_xmax_used(
-        self,
-        value: float,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """25 行目（xmax used in the run）を設定する。"""
-        self.set_line(25, self._fmt_number(value), auto_write=auto_write)
+    def set_xmax_used(self, value: float, *, auto_write: Optional[bool] = None) -> None:
+        """``[ GENERAL ]`` の ``XMAX-FACTOR`` を設定する。"""
+        self._set_value("GENERAL", "XMAX-FACTOR", self._fmt_number(value))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def get_num_atoms_per_move(self) -> int:
-        """
-        26 行目（number of atoms moved in a single move）を取得する。
-
-        Note:
-            - 1 回の move 操作で同時に動かす原子の数。
-              通常は 1。
-
-        Returns:
-            int: 移動させる原子数。
-        """
-        try:
-            return int(float(self.get_line(26).split()[0]))
-
-        except (IndexError, ValueError):
-            if self._config.rmc_num_atoms_per_move is not None:
-                return int(self._config.rmc_num_atoms_per_move)
-
-            raise ValueError(
-                "num_atoms_per_move が未設定です。"
-                " .dat の 26 行目にもなく、config.rmc_num_atoms_per_move も None です。"
-            )
+        """通常の自由形式 atomic RMC では1回の move で動かす原子数は1を返す。"""
+        return 1
 
     def set_num_atoms_per_move(
-        self,
-        value: int,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """26 行目（number of atoms moved）を設定する。"""
-        self._config.rmc_num_atoms_per_move = int(value)
-        self.set_line(26, str(int(value)), auto_write=auto_write)
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
+        """自由形式 atomic RMC では1以外を設定しない。"""
+        if int(value) != 1:
+            self._logger.error(
+                "[rmc_pot_dat_free] 自由形式の通常 atomic RMC では1回の move で動かす原子数は1です"
+            )
+            return False
+        self._config.rmc_num_atoms_per_move = 1
+        return True
 
     def get_history_buffer_size(self) -> int:
-        """
-        27 行目（size of the history buffer）を取得する。
-
-        Note:
-            - 受理率など過去情報を保持する履歴バッファサイズ。
-              統計の平滑化に使用される。
-
-        Returns:
-            int: バッファサイズ。
-        """
-        return int(float(self.get_line(27).split()[0]))
+        """``[ GENERAL ]`` の ``HST_BUFFSIZE`` を返す。"""
+        value = self._first_value("GENERAL", "HST_BUFFSIZE", "0")
+        return int(float(value))
 
     def set_history_buffer_size(
-        self,
-        value: int,
-        *,
-        auto_write: Optional[bool] = None,
+        self, value: int, *, auto_write: Optional[bool] = None
     ) -> None:
-        """27 行目（history buffer size）を設定する。"""
-        self.set_line(27, str(int(value)), auto_write=auto_write)
+        """``[ GENERAL ]`` の ``HST_BUFFSIZE`` を設定する。"""
+        self._set_value("GENERAL", "HST_BUFFSIZE", str(int(value)))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def get_display_update_interval(self) -> int:
-        """
-        28 行目（number of display update between each history buffering）を取得する。
-
-        Returns:
-            int: 表示更新の間隔。
-        """
-        return int(float(self.get_line(28).split()[0]))
+        """``[ GENERAL ]`` の ``HST-STEP-FACTOR`` を返す。"""
+        value = self._first_value("GENERAL", "HST-STEP-FACTOR", "1")
+        return int(float(value))
 
     def set_display_update_interval(
-        self,
-        value: int,
-        *,
-        auto_write: Optional[bool] = None,
+        self, value: int, *, auto_write: Optional[bool] = None
     ) -> None:
-        """28 行目（display update interval）を設定する。"""
-        self.set_line(28, str(int(value)), auto_write=auto_write)
+        """``[ GENERAL ]`` の ``HST-STEP-FACTOR`` を設定する。"""
+        self._set_value("GENERAL", "HST-STEP-FACTOR", str(int(value)))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def get_custom_move_flag(self) -> int:
-        """
-        29 行目（indicator of custom move）を取得する。
-
-        Returns:
-            int: カスタムムーブ使用フラグ（0/1）。
-        """
-        return int(float(self.get_line(29).split()[0]))
+        """自由形式で対応する設定がないため ``0`` を返す。"""
+        return 0
 
     def set_custom_move_flag(
-        self,
-        value: int,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """29 行目（custom move flag）を設定する。"""
-        self.set_line(29, str(int(value)), auto_write=auto_write)
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
+        """自由形式で対応する設定がないため設定しない。"""
+        if int(value) == 0:
+            return True
+        self._logger.error(
+            "[rmc_pot_dat_free] この設定に対応する自由形式キーワードはありません"
+        )
+        return False
 
     def get_load_histogram_flag(self) -> int:
-        """
-        30 行目（whether to load the histogram from file）を取得する。
-
-        Returns:
-            int: 0 ならロードしない、1 ならロードする。
-        """
-        return int(float(self.get_line(30).split()[0]))
+        """``[ GENERAL ]`` の ``RELOAD`` を返す。"""
+        value = self._first_value("GENERAL", "RELOAD", "0")
+        return int(float(value))
 
     def set_load_histogram_flag(
-        self,
-        value: int,
-        *,
-        auto_write: Optional[bool] = None,
+        self, value: int, *, auto_write: Optional[bool] = None
     ) -> None:
-        """30 行目（load histogram flag）を設定する。"""
-        self.set_line(30, str(int(value)), auto_write=auto_write)
+        """``[ GENERAL ]`` の ``RELOAD`` を設定する。"""
+        self._set_value("GENERAL", "RELOAD", str(int(value)))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def get_max_atoms_per_cell(self) -> int:
-        """
-        31 行目（maximum number of atoms in a gridcell）を取得する。
-
-        Returns:
-            int: グリッドセル内最大原子数。
-        """
-        return int(float(self.get_line(31).split()[0]))
+        """自由形式で対応する設定がないため ``0`` を返す。"""
+        return 0
 
     def set_max_atoms_per_cell(
-        self,
-        value: int,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """31 行目（max atoms per gridcell）を設定する。"""
-        self.set_line(31, str(int(value)), auto_write=auto_write)
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
+        """自由形式で対応する設定がないため設定しない。"""
+        if int(value) == 0:
+            return True
+        self._logger.error(
+            "[rmc_pot_dat_free] この設定に対応する自由形式キーワードはありません"
+        )
+        return False
 
-    def get_swap_settings(self) -> Tuple[int, int]:
-        """
-        32 行目（fraction of swaps, allow flag）を取得する。
-
-        Returns:
-            tuple[int, int]: (swap_fraction, allow_flag)
-        """
-        toks = self.get_line(32).split()
-        if len(toks) < 2:
-            raise ValueError("32 行目は 2 つの整数が必要です。")
-        return int(float(toks[0])), int(float(toks[1]))
+    def get_swap_settings(self) -> Tuple[float, int]:
+        """``[ GENERAL ]`` の ``SWAP-FRACTION`` と ``SWAP-ALLOW`` を返す。"""
+        fraction = self._first_value("GENERAL", "SWAP-FRACTION", "0")
+        allow = self._first_value("GENERAL", "SWAP-ALLOW", "0")
+        return float(fraction), int(float(allow))
 
     def set_swap_settings(
-        self,
-        fraction: int,
-        allow_flag: int,
-        *,
-        auto_write: Optional[bool] = None,
+        self, fraction: int, allow_flag: int, *, auto_write: Optional[bool] = None
     ) -> None:
-        """32 行目（swap fraction と許可フラグ）を設定する。"""
-        self.set_line(32, f"{int(fraction)} {int(allow_flag)}", auto_write=auto_write)
+        """``[ GENERAL ]`` の swap 関連キーワードを設定する。"""
+        self._set_value("GENERAL", "SWAP-FRACTION", self._fmt_number(fraction))
+        self._set_value("GENERAL", "SWAP-ALLOW", str(int(allow_flag)))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def get_thread_count(self) -> int:
-        """
-        33 行目（total number of threads to use）を取得する。
-
-        Returns:
-            int: 使用スレッド数。
-        """
-        return int(float(self.get_line(33).split()[0]))
+        """``[ GENERAL ]`` の ``THREADS`` を返す。"""
+        value = self._first_value("GENERAL", "THREADS", "1")
+        return int(float(value))
 
     def set_thread_count(
-        self,
-        value: int,
-        *,
-        auto_write: Optional[bool] = None,
+        self, value: int, *, auto_write: Optional[bool] = None
     ) -> None:
-        """33 行目（スレッド数）を設定する。"""
-        self.set_line(33, str(int(value)), auto_write=auto_write)
+        """``[ GENERAL ]`` の ``THREADS`` を設定する。"""
+        self._set_value("GENERAL", "THREADS", str(int(value)))
+        if self._resolve_auto_write(auto_write):
+            self.write()
 
     def _resolve_auto_write(self, auto_write: Optional[bool]) -> bool:
         """自動書き込みの実行可否を決定する。
@@ -2572,9 +1977,7 @@ class RmcPotDatFree:
         if minimum_value < 0.0:
             raise ValueError(f"{argument_name} の下限は 0 以上で指定してください.")
         if maximum_value <= minimum_value:
-            raise ValueError(
-                f"{argument_name} の上限は下限より大きくしてください."
-            )
+            raise ValueError(f"{argument_name} の上限は下限より大きくしてください.")
         return minimum_value, maximum_value
 
     def get_qn_constraints(self) -> List[Dict[str, Any]]:
@@ -2669,15 +2072,13 @@ class RmcPotDatFree:
             sigma_values = section[sigma_key]
             if len(sigma_values) != 1:
                 raise ValueError(
-                    f"[SNC] index={section_index}: "
-                    f"{sigma_key} は 1 行必要です。"
+                    f"[SNC] index={section_index}: " f"{sigma_key} は 1 行必要です。"
                 )
 
             sigma_tokens = sigma_values[0].split()
             if len(sigma_tokens) != 3:
                 raise ValueError(
-                    f"[SNC] index={section_index}: "
-                    f"{sigma_key} は 3 値必要です。"
+                    f"[SNC] index={section_index}: " f"{sigma_key} は 3 値必要です。"
                 )
 
             constraint = {
@@ -2703,9 +2104,7 @@ class RmcPotDatFree:
         first_neighbor_type: int,
         first_neighbor_minimum: Union[int, float],
         first_neighbor_maximum: Union[int, float],
-        second_neighbors: Sequence[
-            Tuple[int, Union[int, float], Union[int, float]]
-        ],
+        second_neighbors: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
         coordination_number: int,
         fraction: Union[int, float],
         sigma: Union[int, float],
@@ -2838,9 +2237,7 @@ class RmcPotDatFree:
         first_neighbor_type: int,
         first_neighbor_minimum: Union[int, float],
         first_neighbor_maximum: Union[int, float],
-        second_neighbors: Sequence[
-            Tuple[int, Union[int, float], Union[int, float]]
-        ],
+        second_neighbors: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
         coordination_number: int,
         fraction: Union[int, float],
         sigma: Union[int, float],
@@ -2923,9 +2320,7 @@ class RmcPotDatFree:
             auto_write: 更新後に保存するかどうか。
         """
         self.remove_section("SNC", index)
-        self._logger.info(
-            f"[rmc_pot_dat_free] remove_qn_constraint: index={index}"
-        )
+        self._logger.info(f"[rmc_pot_dat_free] remove_qn_constraint: index={index}")
         if self._resolve_auto_write(auto_write):
             self.write()
 
@@ -2938,17 +2333,14 @@ class RmcPotDatFree:
 
         Args:
             auto_write: 更新後に保存するかどうか。
+
+        Notes:
+            従来名との互換メソッド。新しく Qn/SNC 一式を作り直す場合は
+            ``initialize_qn_constraints()`` を使用する。
         """
-        retained_sections: List[Tuple[str, Dict[str, List[str]]]] = []
-        for name, values in self._sections:
-            if name != "SNC":
-                retained_sections.append((name, values))
-        self._sections = retained_sections
-
-        self._logger.info("[rmc_pot_dat_free] clear_qn_constraints")
-
-        if self._resolve_auto_write(auto_write):
-            self.write()
+        self.initialize_qn_constraints(
+            auto_write=auto_write,
+        )
 
     def _validate_aenet_compatibility(self) -> None:
         """AENET と明示的に共存不可の自由形式セクションを検査する。
@@ -2973,17 +2365,11 @@ class RmcPotDatFree:
         for section_name in incompatible_sections:
             if self._find_sections(section_name):
                 raise ValueError(
-                    "AENET と共存できないセクションがあります: "
-                    f"[{section_name}]"
+                    "AENET と共存できないセクションがあります: " f"[{section_name}]"
                 )
 
-        fnc_type = self._first_value("GENERAL", "FNC-TYPE", "NONE")
-        fnc_tokens = fnc_type.split()
-        if fnc_tokens:
-            if fnc_tokens[0].upper() == "FLEXIBLE":
-                raise ValueError(
-                    "AENET は FNC-TYPE=FLEXIBLE と併用できません。"
-                )
+        if self._find_sections("BPOT"):
+            raise ValueError("AENET は [ BPOT ] topology mode と併用できません。")
 
     def get_aenet_settings(self) -> Optional[Dict[str, Any]]:
         """自由形式 ``[ AENET ]`` の ANN ポテンシャル設定を取得する。
@@ -3006,9 +2392,7 @@ class RmcPotDatFree:
         section = sections[0]
         potential_values = section.get("IND_ANN-FILE_TYPE-NAME", [])
         if not potential_values:
-            raise ValueError(
-                "[AENET] IND_ANN-FILE_TYPE-NAME は 1 行以上必要です。"
-            )
+            raise ValueError("[AENET] IND_ANN-FILE_TYPE-NAME は 1 行以上必要です。")
 
         potentials: List[Dict[str, Any]] = []
         for value in potential_values:
@@ -3047,8 +2431,7 @@ class RmcPotDatFree:
 
         if not sigma_key:
             raise ValueError(
-                "[AENET] SIGMA、SIGMA-MASTER、SIGMA-SCALABLE "
-                "のいずれかが必要です。"
+                "[AENET] SIGMA、SIGMA-MASTER、SIGMA-SCALABLE " "のいずれかが必要です。"
             )
 
         settings: Dict[str, Any] = {
@@ -3147,8 +2530,7 @@ class RmcPotDatFree:
             )
             if atom_type_value in seen_types:
                 raise ValueError(
-                    "AENET の atom_type は重複指定できません: "
-                    f"{atom_type_value}"
+                    "AENET の atom_type は重複指定できません: " f"{atom_type_value}"
                 )
             seen_types.add(atom_type_value)
 
@@ -3171,9 +2553,7 @@ class RmcPotDatFree:
             section["IND_ANN-FILE_TYPE-NAME"].append(" ".join(tokens))
 
         if cutoff_value is not None:
-            section["CUTOFF-AENET"] = [
-                self._fmt_number(cutoff_value)
-            ]
+            section["CUTOFF-AENET"] = [self._fmt_number(cutoff_value)]
 
         if write_atomic_energy:
             section["WRITE-ATOMIC-ENERGY"] = ["1"]
@@ -3229,8 +2609,7 @@ class RmcPotDatFree:
         for item in settings["potentials"]:
             if item["atom_type"] == atom_type_value:
                 raise ValueError(
-                    "AENET の atom_type は重複指定できません: "
-                    f"{atom_type_value}"
+                    "AENET の atom_type は重複指定できません: " f"{atom_type_value}"
                 )
 
         section = self._find_sections("AENET")[0]
@@ -3245,9 +2624,7 @@ class RmcPotDatFree:
         if type_name is not None:
             type_name_value = str(type_name).strip()
             if not type_name_value:
-                raise ValueError(
-                    "type_name は文字列または None で指定してください。"
-                )
+                raise ValueError("type_name は文字列または None で指定してください。")
             tokens.append(type_name_value)
 
         section["IND_ANN-FILE_TYPE-NAME"].append(" ".join(tokens))
@@ -3296,8 +2673,7 @@ class RmcPotDatFree:
 
         if not removed:
             raise ValueError(
-                "指定した AENET atom_type は存在しません: "
-                f"{atom_type_value}"
+                "指定した AENET atom_type は存在しません: " f"{atom_type_value}"
             )
         if not retained_values:
             raise ValueError(
@@ -3330,6 +2706,3 @@ class RmcPotDatFree:
 
         if self._resolve_auto_write(auto_write):
             self.write()
-
-
-RmcPotDat = RmcPotDatFree
