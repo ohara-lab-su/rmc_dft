@@ -30,7 +30,6 @@ class RmcPotDatFree:
         1: "NORMAL",
         2: "ADJUST",
         3: "MOVE-IN",
-        4: "FLEXIBLE",
     }
     _FREE_TO_FNC = {value: key for key, value in _FNC_TO_FREE.items()}
 
@@ -289,6 +288,9 @@ class RmcPotDatFree:
             base = self._cfg_name
         else:
             base = out_name
+        self.validate_mode_configuration(
+            check_input_files=False,
+        )
         self._write_path(Path(f"{base}.dat"))
 
     def _write_path(self, path: Path) -> None:
@@ -547,7 +549,7 @@ class RmcPotDatFree:
             20: str(len(self._find_sections("COORD"))),
             21: str(len(self._find_sections("AVCOORD"))),
             22: potential_flag,
-            23: self._fnc_free_to_fixed(self._first_value("GENERAL", "FNC-TYPE", "NONE")),
+            23: self._fnc_compat_line(),
             24: self._first_value("GENERAL", "BIN-SHIFT", "0"),
             25: self._first_value("GENERAL", "XMAX-FACTOR", "1"),
             27: self._first_value("GENERAL", "HST_BUFFSIZE", "0"),
@@ -609,11 +611,34 @@ class RmcPotDatFree:
                 mode = int(float(tokens[0]))
             else:
                 mode = 0
-            free = self._FNC_TO_FREE.get(mode)
-            if free is None:
-                raise ValueError(f"未対応の FNC switch です: {mode}")
-            value = " ".join([free] + tokens[1:])
-            self._set_value("GENERAL", "FNC-TYPE", value)
+
+            options = tokens[1:]
+
+            if mode == 4:
+                self._set_value(
+                    "GENERAL",
+                    "FNC-TYPE",
+                    "NONE",
+                )
+                bpot = self._first_section(
+                    "BPOT",
+                    create=True,
+                )
+                if options:
+                    bpot["COMP-OPTION"] = list(options)
+            else:
+                free = self._FNC_TO_FREE.get(mode)
+                if free is None:
+                    raise ValueError(
+                        f"未対応の FNC switch です: {mode}"
+                    )
+                value_tokens = [free]
+                value_tokens.extend(options)
+                self._set_value(
+                    "GENERAL",
+                    "FNC-TYPE",
+                    " ".join(value_tokens),
+                )
         elif line_no == 24:
             self._set_value("GENERAL", "BIN-SHIFT", text)
         elif line_no == 25:
@@ -689,6 +714,25 @@ class RmcPotDatFree:
         if bool_value == "1":
             return ".true."
         return ".false."
+
+    def _fnc_compat_line(self) -> str:
+        """自由形式の mode を固定形式互換 FNC 行へ変換する。
+
+        Returns:
+            FNC 0～4 と option を表す文字列。
+        """
+        if self._find_sections("BPOT"):
+            options = self.get_fnc_options()
+            tokens = ["4"]
+            tokens.extend(options)
+            return " ".join(tokens)
+
+        fnc_value = self._first_value(
+            "GENERAL",
+            "FNC-TYPE",
+            "NONE",
+        )
+        return self._fnc_free_to_fixed(fnc_value)
 
     def _fnc_free_to_fixed(self, value: str) -> str:
         """自由形式の ``FNC-TYPE`` を固定形式互換表現へ変換する。
@@ -1989,30 +2033,61 @@ class RmcPotDatFree:
         self.set_line(22, str(int(value)), auto_write=auto_write)
 
     def get_fnc_switch(self) -> int:
-        """
-        23 行目（FNC switch）の先頭番号を取得する。
-
-        Note:
-            - 0: FNC なし
-            - 1: 通常 FNC。初期構造が FNC 距離範囲内にあることを要求する。
-            - 2: FNC 距離範囲を初期構造に合わせて調整して開始する。
-            - 3: 範囲外ペアを許して開始し、範囲内へ近づく move を受理する。
-            - 4: flexible molecule / bonded potential。通常 FNC ではなく topology を使う。
+        """固定形式互換の FNC switch 番号を取得する。
 
         Returns:
-            int: FNC switch の先頭番号。
+            0 から 4 の固定形式互換番号。
+
+            - 0: FNC なし、かつ ``[ BPOT ]`` なし
+            - 1: ``FNC-TYPE = NORMAL``
+            - 2: ``FNC-TYPE = ADJUST``
+            - 3: ``FNC-TYPE = MOVE-IN``
+            - 4: ``[ BPOT ]`` による flexible molecule / topology mode
+
+        Notes:
+            自由形式では ``FNC-TYPE`` に 4 または ``FLEXIBLE`` は存在しない。
+            topology を使う flexible molecule mode は ``[ BPOT ]`` の存在で判定する。
         """
-        return int(float(self.get_line(23).split()[0]))
+        if self._find_sections("BPOT"):
+            return 4
+
+        fnc_type = self._first_value(
+            "GENERAL",
+            "FNC-TYPE",
+            "NONE",
+        )
+        tokens = fnc_type.split()
+        if not tokens:
+            return 0
+
+        mode = self._FREE_TO_FNC.get(tokens[0].upper())
+        if mode is None:
+            raise ValueError(
+                "未対応の FNC-TYPE です: "
+                f"{tokens[0]}"
+            )
+        return mode
 
     def get_fnc_options(self) -> List[str]:
-        """
-        23 行目（FNC switch）の先頭番号以降のオプションを取得する。
+        """固定形式互換の FNC / topology option を取得する。
 
         Returns:
-            List[str]: 例: ["-D_FF_OPLS", "-D_FLEX", "-DORI_ANGLE"]
+            FNC 1～3 では ``FNC-TYPE`` の追加トークンを返す。
+            topology mode では ``[ BPOT ]`` の ``COMP-OPTION`` を返す。
         """
-        toks = self.get_line(23).split()
-        return toks[1:]
+        mode = self.get_fnc_switch()
+
+        if mode == 4:
+            section = self._first_section("BPOT")
+            return list(section.get("COMP-OPTION", []))
+
+        fnc_type = self._first_value(
+            "GENERAL",
+            "FNC-TYPE",
+            "NONE",
+        )
+        tokens = fnc_type.split()
+        return tokens[1:]
 
     @staticmethod
     def _coerce_fnc_switch_value(
@@ -2064,41 +2139,216 @@ class RmcPotDatFree:
         keep_existing_opt: bool = True,
         auto_write: Optional[bool] = None,
     ) -> None:
-        """
-        23 行目（FNC switch）を設定する。
+        """固定形式互換番号で FNC または topology mode を設定する。
 
         Args:
-            value: True/False または RMC_POT の FNC switch 番号。
-                True は 1、False は 0 に変換する。
-                int を渡した場合は、その番号指定を最優先する。
-            opt: FNC switch 番号の後ろに付ける追加オプション。
-                例: "-D_FF_OPLS -D_FLEX -DORI_ANGLE -DORI_BOND"
-            keep_existing_opt: opt が None の場合に、既存行の追加オプションを保持する。
-                ただし value が bool の場合は通常の有効/無効操作なので保持しない。
-            auto_write: True 指定で即時保存。None の場合はインスタンス既定に従う。
+            value: ``False``/``True`` または 0～4 の固定形式互換番号。
+            opt: FNC の追加トークン、または mode 4 の ``COMP-OPTION``。
+            keep_existing_opt: ``opt`` 省略時に既存 option を保持するか。
+            auto_write: 設定後に直ちに保存するか。
 
-        Examples:
-            set_fnc_switch(True)
-                -> "1"
-            set_fnc_switch(False)
-                -> "0"
-            set_fnc_switch(3)
-                -> "3"
-            set_fnc_switch(4, opt="-D_FF_OPLS -D_FLEX -DORI_ANGLE -DORI_BOND")
-                -> "4 -D_FF_OPLS -D_FLEX -DORI_ANGLE -DORI_BOND"
+        Raises:
+            ValueError: FNC 1～3 と ``[ BPOT ]`` を同時指定した場合。
+
+        Notes:
+            自由形式では FNC 1～3 は ``[ GENERAL ]`` の ``FNC-TYPE`` で指定する。
+            固定形式の FNC=4 に相当する flexible molecule mode は
+            ``FNC-TYPE`` ではなく ``[ BPOT ]`` の存在で指定する。
         """
         is_bool_input = isinstance(value, bool)
         mode = self._coerce_fnc_switch_value(value)
 
+        options: List[str] = []
         if opt is not None:
             options = self._coerce_fnc_options(opt)
-        elif keep_existing_opt and not is_bool_input:
-            options = self.get_fnc_options()
         else:
-            options = []
+            if keep_existing_opt:
+                if not is_bool_input:
+                    options = self.get_fnc_options()
 
-        tokens = [str(mode)] + options
-        self.set_line(23, " ".join(tokens), auto_write=auto_write)
+        if mode == 4:
+            self._set_value(
+                "GENERAL",
+                "FNC-TYPE",
+                "NONE",
+            )
+
+            bpot = self._first_section(
+                "BPOT",
+                create=True,
+            )
+            if options:
+                bpot["COMP-OPTION"] = list(options)
+
+        else:
+            if mode in {1, 2, 3}:
+                if self._find_sections("BPOT"):
+                    raise ValueError(
+                        "自由形式では FNC 1～3 と [ BPOT ] topology mode "
+                        "を同時に使用できません。"
+                    )
+
+            if mode == 0:
+                retained_sections = []
+                for name, values in self._sections:
+                    if name != "BPOT":
+                        retained_sections.append((name, values))
+                self._sections = retained_sections
+
+            free_mode = self._FNC_TO_FREE[mode]
+            tokens = [free_mode]
+            tokens.extend(options)
+            self._set_value(
+                "GENERAL",
+                "FNC-TYPE",
+                " ".join(tokens),
+            )
+
+        self.validate_mode_configuration(
+            check_input_files=False,
+        )
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def get_structure_mode(self) -> str:
+        """現在の構造拘束・topology mode を返す。
+
+        Returns:
+            ``"none"``、``"fnc"``、``"topology"`` のいずれか。
+        """
+        mode = self.get_fnc_switch()
+
+        if mode == 4:
+            return "topology"
+
+        if mode in {1, 2, 3}:
+            return "fnc"
+
+        return "none"
+
+    def set_structure_mode(
+        self,
+        mode: str,
+        *,
+        fnc_type: int = 1,
+        topology_options: Optional[
+            Union[str, Sequence[str]]
+        ] = None,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """自由形式で使用する構造拘束 mode を明示的に設定する。
+
+        Args:
+            mode: ``"none"``、``"fnc"``、``"topology"``。
+            fnc_type: ``mode="fnc"`` のときに使う 1、2、3。
+            topology_options: ``mode="topology"`` のときに
+                ``[ BPOT ]`` へ設定する ``COMP-OPTION``。
+            auto_write: 設定後に保存するか。
+        """
+        normalized = str(mode).strip().lower()
+
+        if normalized == "none":
+            self.set_fnc_switch(
+                0,
+                auto_write=auto_write,
+            )
+            return
+
+        if normalized == "fnc":
+            if fnc_type not in {1, 2, 3}:
+                raise ValueError(
+                    "fnc_type は 1、2、3 のいずれかです。"
+                )
+            self.set_fnc_switch(
+                fnc_type,
+                auto_write=auto_write,
+            )
+            return
+
+        if normalized == "topology":
+            self.set_fnc_switch(
+                4,
+                opt=topology_options,
+                auto_write=auto_write,
+            )
+            return
+
+        raise ValueError(
+            "mode は 'none'、'fnc'、'topology' "
+            "のいずれかで指定してください。"
+        )
+
+    def validate_mode_configuration(
+        self,
+        *,
+        check_input_files: bool = False,
+    ) -> None:
+        """自由形式の mode 指定と入力ファイルを検証する。
+
+        Args:
+            check_input_files: ``True`` の場合、mode が要求する
+                ``*.fnc`` または ``*.top`` の存在も確認する。
+
+        Raises:
+            ValueError: 排他的な mode が同時に設定されている場合。
+            FileNotFoundError: 必要な外部入力ファイルが存在しない場合。
+
+        Notes:
+            ``[ SNC ]`` は ``*.dat`` 内の制約セクションであり、
+            外部 ``*.snc`` 入力ファイルを選択する mode ではない。
+        """
+        fnc_type = self._first_value(
+            "GENERAL",
+            "FNC-TYPE",
+            "NONE",
+        )
+        fnc_tokens = fnc_type.split()
+
+        fnc_mode = "NONE"
+        if fnc_tokens:
+            fnc_mode = fnc_tokens[0].upper()
+
+        allowed_fnc_modes = {
+            "NONE",
+            "NORMAL",
+            "ADJUST",
+            "MOVE-IN",
+        }
+        if fnc_mode not in allowed_fnc_modes:
+            raise ValueError(
+                "自由形式の FNC-TYPE は NONE、NORMAL、ADJUST、"
+                "MOVE-IN のいずれかです。"
+            )
+
+        has_bpot = bool(self._find_sections("BPOT"))
+        if has_bpot:
+            if fnc_mode != "NONE":
+                raise ValueError(
+                    "[ BPOT ] topology mode と FNC-TYPE=NORMAL/ADJUST/"
+                    "MOVE-IN は同時に使用できません。"
+                )
+
+        if self._find_sections("AENET"):
+            self._validate_aenet_compatibility()
+
+        if not check_input_files:
+            return
+
+        if fnc_mode != "NONE":
+            fnc_path = Path(f"{self._cfg_name}.fnc")
+            if not fnc_path.exists():
+                raise FileNotFoundError(
+                    f"FNC mode に必要なファイルがありません: {fnc_path}"
+                )
+
+        if has_bpot:
+            top_path = Path(f"{self._cfg_name}.top")
+            if not top_path.exists():
+                raise FileNotFoundError(
+                    "topology mode に必要なファイルがありません: "
+                    f"{top_path}"
+                )
 
     def _resolve_fnc_path(
         self,
@@ -2977,13 +3227,10 @@ class RmcPotDatFree:
                     f"[{section_name}]"
                 )
 
-        fnc_type = self._first_value("GENERAL", "FNC-TYPE", "NONE")
-        fnc_tokens = fnc_type.split()
-        if fnc_tokens:
-            if fnc_tokens[0].upper() == "FLEXIBLE":
-                raise ValueError(
-                    "AENET は FNC-TYPE=FLEXIBLE と併用できません。"
-                )
+        if self._find_sections("BPOT"):
+            raise ValueError(
+                "AENET は [ BPOT ] topology mode と併用できません。"
+            )
 
     def get_aenet_settings(self) -> Optional[Dict[str, Any]]:
         """自由形式 ``[ AENET ]`` の ANN ポテンシャル設定を取得する。
