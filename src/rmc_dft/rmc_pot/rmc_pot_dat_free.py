@@ -12,6 +12,40 @@ from rmc_dft.config import Config
 from x_logger import XLogger
 
 
+FREE_DAT_TEMPLATE: str = """{version}
+
+[ GENERAL ]
+TITLE = FeSiB
+NDENS = 0.0915
+CUT-OFF = 2.3 2.1 2 2.3 2.1 2
+MAX-MOVES = 0.1 0.1 0.1
+R-SPACING = 0.025
+MOVEOUT = 0
+COLL-NUMBER = 0
+PRINT-STEP = 5000
+RUN-TIME = 0.2
+SAVE-TIME = 0
+FNC-TYPE = NONE
+BIN-SHIFT = 0
+XMAX-FACTOR = 1
+HST_BUFFSIZE = 200
+HST-STEP-FACTOR = 10
+RELOAD = 0
+THREADS = 4
+
+[ EXP ]
+TYPE = XRD
+DATAFILE = test.xsq
+POINT-RANGE = 1 290
+SCALE = 1.0
+SIGMA = 5E-3
+USE-RFACTOR = 0
+RENORM = 1
+READ-COEFFS = 0
+COMPTON-SUPR-COEFF = 0
+"""
+
+
 class RmcPotDatFree:
     """固定形式版と同じ公開 I/F で自由形式 ``*.dat`` を扱う。
 
@@ -158,25 +192,9 @@ class RmcPotDatFree:
         if path.exists():
             self._logger.error(f'[rmc_pot_dat_free] "{path}" はすでに存在します')
             return False
-        self._sections = [("GENERAL", {})]
-        self._set_value("GENERAL", "TITLE", "")
-        self._set_value("GENERAL", "NDENS", "0.0915")
-        self._set_value("GENERAL", "CUT-OFF", "2.3 2.1 2 2.3 2.1 2")
-        self._set_value("GENERAL", "MAX-MOVES", "0.1 0.1 0.1")
-        self._set_value("GENERAL", "R-SPACING", "0.025")
-        self._set_value("GENERAL", "MOVEOUT", "0")
-        self._set_value("GENERAL", "COLL-NUMBER", "0")
-        self._set_value("GENERAL", "PRINT-STEP", "5000")
-        self._set_value("GENERAL", "RUN-TIME", "0.2")
-        self._set_value("GENERAL", "SAVE-TIME", "0")
-        self._set_value("GENERAL", "FNC-TYPE", "NONE")
-        self._set_value("GENERAL", "BIN-SHIFT", "0")
-        self._set_value("GENERAL", "XMAX-FACTOR", "1")
-        self._set_value("GENERAL", "HST_BUFFSIZE", "200")
-        self._set_value("GENERAL", "HST-STEP-FACTOR", "10")
-        self._set_value("GENERAL", "RELOAD", "0")
-        self._set_value("GENERAL", "THREADS", "4")
-        self._write_path(path)
+        default_input = FREE_DAT_TEMPLATE.format(version=self._version)
+        path.write_text(default_input, encoding="utf-8")
+        self._logger.info(f"[rmc_pot_dat_free] default dat file を作成しました: {path}")
         return True
 
     @staticmethod
