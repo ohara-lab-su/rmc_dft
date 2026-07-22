@@ -1808,7 +1808,7 @@ class RmcPotDatFixed:
 
     def get_display_update_interval(self) -> int:
         """
-        28 行目（number of display update between each history buffering）を取得する。
+        28 行目（number of display updates between each history buffering）を取得する。
 
         Returns:
             int: 表示更新の間隔。

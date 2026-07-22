@@ -26,7 +26,7 @@ from rmc_dft import (
     VaspLog,
     RmcPot,
     RmcPotLog,
-    # RmcPotDat,
+    RmcPotDat,
     RmcPotFit,
     RmcPotHst,
     RmcPotPpcf,
@@ -90,8 +90,7 @@ if __name__ == "__main__":
     stop_mode = "VASP"
 
     # 1. RMC 関連インスタンスは RMC-DFT loop で毎回作った方がハンドリングしやすいのでここでは作らん
-    # rmc_dat = RmcPotDat(config=config, logger=logger)
-    rmc_dat = RmcPotDatFree(config=config, logger=logger)
+    rmc_dat = RmcPotDat(config=config, logger=logger)
 
     # 2. VASP 関係インスタンス
     vasp_log = VaspLog(logger=logger)

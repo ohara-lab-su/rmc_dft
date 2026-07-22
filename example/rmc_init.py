@@ -23,8 +23,7 @@ from rmc_dft import (
     VaspLog,
     RmcPot,
     RmcPotLog,
-    # RmcPotDat,  # fixed-format *.dat
-    RmcPotDatFree,
+    RmcPotDat,  # fixed-format *.dat
     RmcPotFit,
     RmcPotHst,
     RmcPotPpcf,
@@ -36,7 +35,7 @@ from x_logger import XLogger
 
 def run_rmc_init(
     config: Config,
-    rmc_dat: Optional[RmcPotDatFree] = None,
+    rmc_dat: Optional[RmcPotDat] = None,
     *,
     logger: Optional[Any] = None,
 ) -> bool:
@@ -47,8 +46,7 @@ def run_rmc_init(
         logger = XLogger()
 
     if rmc_dat is None:
-        # rmc_dat = RmcPotDat(config=config, logger=logger)
-        rmc_dat = RmcPotDatFree(config=config, logger=logger)
+        rmc_dat = RmcPotDat(config=config, logger=logger)
 
     ######################################
     # パラメーター調整
