@@ -166,12 +166,12 @@ def run_rmc_init(
     # ------------------------------------------------------------------
     # SiO2 Qn / SNC constraint
     # ------------------------------------------------------------------
-    # SNC を使用しない場合は、この clear_qn_constraints() と
+    # SNC を使用しない場合は、この initialize_qn_constraints() と
     # 3個の add_qn_constraint() 呼び出しをまとめてコメントアウトする。
     #
     # Q4/Q3/Q2 は、それぞれ独立した [ SNC ] セクションとして出力される。
     # fraction は全中心 Si に対する目標割合で、百分率ではなく 0～1 で指定する。
-    rmc_dat.clear_qn_constraints(auto_write=False)
+    rmc_dat.initialize_qn_constraints()
 
     # Q4 = 80 %
     rmc_dat.add_qn_constraint(
@@ -189,7 +189,6 @@ def run_rmc_init(
         coordination_number=4,
         fraction=0.80,
         sigma=1.0,
-        auto_write=False,
     )
 
     # Q3 = 15 %
@@ -208,7 +207,6 @@ def run_rmc_init(
         coordination_number=3,
         fraction=0.15,
         sigma=1.0,
-        auto_write=False,
     )
 
     # Q2 = 5 %
@@ -227,7 +225,6 @@ def run_rmc_init(
         coordination_number=2,
         fraction=0.05,
         sigma=1.0,
-        auto_write=False,
     )
 
     # FNC ファイルの距離範囲を RMC 実行前に変更する。
@@ -244,11 +241,6 @@ def run_rmc_init(
     # )
 
     # 26 行目：1 回の move で動かす原子数（通常 1）を設定する
-    rmc_dat.set_num_atoms_per_move(
-        1,
-        auto_write=False,
-    )
-
-    rmc_dat.write()
+    rmc_dat.set_num_atoms_per_move(1)
 
     return True

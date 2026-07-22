@@ -56,7 +56,15 @@ class RmcPotDatFree:
         Notes:
             固定形式版 ``RmcPotDat`` と同じ公開 I/F を維持するため、
             行番号ベースの操作は自由形式のセクション名とキーへ内部変換する。
-            既存ファイルがなければ自由形式の初期ファイルを生成して読み込む。
+
+            ``<cfg_name>.dat`` が存在する場合は、その自由形式ファイルを読み込み、
+            先頭行の ``#002`` または ``#003`` を以後の出力形式として維持する。
+            ファイルが存在しない場合だけ、``version`` で指定した形式の
+            デフォルト ``*.dat`` を新規作成する。
+
+            ``auto_write=True`` の場合、各 setter は更新直後に ``*.dat`` へ
+            反映する。複数設定をまとめて反映したい場合だけ、
+            インスタンスまたは各メソッドで ``auto_write=False`` を指定する。
         """
         self._logger = logger or XLogger()
         self._config = config or Config()
@@ -830,6 +838,69 @@ class RmcPotDatFree:
             return []
         return list(sections[index].get(key.upper(), []))
 
+    def initialize_sections(
+        self,
+        section: str,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """指定名のセクションをすべて削除して未設定状態へ戻す。
+
+        Args:
+            section: 初期化するセクション名。
+            auto_write: 初期化後に ``*.dat`` を保存するかどうか。
+                ``None`` の場合はインスタンスの ``auto_write`` 設定を使う。
+
+        Notes:
+            ``[ SNC ]``、``[ EXP ]``、``[ COS ]`` など、同じ名前の
+            セクションを複数記述できる項目を作り直す前に使用する。
+
+            空のセクションは作成しない。既存の同名セクションをすべて削除し、
+            次の高水準 setter または add メソッドが完全なセクションを
+            一つずつ追加できる状態にする。
+        """
+        section_name = str(section).strip().upper()
+        if not section_name:
+            raise ValueError("section は空にできません。")
+
+        retained_sections: List[
+            Tuple[str, Dict[str, List[str]]]
+        ] = []
+
+        for name, values in self._sections:
+            if name != section_name:
+                retained_sections.append((name, values))
+
+        self._sections = retained_sections
+
+        self._logger.info(
+            "[rmc_pot_dat_free] initialize_sections: "
+            f"section={section_name}"
+        )
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def initialize_qn_constraints(
+        self,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """すべての Qn/SNC 制約を削除して再設定前の状態へ戻す。
+
+        Args:
+            auto_write: 初期化後に ``*.dat`` を保存するかどうか。
+                ``None`` の場合はインスタンスの ``auto_write`` 設定を使う。
+
+        Notes:
+            Q4、Q3、Q2 などを一式として作り直す場合に最初に呼び出す。
+            既存の ``[ SNC ]`` を残したまま追加し続けることを防ぐ。
+        """
+        self.initialize_sections(
+            "SNC",
+            auto_write=auto_write,
+        )
+
     def add_section(self, section: str) -> int:
         """空の自由形式セクションを末尾へ追加する。
 
@@ -838,6 +909,11 @@ class RmcPotDatFree:
 
         Returns:
             追加した同名セクションの 0 始まり位置。
+
+        Notes:
+            内部構築用の低水準メソッドであり、自動書き込みは行わない。
+            必須キーを持たない空セクションを一時的に作るためである。
+            通常は ``add_qn_constraint()`` などの高水準メソッドを使用する。
         """
         values: Dict[str, List[str]] = {}
         self._sections.append((section.upper(), values))
@@ -3127,17 +3203,14 @@ class RmcPotDatFree:
 
         Args:
             auto_write: 更新後に保存するかどうか。
+
+        Notes:
+            従来名との互換メソッド。新しく Qn/SNC 一式を作り直す場合は
+            ``initialize_qn_constraints()`` を使用する。
         """
-        retained_sections: List[Tuple[str, Dict[str, List[str]]]] = []
-        for name, values in self._sections:
-            if name != "SNC":
-                retained_sections.append((name, values))
-        self._sections = retained_sections
-
-        self._logger.info("[rmc_pot_dat_free] clear_qn_constraints")
-
-        if self._resolve_auto_write(auto_write):
-            self.write()
+        self.initialize_qn_constraints(
+            auto_write=auto_write,
+        )
 
     def _validate_aenet_compatibility(self) -> None:
         """AENET と明示的に共存不可の自由形式セクションを検査する。
