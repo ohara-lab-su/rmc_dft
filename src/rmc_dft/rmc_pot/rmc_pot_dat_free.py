@@ -137,6 +137,10 @@ class RmcPotDatFree:
         Notes:
             初期値は ``[ GENERAL ]`` セクションへ自由形式のキーとして設定する。
             固定形式テンプレートの物理的な行配置には依存しない。
+
+            初期状態では ``FNC-TYPE = NONE`` とし、``[ BPOT ]`` を作成しない。
+            したがって ``set_fnc_switch()`` を呼ばなければ、FNC も topology も
+           使用しない自由形式 ``*.dat`` になる。
         """
         path = Path(f"{basename}.dat")
         if path.exists():
@@ -2045,6 +2049,9 @@ class RmcPotDatFree:
             - 4: ``[ BPOT ]`` による flexible molecule / topology mode
 
         Notes:
+            ``FNC-TYPE`` が存在しない場合も ``NONE`` として扱う。
+            ``[ BPOT ]`` が存在しない場合は topology mode ではない。
+
             自由形式では ``FNC-TYPE`` に 4 または ``FLEXIBLE`` は存在しない。
             topology を使う flexible molecule mode は ``[ BPOT ]`` の存在で判定する。
         """
@@ -2210,74 +2217,6 @@ class RmcPotDatFree:
 
         if self._resolve_auto_write(auto_write):
             self.write()
-
-    def get_structure_mode(self) -> str:
-        """現在の構造拘束・topology mode を返す。
-
-        Returns:
-            ``"none"``、``"fnc"``、``"topology"`` のいずれか。
-        """
-        mode = self.get_fnc_switch()
-
-        if mode == 4:
-            return "topology"
-
-        if mode in {1, 2, 3}:
-            return "fnc"
-
-        return "none"
-
-    def set_structure_mode(
-        self,
-        mode: str,
-        *,
-        fnc_type: int = 1,
-        topology_options: Optional[
-            Union[str, Sequence[str]]
-        ] = None,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """自由形式で使用する構造拘束 mode を明示的に設定する。
-
-        Args:
-            mode: ``"none"``、``"fnc"``、``"topology"``。
-            fnc_type: ``mode="fnc"`` のときに使う 1、2、3。
-            topology_options: ``mode="topology"`` のときに
-                ``[ BPOT ]`` へ設定する ``COMP-OPTION``。
-            auto_write: 設定後に保存するか。
-        """
-        normalized = str(mode).strip().lower()
-
-        if normalized == "none":
-            self.set_fnc_switch(
-                0,
-                auto_write=auto_write,
-            )
-            return
-
-        if normalized == "fnc":
-            if fnc_type not in {1, 2, 3}:
-                raise ValueError(
-                    "fnc_type は 1、2、3 のいずれかです。"
-                )
-            self.set_fnc_switch(
-                fnc_type,
-                auto_write=auto_write,
-            )
-            return
-
-        if normalized == "topology":
-            self.set_fnc_switch(
-                4,
-                opt=topology_options,
-                auto_write=auto_write,
-            )
-            return
-
-        raise ValueError(
-            "mode は 'none'、'fnc'、'topology' "
-            "のいずれかで指定してください。"
-        )
 
     def validate_mode_configuration(
         self,
