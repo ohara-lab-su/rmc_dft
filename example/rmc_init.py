@@ -173,57 +173,39 @@ def run_rmc_init(
     # fraction は全中心 Si に対する目標割合で、百分率ではなく 0～1 で指定する。
     rmc_dat.initialize_qn_constraints()
 
-    # Q4 = 80 %
+    # Q5 = 0.2 %
     rmc_dat.add_qn_constraint(
         central_type=1,
         first_neighbor_type=2,
         first_neighbor_minimum=1.40,
         first_neighbor_maximum=1.90,
-        second_neighbors=[
-            (
-                1,
-                1.40,
-                1.90,
-            ),
-        ],
+        second_neighbors=[(1, 1.40, 1.90)],
+        coordination_number=5,
+        fraction=0.002,
+        sigma=1.0,
+    )
+
+    # Q4 = 99.4 %
+    rmc_dat.add_qn_constraint(
+        central_type=1,
+        first_neighbor_type=2,
+        first_neighbor_minimum=1.40,
+        first_neighbor_maximum=1.90,
+        second_neighbors=[(1, 1.40, 1.90)],
         coordination_number=4,
-        fraction=0.80,
+        fraction=0.994,
         sigma=1.0,
     )
 
-    # Q3 = 15 %
+    # Q3 = 0.4 %
     rmc_dat.add_qn_constraint(
         central_type=1,
         first_neighbor_type=2,
         first_neighbor_minimum=1.40,
         first_neighbor_maximum=1.90,
-        second_neighbors=[
-            (
-                1,
-                1.40,
-                1.90,
-            ),
-        ],
+        second_neighbors=[(1, 1.40, 1.90)],
         coordination_number=3,
-        fraction=0.15,
-        sigma=1.0,
-    )
-
-    # Q2 = 5 %
-    rmc_dat.add_qn_constraint(
-        central_type=1,
-        first_neighbor_type=2,
-        first_neighbor_minimum=1.40,
-        first_neighbor_maximum=1.90,
-        second_neighbors=[
-            (
-                1,
-                1.40,
-                1.90,
-            ),
-        ],
-        coordination_number=2,
-        fraction=0.05,
+        fraction=0.004,
         sigma=1.0,
     )
 
