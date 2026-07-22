@@ -2,6 +2,28 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.5.0 nakada
+
+### Added
+
+- Added support for RMC_POT free-format `*.dat` files.
+- Added `RmcPotDatFree`, which preserves the existing fixed-format `RmcPotDat` public interface while reading and writing free-format `#002` / `#003` input files.
+- Added free-format-only support for second-neighbour constraints (`[ SNC ]`) used to specify Qn network fractions.
+  - Added methods for adding, updating, reading, removing, and clearing Qn/SNC constraints.
+  - Added support for `CTYPE_FTYPE_FROM_TO`, repeated `STYPE_FROM_TO`, and `COORDNUM_FRACT_SIGMA` variants.
+- Added free-format-only support for AENET artificial neural-network potentials (`[ AENET ]`).
+  - Added methods for configuring trained ANN potential files for each RMC atom type.
+  - Added support for `CUTOFF-AENET`, `WRITE-ATOMIC-ENERGY`, `AENET-STEP`, and sigma variants.
+  - Added validation for settings explicitly incompatible with AENET.
+- Added `make_qn_snc.py`.
+  - Generates a free-format RMC_POT `*.dat` file for SiO2 with specified Q4/Q3/Q2 fractions.
+  - Converts percentages to the SNC fraction values used by RMC_POT.
+- Added `analize_sio2_snqq_from_poscar.py`.
+  - Reads an existing VASP POSCAR structure and calculates the Qn distribution of Si atoms.
+  - Reports Q4/Q3/Q2 and any other detected Qn states.
+  - Reports Si atoms that do not satisfy any Qn state under the configured first- and second-neighbour distance ranges.
+
+
 ## v0.4.33 nakada
 
 ### Fixed

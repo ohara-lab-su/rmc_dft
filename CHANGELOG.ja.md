@@ -2,6 +2,28 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.5.0
+
+## 追加
+
+- RMC_POT の自由形式 `*.dat` ファイルに対応。
+- 固定形式版 `RmcPotDat` の公開 I/F を維持したまま、自由形式 `#002` / `#003` を読み書きする `RmcPotDatFree` を追加。
+- 自由形式でのみ指定できる第二近接制約 `[ SNC ]` に対応し、Qn ネットワークの割合指定を追加。
+  - Qn/SNC 制約の追加、更新、取得、削除、全削除メソッドを追加。
+  - `CTYPE_FTYPE_FROM_TO`、複数行の `STYPE_FROM_TO`、`COORDNUM_FRACT_SIGMA` 系キーワードに対応。
+- 自由形式でのみ指定できる AENET 機械学習ポテンシャル `[ AENET ]` に対応。
+  - RMC 原子タイプごとの学習済み ANN ポテンシャルファイル指定メソッドを追加。
+  - `CUTOFF-AENET`、`WRITE-ATOMIC-ENERGY`、`AENET-STEP`、各種 sigma 指定に対応。
+  - AENET と明示的に共存できない設定の検証を追加。
+- `make_qn_snc.py` を追加。
+  - SiO2 の Q4/Q3/Q2 割合を指定し、自由形式 RMC_POT `*.dat` を生成するスクリプトを追加。
+  - パーセンテージ指定を RMC_POT の SNC で使用する fraction 値へ変換。
+- `analize_sio2_snqq_from_poscar.py` を追加。
+  - 既存の VASP POSCAR 構造から Si 原子の Qn 分布を解析。
+  - Q4/Q3/Q2 に加え、検出されたその他の Qn 状態も表示。
+  - 設定した第一近接・第二近接距離範囲では、いずれの Qn にも該当しない Si 原子を別途表示。
+
+
 # v0.4.33 (2026-07-15)
 
 ## 修正
