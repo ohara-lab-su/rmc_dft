@@ -554,11 +554,25 @@ class RmcPot:
                     sys.stdout.write(line)  # 画面へ
                     if f is not None:
                         f.write(line)  # ログへ
-                proc.wait()
 
-            except subprocess.CalledProcessError as e:
+                stderr_text = proc.stderr.read()
+                if stderr_text:
+                    sys.stderr.write(stderr_text)
+                    if f is not None:
+                        f.write(stderr_text)
+
+                return_code = proc.wait()
+
+                if return_code != 0:
+                    self._logger.error(
+                        "[rmc_pot] **Error**: "
+                        f"RMC_POT exited with return code {return_code}"
+                    )
+                    return False
+
+            except OSError as e:
                 self._logger.error(f"[rmc_pot] **Error**: {e}")
-                sys.exit(-1)
+                return False
             finally:
                 if f is not None:
                     f.close()

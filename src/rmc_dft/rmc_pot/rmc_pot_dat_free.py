@@ -327,9 +327,6 @@ class RmcPotDatFree:
         path.write_text("\n".join(output).rstrip() + "\n", encoding="utf-8")
         self._logger.info(f"[rmc_pot_dat_free] == write({path})")
 
-
-
-
     def _find_sections(self, name: str) -> List[Dict[str, List[str]]]:
         """指定名と一致する全セクションを取得する。
 
@@ -426,9 +423,6 @@ class RmcPotDatFree:
             if exp_type in counts:
                 counts[exp_type] += 1
         return counts["GR"], counts["ND"], counts["XRD"], counts["EXAFS"]
-
-
-
 
     @staticmethod
     def _bool_int(value: Any) -> str:
@@ -838,7 +832,9 @@ class RmcPotDatFree:
         try:
             return float(value)
         except ValueError:
-            self._logger.error(f"[rmc_pot_dat_free] NDENS が数値ではありません: {value}")
+            self._logger.error(
+                f"[rmc_pot_dat_free] NDENS が数値ではありません: {value}"
+            )
             return False
 
     def set_density(
@@ -926,7 +922,9 @@ class RmcPotDatFree:
         value = self._first_value("GENERAL", "R-SPACING", "0.0")
         return float(value)
 
-    def set_r_spacing(self, dr: Union[int, float], *, auto_write: Optional[bool] = True) -> None:
+    def set_r_spacing(
+        self, dr: Union[int, float], *, auto_write: Optional[bool] = True
+    ) -> None:
         """``[ GENERAL ]`` の ``R-SPACING`` を設定する。"""
         self._config.rmc_r_spacing = float(dr)
         self._set_value("GENERAL", "R-SPACING", self._fmt_number(dr))
@@ -938,7 +936,9 @@ class RmcPotDatFree:
         value = self._first_value("GENERAL", "MOVEOUT", "0")
         return self._bool_int(value) == "1"
 
-    def set_moveout_option(self, use_moveout: bool, *, auto_write: Optional[bool] = True) -> None:
+    def set_moveout_option(
+        self, use_moveout: bool, *, auto_write: Optional[bool] = True
+    ) -> None:
         """``[ GENERAL ]`` の ``MOVEOUT`` を設定する。"""
         self._config.rmc_moveout_option = bool(use_moveout)
         self._set_value("GENERAL", "MOVEOUT", self._bool_int(use_moveout))
@@ -950,7 +950,9 @@ class RmcPotDatFree:
         value = self._first_value("GENERAL", "COLL-NUMBER", "0")
         return int(float(value))
 
-    def set_num_config_to_collect(self, value: int, *, auto_write: Optional[bool] = True) -> None:
+    def set_num_config_to_collect(
+        self, value: int, *, auto_write: Optional[bool] = True
+    ) -> None:
         """``[ GENERAL ]`` の ``COLL-NUMBER`` を設定する。"""
         self._set_value("GENERAL", "COLL-NUMBER", str(int(value)))
         if self._resolve_auto_write(auto_write):
@@ -961,7 +963,9 @@ class RmcPotDatFree:
         value = self._first_value("GENERAL", "PRINT-STEP", "0")
         return int(float(value))
 
-    def set_print_interval(self, value: int, *, auto_write: Optional[bool] = True) -> None:
+    def set_print_interval(
+        self, value: int, *, auto_write: Optional[bool] = True
+    ) -> None:
         """``[ GENERAL ]`` の ``PRINT-STEP`` を設定する。"""
         self._set_value("GENERAL", "PRINT-STEP", str(int(value)))
         if self._resolve_auto_write(auto_write):
@@ -997,7 +1001,9 @@ class RmcPotDatFree:
         """
         return self._exp_type_counts()
 
-    def set_data_flags(self, flags: Sequence[int], *, auto_write: Optional[bool] = True) -> bool:
+    def set_data_flags(
+        self, flags: Sequence[int], *, auto_write: Optional[bool] = True
+    ) -> bool:
         """指定されたデータ種別の ``[ EXP ]`` セクションを残す。
 
         新しい ``[ EXP ]`` は ``TYPE`` だけを持つ。``DATAFILE`` などの必須値を
@@ -1009,7 +1015,9 @@ class RmcPotDatFree:
             return False
         for value in values:
             if value not in (0, 1):
-                self._logger.error("[rmc_pot_dat_free] flags は0または1で指定してください")
+                self._logger.error(
+                    "[rmc_pot_dat_free] flags は0または1で指定してください"
+                )
                 return False
         types = ["GR", "ND", "XRD", "EXAFS"]
         existing = self._find_sections("EXP")
@@ -1077,7 +1085,9 @@ class RmcPotDatFree:
 
         return filename
 
-    def set_exp_filename(self, path: Union[str, Path], *, auto_write: Optional[bool] = None) -> bool:
+    def set_exp_filename(
+        self, path: Union[str, Path], *, auto_write: Optional[bool] = None
+    ) -> bool:
         """最初の ``[ EXP ]`` の ``DATAFILE`` を設定する。"""
         exp = self._first_exp()
         if not exp:
@@ -1102,18 +1112,26 @@ class RmcPotDatFree:
             return False
         tokens = values[0].split()
         if len(tokens) != 2:
-            self._logger.error(f"[rmc_pot_dat_free] POINT-RANGE が不正です: {values[0]}")
+            self._logger.error(
+                f"[rmc_pot_dat_free] POINT-RANGE が不正です: {values[0]}"
+            )
             return False
         try:
             return int(tokens[0]), int(tokens[1])
         except ValueError:
-            self._logger.error(f"[rmc_pot_dat_free] POINT-RANGE が不正です: {values[0]}")
+            self._logger.error(
+                f"[rmc_pot_dat_free] POINT-RANGE が不正です: {values[0]}"
+            )
             return False
 
-    def set_exp_range(self, start: int, end: int, *, auto_write: Optional[bool] = None) -> bool:
+    def set_exp_range(
+        self, start: int, end: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
         """最初の ``[ EXP ]`` の ``POINT-RANGE`` を設定する。"""
         if start < 1 or end < start:
-            self._logger.error(f"[rmc_pot_dat_free] POINT-RANGE が不正です: {start} {end}")
+            self._logger.error(
+                f"[rmc_pot_dat_free] POINT-RANGE が不正です: {start} {end}"
+            )
             return False
         exp = self._first_exp()
         if not exp:
@@ -1127,12 +1145,18 @@ class RmcPotDatFree:
 
     def get_scale_factor(self) -> bool:
         """自由形式に汎用 ``SCALE`` キーはないため ``False`` を返す。"""
-        self._logger.error("[rmc_pot_dat_free] 自由形式 [ EXP ] に汎用 SCALE キーはありません")
+        self._logger.error(
+            "[rmc_pot_dat_free] 自由形式 [ EXP ] に汎用 SCALE キーはありません"
+        )
         return False
 
-    def set_scale_factor(self, value: float, *, auto_write: Optional[bool] = None) -> bool:
+    def set_scale_factor(
+        self, value: float, *, auto_write: Optional[bool] = None
+    ) -> bool:
         """自由形式に汎用 ``SCALE`` キーはないため設定しない。"""
-        self._logger.error("[rmc_pot_dat_free] 自由形式 [ EXP ] に汎用 SCALE キーはありません")
+        self._logger.error(
+            "[rmc_pot_dat_free] 自由形式 [ EXP ] に汎用 SCALE キーはありません"
+        )
         return False
 
     def get_sigma_factor(self) -> Union[float, bool]:
@@ -1149,7 +1173,9 @@ class RmcPotDatFree:
             self._logger.error(f"[rmc_pot_dat_free] SIGMA が不正です: {values[0]}")
             return False
 
-    def set_sigma_factor(self, sigma: float, *, auto_write: Optional[bool] = None) -> bool:
+    def set_sigma_factor(
+        self, sigma: float, *, auto_write: Optional[bool] = None
+    ) -> bool:
         """最初の ``[ EXP ]`` の ``SIGMA`` を設定する。"""
         exp = self._first_exp()
         if not exp:
@@ -1241,7 +1267,9 @@ class RmcPotDatFree:
         """``[ COS ]`` セクション数を返す。"""
         return len(self._find_sections("COS"))
 
-    def set_angle_constraint_count(self, value: int, *, auto_write: Optional[bool] = None) -> bool:
+    def set_angle_constraint_count(
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
         """自由形式では制約数を独立設定できないため設定しない。"""
         current = len(self._find_sections("COS"))
         if int(value) == current:
@@ -1255,7 +1283,9 @@ class RmcPotDatFree:
         """``[ COORD ]`` セクション数を返す。"""
         return len(self._find_sections("COORD"))
 
-    def set_coord_constraint_count(self, value: int, *, auto_write: Optional[bool] = None) -> bool:
+    def set_coord_constraint_count(
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
         """自由形式では制約数を独立設定できないため設定しない。"""
         current = len(self._find_sections("COORD"))
         if int(value) == current:
@@ -1269,7 +1299,9 @@ class RmcPotDatFree:
         """``[ AVCOORD ]`` セクション数を返す。"""
         return len(self._find_sections("AVCOORD"))
 
-    def set_avg_coord_constraint_count(self, value: int, *, auto_write: Optional[bool] = None) -> bool:
+    def set_avg_coord_constraint_count(
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
         """自由形式では制約数を独立設定できないため設定しない。"""
         current = len(self._find_sections("AVCOORD"))
         if int(value) == current:
@@ -1286,7 +1318,9 @@ class RmcPotDatFree:
                 return 1
         return 0
 
-    def set_potential_flag(self, value: int, *, auto_write: Optional[bool] = None) -> bool:
+    def set_potential_flag(
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
         """自由形式では potential 種別をセクションで指定するため設定しない。"""
         current = self.get_potential_flag()
         if int(value) == current:
@@ -1702,7 +1736,9 @@ class RmcPotDatFree:
         value = self._first_value("GENERAL", "BIN-SHIFT", "0")
         return int(float(value))
 
-    def set_initial_bin_shift(self, value: int, *, auto_write: Optional[bool] = None) -> None:
+    def set_initial_bin_shift(
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> None:
         """``[ GENERAL ]`` の ``BIN-SHIFT`` を設定する。"""
         self._set_value("GENERAL", "BIN-SHIFT", str(int(value)))
         if self._resolve_auto_write(auto_write):
@@ -1723,7 +1759,9 @@ class RmcPotDatFree:
         """通常の自由形式 atomic RMC では1回の move で動かす原子数は1を返す。"""
         return 1
 
-    def set_num_atoms_per_move(self, value: int, *, auto_write: Optional[bool] = None) -> bool:
+    def set_num_atoms_per_move(
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
         """自由形式 atomic RMC では1以外を設定しない。"""
         if int(value) != 1:
             self._logger.error(
@@ -1738,7 +1776,9 @@ class RmcPotDatFree:
         value = self._first_value("GENERAL", "HST_BUFFSIZE", "0")
         return int(float(value))
 
-    def set_history_buffer_size(self, value: int, *, auto_write: Optional[bool] = None) -> None:
+    def set_history_buffer_size(
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> None:
         """``[ GENERAL ]`` の ``HST_BUFFSIZE`` を設定する。"""
         self._set_value("GENERAL", "HST_BUFFSIZE", str(int(value)))
         if self._resolve_auto_write(auto_write):
@@ -1749,7 +1789,9 @@ class RmcPotDatFree:
         value = self._first_value("GENERAL", "HST-STEP-FACTOR", "1")
         return int(float(value))
 
-    def set_display_update_interval(self, value: int, *, auto_write: Optional[bool] = None) -> None:
+    def set_display_update_interval(
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> None:
         """``[ GENERAL ]`` の ``HST-STEP-FACTOR`` を設定する。"""
         self._set_value("GENERAL", "HST-STEP-FACTOR", str(int(value)))
         if self._resolve_auto_write(auto_write):
@@ -1759,11 +1801,15 @@ class RmcPotDatFree:
         """自由形式で対応する設定がないため ``0`` を返す。"""
         return 0
 
-    def set_custom_move_flag(self, value: int, *, auto_write: Optional[bool] = None) -> bool:
+    def set_custom_move_flag(
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
         """自由形式で対応する設定がないため設定しない。"""
         if int(value) == 0:
             return True
-        self._logger.error("[rmc_pot_dat_free] この設定に対応する自由形式キーワードはありません")
+        self._logger.error(
+            "[rmc_pot_dat_free] この設定に対応する自由形式キーワードはありません"
+        )
         return False
 
     def get_load_histogram_flag(self) -> int:
@@ -1771,7 +1817,9 @@ class RmcPotDatFree:
         value = self._first_value("GENERAL", "RELOAD", "0")
         return int(float(value))
 
-    def set_load_histogram_flag(self, value: int, *, auto_write: Optional[bool] = None) -> None:
+    def set_load_histogram_flag(
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> None:
         """``[ GENERAL ]`` の ``RELOAD`` を設定する。"""
         self._set_value("GENERAL", "RELOAD", str(int(value)))
         if self._resolve_auto_write(auto_write):
@@ -1781,11 +1829,15 @@ class RmcPotDatFree:
         """自由形式で対応する設定がないため ``0`` を返す。"""
         return 0
 
-    def set_max_atoms_per_cell(self, value: int, *, auto_write: Optional[bool] = None) -> bool:
+    def set_max_atoms_per_cell(
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> bool:
         """自由形式で対応する設定がないため設定しない。"""
         if int(value) == 0:
             return True
-        self._logger.error("[rmc_pot_dat_free] この設定に対応する自由形式キーワードはありません")
+        self._logger.error(
+            "[rmc_pot_dat_free] この設定に対応する自由形式キーワードはありません"
+        )
         return False
 
     def get_swap_settings(self) -> Tuple[float, int]:
@@ -1794,7 +1846,9 @@ class RmcPotDatFree:
         allow = self._first_value("GENERAL", "SWAP-ALLOW", "0")
         return float(fraction), int(float(allow))
 
-    def set_swap_settings(self, fraction: int, allow_flag: int, *, auto_write: Optional[bool] = None) -> None:
+    def set_swap_settings(
+        self, fraction: int, allow_flag: int, *, auto_write: Optional[bool] = None
+    ) -> None:
         """``[ GENERAL ]`` の swap 関連キーワードを設定する。"""
         self._set_value("GENERAL", "SWAP-FRACTION", self._fmt_number(fraction))
         self._set_value("GENERAL", "SWAP-ALLOW", str(int(allow_flag)))
@@ -1806,7 +1860,9 @@ class RmcPotDatFree:
         value = self._first_value("GENERAL", "THREADS", "1")
         return int(float(value))
 
-    def set_thread_count(self, value: int, *, auto_write: Optional[bool] = None) -> None:
+    def set_thread_count(
+        self, value: int, *, auto_write: Optional[bool] = None
+    ) -> None:
         """``[ GENERAL ]`` の ``THREADS`` を設定する。"""
         self._set_value("GENERAL", "THREADS", str(int(value)))
         if self._resolve_auto_write(auto_write):
@@ -2650,6 +2706,3 @@ class RmcPotDatFree:
 
         if self._resolve_auto_write(auto_write):
             self.write()
-
-
-RmcPotDat = RmcPotDatFree

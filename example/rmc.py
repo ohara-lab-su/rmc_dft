@@ -109,7 +109,9 @@ def run_rmc(
             return False
 
         # rmc.run(cfg_name=config.cfg_name)
-        rmc.run()
+        if not rmc.run():
+            logger.error("**Error**: RMC_POT execution failed.")
+            return False
 
         # インスタンス生成時にログ読み込みする
         hst = RmcPotHst(cfg_name=f"{config.cfg_name}")  # sample.cfg → sample.hst
