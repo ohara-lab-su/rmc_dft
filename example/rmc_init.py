@@ -120,8 +120,8 @@ def run_rmc_init(
     # 計算時間と構造をsaveするステップ間隔
     # rmc_dat.set_time_and_save(0.5, 0.5)
     # rmc_dat.set_time_and_save(5, 1)
-    # rmc_dat.set_time_and_save(15, 1)
-    rmc_dat.set_time_and_save(30, 1)
+    rmc_dat.set_time_and_save(15, 1)
+    # rmc_dat.set_time_and_save(30, 1)
     # rmc_dat.set_time_and_save(60, 1)
     # rmc_dat.set_time_and_save(120, 1)
     # rmc_dat.set_time_and_save(360, 1)
