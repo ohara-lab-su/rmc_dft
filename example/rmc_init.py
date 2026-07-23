@@ -221,8 +221,14 @@ def run_rmc_init(
 
     # 自由形式フォーマットだと element 情報が必須となる
     if use_free_format:
+        # element
         element_info = config.element_info
         rmc_dat.set_element_info(element_info)
+        # HST
+        rmc_dat.set_history_buffer_size(200)
+        # SAVE (固定フォーマットからの互換メソッドの方でセットされるのでなくてもいい)
+        # HST-STEP-FACTOR は独立した時間ではなく、SAVE-TIME を基準にした倍率
+        # rmc_dat.set_display_update_interval(1)
 
     # ------------------------------------------------------------------
     # SiO2 Qn / SNC constraint
