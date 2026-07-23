@@ -96,9 +96,7 @@ def run_rmc(
         logger.info(f"[rmc] rmc_dir = {rmc_dir}")
 
         if not rmc.preprocess():
-            logger.error(
-                "**Error**: RMC_POT input validation failed."
-            )
+            logger.error("**Error**: RMC_POT input validation failed.")
             return False
 
         # cutoff と FNC の矛盾チェック
@@ -200,7 +198,8 @@ if __name__ == "__main__":
     # poscar2cfg(cfg_name=config.cfg_name)#
     # ---------------------------
 
-    use_free_format_ = True
+    # use_free_format_ = True
+    use_free_format_ = False
 
     rmc_log_ = RmcPotLog(cfg_name=config_.cfg_name, logger=logger_)
 
