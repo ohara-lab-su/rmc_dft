@@ -201,9 +201,10 @@ def run_rmc_init(
     # aaa.top を使用する場合:
     # rmc_dat.set_fnc_switch(4)
 
-    # # 自由形式フォーマットだと element 情報が必須となる
-    # element_info = config.element_info
-    # rmc_dat.set_element_info(element_info)
+    # 自由形式フォーマットだと element 情報が必須となる
+    if use_free_format:
+        element_info = config.element_info
+        rmc_dat.set_element_info(element_info)
 
     # # ------------------------------------------------------------------
     # # SiO2 Qn / SNC constraint
