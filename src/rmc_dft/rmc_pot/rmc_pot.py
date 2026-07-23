@@ -31,8 +31,9 @@ class RmcPot:
         rmc_log: Optional[RmcPotLog] = None,  # instance
         rmc_dat: Optional[RmcPotDat] = None,  # instance
         config: Optional[Config] = None,  # Config(),  # instance
-        logger: Optional[XLogger] = None,  # XLogger(),  # instance
         cfg_name: Optional[str] = None,
+        use_free_format: bool = False,
+        logger: Optional[XLogger] = None,  # XLogger(),  # instance
     ) -> None:
         """
         config インスタンスを与えると、cfg_name はいらない
@@ -50,6 +51,7 @@ class RmcPot:
         # （引数で与えればそれを使う／なければ新規作成）
         self._logger: XLogger = logger or XLogger()
         self._config: Config = config or Config()
+        self._use_free_format: bool = use_free_format
 
         # ------------------------------------------------------------
         # 2. cfg_name の決定
@@ -93,6 +95,7 @@ class RmcPot:
                 cfg_name=self._cfg_name,
                 auto_write=self._auto_write,
                 config=self._config,
+                use_free_format=self._use_free_format,
                 logger=self._logger,
             )
 
