@@ -2,6 +2,46 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.5.2
+
+- Cumulative bug fixes, primarily related to parameter tuning, binary rebuilds, and execution testing.
+
+## Building with SNC Support
+
+To enable SNC support, rebuild `rmc_pot` with:
+
+```text
+
+make AGC=0
+
+```
+
+## Bug Fixes for Fugaku `rmc_pot` (Nakada Version)
+
+A bug was identified in the SNC implementation of the Fugaku-specific `rmc_pot` (Nakada version).
+
+Due to incomplete implementation during the initial development, the SNC functionality contained defects that caused incorrect behavior whenever SNC was enabled.
+
+This issue was **not** caused by the usage of `rmc_dft` or by incorrect input files, but by the implementation of the `rmc_pot` program itself (Nakada version).
+
+The implementation has been corrected.
+
+## Free Format and Fixed Format Verification
+
+Additional verification was performed using the standard (non-AGC) build.
+
+Both Free Format and Fixed Format input modes were tested under the normal execution environment.
+
+## SNC Verification
+
+Comparative validation was performed between:
+
+- Original `rmc_pot`
+
+- Fugaku `rmc_pot` (Nakada version)
+
+The SNC functionality and execution behavior were compared to confirm consistency after the bug fixes.
+
 # v0.5.1
 
 - bugfix

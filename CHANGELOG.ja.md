@@ -2,6 +2,30 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.5.2
+
+- 累積bugfix(どちらかと言うとパラメーター調整/rmc_potバイナリ再ビルドなどの実行テスト系
+
+## SNC を有効にするにはビルドが必要
+
+```text
+make AGC=0
+```
+
+## 富岳用の rmc_pot (nakada版) のbugfix
+
+手抜きで後躯していた snc 周りにバグがあったために、
+snc を有効にするとバグっていた事が判明。
+(使い方やこのrmc_dftの問題ではなくて rmc_pot プロムラム(nakada版)の問題)
+修正を行った。
+
+## free format and fixed format
+
+ACG オプションではなくて通常でのテスト・環境でのテスト
+
+## SNC での試験
+
+オリジナル版 rmc_pot と 富岳版 rmc_pot (nakada版) の比較検討
 
 # v0.5.1
 
