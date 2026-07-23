@@ -90,7 +90,11 @@ if __name__ == "__main__":
     stop_mode = "VASP"
 
     # 1. RMC 関連インスタンスは RMC-DFT loop で毎回作った方がハンドリングしやすいのでここでは作らん
+
+    ######################
     use_free_format = True
+    # use_free_format = False
+    ######################
 
     # 実行バイナリが _ADVANCED_GEOM_CONST を有効に置く必要がある
     # make AGC=0
@@ -117,6 +121,7 @@ if __name__ == "__main__":
             run_rmc_init(
                 config=config,
                 rmc_dat=rmc_dat,
+                use_free_format=use_free_format,
                 logger=logger,
             )
             # 富岳対応 (キャッシュ対策)
@@ -133,6 +138,7 @@ if __name__ == "__main__":
                 rmc_dat=rmc_dat,
                 auto_converge=False,
                 msg=f"{msg_rmc}",
+                use_free_format=use_free_format,
                 logger=logger,
             )
             # 次回のDFTの初期構造ファイル
