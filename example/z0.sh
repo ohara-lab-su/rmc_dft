@@ -27,6 +27,9 @@ cp $SCRIPT/rmc_vasp_script.py $DST/
 # cp $SCRIPT/make_number_density.py ./
 #####################
 
+cp $SCRIPT/conv_poscar2cfg.py $DST/
+cp $SCRIPT/conv_cfg2poscar.py $DST/
+
 cp $SCRIPT/rmc.py $DST/
 cp $SCRIPT/rmc_vasp.py $DST/
 cp $SCRIPT/clean_rmc.py $DST/
@@ -38,3 +41,6 @@ cp $SCRIPT/plot_multi_hst.py $DST/
 cp $SCRIPT/analyze_* $DST/
 
 chmod u+x *.py
+
+cp $SCRIPT/job_hpcs2024_node1.sh $DST/
+cp $SCRIPT/job_hpcs2024_node2.sh $DST/
