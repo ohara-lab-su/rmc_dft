@@ -17,21 +17,41 @@ from rmc_dft import RmcPot, RmcPotLog
 from x_logger import XLogger
 
 
+# =============================================================================
+# ユーザー設定
+# =============================================================================
+
+# 構造ファイルの探索候補。
 DEFAULT_POSCAR_PATH = Path("POSCAR")
 POSCAR_VASP_PATH = Path("POSCAR.vasp")
 AAA_VASP_PATH = Path("aaa.vasp")
 AAA_CFG_PATH = Path("aaa.cfg")
 
-# 中心 Si から第一近接 O までの距離範囲 [Å]。
-SI_O_MIN = 1.40
-SI_O_MAX = 1.90
+# Qn解析で使用する元素記号。
+CENTER_ELEMENT = "Si"
+FIRST_NEIGHBOR_ELEMENT = "O"
+SECOND_NEIGHBOR_ELEMENT = "Si"
 
-# 第一近接 O から第二近接 Si までの距離範囲 [Å]。
-O_SI_MIN = 1.40
-O_SI_MAX = 1.90
+# CFGからPOSCARへ変換するときの元素順。
+# aaa.cfg 内の元素番号の並びと一致させる。
+CFG_ELEMENT_INFO = [
+    "Si",
+    "O",
+]
+
+# 中心元素から第一近接元素までの距離範囲 [Å]。
+CENTER_FIRST_MIN = 1.40
+CENTER_FIRST_MAX = 1.90
+
+# 第一近接元素から第二近接元素までの距離範囲 [Å]。
+FIRST_SECOND_MIN = 1.40
+FIRST_SECOND_MAX = 1.90
 
 # 画面へ必ず表示する Qn。
 DISPLAY_QN = [4, 3, 2]
+
+# Qnに分類されなかった中心原子の詳細を表示する。
+DISPLAY_UNMATCHED_DETAILS = True
 
 
 
@@ -83,10 +103,7 @@ def convert_cfg_to_poscar(
         )
 
     cfg_name = str(cfg_path.with_suffix(""))
-    element_info = [
-        "Si",
-        "O",
-    ]
+    element_info = CFG_ELEMENT_INFO
 
     print()
     print(f"[CONVERT] {cfg_path} から {output_path} を生成します")
@@ -208,23 +225,30 @@ def check_sio2_structure(structure: Structure) -> None:
         elements.add(site.specie.symbol)
 
     allowed = {
-        "Si",
-        "O",
+        CENTER_ELEMENT,
+        FIRST_NEIGHBOR_ELEMENT,
+        SECOND_NEIGHBOR_ELEMENT,
     }
 
     unsupported = elements - allowed
     if unsupported:
         names = ", ".join(sorted(unsupported))
         raise ValueError(
-            "SiO2 Qn 解析では Si と O 以外を扱いません。"
+            "設定された解析元素以外を含む構造は扱いません。"
             f"検出元素: {names}"
         )
 
-    if "Si" not in elements:
-        raise ValueError("構造中に Si がありません。")
+    required_elements = {
+        CENTER_ELEMENT,
+        FIRST_NEIGHBOR_ELEMENT,
+        SECOND_NEIGHBOR_ELEMENT,
+    }
 
-    if "O" not in elements:
-        raise ValueError("構造中に O がありません。")
+    for required_element in required_elements:
+        if required_element not in elements:
+            raise ValueError(
+                f"構造中に {required_element} がありません。"
+            )
 
 
 def unique_neighbor_indices(
@@ -307,9 +331,9 @@ def analyze_si_site(
     first_oxygen_indices = unique_neighbor_indices(
         structure=structure,
         center_index=si_index,
-        neighbor_symbol="O",
-        minimum=SI_O_MIN,
-        maximum=SI_O_MAX,
+        neighbor_symbol=FIRST_NEIGHBOR_ELEMENT,
+        minimum=CENTER_FIRST_MIN,
+        maximum=CENTER_FIRST_MAX,
     )
 
     bridging_oxygen_indices: List[int] = []
@@ -319,9 +343,9 @@ def analyze_si_site(
         second_si_indices = unique_neighbor_indices(
             structure=structure,
             center_index=oxygen_index,
-            neighbor_symbol="Si",
-            minimum=O_SI_MIN,
-            maximum=O_SI_MAX,
+            neighbor_symbol=SECOND_NEIGHBOR_ELEMENT,
+            minimum=FIRST_SECOND_MIN,
+            maximum=FIRST_SECOND_MAX,
         )
 
         second_si_except_center: List[int] = []
@@ -378,7 +402,7 @@ def analyze_qn(structure: Structure) -> Dict[str, object]:
     unmatched_count = 0
 
     for index, site in enumerate(structure):
-        if site.specie.symbol != "Si":
+        if site.specie.symbol != CENTER_ELEMENT:
             continue
 
         result = analyze_si_site(
@@ -421,12 +445,18 @@ def print_summary(
     if not isinstance(counts, Counter):
         raise TypeError("qn_counts の型が不正です。")
 
-    print("SiO2 Qn analysis")
+    print(f"{CENTER_ELEMENT} Qn analysis")
     print(f"POSCAR: {structure_path}")
-    print(f"Si-O range: {SI_O_MIN:.6f} - {SI_O_MAX:.6f} Å")
-    print(f"O-Si range: {O_SI_MIN:.6f} - {O_SI_MAX:.6f} Å")
+    print(
+        f"{CENTER_ELEMENT}-{FIRST_NEIGHBOR_ELEMENT} range: "
+        f"{CENTER_FIRST_MIN:.6f} - {CENTER_FIRST_MAX:.6f} Å"
+    )
+    print(
+        f"{FIRST_NEIGHBOR_ELEMENT}-{SECOND_NEIGHBOR_ELEMENT} range: "
+        f"{FIRST_SECOND_MIN:.6f} - {FIRST_SECOND_MAX:.6f} Å"
+    )
     print()
-    print(f"Total Si: {total_si}")
+    print(f"Total {CENTER_ELEMENT}: {total_si}")
     print()
     print("Qn    Count    Ratio")
 
@@ -489,7 +519,7 @@ def print_unmatched_details(result: Dict[str, object]) -> None:
         return
 
     print()
-    print("Unmatched Si details")
+    print(f"Unmatched {CENTER_ELEMENT} details")
     print(
         "VASP index    First O    Bridging O    "
         "Non-bridging O    Reason"
@@ -514,14 +544,14 @@ def print_unmatched_details(result: Dict[str, object]) -> None:
 def main() -> None:
     """構造ファイルを決定し、SiO2 の Qn 分布を表示する。"""
     check_distance_range(
-        SI_O_MIN,
-        SI_O_MAX,
-        "SI_O",
+        CENTER_FIRST_MIN,
+        CENTER_FIRST_MAX,
+        "CENTER_FIRST",
     )
     check_distance_range(
-        O_SI_MIN,
-        O_SI_MAX,
-        "O_SI",
+        FIRST_SECOND_MIN,
+        FIRST_SECOND_MAX,
+        "FIRST_SECOND",
     )
 
     argument_path: Optional[str] = None
@@ -542,7 +572,8 @@ def main() -> None:
         result=result,
         structure_path=structure_path,
     )
-    print_unmatched_details(result)
+    if DISPLAY_UNMATCHED_DETAILS:
+        print_unmatched_details(result)
 
 
 if __name__ == "__main__":
