@@ -9,12 +9,18 @@ RMC_POT の second-neighbour constraint (SNC) の定義に合わせて、
 
 from collections import Counter
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+import subprocess
+import sys
+from typing import Dict, List, Optional, Set, Tuple
 
 from pymatgen.core import Structure
 
 
-POSCAR_PATH = Path("POSCAR")
+DEFAULT_POSCAR_PATH = Path("POSCAR")
+POSCAR_VASP_PATH = Path("POSCAR.vasp")
+AAA_VASP_PATH = Path("aaa.vasp")
+AAA_CFG_PATH = Path("aaa.cfg")
+CONVERTER_PATH = Path(__file__).with_name("conv_cfg2poscar.py")
 
 # 中心 Si から第一近接 O までの距離範囲 [Å]。
 SI_O_MIN = 1.40
@@ -26,6 +32,132 @@ O_SI_MAX = 1.90
 
 # 画面へ必ず表示する Qn。
 DISPLAY_QN = [4, 3, 2]
+
+
+
+def get_structure_file_paths(
+    argument_path: Optional[str],
+) -> List[Path]:
+    """構造ファイルの探索候補を作成する。
+
+    Args:
+        argument_path: コマンドライン引数で指定されたファイル名。
+            指定されていない場合は ``None``。
+
+    Returns:
+        探索順に並べた4個のファイルパス。
+    """
+    if argument_path is None:
+        first_path = DEFAULT_POSCAR_PATH
+    else:
+        first_path = Path(argument_path)
+
+    return [
+        first_path,
+        POSCAR_VASP_PATH,
+        AAA_VASP_PATH,
+        AAA_CFG_PATH,
+    ]
+
+
+def convert_cfg_to_poscar(
+    cfg_path: Path,
+    output_path: Path,
+) -> Path:
+    """CFGをPOSCAR形式へ変換する。
+
+    Args:
+        cfg_path: 変換元CFGファイル。
+        output_path: 生成するPOSCAR形式ファイル。
+
+    Returns:
+        生成されたPOSCAR形式ファイル。
+
+    Raises:
+        FileExistsError: 生成先が既に存在する場合。
+        FileNotFoundError: 変換プログラムまたは生成結果がない場合。
+        subprocess.CalledProcessError: 変換プログラムが失敗した場合。
+    """
+    if output_path.exists():
+        raise FileExistsError(
+            f"既存ファイルは上書きしません: {output_path}"
+        )
+
+    if not CONVERTER_PATH.exists():
+        raise FileNotFoundError(
+            f"変換プログラムが見つかりません: {CONVERTER_PATH}"
+        )
+
+    cfg_name = str(cfg_path.with_suffix(""))
+
+    print()
+    print(f"[CONVERT] {cfg_path} から {output_path} を生成します")
+    print(f"[CONVERTER] {CONVERTER_PATH}")
+
+    subprocess.run(
+        [
+            sys.executable,
+            str(CONVERTER_PATH),
+            cfg_name,
+            "Si,O",
+        ],
+        check=True,
+    )
+
+    if not output_path.exists():
+        raise FileNotFoundError(
+            "変換処理は終了しましたが、生成ファイルが見つかりません: "
+            f"{output_path}"
+        )
+
+    print(f"[GENERATED] {output_path}")
+
+    return output_path
+
+
+def find_structure_file(
+    argument_path: Optional[str],
+) -> Path:
+    """解析に使用する構造ファイルを決定する。
+
+    Args:
+        argument_path: コマンドライン引数で指定されたファイル名。
+            指定されていない場合は ``None``。
+
+    Returns:
+        解析に使用するPOSCAR形式ファイル。
+
+    Raises:
+        FileNotFoundError: 候補ファイルがすべて存在しない場合。
+    """
+    candidate_paths = get_structure_file_paths(argument_path)
+
+    for index, candidate_path in enumerate(candidate_paths, 1):
+        print(f"[TRY {index}/4] {candidate_path}")
+
+        if not candidate_path.exists():
+            continue
+
+        print(f"[FOUND] {candidate_path}")
+
+        if candidate_path == AAA_CFG_PATH:
+            structure_path = convert_cfg_to_poscar(
+                cfg_path=candidate_path,
+                output_path=AAA_VASP_PATH,
+            )
+            print(f"[USE] {structure_path}")
+            return structure_path
+
+        print(f"[USE] {candidate_path}")
+        return candidate_path
+
+    tried_names = ", ".join(
+        str(candidate_path)
+        for candidate_path in candidate_paths
+    )
+    raise FileNotFoundError(
+        f"構造ファイルが見つかりません。探索対象: {tried_names}"
+    )
 
 
 def validate_distance_range(
@@ -267,11 +399,15 @@ def analyze_qn(structure: Structure) -> Dict[str, object]:
     }
 
 
-def print_summary(result: Dict[str, object]) -> None:
+def print_summary(
+    result: Dict[str, object],
+    structure_path: Path,
+) -> None:
     """Qn 分布と非該当数を標準出力へ表示する。
 
     Args:
         result: ``analyze_qn()`` の戻り値。
+        structure_path: 解析に使用した構造ファイル。
     """
     total_si = int(result["total_si"])
     counts = result["qn_counts"]
@@ -281,7 +417,7 @@ def print_summary(result: Dict[str, object]) -> None:
         raise TypeError("qn_counts の型が不正です。")
 
     print("SiO2 Qn analysis")
-    print(f"POSCAR: {POSCAR_PATH}")
+    print(f"POSCAR: {structure_path}")
     print(f"Si-O range: {SI_O_MIN:.6f} - {SI_O_MAX:.6f} Å")
     print(f"O-Si range: {O_SI_MIN:.6f} - {O_SI_MAX:.6f} Å")
     print()
@@ -371,7 +507,7 @@ def print_unmatched_details(result: Dict[str, object]) -> None:
 
 
 def main() -> None:
-    """POSCAR を読み込み、SiO2 の Qn 分布を表示する。"""
+    """構造ファイルを決定し、SiO2 の Qn 分布を表示する。"""
     validate_distance_range(
         SI_O_MIN,
         SI_O_MAX,
@@ -383,19 +519,24 @@ def main() -> None:
         "O_SI",
     )
 
-    if not POSCAR_PATH.exists():
-        raise FileNotFoundError(
-            f"POSCAR が見つかりません: {POSCAR_PATH}"
-        )
+    argument_path: Optional[str] = None
+    if len(sys.argv) >= 2:
+        argument_path = sys.argv[1]
+
+    structure_path = find_structure_file(argument_path)
 
     structure = Structure.from_file(
-        str(POSCAR_PATH)
+        str(structure_path)
     )
     validate_sio2_structure(structure)
 
     result = analyze_qn(structure)
 
-    print_summary(result)
+    print()
+    print_summary(
+        result=result,
+        structure_path=structure_path,
+    )
     print_unmatched_details(result)
 
 
