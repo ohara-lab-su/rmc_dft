@@ -2,6 +2,28 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.5.3 nakada
+
+### Qn ネットワーク解析
+
+- VASP/POSCAR 構造に対する Qn ネットワーク解析機能を追加。
+- 入力構造ファイルの自動検出機能を追加。
+  - `POSCAR`
+  - `POSCAR.vasp`
+  - `aaa.vasp`
+  - `aaa.cfg`
+- RMC_POT の `cfg` ファイルから VASP 形式への自動変換機能を追加。
+- Qn 解析に必要な設定を解析スクリプト内へ集約。
+  - 簡易解析では外部 JSON 設定ファイルが不要。
+- 元素種類や距離カットオフなどの主要パラメータを一箇所で編集できる構成へ変更。
+- 入力構造の検出および表示メッセージを改善。
+- Qn 解析コードを整理・リファクタリング。
+- バグ修正および内部コード整理。
+
+### RMC_POT
+
+- 軽微なバグ修正および内部整理。
+ 
 # v0.5.2
 
 - 累積bugfix(どちらかと言うとパラメーター調整/rmc_potバイナリ再ビルドなどの実行テスト系

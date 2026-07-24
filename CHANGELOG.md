@@ -2,6 +2,40 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.5.3 nakada
+
+### Qn Network Analysis
+
+- Added a Qn network analysis tool for VASP/POSCAR structures.
+
+- Added automatic input structure detection.
+
+  - `POSCAR`
+
+  - `POSCAR.vasp`
+
+  - `aaa.vasp`
+
+  - `aaa.cfg`
+
+- Added automatic conversion from RMC_POT `cfg` files to VASP format.
+
+- Embedded Qn analysis parameters directly into the analysis script.
+
+  - External JSON configuration is no longer required for simple analysis.
+
+- Improved the configuration layout so that atom types and distance cutoffs can be edited in one place.
+
+- Improved output messages and structure detection.
+
+- Refactored the Qn analysis utility.
+
+- Bug fixes and internal code cleanup.
+
+### RMC_POT
+
+- Minor bug fixes and code cleanup.
+ 
 # v0.5.2
 
 - Cumulative bug fixes, primarily related to parameter tuning, binary rebuilds, and execution testing.
