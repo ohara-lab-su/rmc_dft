@@ -1,20 +1,40 @@
 #!/usr/bin/env bash
+# 最初に script 関係を指定フォルダにコピーする
+# その後の　z.sh 作業は指定フォルダからのコピーとする
+#
+# scriptバージョン同一性の担保となる
+# (module バージョンは今入れているモジュールバージョンになる)
 
-#NAME="SiO2_750_S1_nvt4"
-# NAME="D1100"
+SCRIPT="$HOME/zaiene_dev/rmc_dft/example"
+DST="$HOME/LiSPC/script"
 
-SCRIPT="$HOME/zaiene_dev/packmol_util/example"
-#DATA="$HOME/SiO2/data"
-# DATA="$HOME/LiSPC/data"
+if [ ! -d "$DST" ]; then
+    mkdir -p "$DST"
+fi
 
-# cp -r $SCRIPT/fnc/SiO2_03/* .
-#cp -r $SCRIPT/LiSPC/data/* .
+#####################
+# パラメータ群
+cp $SCRIPT/rmc_vasp_init.py $DST/
+cp $SCRIPT/rmc_vasp_init_safe.py $DST/
+cp $SCRIPT/rmc_vasp_init_normal.py $DST/
+cp $SCRIPT/rmc_init.py $DST
+cp $SCRIPT/rmc_vasp_script.py $DST/
 
-# 一部ファイルを上書きする(こっちのほうが優先)
-# cp -r $DATA/* .
+#####################
+# 初期構造作成
+# cp $SCRIPT/config.yml ./
+# cp $SCRIPT/make_mass_density.py ./
+# cp $SCRIPT/make_number_density.py ./
+#####################
 
-cp $SCRIPT/make_amorphous_random.py ./
-cp $SCRIPT/make_mass_density.py ./
-cp $SCRIPT/make_number_density.py ./
+cp $SCRIPT/rmc.py $DST/
+cp $SCRIPT/rmc_vasp.py $DST/
+cp $SCRIPT/clean_rmc.py $DST/
+cp $SCRIPT/make_log_dirname.py $DST/
+cp $SCRIPT/plot_fit.py $DST/
+cp $SCRIPT/plot_multi_fit.py $DST/
+cp $SCRIPT/plot_multi_hst.py $DST/
+
+cp $SCRIPT/analyze_* $DST/
 
 chmod u+x *.py

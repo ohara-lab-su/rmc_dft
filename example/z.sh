@@ -3,23 +3,29 @@
 #NAME="SiO2_750_S1_nvt4"
 NAME="D1100"
 
-SCRIPT="$HOME/zaiene_dev/rmc_dft/example"
+#SCRIPT="$HOME/zaiene_dev/rmc_dft/example"
+
+#SCRIPT="$HOME/LiSPC/script"
+SCRIPT="$HOME/SiC/script"
+#SCRIPT="$HOME/Li3PO4/script"
+
 #DATA="$HOME/SiO2/data"
-DATA="$HOME/LiSPC/data"
+#DATA="$HOME/LiSPC/data"
 
 # cp -r $SCRIPT/fnc/SiO2_03/* .
 #cp -r $SCRIPT/LiSPC/data/* .
 
 # 一部ファイルを上書きする(こっちのほうが優先)
-cp -r $DATA/* .
+#cp -r $DATA/* .
+cp -r $SCRIPT/* .
 
 #####################
 # パラメータ群
-cp $SCRIPT/rmc_vasp_init.py ./
-cp $SCRIPT/rmc_vasp_init_safe.py ./
-cp $SCRIPT/rmc_vasp_init_normal.py ./
-cp $SCRIPT/rmc_init.py ./
-cp $SCRIPT/rmc_vasp_script.py ./
+#cp $SCRIPT/rmc_vasp_init.py ./
+#cp $SCRIPT/rmc_vasp_init_safe.py ./
+#cp $SCRIPT/rmc_vasp_init_normal.py ./
+#cp $SCRIPT/rmc_init.py ./
+#cp $SCRIPT/rmc_vasp_script.py ./
 
 #####################
 # 初期構造作成
@@ -28,13 +34,13 @@ cp $SCRIPT/rmc_vasp_script.py ./
 # cp $SCRIPT/make_number_density.py ./
 #####################
 
-cp $SCRIPT/rmc.py ./
-cp $SCRIPT/rmc_vasp.py ./
-cp $SCRIPT/clean_rmc.py ./
-cp $SCRIPT/make_log_dirname.py ./
-cp $SCRIPT/plot_fit.py ./
-cp $SCRIPT/plot_multi_fit.py ./
-cp $SCRIPT/plot_multi_hst.py ./
+#cp $SCRIPT/rmc.py ./
+#cp $SCRIPT/rmc_vasp.py ./
+#cp $SCRIPT/clean_rmc.py ./
+#cp $SCRIPT/make_log_dirname.py ./
+#cp $SCRIPT/plot_fit.py ./
+#cp $SCRIPT/plot_multi_fit.py ./
+#cp $SCRIPT/plot_multi_hst.py ./
 
 #####################
 # cp $SCRIPT/analyze_* ./
@@ -50,8 +56,8 @@ chmod u+x *.py
 # cp $NAME.cfg aaa.cfg
 
 # convert
-cp POSCAR0 aaa.vasp
-./poscar2cfg.py aaa
+# cp POSCAR0 aaa.vasp
+# ./poscar2cfg.py aaa
 ###########################
 
 #####################
