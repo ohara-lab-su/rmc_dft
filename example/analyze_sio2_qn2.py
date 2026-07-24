@@ -9,18 +9,18 @@ RMC_POT の second-neighbour constraint (SNC) の定義に合わせて、
 
 from collections import Counter
 from pathlib import Path
-import subprocess
 import sys
 from typing import Dict, List, Optional, Set, Tuple
 
 from pymatgen.core import Structure
+from rmc_dft import RmcPot, RmcPotLog
+from x_logger import XLogger
 
 
 DEFAULT_POSCAR_PATH = Path("POSCAR")
 POSCAR_VASP_PATH = Path("POSCAR.vasp")
 AAA_VASP_PATH = Path("aaa.vasp")
 AAA_CFG_PATH = Path("aaa.cfg")
-CONVERTER_PATH = Path(__file__).with_name("conv_cfg2poscar.py")
 
 # 中心 Si から第一近接 O までの距離範囲 [Å]。
 SI_O_MIN = 1.40
@@ -75,33 +75,38 @@ def convert_cfg_to_poscar(
 
     Raises:
         FileExistsError: 生成先が既に存在する場合。
-        FileNotFoundError: 変換プログラムまたは生成結果がない場合。
-        subprocess.CalledProcessError: 変換プログラムが失敗した場合。
+        FileNotFoundError: 変換後のファイルが生成されなかった場合。
     """
     if output_path.exists():
         raise FileExistsError(
             f"既存ファイルは上書きしません: {output_path}"
         )
 
-    if not CONVERTER_PATH.exists():
-        raise FileNotFoundError(
-            f"変換プログラムが見つかりません: {CONVERTER_PATH}"
-        )
-
     cfg_name = str(cfg_path.with_suffix(""))
+    element_info = [
+        "Si",
+        "O",
+    ]
 
     print()
     print(f"[CONVERT] {cfg_path} から {output_path} を生成します")
-    print(f"[CONVERTER] {CONVERTER_PATH}")
 
-    subprocess.run(
-        [
-            sys.executable,
-            str(CONVERTER_PATH),
-            cfg_name,
-            "Si,O",
-        ],
-        check=True,
+    logger = XLogger(
+        log_level="debug",
+        logger_name="conv_cfg2poscar",
+    )
+    rmc_log = RmcPotLog(
+        cfg_name=cfg_name,
+        logger=logger,
+    )
+    rmc = RmcPot(
+        rmc_log=rmc_log,
+        cfg_name=cfg_name,
+        logger=logger,
+    )
+    rmc.cfg2poscar(
+        cfg_name=cfg_name,
+        element_info=element_info,
     )
 
     if not output_path.exists():
