@@ -160,7 +160,7 @@ def find_structure_file(
     )
 
 
-def validate_distance_range(
+def check_distance_range(
     minimum: float,
     maximum: float,
     name: str,
@@ -184,7 +184,7 @@ def validate_distance_range(
         )
 
 
-def validate_sio2_structure(structure: Structure) -> None:
+def check_sio2_structure(structure: Structure) -> None:
     """構造が Si と O だけから構成されることを確認する。
 
     Args:
@@ -508,12 +508,12 @@ def print_unmatched_details(result: Dict[str, object]) -> None:
 
 def main() -> None:
     """構造ファイルを決定し、SiO2 の Qn 分布を表示する。"""
-    validate_distance_range(
+    check_distance_range(
         SI_O_MIN,
         SI_O_MAX,
         "SI_O",
     )
-    validate_distance_range(
+    check_distance_range(
         O_SI_MIN,
         O_SI_MAX,
         "O_SI",
@@ -528,7 +528,7 @@ def main() -> None:
     structure = Structure.from_file(
         str(structure_path)
     )
-    validate_sio2_structure(structure)
+    check_sio2_structure(structure)
 
     result = analyze_qn(structure)
 
