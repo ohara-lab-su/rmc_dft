@@ -13,20 +13,35 @@ from x_logger import XLogger
 FREE_DAT_TEMPLATE: str = """{version}
 
 [ GENERAL ]
-TITLE = System
-NDENS = 0.08
-CUT-OFF = 2.0
-MAX-MOVES = 0.1
+TITLE = FeSiB
+NDENS = 0.0915
+CUT-OFF = 2.3 2.1 2 2.3 2.1 2
+MAX-MOVES = 0.1 0.1 0.1
 R-SPACING = 0.025
-PRINT-STEP = 1000
-RUN-TIME = 1.0 0
+MOVEOUT = 0
+COLL-NUMBER = 0
+PRINT-STEP = 5000
+RUN-TIME = 0.2
+SAVE-TIME = 0
 FNC-TYPE = NONE
-SAVE-TIME = 1
+BIN-SHIFT = 0
+XMAX-FACTOR = 1
 HST_BUFFSIZE = 200
 HST-STEP-FACTOR = 10
+RELOAD = 0
+ATOMS-IN-GRIDCELL = 5
+THREADS = 4
 
 [ EXP ]
 TYPE = XRD
+DATAFILE = test.xsq
+POINT-RANGE = 1 290
+SCALE = 1.0
+SIGMA = 5E-3
+USE-RFACTOR = 0
+RENORM = 1
+READ-COEFFS = 0
+COMPTON-SUPR-COEFF = 0
 """
 
 
@@ -1759,19 +1774,39 @@ class RmcPotDatFree:
             self.write()
 
     def get_num_atoms_per_move(self) -> int:
-        """通常の自由形式 atomic RMC では1回の move で動かす原子数は1を返す。"""
-        return 1
+        """1回の move で動かす原子数を返す。
+
+        通常の atomic move では常に1を返す。``[ CUSTMOVE ]`` が存在する場合は、
+        同セクションの ``NMOVED-ATOMS`` を返す。
+        """
+        section = self._first_section("CUSTMOVE")
+        if not section:
+            return 1
+        value = section.get("NMOVED-ATOMS", ["1"])[0]
+        return int(float(value))
 
     def set_num_atoms_per_move(
         self, value: int, *, auto_write: Optional[bool] = None
     ) -> bool:
-        """自由形式 atomic RMC では1以外を設定しない。"""
-        if int(value) != 1:
-            self._logger.error(
-                "[rmc_pot_dat_free] 自由形式の通常 atomic RMC では1回の move で動かす原子数は1です"
-            )
-            return False
-        self._config.rmc_num_atoms_per_move = 1
+        """1回の custom move で動かす原子数を設定する。
+
+        ``value=1`` かつ ``[ CUSTMOVE ]`` が存在しない場合は、通常の
+        atomic move の既定値として保持し、セクションは作成しない。
+        2以上を指定した場合は ``[ CUSTMOVE ]`` を作成して
+        ``NMOVED-ATOMS`` を設定する。
+        """
+        moved_atoms = int(value)
+        if moved_atoms < 1:
+            raise ValueError("1回の move で動かす原子数は1以上である必要があります")
+
+        self._config.rmc_num_atoms_per_move = moved_atoms
+        section = self._first_section("CUSTMOVE")
+        if section or moved_atoms != 1:
+            section = self._first_section("CUSTMOVE", create=True)
+            section["NMOVED-ATOMS"] = [str(moved_atoms)]
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
         return True
 
     def get_history_buffer_size(self) -> int:
@@ -1801,19 +1836,40 @@ class RmcPotDatFree:
             self.write()
 
     def get_custom_move_flag(self) -> int:
-        """自由形式で対応する設定がないため ``0`` を返す。"""
+        """``[ CUSTMOVE ]`` が存在する場合に1、存在しない場合に0を返す。"""
+        if self._find_sections("CUSTMOVE"):
+            return 1
         return 0
 
     def set_custom_move_flag(
         self, value: int, *, auto_write: Optional[bool] = None
     ) -> bool:
-        """自由形式で対応する設定がないため設定しない。"""
-        if int(value) == 0:
-            return True
-        self._logger.error(
-            "[rmc_pot_dat_free] この設定に対応する自由形式キーワードはありません"
-        )
-        return False
+        """custom move の有効・無効を ``[ CUSTMOVE ]`` の有無で設定する。
+
+        有効化時は、現在の ``get_num_atoms_per_move()`` の値を
+        ``NMOVED-ATOMS`` に設定する。具体的な custom move パラメータは
+        ``CUSTOM-LINE`` として別途追加する。
+        """
+        enabled = int(value)
+        if enabled not in {0, 1}:
+            raise ValueError("custom move flag は0または1で指定してください")
+
+        if enabled == 0:
+            self._sections = [
+                (name, values)
+                for name, values in self._sections
+                if name != "CUSTMOVE"
+            ]
+        elif not self._find_sections("CUSTMOVE"):
+            moved_atoms = self._config.rmc_num_atoms_per_move
+            if moved_atoms is None:
+                moved_atoms = 1
+            section = self._first_section("CUSTMOVE", create=True)
+            section["NMOVED-ATOMS"] = [str(int(moved_atoms))]
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return True
 
     def get_load_histogram_flag(self) -> int:
         """``[ GENERAL ]`` の ``RELOAD`` を返す。"""
@@ -1829,32 +1885,63 @@ class RmcPotDatFree:
             self.write()
 
     def get_max_atoms_per_cell(self) -> int:
-        """自由形式で対応する設定がないため ``0`` を返す。"""
-        return 0
+        """``[ GENERAL ]`` の ``ATOMS-IN-GRIDCELL`` を返す。"""
+        value = self._first_value("GENERAL", "ATOMS-IN-GRIDCELL", "5")
+        return int(float(value))
 
     def set_max_atoms_per_cell(
         self, value: int, *, auto_write: Optional[bool] = None
     ) -> bool:
-        """自由形式で対応する設定がないため設定しない。"""
-        if int(value) == 0:
-            return True
-        self._logger.error(
-            "[rmc_pot_dat_free] この設定に対応する自由形式キーワードはありません"
-        )
-        return False
+        """``[ GENERAL ]`` の ``ATOMS-IN-GRIDCELL`` を設定する。"""
+        atoms = int(value)
+        if atoms < 1:
+            raise ValueError("grid cell内の最大原子数は1以上である必要があります")
+        self._set_value("GENERAL", "ATOMS-IN-GRIDCELL", str(atoms))
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return True
 
     def get_swap_settings(self) -> Tuple[float, int]:
-        """``[ GENERAL ]`` の ``SWAP-FRACTION`` と ``SWAP-ALLOW`` を返す。"""
-        fraction = self._first_value("GENERAL", "SWAP-FRACTION", "0")
-        allow = self._first_value("GENERAL", "SWAP-ALLOW", "0")
-        return float(fraction), int(float(allow))
+        """``[ SWAP ]`` の交換割合と有効状態を返す。
+
+        Returns:
+            ``(FRACT, enabled)``。``[ SWAP ]`` が存在しない場合は
+            固定形式の既定値に対応する ``(0.0, 0)`` を返す。
+        """
+        section = self._first_section("SWAP")
+        if not section:
+            return 0.0, 0
+        fraction = section.get("FRACT", ["0"])[0]
+        return float(fraction), 1
 
     def set_swap_settings(
-        self, fraction: int, allow_flag: int, *, auto_write: Optional[bool] = None
+        self, fraction: float, allow_flag: int, *, auto_write: Optional[bool] = None
     ) -> None:
-        """``[ GENERAL ]`` の swap 関連キーワードを設定する。"""
-        self._set_value("GENERAL", "SWAP-FRACTION", self._fmt_number(fraction))
-        self._set_value("GENERAL", "SWAP-ALLOW", str(int(allow_flag)))
+        """固定形式互換のswap設定を自由形式の ``[ SWAP ]`` へ反映する。
+
+        ``allow_flag=0`` または ``fraction=0`` の場合は ``[ SWAP ]`` を削除する。
+        有効化する場合は ``FRACT`` と ``PAIRS = ALL`` を設定する。
+        個別の原子種pairを指定する場合は ``set()`` または ``add()`` で
+        ``[ SWAP ]`` の ``PAIRS`` を設定する。
+        """
+        enabled = int(allow_flag)
+        swap_fraction = float(fraction)
+        if enabled not in {0, 1}:
+            raise ValueError("swap allow flag は0または1で指定してください")
+        if swap_fraction < 0.0 or swap_fraction > 1.0:
+            raise ValueError("swap fraction は0以上1以下で指定してください")
+
+        if enabled == 0 or swap_fraction == 0.0:
+            self._sections = [
+                (name, values)
+                for name, values in self._sections
+                if name != "SWAP"
+            ]
+        else:
+            section = self._first_section("SWAP", create=True)
+            section["FRACT"] = [self._fmt_number(swap_fraction)]
+            section["PAIRS"] = ["ALL"]
+
         if self._resolve_auto_write(auto_write):
             self.write()
 
