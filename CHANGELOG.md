@@ -2,6 +2,71 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.5.4
+
+## SiO2 Qn structure analysis script
+
+The standalone script for analyzing the Qn distribution in an SiO2 structure was reorganized and corrected.
+
+### Removed the external JSON configuration
+
+- Removed the requirement to load Qn analysis settings from an external JSON file.
+- Consolidated the analysis settings into `QN_CONFIG` at the beginning of the script.
+- Qn analysis conditions can now be changed by editing only `QN_CONFIG`.
+- Resolved `FileNotFoundError` failures caused by missing external files such as `aaa.json`.
+
+### Automatic structure-file discovery
+
+When no structure file is explicitly specified, the analysis script now searches the default candidates in order.
+
+```text
+CONTCAR
+POSCAR
+POSCAR.vasp
+aaa.vasp
+aaa.cfg
+```
+
+## Fixed
+
+### Unified fixed-format and free-format APIs
+
+The free-format implementation has been revised to provide API compatibility with the fixed-format implementation.
+
+The goal of this update is to allow the same initialization script (`rmc_init.py`) to generate either fixed-format or free-format RMC_POT input files without requiring changes to the calling code.
+
+### Improved fixed/free format compatibility
+
+The free-format implementation now follows the behavior of the fixed-format implementation more closely.
+
+Major compatibility improvements include:
+
+- Added compatibility methods corresponding to fixed-format APIs.
+- Unified method names and keyword argument names between fixed-format and free-format implementations.
+- Corrected internal parameter mappings that did not correspond to the fixed-format implementation.
+- Improved handling of constraint-count APIs so that existing initialization scripts behave consistently.
+- Improved potential enable/disable handling for compatibility with the fixed-format interface.
+
+### X-ray experiment parameter compatibility
+
+Corrected the mapping of X-ray experiment parameters.
+
+Changes include:
+
+- `READ-COEFFS` now defaults to reading coefficients from the experimental data file, matching the behavior of the fixed-format implementation.
+- Corrected the mapping of fixed-format experiment parameters to the corresponding free-format keywords.
+- Replaced the incorrect use of `SCALE` with the appropriate `CONST-SUBTRACT` parameter.
+- Corrected the mapping of background correction flags using `POLY-BACK-FLAGS`.
+- Updated `RENORM` handling to match the fixed-format implementation.
+
+### Internal consistency improvements
+
+Improved consistency between the fixed-format and free-format implementations.
+
+- Added compatibility methods where necessary while preserving the existing fixed-format behavior.
+- Improved compatibility of getter/setter APIs used by initialization scripts.
+- Existing fixed-format workflows remain unchanged.
+
 ## v0.5.3 nakada
 
 ### Qn Network Analysis
