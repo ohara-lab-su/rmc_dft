@@ -36,12 +36,12 @@ THREADS = 4
 TYPE = XRD
 DATAFILE = test.xsq
 POINT-RANGE = 1 290
-SCALE = 1.0
+CONST-SUBTRACT = 1.0
 SIGMA = 5E-3
 USE-RFACTOR = 0
-RENORM = 1
+RENORM = 0
+POLY-BACK-FLAGS = 1 0 0 0
 READ-COEFFS = 1
-COMPTON-SUPR-COEFF = 0
 """
 
 
@@ -1161,21 +1161,32 @@ class RmcPotDatFree:
             self.write()
         return True
 
-    def get_scale_factor(self) -> bool:
-        """自由形式に汎用 ``SCALE`` キーはないため ``False`` を返す。"""
-        self._logger.error(
-            "[rmc_pot_dat_free] 自由形式 [ EXP ] に汎用 SCALE キーはありません"
-        )
-        return False
+    def get_scale_factor(self) -> Union[float, bool]:
+        """固定形式13行目に対応する ``CONST-SUBTRACT`` を返す。"""
+        exp = self._first_exp()
+        if not exp:
+            return False
+        values = exp.get("CONST-SUBTRACT", ["0"])
+        try:
+            return float(values[0].split()[0])
+        except ValueError:
+            self._logger.error(
+                f"[rmc_pot_dat_free] CONST-SUBTRACT が不正です: {values[0]}"
+            )
+            return False
 
     def set_scale_factor(
         self, value: float, *, auto_write: Optional[bool] = None
     ) -> bool:
-        """自由形式に汎用 ``SCALE`` キーはないため設定しない。"""
-        self._logger.error(
-            "[rmc_pot_dat_free] 自由形式 [ EXP ] に汎用 SCALE キーはありません"
-        )
-        return False
+        """固定形式13行目に対応する ``CONST-SUBTRACT`` を設定する。"""
+        exp = self._first_exp()
+        if not exp:
+            self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
+            return False
+        exp["CONST-SUBTRACT"] = [self._fmt_number(value)]
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return True
 
     def get_sigma_factor(self) -> Union[float, bool]:
         """最初の ``[ EXP ]`` の ``SIGMA`` を返す。"""
@@ -1205,35 +1216,52 @@ class RmcPotDatFree:
             self.write()
         return True
 
-    def get_flag_15(self) -> bool:
-        """最初の ``[ EXP ]`` の ``USE-RFACTOR`` を返す。"""
+    def _get_poly_back_flags(self) -> List[str]:
+        """最初の ``[ EXP ]`` の ``POLY-BACK-FLAGS`` を4要素で返す。"""
         exp = self._first_exp()
         if not exp:
-            return False
-        values = exp.get("USE-RFACTOR", ["0"])
-        return self._bool_int(values[0]) == "1"
+            return ["0", "0", "0", "0"]
 
-    def set_flag_15(self, value: bool, *, auto_write: Optional[bool] = None) -> bool:
-        """最初の ``[ EXP ]`` の ``USE-RFACTOR`` を設定する。"""
+        values = exp.get("POLY-BACK-FLAGS", ["0 0 0 0"])
+        tokens = values[0].split()
+        normalized = [self._bool_int(token) for token in tokens[:4]]
+
+        while len(normalized) < 4:
+            normalized.append("0")
+
+        return normalized
+
+    def _set_poly_back_flag(
+        self,
+        position: int,
+        value: bool,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> bool:
+        """``POLY-BACK-FLAGS`` の指定位置だけを更新する。"""
         exp = self._first_exp()
         if not exp:
             self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
             return False
-        exp["USE-RFACTOR"] = [self._bool_int(value)]
+
+        flags = self._get_poly_back_flags()
+        flags[position] = self._bool_int(value)
+        exp["POLY-BACK-FLAGS"] = [" ".join(flags)]
+
         if self._resolve_auto_write(auto_write):
             self.write()
         return True
 
-    def get_flag_16(self) -> bool:
-        """最初の ``[ EXP ]`` の ``RENORM`` を返す。"""
+    def get_flag_15(self) -> bool:
+        """固定形式15行目に対応する ``RENORM`` を返す。"""
         exp = self._first_exp()
         if not exp:
             return False
         values = exp.get("RENORM", ["0"])
         return self._bool_int(values[0]) == "1"
 
-    def set_flag_16(self, value: bool, *, auto_write: Optional[bool] = None) -> bool:
-        """最初の ``[ EXP ]`` の ``RENORM`` を設定する。"""
+    def set_flag_15(self, value: bool, *, auto_write: Optional[bool] = None) -> bool:
+        """固定形式15行目に対応する ``RENORM`` を設定する。"""
         exp = self._first_exp()
         if not exp:
             self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
@@ -1243,43 +1271,29 @@ class RmcPotDatFree:
             self.write()
         return True
 
+    def get_flag_16(self) -> bool:
+        """固定形式16行目に対応する定数項補正フラグを返す。"""
+        return self._get_poly_back_flags()[0] == "1"
+
+    def set_flag_16(self, value: bool, *, auto_write: Optional[bool] = None) -> bool:
+        """固定形式16行目に対応する定数項補正フラグを設定する。"""
+        return self._set_poly_back_flag(0, value, auto_write=auto_write)
+
     def get_flag_17(self) -> bool:
-        """最初の ``[ EXP ]`` の ``READ-COEFFS`` を返す。"""
-        exp = self._first_exp()
-        if not exp:
-            return False
-        values = exp.get("READ-COEFFS", ["1"])
-        return self._bool_int(values[0]) == "1"
+        """固定形式17行目に対応する一次項補正フラグを返す。"""
+        return self._get_poly_back_flags()[1] == "1"
 
     def set_flag_17(self, value: bool, *, auto_write: Optional[bool] = None) -> bool:
-        """最初の ``[ EXP ]`` の ``READ-COEFFS`` を設定する。"""
-        exp = self._first_exp()
-        if not exp:
-            self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
-            return False
-        exp["READ-COEFFS"] = [self._bool_int(value)]
-        if self._resolve_auto_write(auto_write):
-            self.write()
-        return True
+        """固定形式17行目に対応する一次項補正フラグを設定する。"""
+        return self._set_poly_back_flag(1, value, auto_write=auto_write)
 
     def get_flag_18(self) -> bool:
-        """最初の ``[ EXP ]`` の ``COMPTON-SUPR-COEFF`` を返す。"""
-        exp = self._first_exp()
-        if not exp:
-            return False
-        values = exp.get("COMPTON-SUPR-COEFF", ["0"])
-        return self._bool_int(values[0]) == "1"
+        """固定形式18行目に対応する二次項補正フラグを返す。"""
+        return self._get_poly_back_flags()[2] == "1"
 
     def set_flag_18(self, value: bool, *, auto_write: Optional[bool] = None) -> bool:
-        """最初の ``[ EXP ]`` の ``COMPTON-SUPR-COEFF`` を設定する。"""
-        exp = self._first_exp()
-        if not exp:
-            self._logger.error("[rmc_pot_dat_free] [ EXP ] セクションがありません")
-            return False
-        exp["COMPTON-SUPR-COEFF"] = [self._bool_int(value)]
-        if self._resolve_auto_write(auto_write):
-            self.write()
-        return True
+        """固定形式18行目に対応する二次項補正フラグを設定する。"""
+        return self._set_poly_back_flag(2, value, auto_write=auto_write)
 
     def get_angle_constraint_count(self) -> int:
         """``[ COS ]`` セクション数を返す。"""
