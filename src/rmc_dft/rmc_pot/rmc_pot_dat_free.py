@@ -40,7 +40,7 @@ SCALE = 1.0
 SIGMA = 5E-3
 USE-RFACTOR = 0
 RENORM = 1
-READ-COEFFS = 0
+READ-COEFFS = 1
 COMPTON-SUPR-COEFF = 0
 """
 
@@ -1248,7 +1248,7 @@ class RmcPotDatFree:
         exp = self._first_exp()
         if not exp:
             return False
-        values = exp.get("READ-COEFFS", ["0"])
+        values = exp.get("READ-COEFFS", ["1"])
         return self._bool_int(values[0]) == "1"
 
     def set_flag_17(self, value: bool, *, auto_write: Optional[bool] = None) -> bool:
