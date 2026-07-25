@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 from __future__ import annotations
 
 import math

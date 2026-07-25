@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""RMC_POT の Fixed Neighbour Constraint（``*.fnc``）を扱う。
+"""
+K.NAKADA, kengo.nakada@gmail.com
+
+RMC_POT の Fixed Neighbour Constraint（``*.fnc``）を扱う。
 
 FNC ファイルの読み込み、編集、検証、保存をこのモジュールだけで担当する。
 ``*.dat`` の固定形式／自由形式には依存しない。FNC 内の原子番号は、最終的な

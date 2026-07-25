@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+K.NAKADA, kengo.nakada@gmail.com
+
 hst ファイルからRMCの収束に関する結果を抜き出す。
 """
 

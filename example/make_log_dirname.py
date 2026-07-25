@@ -1,4 +1,6 @@
 """
+K.NAKADA, kengo.nakada@gmail.com
+
 log_dirname モジュール
 
 RMC / DFT のログディレクトリ命名規則

@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""RMC_POT の GROMACS 型 topology（``*.top``／``*.itp``）を扱う。
+"""
+K.NAKADA, kengo.nakada@gmail.com
+
+RMC_POT の GROMACS 型 topology（``*.top``／``*.itp``）を扱う。
 
 TOP/ITP の読み込み、編集、検証、保存をこのモジュールだけで担当する。
 結合項では分子内のローカル原子番号を使い、``[ atoms ]`` のコメント部には

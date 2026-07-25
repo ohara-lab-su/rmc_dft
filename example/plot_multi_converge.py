@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """plot_multi_converge.py
+K.NAKADA, kengo.nakada@gmail.com
 
 RMC と DFT の収束状況を同一 Figure に並べて描画
 

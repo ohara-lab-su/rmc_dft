@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from rmc_dft.rmc_pot.qn.qn_network_analysis import QnNetworkAnalysis

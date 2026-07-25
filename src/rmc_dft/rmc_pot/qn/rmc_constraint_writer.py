@@ -1,4 +1,7 @@
 # /usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 import itertools
 import os
