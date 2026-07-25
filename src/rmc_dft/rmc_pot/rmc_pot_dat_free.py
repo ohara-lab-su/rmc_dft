@@ -2709,3 +2709,33 @@ class RmcPotDatFree:
 
         if self._resolve_auto_write(auto_write):
             self.write()
+
+
+def main() -> None:
+    """自由形式 DAT と SNC セクションを設定する利用例。
+
+    Notes:
+        SNC は独立ファイルではなく、自由形式 DAT 内の ``[ SNC ]``
+        セクションとして従来の ``RmcPotDatFree`` が管理する。
+    """
+    dat = RmcPotDatFree(cfg_name="sample_free", auto_write=False)
+    dat.set_comment("SiO2 SNC sample", auto_write=False)
+    dat.set_density(0.0665715652, auto_write=False)
+    dat.initialize_qn_constraints(auto_write=False)
+    dat.add_qn_constraint(
+        central_type=1,
+        first_neighbor_type=2,
+        first_neighbor_minimum=1.40,
+        first_neighbor_maximum=1.90,
+        second_neighbors=[(1, 1.40, 1.90)],
+        coordination_number=4,
+        fraction=0.994,
+        sigma=1.0,
+        auto_write=False,
+    )
+    dat.write()
+    print("generated: sample_free.dat")
+
+
+if __name__ == "__main__":
+    main()

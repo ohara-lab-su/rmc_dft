@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""RMC_POT GROMACS-type topology (``*.top``/``*.itp``) support.
+"""RMC_POT の GROMACS 型 topology（``*.top``／``*.itp``）を扱う。
 
-Topology files are independent of whether the accompanying ``*.dat`` file uses
-fixed or free format.  Bonded topology uses local GROMACS serial indices, while
-``[ atoms ]`` carries the first/second RMC indices that map each local atom to
-the final ``*.cfg`` ordering.
+TOP/ITP の読み込み、編集、検証、保存をこのモジュールだけで担当する。
+結合項では分子内のローカル原子番号を使い、``[ atoms ]`` のコメント部には
+最初と2番目の分子インスタンスに対応する RMC 原子 index を記録する。
 """
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -17,17 +16,23 @@ Number = Union[int, float]
 
 @dataclass
 class TopologySection:
+    """TOP/ITP 内の 1 セクションを保持する。
+
+    Attributes:
+        name: 角括弧を除いたセクション名。
+        lines: セクション内部のデータ行。
+    """
+
     name: str
     lines: List[str] = field(default_factory=list)
 
 
 class RmcPotDatTop:
-    """Create, read, edit, validate, and write RMC_POT TOP/ITP files.
+    """RMC_POT TOP/ITP ファイルを生成・編集する独立クラス。
 
-    Low-level section methods can represent every directive recognised by
-    RMC_POT.  Typed methods cover the recognised topology records.  Convenience
-    methods build reusable molecule templates or one explicit whole-cell
-    network molecule.
+    低水準のセクション操作に加え、atoms、bonds、angles、dihedrals などを
+    明示的に追加するメソッドを提供する。規則的な分子テンプレートと、セル全体を
+    1 分子として列挙する不規則ネットワークの両方を扱う。
     """
 
     KNOWN_SECTIONS = {
@@ -52,6 +57,13 @@ class RmcPotDatTop:
         auto_write: bool = True,
         logger: Optional[XLogger] = None,
     ) -> None:
+        """インスタンスを初期化する。
+
+        Args:
+            name: name に指定する値。
+            auto_write: auto_write に指定する値。
+            logger: logger に指定する値。
+        """
         self._path = self._resolve_path(name)
         self._auto_write = bool(auto_write)
         self._logger = logger or XLogger()
@@ -61,6 +73,14 @@ class RmcPotDatTop:
 
     @staticmethod
     def _resolve_path(name: str) -> Path:
+        """入力名から出力パスを決定する。
+
+        Args:
+            name: name に指定する値。
+
+        Returns:
+            処理結果。
+        """
         path = Path(name)
         if path.suffix.lower() not in (".top", ".itp"):
             path = Path(str(path) + ".top")
@@ -68,13 +88,25 @@ class RmcPotDatTop:
 
     @property
     def path(self) -> Path:
+        """現在の入出力パスを返す。
+
+        Returns:
+            処理結果。
+        """
         return self._path
 
     def clear(self, *, auto_write: Optional[bool] = None) -> None:
+        """保持している内容を消去する。
+
+        Args:
+            auto_write: auto_write に指定する値。
+        """
         self._items = []
         self._write_if_requested(auto_write)
 
     def load(self) -> None:
+        """既存ファイルを読み込む。
+        """
         if not self._path.exists():
             raise FileNotFoundError(str(self._path))
         self._items = []
@@ -93,6 +125,11 @@ class RmcPotDatTop:
         self._logger.info("[rmc_pot_dat_top] load %s" % self._path)
 
     def write(self, out_name: Optional[str] = None) -> None:
+        """現在の内部状態をファイルへ書き出す。
+
+        Args:
+            out_name: out_name に指定する値。
+        """
         self.validate()
         path = self._path if out_name is None else self._resolve_path(out_name)
         output: List[str] = []
@@ -105,29 +142,70 @@ class RmcPotDatTop:
         path.write_text("\n".join(output).rstrip() + "\n", encoding="utf-8")
         self._logger.info("[rmc_pot_dat_top] write %s" % path)
 
+
     def add_raw_line(self, line: str = "", *, auto_write: Optional[bool] = None) -> None:
+        """raw line を追加する。
+
+        Args:
+            line: line に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         self._items.append(str(line))
         self._write_if_requested(auto_write)
 
     def add_comment(self, comment: str, *, auto_write: Optional[bool] = None) -> None:
+        """comment を追加する。
+
+        Args:
+            comment: comment に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         text = str(comment)
         if not text.startswith(";"):
             text = "; " + text
         self.add_raw_line(text, auto_write=auto_write)
 
     def add_include(self, filename: str, *, auto_write: Optional[bool] = None) -> None:
+        """include を追加する。
+
+        Args:
+            filename: filename に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         self.add_raw_line('#include "%s"' % str(filename), auto_write=auto_write)
 
     def add_ifdef(self, symbol: str, *, auto_write: Optional[bool] = None) -> None:
+        """ifdef を追加する。
+
+        Args:
+            symbol: symbol に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         self.add_raw_line("#ifdef %s" % str(symbol), auto_write=auto_write)
 
     def add_ifndef(self, symbol: str, *, auto_write: Optional[bool] = None) -> None:
+        """ifndef を追加する。
+
+        Args:
+            symbol: symbol に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         self.add_raw_line("#ifndef %s" % str(symbol), auto_write=auto_write)
 
     def add_else(self, *, auto_write: Optional[bool] = None) -> None:
+        """else を追加する。
+
+        Args:
+            auto_write: auto_write に指定する値。
+        """
         self.add_raw_line("#else", auto_write=auto_write)
 
     def add_endif(self, *, auto_write: Optional[bool] = None) -> None:
+        """endif を追加する。
+
+        Args:
+            auto_write: auto_write に指定する値。
+        """
         self.add_raw_line("#endif", auto_write=auto_write)
 
     def add_section(
@@ -136,12 +214,29 @@ class RmcPotDatTop:
         *,
         auto_write: Optional[bool] = None,
     ) -> TopologySection:
+        """section を追加する。
+
+        Args:
+            name: name に指定する値。
+            auto_write: auto_write に指定する値。
+
+        Returns:
+            処理結果。
+        """
         section = TopologySection(str(name).strip().lower())
         self._items.append(section)
         self._write_if_requested(auto_write)
         return section
 
     def get_sections(self, name: Optional[str] = None) -> List[TopologySection]:
+        """sections を取得する。
+
+        Args:
+            name: name に指定する値。
+
+        Returns:
+            処理結果。
+        """
         sections = [item for item in self._items if isinstance(item, TopologySection)]
         if name is None:
             return sections
@@ -149,6 +244,14 @@ class RmcPotDatTop:
         return [section for section in sections if section.name == target]
 
     def get_last_section(self, name: str) -> TopologySection:
+        """last section を取得する。
+
+        Args:
+            name: name に指定する値。
+
+        Returns:
+            処理結果。
+        """
         sections = self.get_sections(name)
         if not sections:
             raise ValueError("section がありません: %s" % name)
@@ -162,6 +265,14 @@ class RmcPotDatTop:
         create: bool = True,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """section line を追加する。
+
+        Args:
+            section_name: section_name に指定する値。
+            line: line に指定する値。
+            create: create に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         sections = self.get_sections(section_name)
         if sections:
             section = sections[-1]
@@ -173,6 +284,12 @@ class RmcPotDatTop:
         self._write_if_requested(auto_write)
 
     def remove_sections(self, name: str, *, auto_write: Optional[bool] = None) -> None:
+        """sections を削除する。
+
+        Args:
+            name: name に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         target = str(name).strip().lower()
         self._items = [
             item for item in self._items
@@ -188,6 +305,14 @@ class RmcPotDatTop:
         index_offset: Optional[int] = None,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """begin molecule type を実行する。
+
+        Args:
+            name: name に指定する値。
+            exclusions: exclusions に指定する値。
+            index_offset: index_offset に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         section = self.add_section("moleculetype", auto_write=False)
         line = "%s %d" % (str(name), int(exclusions))
         if index_offset is not None:
@@ -210,6 +335,21 @@ class RmcPotDatTop:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """atom を追加する。
+
+        Args:
+            serial: serial に指定する値。
+            atom_type: atom_type に指定する値。
+            residue_number: residue_number に指定する値。
+            residue_name: residue_name に指定する値。
+            atom_name: atom_name に指定する値。
+            charge_group: charge_group に指定する値。
+            charge: charge に指定する値。
+            mass: mass に指定する値。
+            first_rmc_index: first_rmc_index に指定する値。
+            second_rmc_index: second_rmc_index に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         tokens = [
             str(int(serial)), str(atom_type), str(int(residue_number)),
             str(residue_name), str(atom_name), str(int(charge_group)),
@@ -235,6 +375,19 @@ class RmcPotDatTop:
         mass: float = 0.0,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """virtual atom を追加する。
+
+        Args:
+            serial: serial に指定する値。
+            atom_type: atom_type に指定する値。
+            residue_number: residue_number に指定する値。
+            residue_name: residue_name に指定する値。
+            atom_name: atom_name に指定する値。
+            charge_group: charge_group に指定する値。
+            charge: charge に指定する値。
+            mass: mass に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         self.add_atom(
             serial, atom_type, residue_number, residue_name, atom_name,
             charge_group, charge, mass, 0, 0, auto_write=auto_write,
@@ -250,6 +403,16 @@ class RmcPotDatTop:
         w_parameter: Optional[float] = None,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """pair を追加する。
+
+        Args:
+            atom_i: atom_i に指定する値。
+            atom_j: atom_j に指定する値。
+            function_type: function_type に指定する値。
+            v_parameter: v_parameter に指定する値。
+            w_parameter: w_parameter に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         values: List[Union[int, float]] = [atom_i, atom_j, function_type]
         if (v_parameter is None) != (w_parameter is None):
             raise ValueError("V/W parameter は両方指定するか両方省略してください。")
@@ -269,6 +432,18 @@ class RmcPotDatTop:
         rmc_parameters_after_semicolon: bool = False,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """bond を追加する。
+
+        Args:
+            atom_i: atom_i に指定する値。
+            atom_j: atom_j に指定する値。
+            equilibrium_nm: equilibrium_nm に指定する値。
+            force_constant: force_constant に指定する値。
+            sigma: sigma に指定する値。
+            function_type: function_type に指定する値。
+            rmc_parameters_after_semicolon: rmc_parameters_after_semicolon に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         base = self._join([atom_i, atom_j, function_type])
         parameters = self._join([equilibrium_nm, force_constant])
         if sigma is not None:
@@ -289,6 +464,19 @@ class RmcPotDatTop:
         rmc_parameters_after_semicolon: bool = False,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """angle を追加する。
+
+        Args:
+            atom_i: atom_i に指定する値。
+            atom_j: atom_j に指定する値。
+            atom_k: atom_k に指定する値。
+            equilibrium_degree: equilibrium_degree に指定する値。
+            force_constant: force_constant に指定する値。
+            sigma: sigma に指定する値。
+            function_type: function_type に指定する値。
+            rmc_parameters_after_semicolon: rmc_parameters_after_semicolon に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         base = self._join([atom_i, atom_j, atom_k, function_type])
         parameters = self._join([equilibrium_degree, force_constant])
         if sigma is not None:
@@ -309,6 +497,19 @@ class RmcPotDatTop:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """periodic dihedral を追加する。
+
+        Args:
+            atom_i: atom_i に指定する値。
+            atom_j: atom_j に指定する値。
+            atom_k: atom_k に指定する値。
+            atom_l: atom_l に指定する値。
+            equilibrium_degree: equilibrium_degree に指定する値。
+            force_constant: force_constant に指定する値。
+            multiplicity: multiplicity に指定する値。
+            sigma: sigma に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         values: List[Number] = [
             atom_i, atom_j, atom_k, atom_l, 1,
             equilibrium_degree, force_constant, multiplicity,
@@ -329,6 +530,18 @@ class RmcPotDatTop:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """harmonic dihedral を追加する。
+
+        Args:
+            atom_i: atom_i に指定する値。
+            atom_j: atom_j に指定する値。
+            atom_k: atom_k に指定する値。
+            atom_l: atom_l に指定する値。
+            equilibrium_degree: equilibrium_degree に指定する値。
+            force_constant: force_constant に指定する値。
+            sigma: sigma に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         values: List[Number] = [
             atom_i, atom_j, atom_k, atom_l, 2,
             equilibrium_degree, force_constant,
@@ -348,6 +561,17 @@ class RmcPotDatTop:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """rb dihedral を追加する。
+
+        Args:
+            atom_i: atom_i に指定する値。
+            atom_j: atom_j に指定する値。
+            atom_k: atom_k に指定する値。
+            atom_l: atom_l に指定する値。
+            coefficients: coefficients に指定する値。
+            sigma: sigma に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         if len(coefficients) != 6:
             raise ValueError("RB dihedral は C0～C5 の6係数が必要です。")
         values: List[Number] = [atom_i, atom_j, atom_k, atom_l, 3]
@@ -363,6 +587,13 @@ class RmcPotDatTop:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """exclusion を追加する。
+
+        Args:
+            centre_atom: centre_atom に指定する値。
+            excluded_atoms: excluded_atoms に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         if not excluded_atoms:
             raise ValueError("excluded_atoms は1個以上必要です。")
         self.add_section_line(
@@ -381,6 +612,16 @@ class RmcPotDatTop:
         host_atom: Optional[int] = None,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """virtual site2 を追加する。
+
+        Args:
+            site: site に指定する値。
+            atom_i: atom_i に指定する値。
+            atom_j: atom_j に指定する値。
+            a: a に指定する値。
+            host_atom: host_atom に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         values: List[Number] = [site, atom_i, atom_j, 1, a]
         line = self._join(values)
         if host_atom is not None:
@@ -399,6 +640,18 @@ class RmcPotDatTop:
         host_atom: Optional[int] = None,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """virtual site3 を追加する。
+
+        Args:
+            site: site に指定する値。
+            atom_i: atom_i に指定する値。
+            atom_j: atom_j に指定する値。
+            atom_k: atom_k に指定する値。
+            function_type: function_type に指定する値。
+            parameters: parameters に指定する値。
+            host_atom: host_atom に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         expected = {1: 2, 2: 2, 3: 2, 4: 3}
         type_id = int(function_type)
         if type_id not in expected or len(parameters) != expected[type_id]:
@@ -424,12 +677,32 @@ class RmcPotDatTop:
         host_atom: Optional[int] = None,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """virtual site4 を追加する。
+
+        Args:
+            site: site に指定する値。
+            atom_i: atom_i に指定する値。
+            atom_j: atom_j に指定する値。
+            atom_k: atom_k に指定する値。
+            atom_l: atom_l に指定する値。
+            a: a に指定する値。
+            b: b に指定する値。
+            c_nm: c_nm に指定する値。
+            host_atom: host_atom に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         line = self._join([site, atom_i, atom_j, atom_k, atom_l, 2, a, b, c_nm])
         if host_atom is not None:
             line += " ; %d" % int(host_atom)
         self.add_section_line("virtual_sites4", line, auto_write=auto_write)
 
     def set_system(self, name: str, *, auto_write: Optional[bool] = None) -> None:
+        """system を設定する。
+
+        Args:
+            name: name に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         self.remove_sections("system", auto_write=False)
         section = self.add_section("system", auto_write=False)
         section.lines.append(str(name))
@@ -441,6 +714,12 @@ class RmcPotDatTop:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """molecules を設定する。
+
+        Args:
+            molecules: molecules に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         self.remove_sections("molecules", auto_write=False)
         section = self.add_section("molecules", auto_write=False)
         for name, count in molecules:
@@ -467,7 +746,24 @@ class RmcPotDatTop:
         explicit_exclusions: Sequence[Tuple[int, Sequence[int]]] = (),
         auto_write: Optional[bool] = None,
     ) -> None:
-        """Add one reusable molecule type with explicit first/second RMC mapping."""
+        """再利用可能な 1 分子タイプを追加する。
+
+        Args:
+            molecule_name: ``[ moleculetype ]`` に書く分子名。
+            atoms: 分子内原子の辞書列。``serial`` と ``atom_type`` は必須。
+            first_instance_indices: 1番目の分子に対する local serial と RMC index。
+            second_instance_indices: 2番目の分子に対する local serial と RMC index。
+            exclusions: GROMACS の nrexcl。
+            index_offset: RMC_POT 用の明示的 index offset。
+            bonds: ``add_bond()`` へ渡す辞書列。
+            angles: ``add_angle()`` へ渡す辞書列。
+            periodic_dihedrals: 周期 dihedral の辞書列。
+            harmonic_dihedrals: harmonic dihedral の辞書列。
+            rb_dihedrals: Ryckaert--Bellemans dihedral の辞書列。
+            pairs: ``add_pair()`` へ渡す辞書列。
+            explicit_exclusions: 中心原子と除外原子列の組。
+            auto_write: 追加後に自動保存するか。
+        """
         self.begin_molecule_type(
             molecule_name, exclusions, index_offset=index_offset, auto_write=False
         )
@@ -518,12 +814,11 @@ class RmcPotDatTop:
         rb_dihedrals: Sequence[Mapping[str, object]] = (),
         auto_write: Optional[bool] = None,
     ) -> None:
-        """Represent an arbitrary whole-cell network as one molecule.
+        """任意のセル内ネットワークを 1 個の巨大分子として追加する。
 
-        Each local serial is mapped to one final RMC index.  Because only one
-        molecule instance exists, the first and second RMC indices are written
-        identically.  This is the explicit-numbering route for irregular Qn
-        networks or any topology that cannot be repeated by a molecule template.
+        各 local serial を最終 RMC index へ直接対応付ける。分子インスタンスは
+        1 個だけなので、``[ atoms ]`` に記録する第1・第2 RMC index は同じ値に
+        する。規則的な繰り返しでは表現できない Qn ネットワークに使用する。
         """
         first: Dict[int, int] = {}
         for atom in atoms:
@@ -571,6 +866,8 @@ class RmcPotDatTop:
                     )
 
     def validate(self) -> None:
+        """現在の設定内容を検証する。
+        """
         self._validate_preprocessor()
         molecule_types: List[str] = []
         current_serials: Optional[set] = None
@@ -637,6 +934,12 @@ class RmcPotDatTop:
                     raise ValueError("molecule countは1以上です。")
 
     def _validate_local_indices(self, section: TopologySection, serials: set) -> None:
+        """local indices を検証する。
+
+        Args:
+            section: section に指定する値。
+            serials: serials に指定する値。
+        """
         required = {
             "pairs": 2,
             "bonds": 2,
@@ -660,6 +963,8 @@ class RmcPotDatTop:
                     )
 
     def _validate_preprocessor(self) -> None:
+        """preprocessor を検証する。
+        """
         stack: List[str] = []
         for item in self._items:
             if not isinstance(item, str):
@@ -679,6 +984,14 @@ class RmcPotDatTop:
 
     @staticmethod
     def _data_lines(section: TopologySection) -> List[str]:
+        """ data lines を実行する。
+
+        Args:
+            section: section に指定する値。
+
+        Returns:
+            処理結果。
+        """
         return [
             line.strip() for line in section.lines
             if line.strip() and not line.lstrip().startswith(";")
@@ -686,6 +999,14 @@ class RmcPotDatTop:
 
     @staticmethod
     def _split_semicolon(line: str) -> Tuple[str, str]:
+        """ split semicolon を実行する。
+
+        Args:
+            line: line に指定する値。
+
+        Returns:
+            処理結果。
+        """
         if ";" not in line:
             return line.strip(), ""
         before, after = line.split(";", 1)
@@ -693,11 +1014,28 @@ class RmcPotDatTop:
 
     @staticmethod
     def _tokens(line: str, *, keep_after_semicolon: bool = False) -> List[str]:
+        """ tokens を実行する。
+
+        Args:
+            line: line に指定する値。
+            keep_after_semicolon: keep_after_semicolon に指定する値。
+
+        Returns:
+            処理結果。
+        """
         text = line.replace(";", " ") if keep_after_semicolon else line.split(";", 1)[0]
         return text.split()
 
     @staticmethod
     def _number(value: Number) -> str:
+        """ number を実行する。
+
+        Args:
+            value: value に指定する値。
+
+        Returns:
+            処理結果。
+        """
         number = float(value)
         if number.is_integer():
             return str(int(number))
@@ -705,12 +1043,25 @@ class RmcPotDatTop:
 
     @classmethod
     def _join(cls, values: Iterable[Union[str, Number]]) -> str:
+        """値列を出力用文字列へ変換する。
+
+        Args:
+            values: values に指定する値。
+
+        Returns:
+            処理結果。
+        """
         result = []
         for value in values:
             result.append(str(value) if isinstance(value, str) else cls._number(value))
         return " ".join(result)
 
     def _write_if_requested(self, auto_write: Optional[bool]) -> None:
+        """自動保存設定に従ってファイルへ書き出す。
+
+        Args:
+            auto_write: auto_write に指定する値。
+        """
         enabled = self._auto_write if auto_write is None else bool(auto_write)
         if enabled:
             self.write()
@@ -718,3 +1069,33 @@ class RmcPotDatTop:
 
 class RmcPotDatItp(RmcPotDatTop):
     """Explicit class name for include-topology files."""
+
+
+def main() -> None:
+    """2 原子分子を例として ``sample.top`` を生成する。"""
+    top = RmcPotDatTop("sample", auto_write=False)
+    atoms = [
+        {"serial": 1, "atom_type": "Si", "atom_name": "Si", "charge": 2.4, "mass": 28.085},
+        {"serial": 2, "atom_type": "O", "atom_name": "O", "charge": -1.2, "mass": 15.999},
+    ]
+    top.add_molecule_template(
+        molecule_name="SIO",
+        atoms=atoms,
+        first_instance_indices={1: 1, 2: 2},
+        second_instance_indices={1: 3, 2: 4},
+        bonds=[{
+            "atom_i": 1,
+            "atom_j": 2,
+            "equilibrium_nm": 0.162,
+            "force_constant": 1000.0,
+        }],
+        auto_write=False,
+    )
+    top.set_system("SiO2 topology sample", auto_write=False)
+    top.set_molecules([("SIO", 2)], auto_write=False)
+    top.write()
+    print("generated: sample.top")
+
+
+if __name__ == "__main__":
+    main()

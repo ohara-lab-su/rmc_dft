@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""RMC_POT Fixed Neighbour Constraint (``*.fnc``) file support.
+"""RMC_POT の Fixed Neighbour Constraint（``*.fnc``）を扱う。
 
-The FNC file is independent of whether the accompanying ``*.dat`` file uses
-fixed or free format.  Atom indices in this file are one-based RMC indices in
-the final ``*.cfg`` configuration.
+FNC ファイルの読み込み、編集、検証、保存をこのモジュールだけで担当する。
+``*.dat`` の固定形式／自由形式には依存しない。FNC 内の原子番号は、最終的な
+``*.cfg`` における 1 始まりの RMC 原子 index である。
 """
 from dataclasses import dataclass
 from pathlib import Path
@@ -14,18 +14,23 @@ from x_logger import XLogger
 
 @dataclass(frozen=True)
 class FncNeighbour:
-    """One neighbour entry in an RMC_POT FNC file."""
+    """FNC に記録する近接原子 1 件を表す。
+
+    Attributes:
+        atom_index: 相手原子の 1 始まり RMC index。
+        constraint_type: 距離範囲表を参照する制約タイプ番号。
+    """
 
     atom_index: int
     constraint_type: int
 
 
 class RmcPotDatFnc:
-    """Create, read, edit, validate, and write an RMC_POT ``*.fnc`` file.
+    """RMC_POT ``*.fnc`` ファイルを生成・編集する独立クラス。
 
-    The low-level methods operate on final one-based RMC atom indices.  The
-    template methods expand local molecule indices to final RMC indices, but
-    they never infer connectivity from element names or distances.
+    低水準メソッドは最終構造の 1 始まり RMC 原子 index を直接扱う。
+    テンプレート用メソッドはローカル原子番号から RMC index への対応表を
+    明示的に展開するだけであり、元素名や原子間距離から結合を推定しない。
     """
 
     def __init__(
@@ -36,6 +41,14 @@ class RmcPotDatFnc:
         auto_write: bool = True,
         logger: Optional[XLogger] = None,
     ) -> None:
+        """インスタンスを初期化する。
+
+        Args:
+            name: name に指定する値。
+            atom_count: atom_count に指定する値。
+            auto_write: auto_write に指定する値。
+            logger: logger に指定する値。
+        """
         self._path = self._resolve_path(name)
         self._auto_write = bool(auto_write)
         self._logger = logger or XLogger()
@@ -51,6 +64,14 @@ class RmcPotDatFnc:
 
     @staticmethod
     def _resolve_path(name: str) -> Path:
+        """入力名から出力パスを決定する。
+
+        Args:
+            name: name に指定する値。
+
+        Returns:
+            処理結果。
+        """
         path = Path(name)
         if path.suffix.lower() != ".fnc":
             path = Path(str(path) + ".fnc")
@@ -58,6 +79,11 @@ class RmcPotDatFnc:
 
     @property
     def path(self) -> Path:
+        """現在の入出力パスを返す。
+
+        Returns:
+            処理結果。
+        """
         return self._path
 
     def initialize(
@@ -67,6 +93,13 @@ class RmcPotDatFnc:
         title: Optional[str] = None,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """内部状態を初期化する。
+
+        Args:
+            atom_count: atom_count に指定する値。
+            title: title に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         count = int(atom_count)
         if count < 1:
             raise ValueError("atom_count は1以上である必要があります。")
@@ -78,6 +111,8 @@ class RmcPotDatFnc:
         self._write_if_requested(auto_write)
 
     def load(self) -> None:
+        """既存ファイルを読み込む。
+        """
         if not self._path.exists():
             raise FileNotFoundError(str(self._path))
 
@@ -146,6 +181,11 @@ class RmcPotDatFnc:
         self._logger.info("[rmc_pot_dat_fnc] load %s" % self._path)
 
     def write(self, out_name: Optional[str] = None) -> None:
+        """現在の内部状態をファイルへ書き出す。
+
+        Args:
+            out_name: out_name に指定する値。
+        """
         self.validate()
         path = self._path if out_name is None else self._resolve_path(out_name)
         type_count = len(self._ranges)
@@ -169,18 +209,43 @@ class RmcPotDatFnc:
         path.write_text("\n".join(output).rstrip() + "\n", encoding="utf-8")
         self._logger.info("[rmc_pot_dat_fnc] write %s" % path)
 
+
     @staticmethod
     def _format_float(value: float) -> str:
+        """float を出力形式へ変換する。
+
+        Args:
+            value: value に指定する値。
+
+        Returns:
+            処理結果。
+        """
         return "%.12g" % float(value)
 
     def set_title(self, title: str, *, auto_write: Optional[bool] = None) -> None:
+        """title を設定する。
+
+        Args:
+            title: title に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         self._title = str(title)
         self._write_if_requested(auto_write)
 
     def get_title(self) -> str:
+        """title を取得する。
+
+        Returns:
+            処理結果。
+        """
         return self._title
 
     def get_atom_count(self) -> int:
+        """atom count を取得する。
+
+        Returns:
+            処理結果。
+        """
         return self._atom_count
 
     def set_distance_range(
@@ -191,6 +256,14 @@ class RmcPotDatFnc:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """distance range を設定する。
+
+        Args:
+            constraint_type: constraint_type に指定する値。
+            rmin: rmin に指定する値。
+            rmax: rmax に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         type_id = int(constraint_type)
         if type_id < 1:
             raise ValueError("constraint_type は1以上です。")
@@ -209,6 +282,12 @@ class RmcPotDatFnc:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """distance ranges を設定する。
+
+        Args:
+            ranges: ranges に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         items = ranges.items() if isinstance(ranges, Mapping) else enumerate(ranges, 1)
         new_ranges: Dict[int, Tuple[float, float]] = {}
         for type_id, pair in items:
@@ -225,6 +304,11 @@ class RmcPotDatFnc:
         self._write_if_requested(auto_write)
 
     def get_distance_ranges(self) -> Dict[int, Tuple[float, float]]:
+        """distance ranges を取得する。
+
+        Returns:
+            処理結果。
+        """
         return dict(self._ranges)
 
     def set_atom_neighbours(
@@ -234,6 +318,13 @@ class RmcPotDatFnc:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """atom neighbours を設定する。
+
+        Args:
+            atom_index: atom_index に指定する値。
+            neighbours: neighbours に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         atom = self._check_atom_index(atom_index)
         converted: List[FncNeighbour] = []
         for value in neighbours:
@@ -245,6 +336,14 @@ class RmcPotDatFnc:
         self._write_if_requested(auto_write)
 
     def get_atom_neighbours(self, atom_index: int) -> List[FncNeighbour]:
+        """atom neighbours を取得する。
+
+        Args:
+            atom_index: atom_index に指定する値。
+
+        Returns:
+            処理結果。
+        """
         atom = self._check_atom_index(atom_index)
         return list(self._atoms[atom])
 
@@ -257,6 +356,15 @@ class RmcPotDatFnc:
         reciprocal: bool = False,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """neighbour を追加する。
+
+        Args:
+            atom_index: atom_index に指定する値。
+            neighbour_index: neighbour_index に指定する値。
+            constraint_type: constraint_type に指定する値。
+            reciprocal: reciprocal に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         atom = self._check_atom_index(atom_index)
         neighbour = self._check_atom_index(neighbour_index)
         type_id = self._check_constraint_type(constraint_type)
@@ -275,6 +383,14 @@ class RmcPotDatFnc:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """pair を追加する。
+
+        Args:
+            atom_index1: atom_index1 に指定する値。
+            atom_index2: atom_index2 に指定する値。
+            constraint_type: constraint_type に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         self.add_neighbour(
             atom_index1,
             atom_index2,
@@ -289,6 +405,12 @@ class RmcPotDatFnc:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """pairs を追加する。
+
+        Args:
+            pairs: pairs に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         for atom1, atom2, type_id in pairs:
             self.add_pair(atom1, atom2, type_id, auto_write=False)
         self._write_if_requested(auto_write)
@@ -301,6 +423,14 @@ class RmcPotDatFnc:
         reciprocal: bool = True,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """pair を削除する。
+
+        Args:
+            atom_index1: atom_index1 に指定する値。
+            atom_index2: atom_index2 に指定する値。
+            reciprocal: reciprocal に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         atom1 = self._check_atom_index(atom_index1)
         atom2 = self._check_atom_index(atom_index2)
         self._atoms[atom1] = [item for item in self._atoms[atom1] if item.atom_index != atom2]
@@ -315,6 +445,13 @@ class RmcPotDatFnc:
         reciprocal: bool = True,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """atom neighbours を消去する。
+
+        Args:
+            atom_index: atom_index に指定する値。
+            reciprocal: reciprocal に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         atom = self._check_atom_index(atom_index)
         old = list(self._atoms[atom])
         self._atoms[atom] = []
@@ -352,6 +489,13 @@ class RmcPotDatFnc:
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
+        """template instances を追加する。
+
+        Args:
+            local_pairs: local_pairs に指定する値。
+            instances: instances に指定する値。
+            auto_write: auto_write に指定する値。
+        """
         pairs = list(local_pairs)
         for mapping in instances:
             self.add_template_instance(pairs, mapping, auto_write=False)
@@ -372,6 +516,11 @@ class RmcPotDatFnc:
         self._write_if_requested(auto_write)
 
     def validate(self, *, require_reciprocal: bool = True) -> None:
+        """現在の設定内容を検証する。
+
+        Args:
+            require_reciprocal: require_reciprocal に指定する値。
+        """
         if self._atom_count < 1:
             raise ValueError("atom_count が設定されていません。")
         if sorted(self._ranges) != list(range(1, len(self._ranges) + 1)):
@@ -396,6 +545,14 @@ class RmcPotDatFnc:
                         )
 
     def as_pairs(self, *, unique: bool = True) -> List[Tuple[int, int, int]]:
+        """as pairs を実行する。
+
+        Args:
+            unique: unique に指定する値。
+
+        Returns:
+            処理結果。
+        """
         result: List[Tuple[int, int, int]] = []
         for atom_index in range(1, self._atom_count + 1):
             for item in self._atoms[atom_index]:
@@ -405,18 +562,40 @@ class RmcPotDatFnc:
         return result
 
     def _check_atom_index(self, atom_index: int) -> int:
+        """atom index を検証する。
+
+        Args:
+            atom_index: atom_index に指定する値。
+
+        Returns:
+            処理結果。
+        """
         value = int(atom_index)
         if value < 1 or value > self._atom_count:
             raise ValueError("RMC atom indexが範囲外です: %d" % value)
         return value
 
     def _check_constraint_type(self, constraint_type: int) -> int:
+        """constraint type を検証する。
+
+        Args:
+            constraint_type: constraint_type に指定する値。
+
+        Returns:
+            処理結果。
+        """
         value = int(constraint_type)
         if value not in self._ranges:
             raise ValueError("未定義のFNC constraint_typeです: %d" % value)
         return value
 
     def _append_unique(self, atom_index: int, neighbour: FncNeighbour) -> None:
+        """ append unique を実行する。
+
+        Args:
+            atom_index: atom_index に指定する値。
+            neighbour: neighbour に指定する値。
+        """
         current = self._atoms[atom_index]
         for item in current:
             if item.atom_index == neighbour.atom_index:
@@ -430,6 +609,14 @@ class RmcPotDatFnc:
 
     @staticmethod
     def _unique_neighbours(values: Iterable[FncNeighbour]) -> List[FncNeighbour]:
+        """ unique neighbours を実行する。
+
+        Args:
+            values: values に指定する値。
+
+        Returns:
+            処理結果。
+        """
         result: List[FncNeighbour] = []
         seen = set()
         for item in values:
@@ -441,6 +628,29 @@ class RmcPotDatFnc:
         return result
 
     def _write_if_requested(self, auto_write: Optional[bool]) -> None:
+        """自動保存設定に従ってファイルへ書き出す。
+
+        Args:
+            auto_write: auto_write に指定する値。
+        """
         enabled = self._auto_write if auto_write is None else bool(auto_write)
         if enabled:
             self.write()
+
+
+def main() -> None:
+    """SiO2 の小さな例を用いて ``sample.fnc`` を生成する。
+
+    実運用では、``atom_count`` と RMC 原子 index の組を対象構造に合わせて
+    置き換える。ここでは 1--2 と 1--3 を同じ距離制約タイプで相互登録する。
+    """
+    fnc = RmcPotDatFnc("sample", atom_count=3, auto_write=False)
+    fnc.set_title("SiO2 sample FNC", auto_write=False)
+    fnc.set_distance_range(1, 1.40, 1.90, auto_write=False)
+    fnc.add_pairs([(1, 2, 1), (1, 3, 1)], auto_write=False)
+    fnc.write()
+    print("generated: sample.fnc")
+
+
+if __name__ == "__main__":
+    main()

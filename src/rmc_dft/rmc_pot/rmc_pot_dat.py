@@ -83,3 +83,26 @@ class RmcPotDat:
     def __getattr__(self, name: str) -> Any:
         """未定義の属性・メソッド呼び出しを全て内部実装へ転送する。"""
         return getattr(self._impl, name)
+
+
+def main() -> None:
+    """自由形式 DAT を選択し、基本設定を書き込む利用例。
+
+    Notes:
+        ``sample_dat.dat`` が存在しない場合は、自由形式のデフォルト DAT を
+        作成する。SNC 関係の操作は従来どおり ``RmcPotDatFree`` に委譲される。
+    """
+    dat = RmcPotDat(
+        cfg_name="sample_dat",
+        auto_write=False,
+        use_free_format=True,
+    )
+    dat.set_comment("SiO2 sample", auto_write=False)
+    dat.set_density(0.0665715652, auto_write=False)
+    dat.set_cutoffs([1.9, 1.1, 1.9], auto_write=False)
+    dat.write()
+    print("generated: sample_dat.dat")
+
+
+if __name__ == "__main__":
+    main()

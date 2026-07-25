@@ -180,6 +180,11 @@ class RmcPotDatFixed:
             self.write()
 
     def set_cfg_name(self, cfg_name: str) -> None:
+        """読み書き対象の構成名を変更する。
+
+        Args:
+            cfg_name: cfg_name に指定する値。
+        """
         self._cfg_name = cfg_name
         self._config.cfg_name = cfg_name
 
@@ -1942,3 +1947,17 @@ class _Line:
             return f"{value_part} ! {self.comment.strip()}\n"
         # コメントがなかった行は値のみ
         return f"{self.value.rstrip()}\n"
+
+
+def main() -> None:
+    """固定形式 DAT の基本設定を書き込む利用例。"""
+    dat = RmcPotDatFixed(cfg_name="sample_fixed", auto_write=False)
+    dat.set_comment("SiO2 fixed-format sample", auto_write=False)
+    dat.set_density(0.0665715652, auto_write=False)
+    dat.set_cutoffs([1.9, 1.1, 1.9], auto_write=False)
+    dat.write()
+    print("generated: sample_fixed.dat")
+
+
+if __name__ == "__main__":
+    main()
