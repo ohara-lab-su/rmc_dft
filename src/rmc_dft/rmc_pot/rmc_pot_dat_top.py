@@ -1072,29 +1072,105 @@ class RmcPotDatItp(RmcPotDatTop):
 
 
 def main() -> None:
-    """2 原子分子を例として ``sample.top`` を生成する。"""
-    top = RmcPotDatTop("sample", auto_write=False)
+    """RMC_POT マニュアルの SnI4 配置例から ``sample.top`` を生成する。
+
+    この例の目的は、``[ atoms ]`` の末尾に書く ``first index`` と
+    ``second index`` の対応を示すことである。結合ポテンシャルのパラメータは
+    マニュアルの index 配置例からは決まらないため、``[ bonds ]`` などは
+    生成しない。
+
+    マニュアルの第1表現では、1000 個の SnI4 分子について、Sn 原子を
+    RMC index 1--1000、4種類の I 原子をそれぞれ 1001--2000、
+    2001--3000、3001--4000、4001--5000 のブロックへ配置する。
+    したがって、最初と2番目の分子の対応は次のようになる。
+
+    * Sn: 1, 2
+    * I1: 1001, 1005
+    * I2: 1002, 1006
+    * I3: 1003, 1007
+    * I4: 1004, 1008
+
+    この規則により、任意の分子番号について各原子の RMC index を計算できる。
+    """
+    top = RmcPotDatTop("sample.top", auto_write=False)
+    top.clear(auto_write=False)
+
     atoms = [
-        {"serial": 1, "atom_type": "Si", "atom_name": "Si", "charge": 2.4, "mass": 28.085,},
-        {"serial": 2, "atom_type": "O", "atom_name": "O", "charge": -1.2, "mass": 15.999,},
+        {
+            "serial": 1,
+            "atom_type": "Sn",
+            "residue_name": "SnI4",
+            "atom_name": "Sn",
+            "charge_group": 1,
+            "charge": 0.0,
+            "mass": None,
+        },
+        {
+            "serial": 2,
+            "atom_type": "I",
+            "residue_name": "SnI4",
+            "atom_name": "I1",
+            "charge_group": 1,
+            "charge": 0.0,
+            "mass": None,
+        },
+        {
+            "serial": 3,
+            "atom_type": "I",
+            "residue_name": "SnI4",
+            "atom_name": "I2",
+            "charge_group": 1,
+            "charge": 0.0,
+            "mass": None,
+        },
+        {
+            "serial": 4,
+            "atom_type": "I",
+            "residue_name": "SnI4",
+            "atom_name": "I3",
+            "charge_group": 1,
+            "charge": 0.0,
+            "mass": None,
+        },
+        {
+            "serial": 5,
+            "atom_type": "I",
+            "residue_name": "SnI4",
+            "atom_name": "I4",
+            "charge_group": 1,
+            "charge": 0.0,
+            "mass": None,
+        },
     ]
+
+    first_instance_indices = {
+        1: 1,
+        2: 1001,
+        3: 1002,
+        4: 1003,
+        5: 1004,
+    }
+    second_instance_indices = {
+        1: 2,
+        2: 1005,
+        3: 1006,
+        4: 1007,
+        5: 1008,
+    }
+
     top.add_molecule_template(
-        molecule_name="SIO",
+        molecule_name="SnI4",
         atoms=atoms,
-        first_instance_indices={1: 1, 2: 2},
-        second_instance_indices={1: 3, 2: 4},
-        bonds=[{
-            "atom_i": 1,
-            "atom_j": 2,
-            "equilibrium_nm": 0.162,
-            "force_constant": 1000.0,
-        }],
+        first_instance_indices=first_instance_indices,
+        second_instance_indices=second_instance_indices,
+        exclusions=3,
         auto_write=False,
     )
-    top.set_system("SiO2 topology sample", auto_write=False)
-    top.set_molecules([("SIO", 2)], auto_write=False)
+    top.set_system("SnI4 RMC index mapping example", auto_write=False)
+    top.set_molecules([("SnI4", 1000)], auto_write=False)
     top.write()
-    print("generated: sample.top")
+
+    print("generated: %s" % top.path)
 
 
 if __name__ == "__main__":
