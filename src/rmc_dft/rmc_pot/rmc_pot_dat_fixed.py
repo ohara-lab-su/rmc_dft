@@ -396,6 +396,22 @@ class RmcPotDatFixed:
     # --------------------
     # 代表フィールド: density / cutoffs / max_moves / r_spacing
     # --------------------
+    def set_element_info(
+        self,
+        element_info: Sequence[str],
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> bool:
+        """固定形式には元素記号を保持する欄がないため設定できない。
+
+        自由形式と同じ起動スクリプトから呼ばれた場合に、黙って無視せず
+        固定形式では非対応であることを明示する互換メソッド。
+        """
+        self._logger.error(
+            "[rmc_pot_dat_fixed] 固定形式には CHEMICAL-SYMBOLS に対応する欄がありません"
+        )
+        return False
+
     def get_comment(self) -> str:
         """1 行目 comment を str で返す。"""
         return str(self.get_line(1).split()[0])

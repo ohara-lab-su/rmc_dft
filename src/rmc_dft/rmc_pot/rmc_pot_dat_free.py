@@ -969,10 +969,13 @@ class RmcPotDatFree:
         return int(float(value))
 
     def set_num_config_to_collect(
-        self, value: int, *, auto_write: Optional[bool] = True
+        self, num_config: int, *, auto_write: Optional[bool] = True
     ) -> None:
-        """``[ GENERAL ]`` の ``COLL-NUMBER`` を設定する。"""
-        self._set_value("GENERAL", "COLL-NUMBER", str(int(value)))
+        """``[ GENERAL ]`` の ``COLL-NUMBER`` を設定する。
+
+        固定形式の同名メソッドと同じ ``num_config`` キーワード引数を受け取る。
+        """
+        self._set_value("GENERAL", "COLL-NUMBER", str(int(num_config)))
         if self._resolve_auto_write(auto_write):
             self.write()
 
@@ -982,10 +985,13 @@ class RmcPotDatFree:
         return int(float(value))
 
     def set_print_interval(
-        self, value: int, *, auto_write: Optional[bool] = True
+        self, interval_step: int, *, auto_write: Optional[bool] = True
     ) -> None:
-        """``[ GENERAL ]`` の ``PRINT-STEP`` を設定する。"""
-        self._set_value("GENERAL", "PRINT-STEP", str(int(value)))
+        """``[ GENERAL ]`` の ``PRINT-STEP`` を設定する。
+
+        固定形式の同名メソッドと同じ ``interval_step`` キーワード引数を受け取る。
+        """
+        self._set_value("GENERAL", "PRINT-STEP", str(int(interval_step)))
         if self._resolve_auto_write(auto_write):
             self.write()
 
@@ -1302,12 +1308,29 @@ class RmcPotDatFree:
     def set_angle_constraint_count(
         self, value: int, *, auto_write: Optional[bool] = None
     ) -> bool:
-        """自由形式では制約数を独立設定できないため設定しない。"""
+        """固定形式互換で角度制約数を設定する。
+
+        ``0`` は全 ``[ COS ]`` セクションの削除として扱う。正の値は、
+        既存セクション数と一致する場合だけ受理し、内容のない制約を捏造しない。
+        """
+        requested = int(value)
+        if requested < 0:
+            raise ValueError("angle constraint count は0以上で指定してください")
+
         current = len(self._find_sections("COS"))
-        if int(value) == current:
+        if requested == 0:
+            self._sections = [
+                item for item in self._sections if item[0] != "COS"
+            ]
+            if self._resolve_auto_write(auto_write):
+                self.write()
             return True
+
+        if requested == current:
+            return True
+
         self._logger.error(
-            "[rmc_pot_dat_free] 自由形式では [ COS ] の個数はセクション実体から決まります"
+            "[rmc_pot_dat_free] 正の角度制約数だけでは [ COS ] の内容を生成できません"
         )
         return False
 
@@ -1318,12 +1341,29 @@ class RmcPotDatFree:
     def set_coord_constraint_count(
         self, value: int, *, auto_write: Optional[bool] = None
     ) -> bool:
-        """自由形式では制約数を独立設定できないため設定しない。"""
+        """固定形式互換で配位数制約数を設定する。
+
+        ``0`` は全 ``[ COORD ]`` セクションの削除として扱う。正の値は、
+        既存セクション数と一致する場合だけ受理する。
+        """
+        requested = int(value)
+        if requested < 0:
+            raise ValueError("coordination constraint count は0以上で指定してください")
+
         current = len(self._find_sections("COORD"))
-        if int(value) == current:
+        if requested == 0:
+            self._sections = [
+                item for item in self._sections if item[0] != "COORD"
+            ]
+            if self._resolve_auto_write(auto_write):
+                self.write()
             return True
+
+        if requested == current:
+            return True
+
         self._logger.error(
-            "[rmc_pot_dat_free] 自由形式では [ COORD ] の個数はセクション実体から決まります"
+            "[rmc_pot_dat_free] 正の配位数制約数だけでは [ COORD ] の内容を生成できません"
         )
         return False
 
@@ -1334,12 +1374,31 @@ class RmcPotDatFree:
     def set_avg_coord_constraint_count(
         self, value: int, *, auto_write: Optional[bool] = None
     ) -> bool:
-        """自由形式では制約数を独立設定できないため設定しない。"""
+        """固定形式互換で平均配位数制約数を設定する。
+
+        ``0`` は全 ``[ AVCOORD ]`` セクションの削除として扱う。正の値は、
+        既存セクション数と一致する場合だけ受理する。
+        """
+        requested = int(value)
+        if requested < 0:
+            raise ValueError(
+                "average coordination constraint count は0以上で指定してください"
+            )
+
         current = len(self._find_sections("AVCOORD"))
-        if int(value) == current:
+        if requested == 0:
+            self._sections = [
+                item for item in self._sections if item[0] != "AVCOORD"
+            ]
+            if self._resolve_auto_write(auto_write):
+                self.write()
             return True
+
+        if requested == current:
+            return True
+
         self._logger.error(
-            "[rmc_pot_dat_free] 自由形式では [ AVCOORD ] の個数はセクション実体から決まります"
+            "[rmc_pot_dat_free] 正の平均配位数制約数だけでは [ AVCOORD ] の内容を生成できません"
         )
         return False
 
@@ -1353,12 +1412,29 @@ class RmcPotDatFree:
     def set_potential_flag(
         self, value: int, *, auto_write: Optional[bool] = None
     ) -> bool:
-        """自由形式では potential 種別をセクションで指定するため設定しない。"""
-        current = self.get_potential_flag()
-        if int(value) == current:
+        """固定形式互換でpotentialの無効化または既存状態の確認を行う。
+
+        ``0`` はpotential関連セクションをすべて削除する。正の値だけから
+        potential種別やパラメータは生成できないため、既存設定がある場合だけ受理する。
+        """
+        requested = int(value)
+        if requested < 0:
+            raise ValueError("potential flag は0以上で指定してください")
+
+        potential_sections = {"NBPOT", "BPOT", "AENET", "TABPOT"}
+        if requested == 0:
+            self._sections = [
+                item for item in self._sections if item[0] not in potential_sections
+            ]
+            if self._resolve_auto_write(auto_write):
+                self.write()
             return True
+
+        if self.get_potential_flag() != 0:
+            return True
+
         self._logger.error(
-            "[rmc_pot_dat_free] 自由形式では [ NBPOT ]、[ BPOT ]、[ AENET ]、[ TABPOT ] を設定してください"
+            "[rmc_pot_dat_free] potential flagだけでは自由形式のpotential内容を生成できません"
         )
         return False
 
