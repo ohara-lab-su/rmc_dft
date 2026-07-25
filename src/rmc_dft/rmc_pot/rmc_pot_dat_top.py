@@ -1075,8 +1075,8 @@ def main() -> None:
     """2 原子分子を例として ``sample.top`` を生成する。"""
     top = RmcPotDatTop("sample", auto_write=False)
     atoms = [
-        {"serial": 1, "atom_type": "Si", "atom_name": "Si", "charge": 2.4, "mass": 28.085},
-        {"serial": 2, "atom_type": "O", "atom_name": "O", "charge": -1.2, "mass": 15.999},
+        {"serial": 1, "atom_type": "Si", "atom_name": "Si", "charge": 2.4, "mass": 28.085,},
+        {"serial": 2, "atom_type": "O", "atom_name": "O", "charge": -1.2, "mass": 15.999,},
     ]
     top.add_molecule_template(
         molecule_name="SIO",
