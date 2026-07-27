@@ -14,7 +14,7 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Uni
 
 from x_logger import XLogger
 
-Number = Union[int, float]
+# Number = Union[int, float]
 
 
 @dataclass
@@ -98,7 +98,7 @@ class RmcPotDatTop:
         """
         return self._path
 
-    def clear(self, *, auto_write: Optional[bool] = None) -> None:
+    def clear(self, *, auto_write: Optional[bool] = None,) -> None:
         """保持している内容を消去する。
 
         Args:
@@ -146,7 +146,7 @@ class RmcPotDatTop:
         self._logger.info("[rmc_pot_dat_top] write %s" % path)
 
 
-    def add_raw_line(self, line: str = "", *, auto_write: Optional[bool] = None) -> None:
+    def add_raw_line(self, line: str = "", *, auto_write: Optional[bool] = None,) -> None:
         """raw line を追加する。
 
         Args:
@@ -156,7 +156,7 @@ class RmcPotDatTop:
         self._items.append(str(line))
         self._write_if_requested(auto_write)
 
-    def add_comment(self, comment: str, *, auto_write: Optional[bool] = None) -> None:
+    def add_comment(self, comment: str, *, auto_write: Optional[bool] = None,) -> None:
         """comment を追加する。
 
         Args:
@@ -513,7 +513,7 @@ class RmcPotDatTop:
             sigma: sigma に指定する値。
             auto_write: auto_write に指定する値。
         """
-        values: List[Number] = [
+        values: List[Union[int, float]] = [
             atom_i, atom_j, atom_k, atom_l, 1,
             equilibrium_degree, force_constant, multiplicity,
         ]
@@ -545,7 +545,7 @@ class RmcPotDatTop:
             sigma: sigma に指定する値。
             auto_write: auto_write に指定する値。
         """
-        values: List[Number] = [
+        values: List[Union[int, float]] = [
             atom_i, atom_j, atom_k, atom_l, 2,
             equilibrium_degree, force_constant,
         ]
@@ -577,7 +577,7 @@ class RmcPotDatTop:
         """
         if len(coefficients) != 6:
             raise ValueError("RB dihedral は C0～C5 の6係数が必要です。")
-        values: List[Number] = [atom_i, atom_j, atom_k, atom_l, 3]
+        values: List[Union[int, float]] = [atom_i, atom_j, atom_k, atom_l, 3]
         values.extend(coefficients)
         if sigma is not None:
             values.append(sigma)
@@ -625,7 +625,7 @@ class RmcPotDatTop:
             host_atom: host_atom に指定する値。
             auto_write: auto_write に指定する値。
         """
-        values: List[Number] = [site, atom_i, atom_j, 1, a]
+        values: List[Union[int, float]] = [site, atom_i, atom_j, 1, a]
         line = self._join(values)
         if host_atom is not None:
             line += " ; %d" % int(host_atom)
@@ -659,7 +659,7 @@ class RmcPotDatTop:
         type_id = int(function_type)
         if type_id not in expected or len(parameters) != expected[type_id]:
             raise ValueError("virtual_sites3 のfunction typeまたはparameter数が不正です。")
-        values: List[Number] = [site, atom_i, atom_j, atom_k, type_id]
+        values: List[Union[int, float]] = [site, atom_i, atom_j, atom_k, type_id]
         values.extend(parameters)
         line = self._join(values)
         if host_atom is not None:
@@ -1030,7 +1030,7 @@ class RmcPotDatTop:
         return text.split()
 
     @staticmethod
-    def _number(value: Number) -> str:
+    def _number(value: Union[int, float]) -> str:
         """ number を実行する。
 
         Args:
@@ -1045,7 +1045,7 @@ class RmcPotDatTop:
         return "%.12g" % number
 
     @classmethod
-    def _join(cls, values: Iterable[Union[str, Number]]) -> str:
+    def _join(cls, values: Iterable[Union[str, Union[int, float]]]) -> str:
         """値列を出力用文字列へ変換する。
 
         Args:

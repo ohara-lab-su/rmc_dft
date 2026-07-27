@@ -6,8 +6,9 @@ NAME="D1100"
 #SCRIPT="$HOME/zaiene_dev/rmc_dft/example"
 
 #SCRIPT="$HOME/LiSPC/script"
-SCRIPT="$HOME/SiC/script"
+#SCRIPT="$HOME/SiC/script"
 #SCRIPT="$HOME/Li3PO4/script"
+SCRIPT="./script"
 
 #DATA="$HOME/SiO2/data"
 #DATA="$HOME/LiSPC/data"
