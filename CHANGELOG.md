@@ -3,24 +3,34 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
-# v0.6.0
+## v0.6.1
+
+- Generalized the FNC/cutoff consistency checker to support arbitrary multi-component systems instead of a hard-coded
+  SiO₂ mapping.
+- Removed the fixed mapping between FNC constraint types and cutoff indices. Cutoff entries are now resolved from the
+  actual atom-type pair defined by each FNC constraint.
+- Improved FNC/cutoff validation to evaluate each constrained atom pair independently.
+- Modified the consistency condition to allow `rmin == cutoff`; only `rmin < cutoff` is now treated as an error.
+- Refactored the CFG atom-type lookup to reuse the existing CFG layout instead of relying on SiO₂-specific assumptions.
+
+## v0.6.0
 
 - Refactored the Qn-related programs into an independent package and separated them from the main codebase.
 
-# v0.5.4
+## v0.5.4
 
-## SiO2 Qn structure analysis script
+### SiO2 Qn structure analysis script
 
 The standalone script for analyzing the Qn distribution in an SiO2 structure was reorganized and corrected.
 
-### Removed the external JSON configuration
+#### Removed the external JSON configuration
 
 - Removed the requirement to load Qn analysis settings from an external JSON file.
 - Consolidated the analysis settings into `QN_CONFIG` at the beginning of the script.
 - Qn analysis conditions can now be changed by editing only `QN_CONFIG`.
 - Resolved `FileNotFoundError` failures caused by missing external files such as `aaa.json`.
 
-### Automatic structure-file discovery
+#### Automatic structure-file discovery
 
 When no structure file is explicitly specified, the analysis script now searches the default candidates in order.
 
@@ -32,16 +42,16 @@ aaa.vasp
 aaa.cfg
 ```
 
-## Fixed
+### Fixed
 
-### Unified fixed-format and free-format APIs
+#### Unified fixed-format and free-format APIs
 
 The free-format implementation has been revised to provide API compatibility with the fixed-format implementation.
 
 The goal of this update is to allow the same initialization script (`rmc_init.py`) to generate either fixed-format or
 free-format RMC_POT input files without requiring changes to the calling code.
 
-### Improved fixed/free format compatibility
+#### Improved fixed/free format compatibility
 
 The free-format implementation now follows the behavior of the fixed-format implementation more closely.
 
@@ -53,7 +63,7 @@ Major compatibility improvements include:
 - Improved handling of constraint-count APIs so that existing initialization scripts behave consistently.
 - Improved potential enable/disable handling for compatibility with the fixed-format interface.
 
-### X-ray experiment parameter compatibility
+#### X-ray experiment parameter compatibility
 
 Corrected the mapping of X-ray experiment parameters.
 
@@ -66,7 +76,7 @@ Changes include:
 - Corrected the mapping of background correction flags using `POLY-BACK-FLAGS`.
 - Updated `RENORM` handling to match the fixed-format implementation.
 
-### Internal consistency improvements
+#### Internal consistency improvements
 
 Improved consistency between the fixed-format and free-format implementations.
 
