@@ -6,7 +6,8 @@
 # (module バージョンは今入れているモジュールバージョンになる)
 
 SCRIPT="$HOME/zaiene_dev/rmc_dft/example"
-DST="$HOME/LiSPC/script"
+#DST="$HOME/LiSPC/script"
+DST="./script"
 
 if [ ! -d "$DST" ]; then
     mkdir -p "$DST"
@@ -19,6 +20,7 @@ cp $SCRIPT/rmc_vasp_init_safe.py $DST/
 cp $SCRIPT/rmc_vasp_init_normal.py $DST/
 cp $SCRIPT/rmc_init.py $DST
 cp $SCRIPT/rmc_vasp_script.py $DST/
+cp $SCRIPT/config.yml $DST/
 
 #####################
 # 初期構造作成
@@ -40,7 +42,7 @@ cp $SCRIPT/plot_multi_hst.py $DST/
 
 cp $SCRIPT/analyze_* $DST/
 
-chmod u+x *.py
+chmod u+x $DST/*.py
 
 cp $SCRIPT/job_hpcs2024_node1.sh $DST/
 cp $SCRIPT/job_hpcs2024_node2.sh $DST/

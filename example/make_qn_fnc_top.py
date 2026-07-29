@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""SiO2 構造から Qn 解析と RMC_POT 用 FNC 入力を作る実行例。
+"""
+K.NAKADA, kengo.nakada@gmail.com
+
+SiO2 構造から Qn 解析と RMC_POT 用 FNC 入力を作る実行例。
+
 
 SiO2 固有の条件は隣の ``qn_config_sio2_fnc.json`` に置く。
 
@@ -14,10 +18,13 @@ SiO2 固有の条件は隣の ``qn_config_sio2_fnc.json`` に置く。
     * ``SiO2_750_S1_nvt4_rmc_unit.top``
     * ``SiO2_750_S1_nvt4_report.txt``
 """
+
 # from __future__ import print_function
 
 import shutil
-from rmc_dft.rmc_pot.qn import QnNetworkBuilder
+
+# from rmc_dft.rmc_pot.qn import QnNetworkBuilder
+from qn.qn_network_builder import QnNetworkBuilder
 
 
 def main() -> None:

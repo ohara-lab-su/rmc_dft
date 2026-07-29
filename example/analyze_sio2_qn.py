@@ -10,10 +10,14 @@ CSV、TOP、FNC などのファイルは生成せず、解析結果だけを標�
 from pathlib import Path
 
 from rmc_dft import RmcPot, RmcPotLog
-from rmc_dft.rmc_pot.qn.qn_network_analysis import QnNetworkAnalysis
-from rmc_dft.rmc_pot.qn.vasp_structure import VaspStructure
-from x_logger import XLogger
 
+# from rmc_dft.rmc_pot.qn.qn_network_analysis import QnNetworkAnalysis
+# from rmc_dft.rmc_pot.qn.vasp_structure import VaspStructure
+
+from qn.qn_network_analysis import QnNetworkAnalysis
+from qn.vasp_structure import VaspStructure
+
+from x_logger import XLogger
 
 # =============================================================================
 # ユーザー設定
@@ -76,31 +80,24 @@ QN_CONFIG = {
         "central_types": [
             "Si",
         ],
-
         # 中心元素と第二近接元素の間をつなぐ第一近接元素。
         "bridge_types": [
             "O",
         ],
-
         # bridgeを介して接続する第二近接元素。
         "second_types": [
             "Si",
         ],
-
         # 中心元素－bridge元素の距離範囲 [Å]。
         "first_min": 1.2,
         "first_max": 1.9,
-
         # Q5以上も数えるため、距離範囲内のbridgeをすべて使用する。
         "first_mode": "cutoff",
-
         # first_mode="nearest" の場合だけ使用する。
         "first_nearest_n": 4,
-
         # bridge元素－第二近接元素の距離範囲 [Å]。
         "second_min": 1.2,
         "second_max": 1.9,
-
         # RMC_POT SNCと同様に、第二近接を独立した距離範囲で判定する。
         "second_use_first_network": False,
     },

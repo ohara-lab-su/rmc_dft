@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """plot_multi_energy.py
+K.NAKADA, kengo.nakada@gmail.com
 
 VASP OUTCAR を複数ログ（logX_dft）から読み取り、
 SCF の flatten energy 列を横一列のサブプロットとして描画

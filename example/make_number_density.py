@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""質量密度から数密度を計算する。"""
+"""
+K.NAKADA, kengo.nakada@gmail.com
+
+質量密度から数密度を計算する。
+"""
 
 from packmol_util.config import Config
 from packmol_util.packmol import Packmol

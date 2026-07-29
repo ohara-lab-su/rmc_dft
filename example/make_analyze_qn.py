@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""既存の VASP 構造から Qn 分布だけを解析して標準出力する実行例。
+"""
+K.NAKADA, kengo.nakada@gmail.com
+
+既存の VASP 構造から Qn 分布だけを解析して標準出力する実行例。
 
 構造生成や RMC_POT 用ファイルの作成は行わない。
 QnNetworkAnalysis を使って、Q0 から Q4 の個数と割合を画面に表示する。
@@ -8,7 +11,8 @@ QnNetworkAnalysis を使って、Q0 から Q4 の個数と割合を画面に表�
 
 from typing import Dict
 
-from rmc_dft.rmc_pot.qn.qn_network_analysis import QnNetworkAnalysis
+# from rmc_dft.rmc_pot.qn.qn_network_analysis import QnNetworkAnalysis
+from qn.qn_network_analysis import QnNetworkAnalysis
 
 
 def print_qn_counts(qn_counts: Dict[int, int]) -> None:

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """plot_multi_hst.py
+K.NAKADA, kengo.nakada@gmail.com
 
 RMC_POT の .hst を複数ログ（logX_rmc）から読み取り、
 chi2 の推移を横一列のサブプロットとして描画

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """plot_multi_fit.py
+K.NAKADA, kengo.nakada@gmail.com
 
 RMC_POT の <cfg_name>.fit を複数ログ（logX_rmc）から読み取り、
 S(Q) を多段サブプロットで描画

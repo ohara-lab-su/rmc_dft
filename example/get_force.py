@@ -1,4 +1,7 @@
 #!/usr/bin/env pytnon
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 from __future__ import annotations
 
 

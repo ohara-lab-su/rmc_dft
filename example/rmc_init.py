@@ -263,7 +263,8 @@ def run_rmc_init(
             second_neighbors=[(1, 1.40, 1.90)],
             coordination_number=5,
             fraction=0.002,
-            sigma=1.0,
+            # sigma=1.0,
+            sigma=0.1,
         )
 
         # Q4 = 99.4 %
@@ -275,7 +276,8 @@ def run_rmc_init(
             second_neighbors=[(1, 1.40, 1.90)],
             coordination_number=4,
             fraction=0.994,
-            sigma=1.0,
+            # sigma=1.0,
+            sigma=0.1,
         )
 
         # Q3 = 0.4 %
@@ -287,7 +289,8 @@ def run_rmc_init(
             second_neighbors=[(1, 1.40, 1.90)],
             coordination_number=3,
             fraction=0.004,
-            sigma=1.0,
+            # sigma=1.0,
+            sigma=0.1,
         )
 
     # 26 行目：1 回の move で動かす原子数（通常 1）を設定する

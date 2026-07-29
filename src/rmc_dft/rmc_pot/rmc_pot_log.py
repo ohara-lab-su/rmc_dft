@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-K.KOBAYASHI
 K.NAKADA, kengo.nakada@gmail.com
+K.KOBAYASHI
 
 ログ解析で、hst ファイルと同様（もっと詳しい）
 情報を引っ張り出す

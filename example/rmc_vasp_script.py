@@ -5,6 +5,7 @@ K.NAKADA, kengo.nakada@gmail.com
 RMC-DFT のUIクラスを使わずに直接 rmc_pot, vasp 関係のクラスを起動して
 RMC-VASP を構成する 実用 sample script
 """
+
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 import sys
@@ -12,7 +13,8 @@ import shutil
 import subprocess
 
 # ----- QnNetworkBuilder
-from rmc_dft.rmc_pot.qn import QnNetworkBuilder
+# from rmc_dft.rmc_pot.qn import QnNetworkBuilder
+from qn.qn_network_builder import QnNetworkBuilder
 
 # ----------------------
 
@@ -43,7 +45,6 @@ from rmc import run_rmc
 from rmc_vasp import run_vasp
 from rmc_vasp_init import run_vasp_init
 from rmc_vasp_init_safe import run_vasp_init_safe
-
 
 if __name__ == "__main__":
     logger = XLogger(

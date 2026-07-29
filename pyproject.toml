@@ -1,15 +1,15 @@
 [build-system]
-requires = ["setuptools>=71.0","coloredlogs"]
+requires = ["setuptools>=71.0", "coloredlogs"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "rmc_dft"
-version = "0.5.4"
+version = "0.6.0"
 
 description = "rmc_dft is a Python package for performing Reverse Monte Carlo modeling and ab initio molecular dynamics / relaxation using VASP code."
 authors = [
-    { name="Kengo NAKADA", email="kengo.nakada@email.com" },
-    { name="Kentaro Kobayashi", email="kobayashi@mat.shimane-u.ac.jp"}
+    { name = "Kengo NAKADA", email = "kengo.nakada@email.com" },
+    { name = "Kentaro Kobayashi", email = "kobayashi@mat.shimane-u.ac.jp" }
 ]
 readme = "README.md"
 # requires-python = ">=3.8"
@@ -17,7 +17,7 @@ requires-python = ">=3.10"
 dependencies = [
     # my-modules
     "x_logger",
-    "packmol_util" ,
+    "packmol_util",
     # fnc
     "pymatgen",
     # basic

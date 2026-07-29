@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""RMC_POT *.dat の固定形式 / 自由形式 自動切替ラッパークラス。"""
+"""
+K.NAKADA, kengo.nakada@gmail.com
+RMC_POT *.dat の固定形式 / 自由形式 自動切替ラッパークラス。
+"""
 
 import time
 from dataclasses import dataclass
