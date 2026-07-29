@@ -6,6 +6,7 @@ rmc_vasp_script.py はそのまま RMC-DFT で止めてしまうので、
 DFT でおわる。
 そこから一回RMCをかけるプログラム
 """
+
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 import argparse
@@ -59,8 +60,8 @@ def run_rmc_init(
     ###################################
     # 1 行目のコメント（系名）を設定する
     # rmc_dat.set_comment("comment FeSiB")
-    # rmc_dat.set_comment("comment Li3PO4")
-    rmc_dat.set_comment("comment SiO2")
+    rmc_dat.set_comment("comment Li3PO4")
+    # rmc_dat.set_comment("comment SiO2")
     # rmc_dat.set_comment("comment LiSPC")
 
     ###################################
@@ -72,10 +73,10 @@ def run_rmc_init(
     # rmc_dat.set_density(0.0912)
 
     # --- Li3PO4
-    # rmc_dat.set_density(0.0772877)
+    rmc_dat.set_density(0.0772877)
 
     # --- SiO2 製法A1 mass_density_g_cm3 = 2.214  # SiO2製法A: S1
-    rmc_dat.set_density(0.0665715652)
+    # rmc_dat.set_density(0.0665715652)
 
     # --- LiSPC
     # rmc_dat.set_density(0.0453277972)
@@ -97,13 +98,13 @@ def run_rmc_init(
     # rmc_dat.set_cutoffs([2.2, 2.1, 1.75, 2.3, 1.6, 1.6])
 
     # --- Li3PO4 (test)
-    # rmc_dat.set_cutoffs([2.4, 2.3, 2.1, 2.0, 2.4, 1.7])
+    rmc_dat.set_cutoffs([2.4, 2.3, 2.1, 2.0, 2.4, 1.7])
 
     # --- SiO2 (test)
     # peak Si-Si:2.7-2.70, Si-O:1.5-1.55, O-O: 2.3-2.4
     # rmc_dat.set_cutoffs([2.40, 1.25, 2.10])  # Si-Si, Si-O, O-O
     # rmc_dat.set_cutoffs([1.0, 1.0, 1.0])  # Si-Si, Si-O, O-O
-    rmc_dat.set_cutoffs([1.9, 1.1, 1.9])  # Si-Si, Si-O, O-O
+    # rmc_dat.set_cutoffs([1.9, 1.1, 1.9])  # Si-Si, Si-O, O-O
 
     # ---- Li,S,P,C
     # rmc_dat.set_cutoffs(
@@ -128,10 +129,10 @@ def run_rmc_init(
     # rmc_dat.set_maximum_moves([0.1, 0.1, 0.1])
     # rmc_dat.set_maximum_moves([0.05, 0.01, 0.01])
     # rmc_dat.set_maximum_moves([0.05, 0.01, 0.01])  # 2026.02.16
-    # rmc_dat.set_maximum_moves([0.01, 0.01, 0.01])  # 2026.02.16
+    rmc_dat.set_maximum_moves([0.01, 0.01, 0.01])  # 2026.02.16
 
     # --- SiO2
-    rmc_dat.set_maximum_moves([0.01, 0.01])
+    # rmc_dat.set_maximum_moves([0.01, 0.01])
 
     # -- LiSPC
     # rmc_dat.set_maximum_moves(
@@ -186,9 +187,9 @@ def run_rmc_init(
     # rmc_dat.set_exp_range(50, 1091)  # 2026.02.16
     # rmc_dat.set_exp_range(85, 1091)  # 2026.02.16
     # ---- Li3PO4
-    # rmc_dat.set_exp_range(85, 771)
+    rmc_dat.set_exp_range(85, 771)
     # ---- SiO2,type-A
-    rmc_dat.set_exp_range(1, 588)
+    # rmc_dat.set_exp_range(1, 588)
     # ---- LiSPC
     # rmc_dat.set_exp_range(50, 1092)
 
