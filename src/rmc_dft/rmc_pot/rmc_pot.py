@@ -337,21 +337,16 @@ class RmcPot:
         RMC_POT 実行前に、*.fnc の rmin と *.dat の hard-sphere cutoff の
         整合性を確認する。
 
-        SiO2 用の現在の FNC type 対応：
-            fnc_type=1: Si-O
-            fnc_type=2: Si-Si
-            fnc_type=3: O-O
-
-        *.dat の cutoff 順：
-            cutoffs[0]: Si-Si
-            cutoffs[1]: Si-O
-            cutoffs[2]: O-O
+        FNC の constraint type 番号と原子種ペアを固定対応させず、
+        *.fnc に記録された実際の原子 index ペアと *.cfg の原子種別ブロックから
+        対応する RMC 原子タイプを決定する。
         """
         if cfg_name is None:
             cfg_name = self._cfg_name
 
         dat_path = "%s.dat" % cfg_name
         fnc_path = "%s.fnc" % cfg_name
+        cfg_path = "%s.cfg" % cfg_name
 
         if not os.path.exists(fnc_path):
             self._logger.info(
@@ -363,15 +358,14 @@ class RmcPot:
             self._logger.error("[rmc_pot] **Error**: DAT file not found: %s" % dat_path)
             return False
 
+        if not os.path.exists(cfg_path):
+            self._logger.error("[rmc_pot] **Error**: CFG file not found: %s" % cfg_path)
+            return False
+
         cutoffs = self._read_dat_cutoffs(dat_path)
         fnc_rmin = self._read_fnc_rmin_values(fnc_path)
-
-        if len(cutoffs) < 3:
-            self._logger.error(
-                "[rmc_pot] **Error**: cutoffs could not be read correctly from %s"
-                % dat_path
-            )
-            return False
+        fnc_pairs = self._read_fnc_pairs(fnc_path)
+        atom_types = self._read_cfg_atom_types(cfg_path)
 
         if len(fnc_rmin) == 0:
             self._logger.error(
@@ -380,38 +374,84 @@ class RmcPot:
             )
             return False
 
-        cutoff_map = {
-            1: cutoffs[1],
-            2: cutoffs[0],
-            3: cutoffs[2],
-        }
+        if len(fnc_pairs) == 0:
+            self._logger.error(
+                "[rmc_pot] **Error**: FNC atom pairs could not be read from %s"
+                % fnc_path
+            )
+            return False
 
+        if len(atom_types) == 0:
+            self._logger.error(
+                "[rmc_pot] **Error**: atom types could not be read from %s"
+                % cfg_path
+            )
+            return False
+
+        number_of_types = max(atom_types.values())
+        expected_cutoff_count = number_of_types * (number_of_types + 1) // 2
+
+        if len(cutoffs) != expected_cutoff_count:
+            self._logger.error(
+                "[rmc_pot] **Error**: cutoff count is inconsistent with CFG atom types: "
+                "cutoffs=%d expected=%d atom_types=%d"
+                % (len(cutoffs), expected_cutoff_count, number_of_types)
+            )
+            return False
+
+        checked = set()
         ok = True
 
-        for type_id in sorted(fnc_rmin.keys()):
-            rmin = fnc_rmin[type_id]
-
-            if type_id not in cutoff_map:
+        for atom_index1, atom_index2, type_id in fnc_pairs:
+            if type_id not in fnc_rmin:
                 self._logger.error(
-                    "[rmc_pot] **Error**: FNC/cutoff map is not defined: "
-                    "fnc_type=%d" % type_id
+                    "[rmc_pot] **Error**: FNC range is not defined: fnc_type=%d"
+                    % type_id
                 )
                 ok = False
                 continue
 
-            cutoff = cutoff_map[type_id]
+            if atom_index1 not in atom_types or atom_index2 not in atom_types:
+                self._logger.error(
+                    "[rmc_pot] **Error**: FNC atom index is outside CFG range: "
+                    "atom1=%d atom2=%d" % (atom_index1, atom_index2)
+                )
+                ok = False
+                continue
 
-            if rmin <= cutoff:
+            atom_type1 = atom_types[atom_index1]
+            atom_type2 = atom_types[atom_index2]
+            pair_key = (
+                type_id,
+                min(atom_type1, atom_type2),
+                max(atom_type1, atom_type2),
+            )
+
+            if pair_key in checked:
+                continue
+            checked.add(pair_key)
+
+            cutoff_index = self._get_cutoff_index(
+                atom_type1,
+                atom_type2,
+                number_of_types,
+            )
+            cutoff = cutoffs[cutoff_index]
+            rmin = fnc_rmin[type_id]
+
+            if rmin < cutoff:
                 self._logger.error(
                     "[rmc_pot] **Error**: FNC/cutoff inconsistency: "
-                    "fnc_type=%d rmin=%.8f <= cutoff=%.8f" % (type_id, rmin, cutoff)
+                    "fnc_type=%d atom_types=%d-%d rmin=%.8f < cutoff=%.8f"
+                    % (type_id, atom_type1, atom_type2, rmin, cutoff)
                 )
                 ok = False
                 continue
 
             self._logger.info(
                 "[rmc_pot] FNC/cutoff check: "
-                "fnc_type=%d rmin=%.8f > cutoff=%.8f" % (type_id, rmin, cutoff)
+                "fnc_type=%d atom_types=%d-%d rmin=%.8f >= cutoff=%.8f"
+                % (type_id, atom_type1, atom_type2, rmin, cutoff)
             )
 
         if not ok:
@@ -424,19 +464,25 @@ class RmcPot:
     @staticmethod
     def _read_dat_cutoffs(dat_path: str) -> List[float]:
         """
-        *.dat の cut offs 行から cutoff 値を読む。
+        *.dat の cutoff 値を読む。
+
+        固定形式の ``! cut offs`` と自由形式の ``CUT-OFF =`` の両方を扱う。
         """
         values = []
 
         with open(dat_path, "r", encoding="utf-8") as f:
             for line in f:
-                if "cut offs" not in line:
+                stripped = line.strip()
+                lower = stripped.lower()
+
+                if "cut offs" in lower:
+                    text = line.split("!")[0]
+                elif lower.startswith("cut-off") and "=" in line:
+                    text = line.split("=", 1)[1]
+                else:
                     continue
 
-                text = line.split("!")[0]
-                words = text.split()
-
-                for word in words:
+                for word in text.split():
                     try:
                         value = float(word)
                     except ValueError:
@@ -451,12 +497,6 @@ class RmcPot:
     def _read_fnc_rmin_values(fnc_path: str) -> Dict[int, float]:
         """
         *.fnc の rmin 行を読む。
-
-        qn_network.py の write_fnc() が出す形式：
-            No. of possible rmin-rmax pairs:
-            N
-            rmin_1 rmin_2 ...
-            rmax_1 rmax_2 ...
         """
         with open(fnc_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
@@ -493,6 +533,194 @@ class RmcPot:
             type_id += 1
 
         return result
+
+    @staticmethod
+    def _read_fnc_pairs(fnc_path: str) -> List[Tuple[int, int, int]]:
+        """
+        *.fnc から一意な ``(atom1, atom2, constraint_type)`` を読む。
+        """
+        with open(fnc_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        marker = 0
+        while marker < len(lines):
+            if "No. of possible rmin-rmax pairs" in lines[marker]:
+                break
+            marker += 1
+
+        if marker >= len(lines):
+            return []
+
+        cursor = marker + 4
+        while cursor < len(lines) and not lines[cursor].strip():
+            cursor += 1
+
+        if cursor >= len(lines):
+            return []
+
+        try:
+            atom_count = int(lines[cursor].split()[0])
+        except (IndexError, ValueError):
+            return []
+
+        cursor += 1
+        pairs = []
+        seen = set()
+        atom_entry_count = 0
+
+        while cursor < len(lines) and atom_entry_count < atom_count:
+            if not lines[cursor].strip():
+                cursor += 1
+                continue
+
+            header = lines[cursor].split()
+            cursor += 1
+
+            if len(header) < 2:
+                return []
+
+            try:
+                atom_index = int(header[0])
+                neighbour_count = int(header[1])
+            except ValueError:
+                return []
+
+            atom_entry_count += 1
+
+            if neighbour_count == 0:
+                continue
+
+            if cursor + 1 >= len(lines):
+                return []
+
+            try:
+                neighbours = [int(value) for value in lines[cursor].split()]
+                constraint_types = [
+                    int(value) for value in lines[cursor + 1].split()
+                ]
+            except ValueError:
+                return []
+
+            cursor += 2
+
+            if len(neighbours) != neighbour_count:
+                return []
+            if len(constraint_types) != neighbour_count:
+                return []
+
+            for neighbour, constraint_type in zip(
+                neighbours,
+                constraint_types,
+            ):
+                atom1 = min(atom_index, neighbour)
+                atom2 = max(atom_index, neighbour)
+                key = (atom1, atom2, constraint_type)
+
+                if key in seen:
+                    continue
+
+                seen.add(key)
+                pairs.append(key)
+
+        return pairs
+
+    @staticmethod
+    def _read_cfg_atom_types(cfg_path: str) -> Dict[int, int]:
+        """
+        RMC_POT Version 3 の *.cfg から、RMC atom index とtypeの対応を作る。
+
+        cfg2poscar.py と同じ配置規則を使用する。
+
+        - 8行目: 全原子数
+        - 9行目: type数
+        - 19行目以降: 各typeの定義ブロック
+        - 各typeブロックは4行
+        - ブロック先頭行の第1要素が、そのtypeの原子数
+        - 座標はtype順に連続して並ぶ
+        """
+        with open(cfg_path, "r", encoding="utf-8") as f:
+            datlines = f.read().split("\n")
+
+        if len(datlines) < 18:
+            return {}
+
+        try:
+            total_atoms = int(datlines[7].split()[0])
+            number_of_types = int(datlines[8].split()[0])
+        except (IndexError, ValueError):
+            return {}
+
+        if total_atoms < 1 or number_of_types < 1:
+            return {}
+
+        type_counts = []
+        line_index = 17
+
+        for _ in range(number_of_types):
+            line_index += 1
+
+            if line_index >= len(datlines):
+                return {}
+
+            words = datlines[line_index].split()
+            if len(words) == 0:
+                return {}
+
+            try:
+                atom_count = int(words[0])
+            except ValueError:
+                return {}
+
+            if atom_count < 1:
+                return {}
+
+            type_counts.append(atom_count)
+
+            line_index += 3
+
+        if sum(type_counts) != total_atoms:
+            return {}
+
+        atom_types: Dict[int, int] = {}
+        atom_index = 1
+
+        for atom_type, atom_count in enumerate(type_counts, start=1):
+            for _ in range(atom_count):
+                atom_types[atom_index] = atom_type
+                atom_index += 1
+
+        return atom_types
+
+    @staticmethod
+    def _get_cutoff_index(
+        atom_type1: int,
+        atom_type2: int,
+        number_of_types: int,
+    ) -> int:
+        """
+        RMC の上三角順 cutoff 配列における0始まりindexを返す。
+
+        例: 3 typeの場合
+            (1,1), (1,2), (1,3), (2,2), (2,3), (3,3)
+        """
+        type1 = min(int(atom_type1), int(atom_type2))
+        type2 = max(int(atom_type1), int(atom_type2))
+
+        if type1 < 1 or type2 > number_of_types:
+            raise ValueError(
+                "atom type is outside range: %d-%d, number_of_types=%d"
+                % (type1, type2, number_of_types)
+            )
+
+        index = 0
+        current_type1 = 1
+
+        while current_type1 < type1:
+            index += number_of_types - current_type1 + 1
+            current_type1 += 1
+
+        index += type2 - type1
+        return index
 
     def run(
         self,

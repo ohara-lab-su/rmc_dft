@@ -93,8 +93,8 @@ if __name__ == "__main__":
     # 1. RMC 関連インスタンスは RMC-DFT loop で毎回作った方がハンドリングしやすいのでここでは作らん
 
     ######################
-    use_free_format = True
-    # use_free_format = False
+    # use_free_format = True
+    use_free_format = False
     ######################
 
     # 実行バイナリが _ADVANCED_GEOM_CONST を有効に置く必要がある

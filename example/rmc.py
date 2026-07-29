@@ -6,6 +6,7 @@ rmc_vasp_script.py はそのまま RMC-DFT で止めてしまうので、
 DFT でおわる。
 そこから一回RMCをかけるプログラム
 """
+
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 import argparse
@@ -203,8 +204,8 @@ if __name__ == "__main__":
     # poscar2cfg(cfg_name=config.cfg_name)#
     # ---------------------------
 
-    use_free_format_ = True
-    # use_free_format_ = False
+    # use_free_format_ = True
+    use_free_format_ = False
 
     rmc_log_ = RmcPotLog(
         cfg_name=config_.cfg_name,

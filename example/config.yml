@@ -13,7 +13,7 @@
 # number_density_A3: 0.09119 # 数密度 packmol/RMC
 # number_density_A3: 0.0915 # 数密度 packmol/RMC
 # element_info: ["Fe", "Si", "B"] # packmol/構造変換
-element_info: ["Si", "O"] # packmol/構造変換
+element_info: [ "Si", "O" ] # packmol/構造変換
 # element_info: "label.txt" # VASP4(Rmc.cfg) type --> VASP5 type
 
 max_rmc_dft_loop: 10
@@ -25,7 +25,8 @@ rmc_log_dir: "rmc" # log{xxx}_rmc
 #
 cfg_name: "aaa" # input_file: RMC: aaa.cfg
 # rmc_exp_filename: "Nomag300_0305.xsq"
-rmc_exp_filename: "Sq_s1_deltaQ005_fpd.txt"
+# rmc_exp_filename: "Sq_s1_deltaQ005_fpd.txt"
+rmc_exp_filename: "Li3PO4.xsq"
 # OpenMP thread 数 (富岳のOMGは4つで、12コアになるので12がまぁ、良いとは思う)
 # rmc_omp_num_threads: 12
 rmc_omp_num_threads: 8
