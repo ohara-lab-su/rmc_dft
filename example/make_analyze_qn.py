@@ -11,7 +11,8 @@ QnNetworkAnalysis を使って、Q0 から Q4 の個数と割合を画面に表�
 
 from typing import Dict
 
-from rmc_dft.rmc_pot.qn.qn_network_analysis import QnNetworkAnalysis
+# from rmc_dft.rmc_pot.qn.qn_network_analysis import QnNetworkAnalysis
+from qn.qn_network_analysis import QnNetworkAnalysis
 
 
 def print_qn_counts(qn_counts: Dict[int, int]) -> None:

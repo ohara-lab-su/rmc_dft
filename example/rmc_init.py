@@ -34,11 +34,11 @@ from x_logger import XLogger
 
 
 def run_rmc_init(
-        config: Config,
-        rmc_dat: Optional[RmcPotDat] = None,
-        *,
-        use_free_format: bool = False,
-        logger: Optional[Any] = None,
+    config: Config,
+    rmc_dat: Optional[RmcPotDat] = None,
+    *,
+    use_free_format: bool = False,
+    logger: Optional[Any] = None,
 ) -> bool:
     """
     RMC param

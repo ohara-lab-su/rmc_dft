@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """SiO2 構造の Qn/network 解析だけを実行する。"""
+
 from __future__ import print_function
 
 import os
 import sys
 from pathlib import Path
 
-from rmc_dft.rmc_pot.qn import QnNetworkAnalysis
+# from rmc_dft.rmc_pot.qn import QnNetworkAnalysis
+from qn.qn_network_analysis import QnNetworkAnalysis
 
 
 def resolve_poscar_name(structure_name: str) -> str:
