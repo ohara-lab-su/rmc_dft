@@ -1,4 +1,3 @@
-
 RMC-DFT
 ---
 
@@ -11,10 +10,12 @@ tutorials/index
 ```
 
 # メンテナ
+
 - Kengo NAKADA (中田謙吾)
-  - kengo.nakada@mat.shimane-u.ac.jp
-  - kengo.nakada@gmail.com
+    - kengo.nakada@mat.shimane-u.ac.jp
+    - kengo.nakada@gmail.com
 
 # コラボレーター
-- K. Kobahashi
+
+- K. Kobayashi
 - K. NAKADA
