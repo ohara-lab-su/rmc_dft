@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """
 python 3.6 環境のための setup.py
+
 """
 
 __author__ = "K.Kobayashi, Kengo NAKADA"
@@ -17,7 +18,6 @@ import glob
 import re
 import os
 import shutil
-
 
 # --- クリーン処理 ---
 for path in ["build", "dist"]:
