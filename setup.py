@@ -18,7 +18,6 @@ import re
 import os
 import shutil
 
-
 # --- クリーン処理 ---
 for path in ["build", "dist"]:
     if os.path.exists(path):
