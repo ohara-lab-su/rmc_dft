@@ -18,8 +18,7 @@ SCRIPT="./script"
 
 # 一部ファイルを上書きする(こっちのほうが優先)
 #cp -r $DATA/* .
-#cp -r $SCRIPT/* .
-command cp -rf -- "$SCRIPT"/. .
+cp -r $SCRIPT/* .
 
 #####################
 # パラメータ群
