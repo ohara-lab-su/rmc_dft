@@ -18,7 +18,7 @@ import make_log_dirname
 
 
 def read_energy_from_dir(
-        dir_name: str,
+    dir_name: str,
 ) -> np.ndarray:
     """指定ディレクトリ内の OUTCAR から flatten energy 列を返します。
 
@@ -38,7 +38,7 @@ def read_energy_from_dir(
 
 
 def plot_multi_energy(
-        dir_list: List[str],
+    dir_list: List[str],
 ) -> None:
     """複数ディレクトリの flatten energy を横一列で描画します。
 

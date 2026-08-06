@@ -12,8 +12,8 @@ from rmc_dft import RmcPotPpcf
 
 
 def plot_ppcf(
-        cfg_name: str,
-        target_dir: Optional[str] = None,
+    cfg_name: str,
+    target_dir: Optional[str] = None,
 ) -> None:
     original_cwd: str = os.getcwd()
     try:

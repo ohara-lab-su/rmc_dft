@@ -11,8 +11,8 @@ from rmc_dft import RmcPotHst
 
 
 def plot_chi(
-        cfg_name: str,
-        target_dir: Optional[str] = None,
+    cfg_name: str,
+    target_dir: Optional[str] = None,
 ) -> None:
     hst_name = f"{cfg_name}.hst"
 
