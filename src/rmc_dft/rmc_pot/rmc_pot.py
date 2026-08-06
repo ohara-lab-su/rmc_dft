@@ -98,6 +98,7 @@ class RmcPot:
                 use_free_format=self._use_free_format,
                 logger=self._logger,
             )
+            rmc_dat.init()
 
         self._rmc_dat: RmcPotDat = rmc_dat
         # self._logger.info("")
