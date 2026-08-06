@@ -15,12 +15,12 @@ fi
 
 #####################
 # パラメータ群
-cp $SCRIPT/rmc_vasp_init.py $DST/
-cp $SCRIPT/rmc_vasp_init_safe.py $DST/
-cp $SCRIPT/rmc_vasp_init_normal.py $DST/
-cp $SCRIPT/rmc_init.py $DST
-cp $SCRIPT/rmc_vasp_script.py $DST/
-cp $SCRIPT/config.yml $DST/
+command cp -f -- "$SCRIPT/rmc_vasp_init.py" "$DST/"
+command cp -f -- "$SCRIPT/rmc_vasp_init_safe.py" "$DST/"
+command cp -f -- "$SCRIPT/rmc_vasp_init_normal.py" "$DST/"
+command cp -f -- "$SCRIPT/rmc_init.py" "$DST/"
+command cp -f -- "$SCRIPT/rmc_vasp_script.py" "$DST/"
+command cp -f -- "$SCRIPT/config.yml" "$DST/"
 
 #####################
 # 初期構造作成
@@ -29,20 +29,20 @@ cp $SCRIPT/config.yml $DST/
 # cp $SCRIPT/make_number_density.py ./
 #####################
 
-cp $SCRIPT/conv_poscar2cfg.py $DST/
-cp $SCRIPT/conv_cfg2poscar.py $DST/
+command cp -f -- "$SCRIPT/conv_poscar2cfg.py" "$DST/"
+command cp -f -- "$SCRIPT/conv_cfg2poscar.py" "$DST/"
 
-cp $SCRIPT/rmc.py $DST/
-cp $SCRIPT/rmc_vasp.py $DST/
-cp $SCRIPT/clean_rmc.py $DST/
-cp $SCRIPT/make_log_dirname.py $DST/
-cp $SCRIPT/plot_fit.py $DST/
-cp $SCRIPT/plot_multi_fit.py $DST/
-cp $SCRIPT/plot_multi_hst.py $DST/
+command cp -f -- "$SCRIPT/rmc.py" "$DST/"
+command cp -f -- "$SCRIPT/rmc_vasp.py" "$DST/"
+command cp -f -- "$SCRIPT/clean_rmc.py" "$DST/"
+command cp -f -- "$SCRIPT/make_log_dirname.py" "$DST/"
+command cp -f -- "$SCRIPT/plot_fit.py" "$DST/"
+command cp -f -- "$SCRIPT/plot_multi_fit.py" "$DST/"
+command cp -f -- "$SCRIPT/plot_multi_hst.py" "$DST/"
 
-cp $SCRIPT/analyze_* $DST/
+command cp -f -- "$SCRIPT"/analyze_* "$DST/"
 
 chmod u+x $DST/*.py
 
-cp $SCRIPT/job_hpcs2024_node1.sh $DST/
-cp $SCRIPT/job_hpcs2024_node2.sh $DST/
+command cp -f -- "$SCRIPT/job_hpcs2024_node1.sh" "$DST/"
+command cp -f -- "$SCRIPT/job_hpcs2024_node2.sh" "$DST/"
