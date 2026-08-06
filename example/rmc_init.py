@@ -287,7 +287,8 @@ def run_rmc_init(
             coordination_number=5,
             fraction=0.002,
             # sigma=1.0,
-            sigma=0.1,
+            # sigma=0.1,
+            sigma=0.04,
         )
 
         # Q4 = 99.4 %
@@ -300,7 +301,8 @@ def run_rmc_init(
             coordination_number=4,
             fraction=0.994,
             # sigma=1.0,
-            sigma=0.1,
+            # sigma=0.1,
+            sigma=0.04,
         )
 
         # Q3 = 0.4 %
