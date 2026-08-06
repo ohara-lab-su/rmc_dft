@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 K.NAKADA, kengo.nakada@gmail.com
 
@@ -6,6 +6,7 @@ log ファイルからRMCの収束に関する結果を抜き出す。
 (こちらが hst の下情報になるが、整理されている形式ではないので注意)
 """
 from rmc_dft import RmcPotLog
+
 
 ####################
 # test0

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """VASP 構造から Qn 分布の個数と比率を表示する。
 

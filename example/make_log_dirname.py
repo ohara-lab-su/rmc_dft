@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 K.NAKADA, kengo.nakada@gmail.com
 
@@ -22,7 +23,7 @@ import re
 
 
 def find_log_pairs(
-    base_dir: str,
+        base_dir: str,
 ) -> List[Dict[str, str]]:
     """
     RMC と DFT のログディレクトリをペアで収集する。
@@ -94,7 +95,7 @@ def find_log_pairs(
 
 
 def find_rmc_dirs(
-    base_dir: str,
+        base_dir: str,
 ) -> List[str]:
     """
     RMC ログディレクトリを収集する。
@@ -132,7 +133,7 @@ def find_rmc_dirs(
 
 
 def find_dft_dirs(
-    base_dir: str,
+        base_dir: str,
 ) -> List[str]:
     """
     DFT ログディレクトリを収集する。

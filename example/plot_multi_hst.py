@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """plot_multi_hst.py
 K.NAKADA, kengo.nakada@gmail.com
@@ -18,8 +18,8 @@ import make_log_dirname
 
 
 def read_chi2_from_dir(
-    dir_name: str,
-    cfg_name: str,
+        dir_name: str,
+        cfg_name: str,
 ) -> Union[Tuple[list, list], bool]:
     """指定ディレクトリ内の <cfg_name>.hst から (steps, chi2) を読み取ります。
 
@@ -53,8 +53,8 @@ def read_chi2_from_dir(
 
 
 def plot_multi_chi(
-    dir_list: List[str],
-    cfg_name: str,
+        dir_list: List[str],
+        cfg_name: str,
 ) -> None:
     """複数ディレクトリの chi2 を横一列で描画します。
 

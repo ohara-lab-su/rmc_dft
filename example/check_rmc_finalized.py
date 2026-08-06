@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 K.NAKADA, kengo.nakada@gmail.com
@@ -25,7 +25,6 @@ from x_logger import XLogger
 
 
 def main() -> bool:
-
     logger: XLogger = XLogger()
     config: Config = Config("config.yml")
 

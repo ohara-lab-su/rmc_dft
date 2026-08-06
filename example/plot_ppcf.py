@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 K.NAKADA, kengo.nakada@gmail.com
@@ -11,10 +11,9 @@ from rmc_dft import RmcPotPpcf
 
 
 def plot_ppcf(
-    cfg_name: str,
-    target_dir: Optional[str] = None,
+        cfg_name: str,
+        target_dir: Optional[str] = None,
 ) -> None:
-
     # フォルダ指定がある場合は一時的に移動
     original_cwd: str = os.getcwd()
     try:

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """plot_multi_fit.py
 K.NAKADA, kengo.nakada@gmail.com
@@ -18,8 +18,8 @@ import make_log_dirname
 
 
 def read_sq_from_fit(
-    dir_name: str,
-    cfg_name: str,
+        dir_name: str,
+        cfg_name: str,
 ) -> Union[Tuple[list, list, list], bool]:
     """指定ディレクトリの <cfg_name>.fit から Q, S_calc, S_exp を読み取ります。
 
@@ -56,9 +56,9 @@ def read_sq_from_fit(
 
 
 def plot_multi_fit(
-    dir_list: List[str],
-    cfg_name: str,
-    ncols: int = 4,
+        dir_list: List[str],
+        cfg_name: str,
+        ncols: int = 4,
 ) -> None:
     """複数ディレクトリの S(Q) を多段サブプロットで描画します。
 
@@ -126,7 +126,7 @@ def plot_multi_fit(
         ax.grid(True)
         ax.legend(fontsize=6)
 
-    for ax in axes[len(all_data) :]:
+    for ax in axes[len(all_data):]:
         ax.axis("off")
 
     for ax in axes[-ncols:]:

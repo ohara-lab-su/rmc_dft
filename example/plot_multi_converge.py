@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """plot_multi_converge.py
 K.NAKADA, kengo.nakada@gmail.com
@@ -34,8 +34,8 @@ import make_log_dirname
 
 
 def read_chi2_from_dir(
-    dir_name: str,
-    cfg_name: str,
+        dir_name: str,
+        cfg_name: str,
 ) -> Union[Tuple[list, list], bool]:
     """指定ディレクトリ内の <cfg_name>.hst から (steps, chi2) を読み取り"""
 
@@ -58,7 +58,7 @@ def read_chi2_from_dir(
 
 
 def read_energy_from_dir(
-    dir_name: str,
+        dir_name: str,
 ) -> Union[np.ndarray, bool]:
     """指定ディレクトリ内の OUTCAR から flatten energy 列を返す"""
 
@@ -80,7 +80,7 @@ def _hide_yticklabels_except_first(axes_row) -> None:
 
 
 def find_rmc_dft_pairs(
-    base_dir: str,
+        base_dir: str,
 ) -> List[Dict[str, str]]:
     records: List[Tuple[int, str, str]] = []
 
@@ -139,10 +139,10 @@ def find_rmc_dft_pairs(
 
 
 def plot_multi_converge(
-    log_pairs: List[Dict[str, str]],
-    cfg_name: str,
-    base_dir: str,
-    logger: Optional[XLogger] = None,
+        log_pairs: List[Dict[str, str]],
+        cfg_name: str,
+        base_dir: str,
+        logger: Optional[XLogger] = None,
 ) -> None:
     """RMC(上段) と DFT(下段) を同一 Figure に並べて描画
 

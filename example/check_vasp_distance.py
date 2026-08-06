@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 K.NAKADA, kengo.nakada@gmail.com
@@ -30,8 +30,8 @@ from x_logger import XLogger
 
 
 def get_all_distances(
-    analyzer: VaspPoscarAnalyzer,
-    use_pbc: bool = True,
+        analyzer: VaspPoscarAnalyzer,
+        use_pbc: bool = True,
 ) -> List[Tuple[float, int, int]]:
     """
     全原子ペアの距離一覧を返す。
@@ -51,9 +51,9 @@ def get_all_distances(
 
 
 def print_top10(
-    analyzer: VaspPoscarAnalyzer,
-    dist_list: List[Tuple[float, int, int]],
-    top_n: int = 10,
+        analyzer: VaspPoscarAnalyzer,
+        dist_list: List[Tuple[float, int, int]],
+        top_n: int = 10,
 ) -> None:
     """
     距離の短い順に上位 N 個を表示する。
