@@ -50,19 +50,31 @@ class RmcPotDat:
         self._impl: Optional[Union[RmcPotDatFree, RmcPotDatFixed]] = None
 
     def set_free_format(self, use_free_format: bool) -> None:
-        """新規 *.dat 作成時に使用する形式を設定する。
+        """新規 ``*.dat`` 作成時に使用する形式を設定する。
 
-        init() 完了後、または既存 *.dat がある場合は、既存ファイルの形式を
-        変更しない。
+        初期化前は保持中の形式指定を更新する。初期化後は現在の ``*.dat`` の
+        形式を変更せず、実際に使用している形式をログへ出力する。
         """
-        self._use_free_format = use_free_format
-        target_path = Path(f"{self._cfg_name}.dat")
-        if target_path.exists():
-            detected = self._detect_if_free_format(target_path)
-            format_name = "自由形式" if detected else "固定形式"
-            self._logger.info(
-                f"[rmc_pot_dat] 既存 {target_path.name} を使用します。形式は {format_name} です。"
-            )
+        if self._impl is None:
+            self._use_free_format = use_free_format
+            return
+
+        format_name = "自由形式" if self.is_free_format else "固定形式"
+        self._logger.info(
+            f"[rmc_pot_dat] 初期化済みの {self._cfg_name}.dat を使用します。"
+            f"形式は {format_name} です。"
+        )
+
+    def set_cfg_name(self, cfg_name: str) -> None:
+        """読み書き対象の構成名を変更する。
+
+        初期化前はラッパーが保持する名前だけを変更する。初期化後は内部実装にも
+        同じ名前を反映する。
+        """
+        self._cfg_name = cfg_name
+        self._config.cfg_name = cfg_name
+        if self._impl is not None:
+            self._impl.set_cfg_name(cfg_name)
 
     def init(
         self,
@@ -79,6 +91,14 @@ class RmcPotDat:
                 False の場合は既存ファイルをバックアップし、指定形式の初期値で
                 作り直す。
         """
+        if self._impl is not None:
+            format_name = "自由形式" if self.is_free_format else "固定形式"
+            self._logger.info(
+                f"[rmc_pot_dat] {self._cfg_name}.dat は初期化済みです。"
+                f"形式は {format_name} です。"
+            )
+            return
+
         if use_free_format is not None:
             self._use_free_format = use_free_format
 
@@ -130,13 +150,28 @@ class RmcPotDat:
 
     @property
     def is_free_format(self) -> bool:
-        """現在使用中の実体が自由形式かどうかを返す。"""
+        """現在使用中の実体が自由形式かどうかを返す。
+
+        未初期化の場合は、既存 ``*.dat`` の読込みまたは初期ファイル生成を
+        遅延実行してから判定する。
+        """
+        self._ensure_initialized()
         return isinstance(self._impl, RmcPotDatFree)
 
-    def __getattr__(self, name: str) -> Any:
-        """未定義の属性・メソッド呼び出しを全て内部実装へ転送する。"""
+    def _ensure_initialized(self) -> None:
+        """必要な場合だけ ``init()`` を実行する。"""
         if self._impl is None:
-            raise RuntimeError("RmcPotDat.init() がまだ呼ばれていません。")
+            self.init()
+
+    def __getattr__(self, name: str) -> Any:
+        """未定義の属性・メソッド呼び出しを内部実装へ転送する。
+
+        ``init()`` が明示的に呼ばれていない場合は、最初の getter/setter 等の
+        呼出時に遅延初期化する。
+        """
+        self._ensure_initialized()
+        if self._impl is None:
+            raise RuntimeError("RmcPotDat の初期化に失敗しました。")
         return getattr(self._impl, name)
 
 
