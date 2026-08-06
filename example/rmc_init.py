@@ -51,8 +51,12 @@ def run_rmc_init(
         rmc_dat = RmcPotDat(
             config=config,
             logger=logger,
-            use_free_format=use_free_format,
         )
+
+    rmc_dat.init(
+        use_free_format=use_free_format,
+        prefer_existing=True,
+    )
 
     ######################################
     # パラメーター調整
@@ -243,7 +247,7 @@ def run_rmc_init(
     )
 
     # 自由形式フォーマットだと element 情報が必須となる
-    if use_free_format:
+    if rmc_dat.is_free_format:
         # element
         element_info = config.element_info
         rmc_dat.set_element_info(element_info)
@@ -262,7 +266,7 @@ def run_rmc_init(
     #
     # Q4/Q3/Q2 は、それぞれ独立した [ SNC ] セクションとして出力される。
     # fraction は全中心 Si に対する目標割合で、百分率ではなく 0～1 で指定する。
-    if use_free_format:
+    if rmc_dat.is_free_format:
         pass
         rmc_dat.initialize_qn_constraints()
 

@@ -3,6 +3,20 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.6.2
+
+### Unified fixed/free format initialization
+
+- Refactored the initialization flow of `RmcPotDat` to provide a unified initialization interface for both fixed and
+  free formats.
+- Added lazy initialization so that a `.dat` file is created or loaded only when initialization is actually required.
+- Existing `.dat` files are now detected automatically and their format (fixed/free) is reused instead of recreating the
+  file.
+- Improved the initialization API to support both explicit initialization and automatic initialization through the
+  normal workflow.
+- Preserved the existing parameter-setting API after initialization, allowing scripts to update parameters without
+  changing their usage.
+
 ## v0.6.1
 
 - Generalized the FNC/cutoff consistency checker to support arbitrary multi-component systems instead of a hard-coded

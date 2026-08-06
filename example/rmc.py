@@ -42,7 +42,6 @@ def run_rmc(
     rmc_pot: Optional[RmcPot] = None,
     auto_converge: Optional[bool] = False,
     postprocess: Optional[bool] = True,
-    use_free_format: bool = False,
     msg: Optional[str] = None,
     logger: Optional[Any] = None,
 ) -> bool:
@@ -74,7 +73,6 @@ def run_rmc(
             rmc_dat=rmc_dat,  # instance
             rmc_log=rmc_log,  # instance
             config=config,
-            use_free_format=use_free_format,
             logger=logger,
         )
     else:
@@ -204,9 +202,6 @@ if __name__ == "__main__":
     # poscar2cfg(cfg_name=config.cfg_name)#
     # ---------------------------
 
-    # use_free_format_ = True
-    use_free_format_ = False
-
     rmc_log_ = RmcPotLog(
         cfg_name=config_.cfg_name,
         logger=logger_,
@@ -218,14 +213,12 @@ if __name__ == "__main__":
     rmc_dat_ = RmcPotDat(
         config=config_,
         logger=logger_,
-        use_free_format=use_free_format_,
     )
 
     # ini パラメーターでをここで作り、config や *.dat を上書きする
     run_rmc_init(
         config=config_,
         rmc_dat=rmc_dat_,
-        use_free_format=use_free_format_,
         logger=logger_,
     )
 
@@ -235,6 +228,5 @@ if __name__ == "__main__":
         rmc_dat=rmc_dat_,
         auto_converge=False,
         msg=msg_,
-        use_free_format=use_free_format_,
         logger=logger_,
     )

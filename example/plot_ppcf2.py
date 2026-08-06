@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 K.NAKADA, kengo.nakada@gmail.com
@@ -15,7 +15,6 @@ def plot_ppcf(
     cfg_name: str,
     target_dir: Optional[str] = None,
 ) -> None:
-
     original_cwd: str = os.getcwd()
     try:
         if target_dir is not None:

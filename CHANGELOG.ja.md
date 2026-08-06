@@ -3,6 +3,16 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.6.2
+
+### 固定形式・自由形式の初期化処理を整理
+
+- `RmcPotDat` の初期化処理を見直し、固定形式・自由形式を共通の初期化インターフェースで扱えるよう整理しました。
+- 遅延初期化に対応し、`.dat` ファイルの生成・読込みは実際に初期化が必要になった時点で実行されるよう改善しました。
+- 既存の `.dat` ファイルが存在する場合は、自動的に形式（固定形式・自由形式）を判定し、その形式を利用するよう整理しました。
+- 明示的な初期化と通常のワークフローによる自動初期化の両方に対応できるよう、初期化APIを整理しました。
+- 初期化後のパラメーター設定APIは従来どおり利用できるため、既存スクリプトからの設定方法を維持したまま利用できます。
+
 ## v0.6.1
 
 - FNC と cutoff の整合性チェックを汎用化し、SiO₂専用実装から任意の多成分系に対応。

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """plot_multi_converge.py
 K.NAKADA, kengo.nakada@gmail.com
