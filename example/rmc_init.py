@@ -35,11 +35,11 @@ from x_logger import XLogger
 
 
 def run_rmc_init(
-    config: Config,
-    rmc_dat: Optional[RmcPotDat] = None,
-    *,
-    use_free_format: bool = False,
-    logger: Optional[Any] = None,
+        config: Config,
+        rmc_dat: Optional[RmcPotDat] = None,
+        *,
+        use_free_format: bool = False,
+        logger: Optional[Any] = None,
 ) -> bool:
     """
     RMC param
@@ -53,8 +53,14 @@ def run_rmc_init(
             logger=logger,
         )
 
+    ##########################################
+    # Free Format / Fixed Format の指定
+    #
+    # 繰り返し動作しても、一度intしたら次はintしない
     rmc_dat.init(
-        use_free_format=use_free_format,
+        # use_free_format=use_free_format,
+        # use_free_format=False, # for FNC/TOP
+        use_free_format=True,  # for SNC
         prefer_existing=True,
     )
 
@@ -64,8 +70,8 @@ def run_rmc_init(
     ###################################
     # 1 行目のコメント（系名）を設定する
     # rmc_dat.set_comment("comment FeSiB")
-    rmc_dat.set_comment("comment Li3PO4")
-    # rmc_dat.set_comment("comment SiO2")
+    # rmc_dat.set_comment("comment Li3PO4")
+    rmc_dat.set_comment("comment SiO2")
     # rmc_dat.set_comment("comment LiSPC")
 
     ###################################
@@ -77,10 +83,10 @@ def run_rmc_init(
     # rmc_dat.set_density(0.0912)
 
     # --- Li3PO4
-    rmc_dat.set_density(0.0772877)
+    # rmc_dat.set_density(0.0772877)
 
     # --- SiO2 製法A1 mass_density_g_cm3 = 2.214  # SiO2製法A: S1
-    # rmc_dat.set_density(0.0665715652)
+    rmc_dat.set_density(0.0665715652)
 
     # --- LiSPC
     # rmc_dat.set_density(0.0453277972)
@@ -103,22 +109,22 @@ def run_rmc_init(
 
     # --- Li3PO4 (test)
     # rmc_dat.set_cutoffs([2.4, 2.3, 2.1, 2.0, 2.4, 1.7])
-    rmc_dat.set_cutoffs(
-        [
-            1.8,  # Li-Li
-            2.0,  # Li-P
-            1.7,  # Li-O
-            2.5,  # P-P
-            1.3,  # P-O
-            2.0,  # O-O
-        ]
-    )
+    # rmc_dat.set_cutoffs(
+    #     [
+    #         1.8,  # Li-Li
+    #         2.0,  # Li-P
+    #         1.7,  # Li-O
+    #         2.5,  # P-P
+    #         1.3,  # P-O
+    #         2.0,  # O-O
+    #     ]
+    # )
 
     # --- SiO2 (test)
     # peak Si-Si:2.7-2.70, Si-O:1.5-1.55, O-O: 2.3-2.4
     # rmc_dat.set_cutoffs([2.40, 1.25, 2.10])  # Si-Si, Si-O, O-O
     # rmc_dat.set_cutoffs([1.0, 1.0, 1.0])  # Si-Si, Si-O, O-O
-    # rmc_dat.set_cutoffs([1.9, 1.1, 1.9])  # Si-Si, Si-O, O-O
+    rmc_dat.set_cutoffs([1.9, 1.1, 1.9])  # Si-Si, Si-O, O-O
 
     # ---- Li,S,P,C
     # rmc_dat.set_cutoffs(
@@ -146,7 +152,7 @@ def run_rmc_init(
     rmc_dat.set_maximum_moves([0.01, 0.01, 0.01])  # 2026.02.16
 
     # --- SiO2
-    # rmc_dat.set_maximum_moves([0.01, 0.01])
+    rmc_dat.set_maximum_moves([0.01, 0.01])
 
     # -- LiSPC
     # rmc_dat.set_maximum_moves(
@@ -174,8 +180,8 @@ def run_rmc_init(
     # 計算時間と構造をsaveするステップ間隔
     # rmc_dat.set_time_and_save(0.5, 0.5)
     # rmc_dat.set_time_and_save(5, 1)
-    # rmc_dat.set_time_and_save(15, 1)
-    rmc_dat.set_time_and_save(30, 1)
+    rmc_dat.set_time_and_save(15, 1)
+    # rmc_dat.set_time_and_save(30, 1)
     # rmc_dat.set_time_and_save(60, 1)
     # rmc_dat.set_time_and_save(120, 1)
     # rmc_dat.set_time_and_save(360, 1)
@@ -201,9 +207,9 @@ def run_rmc_init(
     # rmc_dat.set_exp_range(50, 1091)  # 2026.02.16
     # rmc_dat.set_exp_range(85, 1091)  # 2026.02.16
     # ---- Li3PO4
-    rmc_dat.set_exp_range(85, 771)
+    # rmc_dat.set_exp_range(85, 771)
     # ---- SiO2,type-A
-    # rmc_dat.set_exp_range(1, 588)
+    rmc_dat.set_exp_range(1, 588)
     # ---- LiSPC
     # rmc_dat.set_exp_range(50, 1092)
 
@@ -237,20 +243,21 @@ def run_rmc_init(
     # その値を、rmc するときに rmc 毎に変えるなどするには、
     # ペア指定は変えず、constraint type ごとの rmin/rmax だけを書き換える。
 
-    rmc_dat.set_fnc_distance_ranges(
-        {
-            # 1: (1.24, 1.37),  # P-O
-            # 2: (2.02, 2.25),  # O-O
-            # 1: (1.20, 1.45),  # P-O
-            1: (1.20, 1.8),  # P-O
-        }
-    )
+    # rmc_dat.set_fnc_distance_ranges(
+    #     {
+    #         # 1: (1.24, 1.37),  # P-O
+    #         # 2: (2.02, 2.25),  # O-O
+    #         # 1: (1.20, 1.45),  # P-O
+    #         1: (1.20, 1.8),  # P-O
+    #     }
+    # )
 
     # 自由形式フォーマットだと element 情報が必須となる
     if rmc_dat.is_free_format:
         # element
-        element_info = config.element_info
-        rmc_dat.set_element_info(element_info)
+        # element_info = config.element_info
+        # rmc_dat.set_element_info(element_info)
+        rmc_dat.set_element_info(["Si", "O"])
         # HST
         rmc_dat.set_history_buffer_size(200)
         # SAVE (固定フォーマットからの互換メソッドの方でセットされるのでなくてもいい)
