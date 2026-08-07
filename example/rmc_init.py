@@ -149,7 +149,7 @@ def run_rmc_init(
     # rmc_dat.set_maximum_moves([0.1, 0.1, 0.1])
     # rmc_dat.set_maximum_moves([0.05, 0.01, 0.01])
     # rmc_dat.set_maximum_moves([0.05, 0.01, 0.01])  # 2026.02.16
-    rmc_dat.set_maximum_moves([0.01, 0.01, 0.01])  # 2026.02.16
+    # rmc_dat.set_maximum_moves([0.01, 0.01, 0.01])  # 2026.02.16
 
     # --- SiO2
     rmc_dat.set_maximum_moves([0.01, 0.01])
@@ -315,7 +315,8 @@ def run_rmc_init(
             coordination_number=3,
             fraction=0.004,
             # sigma=1.0,
-            sigma=0.1,
+            # sigma=0.1,
+            sigma=0.04,
         )
 
     # 26 行目：1 回の move で動かす原子数（通常 1）を設定する
