@@ -54,7 +54,8 @@ def run_rmc_init(
         )
 
     rmc_dat.init(
-        use_free_format=use_free_format,
+        # use_free_format=use_free_format,
+        use_free_format=True,
         prefer_existing=True,
     )
 
@@ -119,7 +120,9 @@ def run_rmc_init(
     # rmc_dat.set_cutoffs([2.40, 1.25, 2.10])  # Si-Si, Si-O, O-O
     # rmc_dat.set_cutoffs([1.0, 1.0, 1.0])  # Si-Si, Si-O, O-O
     # rmc_dat.set_cutoffs([1.9, 1.1, 1.9])  # Si-Si, Si-O, O-O
-    rmc_dat.set_cutoffs([1.9, 1.4, 1.9])  # Si-Si, Si-O, O-O  # trial: Si-O cutoff 1.1 -> 1.4
+    rmc_dat.set_cutoffs(
+        [1.9, 1.4, 1.9]
+    )  # Si-Si, Si-O, O-O  # trial: Si-O cutoff 1.1 -> 1.4
 
     # ---- Li,S,P,C
     # rmc_dat.set_cutoffs(
@@ -168,7 +171,9 @@ def run_rmc_init(
     # 6行目: moveout を認めるかどうか？
     # カットオフ以下の位置での原子の存在を排除するか？認めるか？
     # rmc_dat.set_moveout_option(True)
-    rmc_dat.set_moveout_option(False)  # trial: cutoff を通常の hard-sphere 条件として評価
+    rmc_dat.set_moveout_option(
+        False
+    )  # trial: cutoff を通常の hard-sphere 条件として評価
 
     ###################################
     # 9行目
