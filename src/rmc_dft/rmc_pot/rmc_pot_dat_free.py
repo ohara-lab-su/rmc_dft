@@ -2164,6 +2164,352 @@ class RmcPotDatFree:
         return minimum_value, maximum_value
 
 
+
+    @staticmethod
+    def _normalize_cos_distribution_type(distribution_type: str) -> str:
+        """COS 制約の分布型を RMC_POT 自由形式表記へ正規化する。
+
+        ``GAUSSIAN``、``UNIFORM``、``ABSENT`` は予約語として扱い、
+        それ以外の文字列は method 3 の分布ファイル名としてそのまま扱う。
+        """
+        value = str(distribution_type).strip()
+        if not value:
+            raise ValueError("distribution_type は空文字列にできません。")
+
+        upper = value.upper()
+        if upper in {"GAUSSIAN", "UNIFORM", "ABSENT"}:
+            return upper
+        return value
+
+    def get_angle_constraints(self) -> List[Dict[str, Any]]:
+        """自由形式 ``[ COS ]`` の結合角（cosine distribution）制約を取得する。
+
+        RMC_POT 2023.1 の free-format ``[ COS ]`` に対応する。
+        """
+        constraints: List[Dict[str, Any]] = []
+
+        for section_index, section in enumerate(self._find_sections("COS")):
+            central_values = section.get("CENT-TYPE", [])
+            if len(central_values) != 1:
+                raise ValueError(
+                    f"[COS] index={section_index}: CENT-TYPE は 1 行必要です。"
+                )
+            central_tokens = central_values[0].split()
+            if len(central_tokens) != 1:
+                raise ValueError(
+                    f"[COS] index={section_index}: CENT-TYPE は 1 値必要です。"
+                )
+
+            neighbor_values = section.get("NEIGH-TYPE_FROM_TO", [])
+            if len(neighbor_values) != 2:
+                raise ValueError(
+                    f"[COS] index={section_index}: "
+                    "NEIGH-TYPE_FROM_TO は neighbour1 / neighbour2 の 2 行必要です。"
+                )
+
+            neighbors: List[Dict[str, Any]] = []
+            for value in neighbor_values:
+                tokens = value.split()
+                if len(tokens) != 3:
+                    raise ValueError(
+                        f"[COS] index={section_index}: "
+                        "NEIGH-TYPE_FROM_TO は 3 値必要です。"
+                    )
+                neighbors.append(
+                    {
+                        "atom_type": int(tokens[0]),
+                        "minimum": float(tokens[1]),
+                        "maximum": float(tokens[2]),
+                    }
+                )
+
+            distribution_values = section.get("DISTRIB-TYPE", [])
+            distribution_type = (
+                distribution_values[0].strip()
+                if distribution_values
+                else "GAUSSIAN"
+            )
+
+            degree_values = section.get("DISTRIB-DEGREES", [])
+            width_values = section.get("DISTRIB-WIDTH", [])
+            dcosth_values = section.get("DCOSTH", [])
+
+            sigma_entries: List[Tuple[str, str]] = []
+            for key, mode in (
+                ("SIGMA", "normal"),
+                ("SIGMA-MASTER", "master"),
+                ("SIGMA-SCALABLE", "scalable"),
+            ):
+                for value in section.get(key, []):
+                    sigma_entries.append((mode, value))
+
+            if len(sigma_entries) != 1:
+                raise ValueError(
+                    f"[COS] index={section_index}: "
+                    "SIGMA / SIGMA-MASTER / SIGMA-SCALABLE のいずれか 1 行が必要です。"
+                )
+
+            sigma_mode, sigma_value = sigma_entries[0]
+            sigma_tokens = sigma_value.split()
+            if len(sigma_tokens) != 1:
+                raise ValueError(
+                    f"[COS] index={section_index}: sigma は 1 値必要です。"
+                )
+
+            item: Dict[str, Any] = {
+                "central_type": int(central_tokens[0]),
+                "neighbor1": neighbors[0],
+                "neighbor2": neighbors[1],
+                "distribution_type": distribution_type,
+                "sigma": float(sigma_tokens[0]),
+                "sigma_mode": sigma_mode,
+            }
+
+            if degree_values:
+                if len(degree_values) != 1 or len(degree_values[0].split()) != 1:
+                    raise ValueError(
+                        f"[COS] index={section_index}: DISTRIB-DEGREES は 1 値必要です。"
+                    )
+                item["angle_degrees"] = float(degree_values[0].split()[0])
+            else:
+                item["angle_degrees"] = None
+
+            if width_values:
+                if len(width_values) != 1 or len(width_values[0].split()) != 1:
+                    raise ValueError(
+                        f"[COS] index={section_index}: DISTRIB-WIDTH は 1 値必要です。"
+                    )
+                item["distribution_width"] = float(width_values[0].split()[0])
+            else:
+                item["distribution_width"] = None
+
+            if dcosth_values:
+                if len(dcosth_values) != 1 or len(dcosth_values[0].split()) != 1:
+                    raise ValueError(
+                        f"[COS] index={section_index}: DCOSTH は 1 値必要です。"
+                    )
+                item["dcosth"] = float(dcosth_values[0].split()[0])
+            else:
+                item["dcosth"] = None
+
+            constraints.append(item)
+
+        return constraints
+
+    def add_angle_constraint(
+        self,
+        central_type: int,
+        neighbor1: Tuple[int, Union[int, float], Union[int, float]],
+        neighbor2: Tuple[int, Union[int, float], Union[int, float]],
+        *,
+        distribution_type: str = "GAUSSIAN",
+        angle_degrees: Optional[Union[int, float]] = None,
+        distribution_width: Optional[Union[int, float]] = None,
+        dcosth: Optional[Union[int, float]] = None,
+        sigma: Union[int, float],
+        sigma_mode: str = "normal",
+        auto_write: Optional[bool] = None,
+    ) -> int:
+        """結合角 ``[ COS ]`` 制約を新しいセクションとして追加する。
+
+        ``distribution_type``:
+            ``GAUSSIAN`` (method 1), ``UNIFORM`` (method 0),
+            ``ABSENT`` (method 2)、または method 3 の分布ファイル名。
+
+        Notes:
+            GAUSSIAN / UNIFORM / ABSENT では ``angle_degrees`` と
+            ``distribution_width`` が必須。
+            ファイル分布では両者を出力しない。
+        """
+        section_index = self.add_section("COS")
+        try:
+            self.set_angle_constraint(
+                central_type=central_type,
+                neighbor1=neighbor1,
+                neighbor2=neighbor2,
+                distribution_type=distribution_type,
+                angle_degrees=angle_degrees,
+                distribution_width=distribution_width,
+                dcosth=dcosth,
+                sigma=sigma,
+                sigma_mode=sigma_mode,
+                index=section_index,
+                auto_write=False,
+            )
+        except Exception:
+            self.remove_section("COS", section_index)
+            raise
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return section_index
+
+    def set_angle_constraint(
+        self,
+        central_type: int,
+        neighbor1: Tuple[int, Union[int, float], Union[int, float]],
+        neighbor2: Tuple[int, Union[int, float], Union[int, float]],
+        *,
+        distribution_type: str = "GAUSSIAN",
+        angle_degrees: Optional[Union[int, float]] = None,
+        distribution_width: Optional[Union[int, float]] = None,
+        dcosth: Optional[Union[int, float]] = None,
+        sigma: Union[int, float],
+        sigma_mode: str = "normal",
+        index: int = 0,
+        auto_write: Optional[bool] = None,
+    ) -> int:
+        """結合角 ``[ COS ]`` 制約を設定する。
+
+        指定 ``index`` が存在すれば置換し、存在しなければ作成する。
+        事前の初期化は不要で、同じ index への繰り返し実行でも重複しない。
+
+        RMC_POT free-format syntax:
+            DISTRIB-TYPE
+            DISTRIB-DEGREES
+            DISTRIB-WIDTH
+            DCOSTH
+            CENT-TYPE
+            NEIGH-TYPE_FROM_TO  (2 行)
+            SIGMA / SIGMA-MASTER / SIGMA-SCALABLE
+        """
+        target_index = int(index)
+        if target_index < 0:
+            raise ValueError("index は 0 以上で指定してください。")
+
+        central_value = self._validate_positive_atom_type(
+            central_type, "central_type"
+        )
+
+        def _validate_neighbor(
+            value: Tuple[int, Union[int, float], Union[int, float]],
+            name: str,
+        ) -> Tuple[int, float, float]:
+            if len(value) != 3:
+                raise ValueError(f"{name} は (atom_type, minimum, maximum) で指定してください。")
+            atom_type, minimum, maximum = value
+            atom_value = self._validate_positive_atom_type(atom_type, f"{name}.atom_type")
+            rmin, rmax = self._validate_distance_range(minimum, maximum, name)
+            return atom_value, rmin, rmax
+
+        n1 = _validate_neighbor(neighbor1, "neighbor1")
+        n2 = _validate_neighbor(neighbor2, "neighbor2")
+
+        distrib_value = self._normalize_cos_distribution_type(distribution_type)
+        predefined = distrib_value in {"GAUSSIAN", "UNIFORM", "ABSENT"}
+
+        if predefined:
+            if angle_degrees is None:
+                raise ValueError(
+                    "GAUSSIAN / UNIFORM / ABSENT では angle_degrees が必要です。"
+                )
+            if distribution_width is None:
+                raise ValueError(
+                    "GAUSSIAN / UNIFORM / ABSENT では distribution_width が必要です。"
+                )
+            angle_value = float(angle_degrees)
+            if not 0.0 <= angle_value <= 180.0:
+                raise ValueError("angle_degrees は 0～180 度で指定してください。")
+            width_value = float(distribution_width)
+            if width_value <= 0.0:
+                raise ValueError("distribution_width は 0 より大きい値を指定してください。")
+        else:
+            if angle_degrees is not None or distribution_width is not None:
+                raise ValueError(
+                    "分布ファイルを DISTRIB-TYPE に指定する場合、"
+                    "angle_degrees / distribution_width は指定しません。"
+                )
+            angle_value = None
+            width_value = None
+
+        if dcosth is not None:
+            dcosth_value = float(dcosth)
+            if not 0.0 < dcosth_value <= 2.0:
+                raise ValueError("dcosth は 0 より大きく 2 以下で指定してください。")
+        else:
+            dcosth_value = None
+
+        sigma_value = float(sigma)
+        if sigma_value <= 0.0:
+            raise ValueError("sigma は 0 より大きい値を指定してください。")
+
+        sections = self._find_sections("COS")
+        while len(sections) <= target_index:
+            self.add_section("COS")
+            sections = self._find_sections("COS")
+
+        section = sections[target_index]
+        new_values: Dict[str, List[str]] = {
+            "DISTRIB-TYPE": [distrib_value],
+            "CENT-TYPE": [self._fmt_sequence([central_value])],
+            "NEIGH-TYPE_FROM_TO": [
+                self._fmt_sequence(list(n1)),
+                self._fmt_sequence(list(n2)),
+            ],
+        }
+
+        if predefined:
+            new_values["DISTRIB-DEGREES"] = [
+                self._fmt_sequence([angle_value])
+            ]
+            new_values["DISTRIB-WIDTH"] = [
+                self._fmt_sequence([width_value])
+            ]
+
+        if dcosth_value is not None:
+            new_values["DCOSTH"] = [
+                self._fmt_sequence([dcosth_value])
+            ]
+
+        sigma_key = self._sigma_keyword("SIGMA", sigma_mode)
+        new_values[sigma_key] = [
+            self._fmt_sequence([sigma_value])
+        ]
+
+        section.clear()
+        section.update(new_values)
+
+        self._logger.info(
+            "[rmc_pot_dat_free] set_angle_constraint: "
+            f"index={target_index}, central_type={central_value}, "
+            f"neighbor1={n1}, neighbor2={n2}, "
+            f"distribution_type={distrib_value}"
+        )
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+        return target_index
+
+    def remove_angle_constraint(
+        self,
+        index: int,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """指定した ``[ COS ]`` 制約を削除する。"""
+        self.remove_section("COS", index)
+        self._logger.info(
+            f"[rmc_pot_dat_free] remove_angle_constraint: index={index}"
+        )
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def clear_angle_constraints(
+        self,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """すべての ``[ COS ]`` 制約を削除する。"""
+        self._sections = [
+            (name, values)
+            for name, values in self._sections
+            if name != "COS"
+        ]
+        self._logger.info("[rmc_pot_dat_free] clear_angle_constraints")
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
     def get_coord_constraints(self) -> List[Dict[str, Any]]:
         """自由形式 ``[ COORD ]`` の通常配位数制約を取得する。
 
