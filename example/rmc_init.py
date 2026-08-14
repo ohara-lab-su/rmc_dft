@@ -229,6 +229,7 @@ def run_rmc_init(
     # ---- SiO2
     # Si-Si, Si-O, O-O
     # rmc_dat.set_swap_settings(0.1, 1)  # trial: 10% of moves are Si-O swaps
+    rmc_dat.set_swap_settings(0.0, 0)  # COORD trial: swap disabled
 
     ###################################
     # --- Si-O coordination constraint trial ---
