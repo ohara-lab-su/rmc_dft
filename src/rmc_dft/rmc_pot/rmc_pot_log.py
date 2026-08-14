@@ -6,6 +6,7 @@ K.KOBAYASHI
 ログ解析で、hst ファイルと同様（もっと詳しい）
 情報を引っ張り出す
 """
+
 import os
 import shutil
 
@@ -796,9 +797,19 @@ class RmcPotLog:
             f"{cfg_name}.fit",
             f"{cfg_name}.pfq",
             f"{cfg_name}.log",
+            # unknown
+            f"{cfg_name}.expt",
+            f"{cfg_name}.free",
+            f"{cfg_name}.freer",
+            f"{cfg_name}.grid",
+            f"{cfg_name}.ngm",
+            f"{cfg_name}.tca",
+            f"{cfg_name}.state",
             # FNC
             f"{cfg_name}.top",
             f"{cfg_name}.fnc",
+            f"{cfg_name}.snc",
+            f"{cfg_name}.cnc",
             f"{cfg_name}_qn.csv",
             f"{cfg_name}_network_bonds.csv",
             f"{cfg_name}_report.txt",
