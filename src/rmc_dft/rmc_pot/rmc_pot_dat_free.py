@@ -2163,6 +2163,318 @@ class RmcPotDatFree:
             raise ValueError(f"{argument_name} の上限は下限より大きくしてください.")
         return minimum_value, maximum_value
 
+
+    def get_coord_constraints(self) -> List[Dict[str, Any]]:
+        """自由形式 ``[ COORD ]`` の通常配位数制約を取得する。
+
+        Returns:
+            制約ごとの辞書を格納したリスト。各辞書は ``central_type``、
+            ``neighbors``、``subconstraints``、``write_cnc_detail`` を含む。
+
+        Notes:
+            RMC_POT マニュアルの自由形式 ``[ COORD ]`` に従い、1つの制約に
+            複数の ``NEIGH-TYPE_FROM_TO`` と複数の
+            ``COORDNUM_FRACT_SIGMA`` 系サブ制約を保持できる。
+        """
+        constraints: List[Dict[str, Any]] = []
+        for section_index, section in enumerate(self._find_sections("COORD")):
+            central_values = section.get("CENT-TYPE", [])
+            if len(central_values) != 1:
+                raise ValueError(
+                    f"[COORD] index={section_index}: CENT-TYPE は 1 行必要です。"
+                )
+            central_tokens = central_values[0].split()
+            if len(central_tokens) != 1:
+                raise ValueError(
+                    f"[COORD] index={section_index}: CENT-TYPE は 1 値必要です。"
+                )
+
+            neighbor_values = section.get("NEIGH-TYPE_FROM_TO", [])
+            if not neighbor_values:
+                raise ValueError(
+                    f"[COORD] index={section_index}: NEIGH-TYPE_FROM_TO は 1 行以上必要です。"
+                )
+            neighbors: List[Dict[str, Any]] = []
+            for value in neighbor_values:
+                tokens = value.split()
+                if len(tokens) != 3:
+                    raise ValueError(
+                        f"[COORD] index={section_index}: NEIGH-TYPE_FROM_TO は 3 値必要です。"
+                    )
+                neighbors.append(
+                    {
+                        "atom_type": int(tokens[0]),
+                        "minimum": float(tokens[1]),
+                        "maximum": float(tokens[2]),
+                    }
+                )
+
+            subconstraints: List[Dict[str, Any]] = []
+            sigma_keys = [
+                ("COORDNUM_FRACT_SIGMA", "normal"),
+                ("COORDNUM_FRACT_SIGMA-MASTER", "master"),
+                ("COORDNUM_FRACT_SIGMA-SCALABLE", "scalable"),
+            ]
+            for sigma_key, sigma_mode in sigma_keys:
+                for value in section.get(sigma_key, []):
+                    tokens = value.split()
+                    if len(tokens) != 3:
+                        raise ValueError(
+                            f"[COORD] index={section_index}: {sigma_key} は 3 値必要です。"
+                        )
+                    subconstraints.append(
+                        {
+                            "coordination_number": int(tokens[0]),
+                            "fraction": float(tokens[1]),
+                            "sigma": float(tokens[2]),
+                            "sigma_mode": sigma_mode,
+                        }
+                    )
+            if not subconstraints:
+                raise ValueError(
+                    f"[COORD] index={section_index}: COORDNUM_FRACT_SIGMA 系が必要です。"
+                )
+
+            detail_values = section.get("WRITE-CNC-DETAIL", [])
+            write_detail = False
+            if detail_values:
+                if len(detail_values) != 1 or len(detail_values[0].split()) != 1:
+                    raise ValueError(
+                        f"[COORD] index={section_index}: WRITE-CNC-DETAIL は 1 値必要です。"
+                    )
+                write_detail = bool(int(detail_values[0].split()[0]))
+
+            constraints.append(
+                {
+                    "central_type": int(central_tokens[0]),
+                    "neighbors": neighbors,
+                    "subconstraints": subconstraints,
+                    "write_cnc_detail": write_detail,
+                }
+            )
+        return constraints
+
+    def add_coord_constraint(
+        self,
+        central_type: int,
+        neighbors: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
+        subconstraints: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
+        *,
+        sigma_mode: str = "normal",
+        write_cnc_detail: bool = False,
+        auto_write: Optional[bool] = None,
+    ) -> int:
+        """通常配位数制約を新しい ``[ COORD ]`` セクションとして追加する。
+
+        Args:
+            central_type: 中心原子の RMC タイプ番号。
+            neighbors: ``(atom_type, minimum, maximum)`` の列。距離単位は Å。
+            subconstraints: ``(coordination_number, fraction, sigma)`` の列。
+                同じ中心/近接定義に複数の目標配位数を与える場合は、別々の
+                ``[ COORD ]`` ではなくここへ複数指定する。
+            sigma_mode: ``normal``、``master``、``scalable`` のいずれか。
+            write_cnc_detail: ``WRITE-CNC-DETAIL = 1`` を出力するか。
+            auto_write: 更新後に ``*.dat`` を保存するか。
+
+        Returns:
+            追加した ``[ COORD ]`` セクションの 0 始まりインデックス。
+        """
+        central_value = self._validate_positive_atom_type(central_type, "central_type")
+        if not neighbors:
+            raise ValueError("neighbors は 1 件以上必要です。")
+        if not subconstraints:
+            raise ValueError("subconstraints は 1 件以上必要です。")
+
+        validated_neighbors: List[Tuple[int, float, float]] = []
+        for atom_type, minimum, maximum in neighbors:
+            neighbor_type = self._validate_positive_atom_type(atom_type, "neighbor atom_type")
+            rmin, rmax = self._validate_distance_range(minimum, maximum, "neighbor_range")
+            validated_neighbors.append((neighbor_type, rmin, rmax))
+
+        validated_subconstraints: List[Tuple[int, float, float]] = []
+        for coordination_number, fraction, sigma in subconstraints:
+            coordination_value = int(coordination_number)
+            if coordination_value < 0:
+                raise ValueError("coordination_number は 0 以上で指定してください。")
+            fraction_value = float(fraction)
+            if not 0.0 <= fraction_value <= 1.0:
+                raise ValueError("fraction は 0 以上 1 以下で指定してください。")
+            sigma_value = float(sigma)
+            if sigma_value <= 0.0:
+                raise ValueError("sigma は 0 より大きい値を指定してください。")
+            validated_subconstraints.append(
+                (coordination_value, fraction_value, sigma_value)
+            )
+
+        section_index = self.add_section("COORD")
+        section = self._find_sections("COORD")[section_index]
+        section["CENT-TYPE"] = [self._fmt_sequence([central_value])]
+        section["NEIGH-TYPE_FROM_TO"] = [
+            self._fmt_sequence([atom_type, rmin, rmax])
+            for atom_type, rmin, rmax in validated_neighbors
+        ]
+        sigma_key = self._sigma_keyword("COORDNUM_FRACT_SIGMA", sigma_mode)
+        section[sigma_key] = [
+            self._fmt_sequence([coordination_number, fraction, sigma])
+            for coordination_number, fraction, sigma in validated_subconstraints
+        ]
+        if write_cnc_detail:
+            section["WRITE-CNC-DETAIL"] = ["1"]
+
+        self._logger.info(
+            "[rmc_pot_dat_free] add_coord_constraint: "
+            f"index={section_index}, central_type={central_value}, "
+            f"neighbors={len(validated_neighbors)}, "
+            f"subconstraints={len(validated_subconstraints)}"
+        )
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return section_index
+
+    def set_coord_constraint(
+        self,
+        central_type: int,
+        neighbors: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
+        subconstraints: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
+        *,
+        index: int = 0,
+        sigma_mode: str = "normal",
+        write_cnc_detail: bool = False,
+        auto_write: Optional[bool] = None,
+    ) -> int:
+        """通常配位数 ``[ COORD ]`` 制約を設定する。
+
+        指定 ``index`` の ``[ COORD ]`` が存在すればその内容を置き換え、
+        存在しなければ必要な位置まで ``[ COORD ]`` を追加して設定する。
+        事前の初期化処理は不要で、同じ ``index`` に対して繰り返し実行しても
+        制約は重複しない。
+
+        Args:
+            central_type: 中心原子の RMC タイプ番号。
+            neighbors: ``(atom_type, minimum, maximum)`` の列。距離単位は Å。
+            subconstraints: ``(coordination_number, fraction, sigma)`` の列。
+                同じ中心/近接定義に複数の目標配位数を与える場合は、
+                1つの ``[ COORD ]`` 内に複数指定する。
+            index: 設定対象の ``[ COORD ]`` セクション番号。既定値は 0。
+            sigma_mode: ``normal``、``master``、``scalable`` のいずれか。
+            write_cnc_detail: ``WRITE-CNC-DETAIL = 1`` を出力するか。
+            auto_write: 更新後に ``*.dat`` を保存するか。
+
+        Returns:
+            設定した ``[ COORD ]`` セクションの 0 始まりインデックス。
+        """
+        target_index = int(index)
+        if target_index < 0:
+            raise ValueError("index は 0 以上で指定してください。")
+
+        central_value = self._validate_positive_atom_type(
+            central_type,
+            "central_type",
+        )
+        if not neighbors:
+            raise ValueError("neighbors は 1 件以上必要です。")
+        if not subconstraints:
+            raise ValueError("subconstraints は 1 件以上必要です。")
+
+        validated_neighbors: List[Tuple[int, float, float]] = []
+        for atom_type, minimum, maximum in neighbors:
+            neighbor_type = self._validate_positive_atom_type(
+                atom_type,
+                "neighbor atom_type",
+            )
+            rmin, rmax = self._validate_distance_range(
+                minimum,
+                maximum,
+                "neighbor_range",
+            )
+            validated_neighbors.append((neighbor_type, rmin, rmax))
+
+        validated_subconstraints: List[Tuple[int, float, float]] = []
+        for coordination_number, fraction, sigma in subconstraints:
+            coordination_value = int(coordination_number)
+            if coordination_value < 0:
+                raise ValueError(
+                    "coordination_number は 0 以上で指定してください。"
+                )
+            fraction_value = float(fraction)
+            if not 0.0 <= fraction_value <= 1.0:
+                raise ValueError("fraction は 0 以上 1 以下で指定してください。")
+            sigma_value = float(sigma)
+            if sigma_value <= 0.0:
+                raise ValueError("sigma は 0 より大きい値を指定してください。")
+            validated_subconstraints.append(
+                (coordination_value, fraction_value, sigma_value)
+            )
+
+        sections = self._find_sections("COORD")
+        while len(sections) <= target_index:
+            self.add_section("COORD")
+            sections = self._find_sections("COORD")
+
+        section = sections[target_index]
+        new_values: Dict[str, List[str]] = {
+            "CENT-TYPE": [self._fmt_sequence([central_value])],
+            "NEIGH-TYPE_FROM_TO": [
+                self._fmt_sequence([atom_type, rmin, rmax])
+                for atom_type, rmin, rmax in validated_neighbors
+            ],
+        }
+
+        sigma_key = self._sigma_keyword(
+            "COORDNUM_FRACT_SIGMA",
+            sigma_mode,
+        )
+        new_values[sigma_key] = [
+            self._fmt_sequence([coordination_number, fraction, sigma])
+            for coordination_number, fraction, sigma
+            in validated_subconstraints
+        ]
+
+        if write_cnc_detail:
+            new_values["WRITE-CNC-DETAIL"] = ["1"]
+
+        section.clear()
+        section.update(new_values)
+
+        self._logger.info(
+            "[rmc_pot_dat_free] set_coord_constraint: "
+            f"index={target_index}, central_type={central_value}, "
+            f"neighbors={len(validated_neighbors)}, "
+            f"subconstraints={len(validated_subconstraints)}"
+        )
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+        return target_index
+
+    def remove_coord_constraint(
+        self,
+        index: int,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """指定した通常配位数 ``[ COORD ]`` 制約を削除する。"""
+        self.remove_section("COORD", index)
+        self._logger.info(f"[rmc_pot_dat_free] remove_coord_constraint: index={index}")
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def clear_coord_constraints(
+        self,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """すべての通常配位数 ``[ COORD ]`` 制約を削除する。"""
+        self._sections = [
+            (name, values)
+            for name, values in self._sections
+            if name != "COORD"
+        ]
+        self._logger.info("[rmc_pot_dat_free] clear_coord_constraints")
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
     def get_qn_constraints(self) -> List[Dict[str, Any]]:
         """自由形式 ``[ SNC ]`` の Qn 制約を取得する。
 

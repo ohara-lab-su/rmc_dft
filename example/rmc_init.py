@@ -223,6 +223,30 @@ def run_rmc_init(
     # rmc_dat.set_sigma_factor(1e-7)
     rmc_dat.set_sigma_factor(0.05)
 
+    ###################################
+    # swap
+    # rmc_dat.set_swap_settings(0.0, 0)
+    # ---- SiO2
+    # Si-Si, Si-O, O-O
+    # rmc_dat.set_swap_settings(0.1, 1)  # trial: 10% of moves are Si-O swaps
+
+    ###################################
+    # --- Si-O coordination constraint trial ---
+    # Si の first-neighbor O 配位を先に形成し、
+    # その上で SNC/Qn によって Si-O-Si network を形成させる。
+    if rmc_dat.is_free_format:
+        rmc_dat.set_coord_constraint(
+            central_type=1,  # Si
+            neighbors=[
+                (2, 1.40, 1.90),  # O: Si-O neighbour range [Å]
+            ],
+            subconstraints=[
+                (4, 0.998, 0.003),  # SiO4: 99.8 %
+                (5, 0.002, 0.012),  # SiO5: 0.2 %
+            ],
+            index=0,
+        )
+
     # ------------------------------------------------------------------
     # FNC / topology を使用する場合だけ、次のどちらかを有効にする。
     # ------------------------------------------------------------------
