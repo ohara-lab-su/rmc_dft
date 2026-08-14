@@ -53,9 +53,14 @@ def run_rmc_init(
             logger=logger,
         )
 
+    ##########################################
+    # Free Format / Fixed Format の指定
+    #
+    # 繰り返し動作しても、一度intしたら次はintしない
     rmc_dat.init(
         # use_free_format=use_free_format,
-        use_free_format=True,
+        # use_free_format=False, # for FNC/TOP
+        use_free_format=True,  # for SNC
         prefer_existing=True,
     )
 
@@ -120,6 +125,7 @@ def run_rmc_init(
     # rmc_dat.set_cutoffs([2.40, 1.25, 2.10])  # Si-Si, Si-O, O-O
     # rmc_dat.set_cutoffs([1.0, 1.0, 1.0])  # Si-Si, Si-O, O-O
     # rmc_dat.set_cutoffs([1.9, 1.1, 1.9])  # Si-Si, Si-O, O-O
+    # rmc_dat.set_cutoffs([1.9, 1.1, 1.9])  # Si-Si, Si-O, O-O
     rmc_dat.set_cutoffs(
         [1.9, 1.4, 1.9]
     )  # Si-Si, Si-O, O-O  # trial: Si-O cutoff 1.1 -> 1.4
@@ -180,8 +186,8 @@ def run_rmc_init(
     # 計算時間と構造をsaveするステップ間隔
     # rmc_dat.set_time_and_save(0.5, 0.5)
     # rmc_dat.set_time_and_save(5, 1)
-    # rmc_dat.set_time_and_save(15, 1)
-    rmc_dat.set_time_and_save(30, 1)
+    rmc_dat.set_time_and_save(15, 1)
+    # rmc_dat.set_time_and_save(30, 1)
     # rmc_dat.set_time_and_save(60, 1)
     # rmc_dat.set_time_and_save(120, 1)
     # rmc_dat.set_time_and_save(360, 1)
@@ -280,8 +286,9 @@ def run_rmc_init(
     # 自由形式フォーマットだと element 情報が必須となる
     if rmc_dat.is_free_format:
         # element
-        element_info = config.element_info
-        rmc_dat.set_element_info(element_info)
+        # element_info = config.element_info
+        # rmc_dat.set_element_info(element_info)
+        rmc_dat.set_element_info(["Si", "O"])
         # HST
         rmc_dat.set_history_buffer_size(200)
         # SAVE (固定フォーマットからの互換メソッドの方でセットされるのでなくてもいい)
@@ -314,7 +321,8 @@ def run_rmc_init(
             coordination_number=5,
             fraction=0.002,
             # sigma=1.0,
-            sigma=0.1,
+            # sigma=0.1,
+            sigma=0.04,
         )
 
         # Q4 = 99.4 %
@@ -330,7 +338,8 @@ def run_rmc_init(
             coordination_number=4,
             fraction=0.994,
             # sigma=1.0,
-            sigma=0.1,
+            # sigma=0.1,
+            sigma=0.04,
         )
 
         # Q3 = 0.4 %
@@ -346,7 +355,8 @@ def run_rmc_init(
             coordination_number=3,
             fraction=0.004,
             # sigma=1.0,
-            sigma=0.1,
+            # sigma=0.1,
+            sigma=0.04,
         )
 
     # 26 行目：1 回の move で動かす原子数（通常 1）を設定する

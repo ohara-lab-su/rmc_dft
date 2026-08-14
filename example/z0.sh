@@ -9,9 +9,11 @@ SCRIPT="$HOME/zaiene_dev/rmc_dft/example"
 #DST="$HOME/LiSPC/script"
 DST="./script"
 
-if [ ! -d "$DST" ]; then
-    mkdir -p "$DST"
-fi
+rm -rf "$DST"
+mkdir -p "$DST"
+# if [ ! -d "$DST" ]; then
+#     mkdir -p "$DST"
+# fi
 
 #####################
 # パラメータ群

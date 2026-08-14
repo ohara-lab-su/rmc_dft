@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 """VASP 構造から Qn 分布の個数と比率を表示する。
 
-Qn network の判定条件は、このファイル前方の ``QN_CONFIG`` にまとめている。
+Qn network の判定条件は、既定では RMC_POT 自由形式 ``*.dat`` の
+``[ SNC ]`` から取得する。手動設定へコメントアウト・コメントインで切替できる。
+
 外部 JSON 設定ファイルは使用しない。
 CSV、TOP、FNC などのファイルは生成せず、解析結果だけを標準出力する。
 """
@@ -10,6 +12,8 @@ CSV、TOP、FNC などのファイルは生成せず、解析結果だけを標�
 from pathlib import Path
 
 from rmc_dft import RmcPot, RmcPotLog
+from rmc_dft.rmc_pot.rmc_pot_dat import RmcPotDat
+from rmc_dft.rmc_pot.rmc_pot_snc import RmcPotSnc
 
 # from rmc_dft.rmc_pot.qn.qn_network_analysis import QnNetworkAnalysis
 # from rmc_dft.rmc_pot.qn.vasp_structure import VaspStructure
@@ -49,7 +53,14 @@ ELEMENT_INFO = [
     "O",
 ]
 
+# RMC_POT の入力・出力ファイル。
+DAT_PATH = Path("aaa.dat")
+SNC_PATH = Path("aaa.snc")
+
 # Qn解析に必要な設定だけをまとめる。
+#
+# DAT_PATH の [ SNC ] を使用せず、手動設定で解析する場合に使用する。
+# main() 内の切替箇所でコメントアウト・コメントインして選択する。
 #
 # first_mode:
 #     "cutoff"
@@ -67,7 +78,7 @@ ELEMENT_INFO = [
 #
 #     True
 #         第一近接networkの逆接続を第二近接判定へ再利用する。
-QN_CONFIG = {
+MANUAL_QN_CONFIG = {
     "structure": {
         # POSCARに元素名行がない場合に使用する元素順。
         "atom_types": [
@@ -102,6 +113,121 @@ QN_CONFIG = {
         "second_use_first_network": False,
     },
 }
+
+
+def load_qn_config_from_dat(dat_path: Path) -> dict:
+    """自由形式 ``*.dat`` の SNC から Qn 解析設定を作る。
+
+    ``RmcPotDatFree.get_qn_constraints()`` を使用し、DAT の再解析は行わない。
+    Q3、Q4、Q5など複数の SNC が同じ network 定義を共有していることを
+    確認し、その共通部分を QnNetworkAnalysis の設定へ変換する。
+
+    Args:
+        dat_path: 解析する自由形式 ``*.dat`` ファイル。
+
+    Returns:
+        QnNetworkAnalysis に渡す設定辞書。
+
+    Raises:
+        ValueError: SNC が無い場合、SNC 間で network 定義が異なる場合、
+            または第二近接原子ごとの距離範囲が異なる場合。
+    """
+    dat = RmcPotDat(
+        cfg_name=str(dat_path.with_suffix("")),
+        auto_write=False,
+    )
+    constraints = dat.get_qn_constraints()
+    if not constraints:
+        raise ValueError(f"{dat_path} に [ SNC ] がありません。")
+
+    chemical_symbols_value = dat.get(
+        "GENERAL",
+        "CHEMICAL-SYMBOLS",
+        default=None,
+    )
+    if chemical_symbols_value is None:
+        raise ValueError(f"{dat_path} に CHEMICAL-SYMBOLS がありません。")
+    chemical_symbols = chemical_symbols_value.split()
+
+    reference = constraints[0]
+    reference_signature = (
+        reference["central_type"],
+        reference["first_neighbor_type"],
+        reference["first_neighbor_range"],
+        tuple(
+            (
+                second["atom_type"],
+                second["minimum"],
+                second["maximum"],
+            )
+            for second in reference["second_neighbors"]
+        ),
+    )
+
+    for index, constraint in enumerate(constraints[1:], start=1):
+        signature = (
+            constraint["central_type"],
+            constraint["first_neighbor_type"],
+            constraint["first_neighbor_range"],
+            tuple(
+                (
+                    second["atom_type"],
+                    second["minimum"],
+                    second["maximum"],
+                )
+                for second in constraint["second_neighbors"]
+            ),
+        )
+        if signature != reference_signature:
+            raise ValueError(
+                "[ SNC ] ごとに Qn network 定義が異なります: " f"index=0, index={index}"
+            )
+
+    second_ranges = {
+        (second["minimum"], second["maximum"])
+        for second in reference["second_neighbors"]
+    }
+    if len(second_ranges) != 1:
+        raise ValueError(
+            "QnNetworkAnalysis は第二近接元素ごとに異なる距離範囲を" "受け取れません。"
+        )
+
+    central_type = reference["central_type"]
+    first_neighbor_type = reference["first_neighbor_type"]
+    second_neighbor_types = [
+        second["atom_type"] for second in reference["second_neighbors"]
+    ]
+
+    used_types = [central_type, first_neighbor_type] + second_neighbor_types
+    for atom_type in used_types:
+        if atom_type < 1 or atom_type > len(chemical_symbols):
+            raise ValueError(
+                "SNC の原子タイプ番号が CHEMICAL-SYMBOLS の範囲外です: "
+                f"atom_type={atom_type}"
+            )
+
+    second_minimum, second_maximum = next(iter(second_ranges))
+    first_minimum, first_maximum = reference["first_neighbor_range"]
+
+    return {
+        "structure": {
+            "atom_types": chemical_symbols,
+        },
+        "network": {
+            "central_types": [chemical_symbols[central_type - 1]],
+            "bridge_types": [chemical_symbols[first_neighbor_type - 1]],
+            "second_types": [
+                chemical_symbols[atom_type - 1] for atom_type in second_neighbor_types
+            ],
+            "first_min": first_minimum,
+            "first_max": first_maximum,
+            "first_mode": "cutoff",
+            "first_nearest_n": 4,
+            "second_min": second_minimum,
+            "second_max": second_maximum,
+            "second_use_first_network": False,
+        },
+    }
 
 
 def convert_cfg_to_poscar() -> Path:
@@ -192,14 +318,21 @@ def main() -> None:
     """VASP 構造を解析し、Qnごとの個数と比率を表示する。"""
     poscar_path = resolve_poscar_path()
 
-    atom_types = QnNetworkAnalysis.get_structure_atom_types(QN_CONFIG)
+    ###################################
+    # DAT の [ SNC ] を使う場合。
+    qn_config = load_qn_config_from_dat(DAT_PATH)
+    # 手動設定を使う場合は、上の1行をコメントアウトし、次の1行を有効にする。
+    # qn_config = MANUAL_QN_CONFIG
+    ###################################
+
+    atom_types = QnNetworkAnalysis.get_structure_atom_types(qn_config)
     structure = VaspStructure.read_poscar(
         str(poscar_path),
         atom_types,
     )
     analysis = QnNetworkAnalysis(
         structure=structure,
-        config=QN_CONFIG,
+        config=qn_config,
     )
 
     qn_counts = analysis.get_qn_counts()
@@ -207,8 +340,17 @@ def main() -> None:
 
     print("Qn distribution")
     print("VASP structure:", poscar_path)
-    print("Qn config: embedded QN_CONFIG")
+    if qn_config is MANUAL_QN_CONFIG:
+        print("Qn config: MANUAL_QN_CONFIG")
+    else:
+        print("Qn config:", DAT_PATH, "[ SNC ]")
     print("Total central atoms:", total_count)
+
+    snc_qn_counts = None
+    if SNC_PATH.is_file():
+        snc = RmcPotSnc(str(SNC_PATH))
+        snc_qn_counts = snc.get_common_qn_counts()
+        print("RMC_POT SNC output:", SNC_PATH)
 
     if total_count == 0:
         print("Qn network was not found.")
@@ -216,12 +358,27 @@ def main() -> None:
 
     max_qn = max(qn_counts.keys())
 
+    if snc_qn_counts:
+        max_qn = max(max_qn, max(snc_qn_counts.keys()))
+
     print()
-    print("Qn    Count    Ratio")
+    if snc_qn_counts is None:
+        print("Qn    Count    Ratio")
+    else:
+        print("Qn    Analyzer    RMC_POT.snc    Difference    Ratio")
+
     for qn in range(max_qn + 1):
         count = qn_counts.get(qn, 0)
         ratio = count / total_count
-        print("Q%-2d %8d %9.4f %%" % (qn, count, ratio * 100.0))
+        if snc_qn_counts is None:
+            print("Q%-2d %8d %9.4f %%" % (qn, count, ratio * 100.0))
+        else:
+            snc_count = snc_qn_counts.get(qn, 0)
+            difference = count - snc_count
+            print(
+                "Q%-2d %10d %14d %13d %9.4f %%"
+                % (qn, count, snc_count, difference, ratio * 100.0)
+            )
 
 
 if __name__ == "__main__":
