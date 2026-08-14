@@ -237,6 +237,23 @@ def run_rmc_init(
     # rmc_dat.set_swap_settings(0.1, 1)  # trial: 10% of moves are Si-O swaps
     rmc_dat.set_swap_settings(0.0, 0)  # COORD trial: swap disabled
 
+    # ------------------------------------------------------------------
+    # 確度拘束(free-format)
+    # ------------------------------------------------------------------
+    # --- O-Si-O angle constraint trial ---
+    if rmc_dat.is_free_format:
+        rmc_dat.set_angle_constraint(
+            central_type=1,  # Si
+            neighbor1=(2, 1.40, 1.90),  # O
+            neighbor2=(2, 1.40, 1.90),  # O
+            distribution_type="GAUSSIAN",
+            angle_degrees=109.47,
+            distribution_width=0.12,  # sigma in cos(theta)
+            dcosth=0.05,
+            sigma=0.01,
+            index=0,
+        )
+
     ###################################
     # --- Si-O coordination constraint trial ---
     # Si の first-neighbor O 配位を先に形成し、
