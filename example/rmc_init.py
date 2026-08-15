@@ -238,7 +238,7 @@ def run_rmc_init(
     rmc_dat.set_swap_settings(0.0, 0)  # COORD trial: swap disabled
 
     # ------------------------------------------------------------------
-    # 確度拘束(free-format)
+    # 角度拘束(free-format)
     # ------------------------------------------------------------------
     # --- O-Si-O angle constraint trial ---
     if rmc_dat.is_free_format:
