@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+K.NAKADA, kengo.nakada@gmail.com
+
 GROMACS topology を RMC_POT topology へ変換する補助モジュール。
 
 目的
@@ -69,7 +71,7 @@ class TopologyInfo(object):
 
     def __init__(self) -> None:
         self.molecule_types = OrderedDict()  # type: OrderedDict[str, MoleculeType]
-        self.molecules = []                  # type: List[Tuple[str, int]]
+        self.molecules = []  # type: List[Tuple[str, int]]
 
 
 _SECTION_RE = re.compile(r"^\s*\[\s*([^\]]+)\s*\]")
@@ -133,7 +135,9 @@ def read_gro(path: str) -> List[GroAtom]:
     try:
         atom_count = int(lines[1].strip())
     except ValueError:
-        raise TopologyConvertError("gro ファイルの 2 行目から原子数を読めません: " + path)
+        raise TopologyConvertError(
+            "gro ファイルの 2 行目から原子数を読めません: " + path
+        )
 
     if len(lines) < atom_count + 3:
         raise TopologyConvertError("gro ファイルの原子行数が不足しています: " + path)
@@ -256,7 +260,9 @@ def parse_topology_info(lines: Sequence[str]) -> TopologyInfo:
 
         if section == "moleculetype":
             if len(tokens) < 2:
-                raise TopologyConvertError("[ moleculetype ] のデータ行が不完全です: " + line.strip())
+                raise TopologyConvertError(
+                    "[ moleculetype ] のデータ行が不完全です: " + line.strip()
+                )
             name = tokens[0]
             nrexcl = tokens[1]
             current_molecule_type = MoleculeType(name, nrexcl)
@@ -270,12 +276,16 @@ def parse_topology_info(lines: Sequence[str]) -> TopologyInfo:
 
         if section == "molecules":
             if len(tokens) < 2:
-                raise TopologyConvertError("[ molecules ] のデータ行が不完全です: " + line.strip())
+                raise TopologyConvertError(
+                    "[ molecules ] のデータ行が不完全です: " + line.strip()
+                )
             name = tokens[0]
             try:
                 count = int(tokens[1])
             except ValueError:
-                raise TopologyConvertError("[ molecules ] の分子数が整数ではありません: " + line.strip())
+                raise TopologyConvertError(
+                    "[ molecules ] の分子数が整数ではありません: " + line.strip()
+                )
             info.molecules.append((name, count))
             continue
 
@@ -286,14 +296,20 @@ def parse_topology_info(lines: Sequence[str]) -> TopologyInfo:
 
     for name, count in info.molecules:
         if name not in info.molecule_types:
-            raise TopologyConvertError("[ molecules ] にある molecule type が未定義です: " + name)
+            raise TopologyConvertError(
+                "[ molecules ] にある molecule type が未定義です: " + name
+            )
         if info.molecule_types[name].atom_count <= 0:
-            raise TopologyConvertError("molecule type に [ atoms ] がありません: " + name)
+            raise TopologyConvertError(
+                "molecule type に [ atoms ] がありません: " + name
+            )
 
     return info
 
 
-def build_rmc_index_map(info: TopologyInfo) -> Tuple[Dict[str, int], Dict[Tuple[str, int], List[int]], int]:
+def build_rmc_index_map(
+    info: TopologyInfo,
+) -> Tuple[Dict[str, int], Dict[Tuple[str, int], List[int]], int]:
     """molecule type ごとの offset と local atom ごとの RMC index を作る。
 
     戻り値:
@@ -302,7 +318,7 @@ def build_rmc_index_map(info: TopologyInfo) -> Tuple[Dict[str, int], Dict[Tuple[
         total_atoms: topology から期待される総原子数。
     """
     offsets = OrderedDict()  # type: OrderedDict[str, int]
-    index_map = {}           # type: Dict[Tuple[str, int], List[int]]
+    index_map = {}  # type: Dict[Tuple[str, int], List[int]]
     current_index = 1
 
     for name, mol_count in info.molecules:
@@ -321,7 +337,9 @@ def build_rmc_index_map(info: TopologyInfo) -> Tuple[Dict[str, int], Dict[Tuple[
     return offsets, index_map, current_index - 1
 
 
-def _format_moleculetype_line(tokens: Sequence[str], offset: int, original_line: str) -> str:
+def _format_moleculetype_line(
+    tokens: Sequence[str], offset: int, original_line: str
+) -> str:
     """[ moleculetype ] のデータ行へ RMCindex_offset を付加する。"""
     if len(tokens) >= 3:
         return original_line
@@ -357,7 +375,9 @@ def _format_atoms_line(
     return "{0:<72s} ; {1}\n".format(data, rmc_text)
 
 
-def replace_force_field_include(lines: Sequence[str], force_field_include: Optional[str]) -> List[str]:
+def replace_force_field_include(
+    lines: Sequence[str], force_field_include: Optional[str]
+) -> List[str]:
     """force-field include を必要に応じて置換する。
 
     ``force_field_include`` が None なら何もしない。
@@ -456,7 +476,9 @@ def convert_topology_lines(
             continue
 
         if section == "atoms" and current_molecule_type is not None:
-            result.append(_format_atoms_line(tokens, line, current_molecule_type, index_map))
+            result.append(
+                _format_atoms_line(tokens, line, current_molecule_type, index_map)
+            )
             continue
 
         result.append(line)
@@ -496,7 +518,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
         description="Convert a GROMACS topology and gro structure to an RMC_POT topology."
     )
     parser.add_argument("--top", required=True, help="Input GROMACS .top file.")
-    parser.add_argument("--gro", required=True, help="Input GROMACS .gro file with the RMC atom order.")
+    parser.add_argument(
+        "--gro", required=True, help="Input GROMACS .gro file with the RMC atom order."
+    )
     parser.add_argument("--out", required=True, help="Output RMC_POT .top file.")
     parser.add_argument(
         "--force-field-include",
@@ -538,7 +562,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     sys.stdout.write("Wrote RMC_POT topology: " + args.out + "\n")
     sys.stdout.write("Molecule types:\n")
     for name, mol_type in info.molecule_types.items():
-        sys.stdout.write("  {0}: atoms_per_molecule={1:d}\n".format(name, mol_type.atom_count))
+        sys.stdout.write(
+            "  {0}: atoms_per_molecule={1:d}\n".format(name, mol_type.atom_count)
+        )
     sys.stdout.write("Molecules:\n")
     for name, count in info.molecules:
         sys.stdout.write("  {0}: count={1:d}\n".format(name, count))

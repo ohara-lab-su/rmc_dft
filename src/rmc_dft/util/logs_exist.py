@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
+
 import os
 
 
