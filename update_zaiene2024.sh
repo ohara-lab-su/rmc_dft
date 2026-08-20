@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #
 #
-server="zaiene-hpcs2024"
+#server="zaiene-hpcs2024"
+server="zaiene-hpcs2024-bridge2023"
 dst_dir="zaiene_dev/rmc_dft/"
 
 # ローカルからリモートへ同期
