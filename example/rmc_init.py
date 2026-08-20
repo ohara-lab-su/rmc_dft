@@ -97,7 +97,7 @@ def run_rmc_init(
     # rmc_dat.set_density(0.0665715652)
 
     # --- Zeolite: Si488 Al12 O1000 Na12, cubic a=29.8080539703 A ---
-    rmc_dat.set_density(0.0570888006875)
+    rmc_dat.set_density(0.0570880440)
 
     # --- LiSPC
     # rmc_dat.set_density(0.0453277972)
@@ -329,7 +329,7 @@ def run_rmc_init(
         # rmc_dat.set_coord_constraint(
         #     central_type=1,  # Si
         #     neighbors=[
-        #         (2, 1.40, 1.90),  # O: Si-O neighbour range [Å]
+        #         (2, 1.40, 1.90),  # O: Si-O neighbor range [Å]
         #     ],
         #     subconstraints=[
         #         (4, 0.998, 0.003),  # SiO4: 99.8 %

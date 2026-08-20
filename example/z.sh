@@ -30,9 +30,9 @@ cp --remove-destination -r $SCRIPT/* .
 
 #####################
 # 初期構造作成
-# cp --remove-destination $SCRIPT/config.yml ./
-# cp --remove-destination $SCRIPT/make_mass_density.py ./
-# cp --remove-destination $SCRIPT/make_number_density.py ./
+cp --remove-destination $SCRIPT/config.yml ./
+cp --remove-destination $SCRIPT/make_mass_density.py ./
+cp --remove-destination $SCRIPT/make_number_density.py ./
 #####################
 
 #cp --remove-destination $SCRIPT/rmc.py ./
