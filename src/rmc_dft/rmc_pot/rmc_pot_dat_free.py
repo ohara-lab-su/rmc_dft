@@ -3040,6 +3040,526 @@ class RmcPotDatFree:
             auto_write=auto_write,
         )
 
+
+    def get_bvs_constraints(self) -> List[Dict[str, Any]]:
+        """自由形式 ``[ BVS ]`` の bond valence sum 制約を取得する。
+
+        RMC_POT 2023.1 の ``[ BVS ]`` に対応する。BVS は
+        ``_ADVANCED_GEOM_CONST`` 付き実行バイナリかつ自由形式 ``*.dat`` でのみ
+        使用できる。
+        """
+        constraints: List[Dict[str, Any]] = []
+        for section_index, section in enumerate(self._find_sections("BVS")):
+            central_values = section.get("CENT-TYPE_CHARGE", [])
+            if len(central_values) != 1:
+                raise ValueError(
+                    f"[BVS] index={section_index}: CENT-TYPE_CHARGE は 1 行必要です。"
+                )
+            central_tokens = central_values[0].split()
+            if len(central_tokens) not in (1, 2):
+                raise ValueError(
+                    f"[BVS] index={section_index}: CENT-TYPE_CHARGE は "
+                    "central_type [charge] の形式です。"
+                )
+
+            neighbor_values = section.get("NEIGH-TYPE_RMAX_R0_B_CHARGE", [])
+            if not neighbor_values:
+                raise ValueError(
+                    f"[BVS] index={section_index}: "
+                    "NEIGH-TYPE_RMAX_R0_B_CHARGE は 1 行以上必要です。"
+                )
+
+            neighbors: List[Dict[str, Any]] = []
+            for value in neighbor_values:
+                tokens = value.split()
+                if len(tokens) < 2 or len(tokens) > 5:
+                    raise ValueError(
+                        f"[BVS] index={section_index}: "
+                        "NEIGH-TYPE_RMAX_R0_B_CHARGE は "
+                        "type rmax [R0 [b [charge]]] の形式です。"
+                    )
+                item: Dict[str, Any] = {
+                    "atom_type": int(tokens[0]),
+                    "rmax": float(tokens[1]),
+                    "r0": None,
+                    "b": None,
+                    "charge": None,
+                }
+                if len(tokens) >= 3:
+                    item["r0"] = float(tokens[2])
+                if len(tokens) >= 4:
+                    item["b"] = float(tokens[3])
+                if len(tokens) >= 5:
+                    item["charge"] = int(tokens[4])
+                neighbors.append(item)
+
+            sigma_entries: List[Tuple[str, str]] = []
+            for key, mode in (
+                ("VALENCE_SIGMA", "normal"),
+                ("VALENCE_SIGMA-MASTER", "master"),
+                ("VALENCE_SIGMA-SCALABLE", "scalable"),
+            ):
+                for value in section.get(key, []):
+                    sigma_entries.append((mode, value))
+
+            if len(sigma_entries) != 1:
+                raise ValueError(
+                    f"[BVS] index={section_index}: VALENCE_SIGMA / "
+                    "VALENCE_SIGMA-MASTER / VALENCE_SIGMA-SCALABLE の "
+                    "いずれか 1 行が必要です。"
+                )
+
+            sigma_mode, sigma_value = sigma_entries[0]
+            sigma_tokens = sigma_value.split()
+            if len(sigma_tokens) != 2:
+                raise ValueError(
+                    f"[BVS] index={section_index}: VALENCE_SIGMA 系は "
+                    "valence sigma の 2 値が必要です。"
+                )
+
+            constraints.append(
+                {
+                    "central_type": int(central_tokens[0]),
+                    "central_charge": (
+                        int(central_tokens[1]) if len(central_tokens) == 2 else None
+                    ),
+                    "neighbors": neighbors,
+                    "valence": float(sigma_tokens[0]),
+                    "sigma": float(sigma_tokens[1]),
+                    "sigma_mode": sigma_mode,
+                }
+            )
+
+        return constraints
+
+    def set_bvs_constraint(
+        self,
+        central_type: int,
+        neighbors: Sequence[
+            Tuple[
+                int,
+                Union[int, float],
+                Optional[Union[int, float]],
+                Optional[Union[int, float]],
+                Optional[int],
+            ]
+        ],
+        valence: Union[int, float],
+        sigma: Union[int, float],
+        *,
+        central_charge: Optional[int] = None,
+        sigma_mode: str = "normal",
+        index: int = 0,
+        auto_write: Optional[bool] = None,
+    ) -> int:
+        """Bond Valence Sum ``[ BVS ]`` 制約を設定する。
+
+        Args:
+            central_type: 中心原子の RMC type (1 始まり)。
+            neighbors: 各近接原子について
+                ``(atom_type, rmax, r0, b, charge)`` を指定する。
+                ``r0`` / ``b`` に ``None`` を指定した場合は RMC_POT の既定値を
+                使用するため ``-1`` を出力する。既定 ``R0`` を使う場合は
+                酸化数判定のため ``central_charge`` と neighbour ``charge`` が必要。
+            valence: 中心原子に期待する bond valence sum。
+            sigma: BVS の重みパラメータ。
+            central_charge: 中心原子の形式電荷。既定 R0/B を使う場合に必要。
+            sigma_mode: ``normal`` / ``master`` / ``scalable``。
+            index: 複数 ``[ BVS ]`` の 0 始まり index。
+            auto_write: 更新後に保存するか。
+
+        Notes:
+            BVS は atomic system 用で、localized bond を持つ FNC / BPOT とは
+            併用しない。非結合 pair potential はマニュアル上併用可能。
+        """
+        target_index = int(index)
+        if target_index < 0:
+            raise ValueError("index は 0 以上で指定してください。")
+
+        if self.get_fnc_switch() != 0:
+            raise ValueError(
+                "BVS は atomic system 用です。FNC / BPOT (localized bonds) とは "
+                "併用できません。"
+            )
+
+        central_value = self._validate_positive_atom_type(
+            central_type, "central_type"
+        )
+        if central_charge is not None:
+            central_charge_value = int(central_charge)
+        else:
+            central_charge_value = None
+
+        if not neighbors:
+            raise ValueError("neighbors は 1 件以上必要です。")
+
+        neighbor_lines: List[str] = []
+        for entry in neighbors:
+            if len(entry) != 5:
+                raise ValueError(
+                    "BVS neighbors は (atom_type, rmax, r0, b, charge) で指定してください。"
+                )
+            atom_type, rmax, r0, b_value, charge = entry
+            atom_type_value = self._validate_positive_atom_type(
+                atom_type, "BVS neighbor atom_type"
+            )
+            rmax_value = float(rmax)
+            if rmax_value <= 0.0:
+                raise ValueError("BVS neighbour rmax は 0 より大きくしてください。")
+
+            use_default_r0 = r0 is None or float(r0) == -1.0
+            use_default_b = b_value is None or float(b_value) == -1.0
+            if use_default_r0:
+                r0_value = -1.0
+            else:
+                r0_value = float(r0)
+                if r0_value <= 0.0:
+                    raise ValueError("BVS R0 は正値、None、または -1 を指定してください。")
+            if use_default_b:
+                b_numeric = -1.0
+            else:
+                b_numeric = float(b_value)
+                if b_numeric <= 0.0:
+                    raise ValueError("BVS b は正値、None、または -1 を指定してください。")
+
+            charge_value = int(charge) if charge is not None else None
+            if use_default_r0 and (
+                central_charge_value is None or charge_value is None
+            ):
+                raise ValueError(
+                    "BVS の既定 R0 を使う場合は central_charge と "
+                    "各 neighbour の charge が必要です。"
+                )
+
+            values: List[Union[int, float]] = [
+                atom_type_value,
+                rmax_value,
+                r0_value,
+                b_numeric,
+            ]
+            if charge_value is not None:
+                values.append(charge_value)
+            neighbor_lines.append(self._fmt_sequence(values))
+
+        valence_value = float(valence)
+        if valence_value < 0.0:
+            raise ValueError("valence は 0 以上で指定してください。")
+        sigma_value = float(sigma)
+        if sigma_value <= 0.0:
+            raise ValueError("sigma は 0 より大きい値を指定してください。")
+
+        sections = self._find_sections("BVS")
+        while len(sections) <= target_index:
+            self.add_section("BVS")
+            sections = self._find_sections("BVS")
+
+        section = sections[target_index]
+        central_line: List[Union[int, float]] = [central_value]
+        if central_charge_value is not None:
+            central_line.append(central_charge_value)
+
+        sigma_key = self._sigma_keyword("VALENCE_SIGMA", sigma_mode)
+        section.clear()
+        section["CENT-TYPE_CHARGE"] = [self._fmt_sequence(central_line)]
+        section["NEIGH-TYPE_RMAX_R0_B_CHARGE"] = neighbor_lines
+        section[sigma_key] = [
+            self._fmt_sequence([valence_value, sigma_value])
+        ]
+
+        self._logger.info(
+            "[rmc_pot_dat_free] set_bvs_constraint: "
+            f"index={target_index}, central_type={central_value}, "
+            f"neighbors={len(neighbor_lines)}"
+        )
+        if self._resolve_auto_write(auto_write):
+            self.write()
+        return target_index
+
+    def remove_bvs_constraint(
+        self,
+        index: int,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """指定 ``[ BVS ]`` 制約を削除する。"""
+        self.remove_section("BVS", index)
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def clear_bvs_constraints(
+        self,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """すべての ``[ BVS ]`` 制約を削除する。"""
+        self.initialize_sections("BVS", auto_write=auto_write)
+
+    def get_pair_potential_settings(self) -> Optional[Dict[str, Any]]:
+        """``[ NBPOT ] NB-TYPE = TABULATED`` の pair potential 設定を取得する。"""
+        sections = self._find_sections("NBPOT")
+        if not sections:
+            return None
+        if len(sections) != 1:
+            raise ValueError("[NBPOT] セクションは 1 つだけ指定できます。")
+        section = sections[0]
+        nb_type = section.get("NB-TYPE", ["LJ"])[0].strip().upper()
+        if nb_type != "TABULATED":
+            return None
+
+        entries: List[Dict[str, Any]] = []
+        for key, mode in (
+            ("IND_SIGMA_FILE", "normal"),
+            ("IND_SIGMA-MASTER_FILE", "master"),
+            ("IND_SIGMA-SCALABLE_FILE", "scalable"),
+        ):
+            for value in section.get(key, []):
+                tokens = value.split()
+                if len(tokens) != 3:
+                    raise ValueError(
+                        f"[NBPOT] {key} は partial_index sigma filename の 3 値が必要です。"
+                    )
+                sigma_token = tokens[1]
+                numeric_token = sigma_token.lower()
+                prefix = ""
+                for candidate in ("ms", "m", "s"):
+                    if numeric_token.startswith(candidate):
+                        prefix = candidate
+                        numeric_token = numeric_token[len(candidate):]
+                        break
+                try:
+                    sigma_numeric = float(numeric_token)
+                except ValueError as exc:
+                    raise ValueError(
+                        f"[NBPOT] {key}: sigma token を解釈できません: {sigma_token!r}"
+                    ) from exc
+                entries.append(
+                    {
+                        "partial_index": int(tokens[0]),
+                        "sigma": sigma_numeric,
+                        "sigma_token": sigma_token,
+                        "sigma_prefix": prefix,
+                        "filename": tokens[2],
+                        "sigma_mode": mode,
+                    }
+                )
+        if not entries:
+            raise ValueError(
+                "[NBPOT] TABULATED には IND_SIGMA_FILE 系が 1 行以上必要です。"
+            )
+
+        cutoff = None
+        if section.get("CUTOFF-TAB"):
+            cutoff = float(section["CUTOFF-TAB"][0].split()[0])
+        temperature = 298.0
+        if section.get("TEMPERATURE"):
+            temperature = float(section["TEMPERATURE"][0].split()[0])
+
+        return {
+            "type": "TABULATED",
+            "cutoff": cutoff,
+            "temperature": temperature,
+            "partials": entries,
+        }
+
+    def set_pair_potential(
+        self,
+        partials: Sequence[
+            Tuple[int, str, Union[int, float, str], str]
+        ],
+        *,
+        cutoff: Optional[Union[int, float]] = None,
+        temperature: Union[int, float] = 298.0,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """距離依存の tabulated pair potential を ``[ NBPOT ]`` に設定する。
+
+        Args:
+            partials: ``(partial_index, filename, sigma, sigma_mode)`` の列。
+                ``partial_index`` は RMC partial の 1 始まり index。
+                ``sigma_mode`` は ``normal`` / ``master`` / ``scalable``。
+                ``sigma`` は数値、または potential 用の ``m`` / ``s`` / ``ms``
+                prefix を含む文字列（例: ``"ms0.5"``）を指定できる。
+            cutoff: tabulated potential cutoff [Å]。省略時は RMC_POT 既定値。
+            temperature: K。マニュアル上、U/kT 表示用でアルゴリズム上の意味はない。
+            auto_write: 更新後に保存するか。
+
+        Notes:
+            RMC_POT の tabulated potential は atomic system 向けで、FNC=1..3 と
+            併用できない。flexible molecule (BPOT) との併用はマニュアルで
+            強く非推奨のため、この API では拒否する。ANN potential とは併用しない。
+        """
+        if self._find_sections("AENET"):
+            raise ValueError("pair potential と AENET ANN potential は併用できません。")
+        if self.get_fnc_switch() != 0:
+            raise ValueError(
+                "tabulated pair potential は FNC / BPOT と併用しないでください。"
+            )
+        if not partials:
+            raise ValueError("partials は 1 件以上必要です。")
+
+        cutoff_value: Optional[float] = None
+        if cutoff is not None:
+            cutoff_value = float(cutoff)
+            if cutoff_value <= 0.0:
+                raise ValueError("cutoff は 0 より大きい値を指定してください。")
+        temperature_value = float(temperature)
+        if temperature_value <= 0.0:
+            raise ValueError("temperature は 0 より大きい値を指定してください。")
+
+        section: Dict[str, List[str]] = {"NB-TYPE": ["TABULATED"]}
+        if cutoff_value is not None:
+            section["CUTOFF-TAB"] = [self._fmt_number(cutoff_value)]
+        section["TEMPERATURE"] = [self._fmt_number(temperature_value)]
+
+        seen_partials = set()
+        for entry in partials:
+            if len(entry) != 4:
+                raise ValueError(
+                    "partials は (partial_index, filename, sigma, sigma_mode) で指定してください。"
+                )
+            partial_index, filename, sigma, sigma_mode = entry
+            partial_value = int(partial_index)
+            if partial_value < 1:
+                raise ValueError("partial_index は 1 以上で指定してください。")
+            if partial_value in seen_partials:
+                raise ValueError(
+                    f"partial_index は重複指定できません: {partial_value}"
+                )
+            seen_partials.add(partial_value)
+
+            filename_value = str(filename).strip()
+            if not filename_value:
+                raise ValueError("pair potential filename は空にできません。")
+            mode = self._normalize_sigma_mode(sigma_mode)
+            key = {
+                "normal": "IND_SIGMA_FILE",
+                "master": "IND_SIGMA-MASTER_FILE",
+                "scalable": "IND_SIGMA-SCALABLE_FILE",
+            }[mode]
+
+            if isinstance(sigma, str):
+                sigma_token = sigma.strip()
+                if not sigma_token:
+                    raise ValueError("sigma は空文字列にできません。")
+                numeric_token = sigma_token.lower()
+                for candidate in ("ms", "m", "s"):
+                    if numeric_token.startswith(candidate):
+                        numeric_token = numeric_token[len(candidate):]
+                        break
+                try:
+                    sigma_numeric = float(numeric_token)
+                except ValueError as exc:
+                    raise ValueError(
+                        f"potential sigma を解釈できません: {sigma!r}"
+                    ) from exc
+                if sigma_numeric <= 0.0:
+                    raise ValueError("sigma は 0 より大きい値を指定してください。")
+            else:
+                sigma_numeric = float(sigma)
+                if sigma_numeric <= 0.0:
+                    raise ValueError("sigma は 0 より大きい値を指定してください。")
+                sigma_token = self._fmt_number(sigma_numeric)
+
+            section.setdefault(key, []).append(
+                f"{partial_value} {sigma_token} {filename_value}"
+            )
+
+        self._sections = [
+            (name, values)
+            for name, values in self._sections
+            if name != "NBPOT"
+        ]
+        self._sections.append(("NBPOT", section))
+
+        self._logger.info(
+            "[rmc_pot_dat_free] set_pair_potential: "
+            f"partials={len(partials)}, cutoff={cutoff_value}"
+        )
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    def clear_pair_potential(
+        self,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """TABULATED ``[ NBPOT ]`` pair potential を削除する。"""
+        sections = self._find_sections("NBPOT")
+        if not sections:
+            return
+        nb_type = sections[0].get("NB-TYPE", ["LJ"])[0].strip().upper()
+        if nb_type != "TABULATED":
+            raise ValueError(
+                "現在の [NBPOT] は TABULATED ではありません。LJ 設定は削除しません。"
+            )
+        self._sections = [
+            (name, values)
+            for name, values in self._sections
+            if name != "NBPOT"
+        ]
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+    @classmethod
+    def write_pair_potential_file(
+        cls,
+        filename: Union[str, Path],
+        points: Sequence[Tuple[Union[int, float], Union[int, float]]],
+        *,
+        comment: str = "",
+    ) -> None:
+        """RMC_POT tabulated potential ファイルを作成する。
+
+        ``r [Å] - U(r) [kJ]`` を等間隔 r で出力する。1 行目は点数、2 行目は
+        コメント、3 行目以降は ``r U(r)`` とする。
+        """
+        values = [(float(r), float(u)) for r, u in points]
+        if len(values) < 2:
+            raise ValueError("points は 2 点以上必要です。")
+        for i in range(1, len(values)):
+            if values[i][0] <= values[i - 1][0]:
+                raise ValueError("r は単調増加で指定してください。")
+        dr = values[1][0] - values[0][0]
+        tolerance = max(abs(dr) * 1.0e-8, 1.0e-12)
+        for i in range(2, len(values)):
+            current_dr = values[i][0] - values[i - 1][0]
+            if abs(current_dr - dr) > tolerance:
+                raise ValueError("RMC_POT tabulated potential の r は等間隔が必要です。")
+
+        lines = [str(len(values)), str(comment)]
+        lines.extend(
+            f"{cls._fmt_number(r)} {cls._fmt_number(u)}" for r, u in values
+        )
+        Path(filename).write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    # ------------------------------------------------------------------
+    # RMC_POT tag 名に合わせた高水準 alias
+    # 実体は既存 API へ委譲し、処理を重複させない。
+    # ------------------------------------------------------------------
+    def get_cos_constraints(self) -> List[Dict[str, Any]]:
+        """``get_angle_constraints()`` の RMC_POT ``COS`` 名 alias。"""
+        return self.get_angle_constraints()
+
+    def set_cos_constraint(self, *args: Any, **kwargs: Any) -> int:
+        """``set_angle_constraint()`` の RMC_POT ``COS`` 名 alias。"""
+        return self.set_angle_constraint(*args, **kwargs)
+
+    def get_snc_constraints(self) -> List[Dict[str, Any]]:
+        """``get_qn_constraints()`` の RMC_POT ``SNC`` 名 alias。"""
+        return self.get_qn_constraints()
+
+    def set_snc_constraint(self, *args: Any, **kwargs: Any) -> int:
+        """``set_qn_constraint()`` の RMC_POT ``SNC`` 名 alias。"""
+        return self.set_qn_constraint(*args, **kwargs)
+
+    def get_ann_potential_settings(self) -> Optional[Dict[str, Any]]:
+        """``get_aenet_settings()`` の ANN 名 alias。"""
+        return self.get_aenet_settings()
+
+    def set_ann_potential(self, *args: Any, **kwargs: Any) -> None:
+        """``set_aenet_potential()`` の ANN 名 alias。"""
+        self.set_aenet_potential(*args, **kwargs)
+
     def _validate_aenet_compatibility(self) -> None:
         """AENET と明示的に共存不可の自由形式セクションを検査する。
 

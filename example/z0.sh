@@ -41,6 +41,7 @@ cp $SCRIPT/make_log_dirname.py $DST/
 cp $SCRIPT/plot_fit.py $DST/
 cp $SCRIPT/plot_multi_fit.py $DST/
 cp $SCRIPT/plot_multi_hst.py $DST/
+cp $SCRIPT/plot_multi_converge.py $DST/
 
 cp $SCRIPT/analyze_* $DST/
 
