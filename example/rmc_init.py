@@ -351,7 +351,7 @@ def run_rmc_init(
         )
 
         # --- Zeolite: Al -> O, CN=4 ---
-        rmc_dat.add_coord_constraint(
+        rmc_dat.set_coord_constraint(
             central_type=2,  # Al
             neighbors=[
                 (3, 1.55, 2.10),  # O
@@ -359,10 +359,11 @@ def run_rmc_init(
             subconstraints=[
                 (4, 1.0, 0.01),
             ],
+            index=1,
         )
 
         # --- Zeolite: O -> (Si + Al), total CN=2 ---
-        rmc_dat.add_coord_constraint(
+        rmc_dat.set_coord_constraint(
             central_type=3,  # O
             neighbors=[
                 (1, 1.40, 1.90),  # Si
@@ -371,6 +372,7 @@ def run_rmc_init(
             subconstraints=[
                 (2, 1.0, 0.01),
             ],
+            index=2,
         )
 
     # ------------------------------------------------------------------

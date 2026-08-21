@@ -632,26 +632,6 @@ class RmcPotDatFree:
         if self._resolve_auto_write(auto_write):
             self.write()
 
-    def initialize_qn_constraints(
-        self,
-        *,
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """すべての Qn/SNC 制約を削除して再設定前の状態へ戻す。
-
-        Args:
-            auto_write: 初期化後に ``*.dat`` を保存するかどうか。
-                ``None`` の場合はインスタンスの ``auto_write`` 設定を使う。
-
-        Notes:
-            Q4、Q3、Q2 などを一式として作り直す場合に最初に呼び出す。
-            既存の ``[ SNC ]`` を残したまま追加し続けることを防ぐ。
-        """
-        self.initialize_sections(
-            "SNC",
-            auto_write=auto_write,
-        )
-
     def add_section(self, section: str) -> int:
         """空の自由形式セクションを末尾へ追加する。
 
@@ -664,7 +644,7 @@ class RmcPotDatFree:
         Notes:
             内部構築用の低水準メソッドであり、自動書き込みは行わない。
             必須キーを持たない空セクションを一時的に作るためである。
-            通常は ``add_qn_constraint()`` などの高水準メソッドを使用する。
+            通常の制約設定では直接使用せず、``set_*_constraint(index=...)`` を使う。
         """
         values: Dict[str, List[str]] = {}
         self._sections.append((section.upper(), values))
@@ -2296,54 +2276,6 @@ class RmcPotDatFree:
 
         return constraints
 
-    def add_angle_constraint(
-        self,
-        central_type: int,
-        neighbor1: Tuple[int, Union[int, float], Union[int, float]],
-        neighbor2: Tuple[int, Union[int, float], Union[int, float]],
-        *,
-        distribution_type: str = "GAUSSIAN",
-        angle_degrees: Optional[Union[int, float]] = None,
-        distribution_width: Optional[Union[int, float]] = None,
-        dcosth: Optional[Union[int, float]] = None,
-        sigma: Union[int, float],
-        sigma_mode: str = "normal",
-        auto_write: Optional[bool] = None,
-    ) -> int:
-        """結合角 ``[ COS ]`` 制約を新しいセクションとして追加する。
-
-        ``distribution_type``:
-            ``GAUSSIAN`` (method 1), ``UNIFORM`` (method 0),
-            ``ABSENT`` (method 2)、または method 3 の分布ファイル名。
-
-        Notes:
-            GAUSSIAN / UNIFORM / ABSENT では ``angle_degrees`` と
-            ``distribution_width`` が必須。
-            ファイル分布では両者を出力しない。
-        """
-        section_index = self.add_section("COS")
-        try:
-            self.set_angle_constraint(
-                central_type=central_type,
-                neighbor1=neighbor1,
-                neighbor2=neighbor2,
-                distribution_type=distribution_type,
-                angle_degrees=angle_degrees,
-                distribution_width=distribution_width,
-                dcosth=dcosth,
-                sigma=sigma,
-                sigma_mode=sigma_mode,
-                index=section_index,
-                auto_write=False,
-            )
-        except Exception:
-            self.remove_section("COS", section_index)
-            raise
-
-        if self._resolve_auto_write(auto_write):
-            self.write()
-        return section_index
-
     def set_angle_constraint(
         self,
         central_type: int,
@@ -2599,83 +2531,6 @@ class RmcPotDatFree:
                 }
             )
         return constraints
-
-    def add_coord_constraint(
-        self,
-        central_type: int,
-        neighbors: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
-        subconstraints: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
-        *,
-        sigma_mode: str = "normal",
-        write_cnc_detail: bool = False,
-        auto_write: Optional[bool] = None,
-    ) -> int:
-        """通常配位数制約を新しい ``[ COORD ]`` セクションとして追加する。
-
-        Args:
-            central_type: 中心原子の RMC タイプ番号。
-            neighbors: ``(atom_type, minimum, maximum)`` の列。距離単位は Å。
-            subconstraints: ``(coordination_number, fraction, sigma)`` の列。
-                同じ中心/近接定義に複数の目標配位数を与える場合は、別々の
-                ``[ COORD ]`` ではなくここへ複数指定する。
-            sigma_mode: ``normal``、``master``、``scalable`` のいずれか。
-            write_cnc_detail: ``WRITE-CNC-DETAIL = 1`` を出力するか。
-            auto_write: 更新後に ``*.dat`` を保存するか。
-
-        Returns:
-            追加した ``[ COORD ]`` セクションの 0 始まりインデックス。
-        """
-        central_value = self._validate_positive_atom_type(central_type, "central_type")
-        if not neighbors:
-            raise ValueError("neighbors は 1 件以上必要です。")
-        if not subconstraints:
-            raise ValueError("subconstraints は 1 件以上必要です。")
-
-        validated_neighbors: List[Tuple[int, float, float]] = []
-        for atom_type, minimum, maximum in neighbors:
-            neighbor_type = self._validate_positive_atom_type(atom_type, "neighbor atom_type")
-            rmin, rmax = self._validate_distance_range(minimum, maximum, "neighbor_range")
-            validated_neighbors.append((neighbor_type, rmin, rmax))
-
-        validated_subconstraints: List[Tuple[int, float, float]] = []
-        for coordination_number, fraction, sigma in subconstraints:
-            coordination_value = int(coordination_number)
-            if coordination_value < 0:
-                raise ValueError("coordination_number は 0 以上で指定してください。")
-            fraction_value = float(fraction)
-            if not 0.0 <= fraction_value <= 1.0:
-                raise ValueError("fraction は 0 以上 1 以下で指定してください。")
-            sigma_value = float(sigma)
-            if sigma_value <= 0.0:
-                raise ValueError("sigma は 0 より大きい値を指定してください。")
-            validated_subconstraints.append(
-                (coordination_value, fraction_value, sigma_value)
-            )
-
-        section_index = self.add_section("COORD")
-        section = self._find_sections("COORD")[section_index]
-        section["CENT-TYPE"] = [self._fmt_sequence([central_value])]
-        section["NEIGH-TYPE_FROM_TO"] = [
-            self._fmt_sequence([atom_type, rmin, rmax])
-            for atom_type, rmin, rmax in validated_neighbors
-        ]
-        sigma_key = self._sigma_keyword("COORDNUM_FRACT_SIGMA", sigma_mode)
-        section[sigma_key] = [
-            self._fmt_sequence([coordination_number, fraction, sigma])
-            for coordination_number, fraction, sigma in validated_subconstraints
-        ]
-        if write_cnc_detail:
-            section["WRITE-CNC-DETAIL"] = ["1"]
-
-        self._logger.info(
-            "[rmc_pot_dat_free] add_coord_constraint: "
-            f"index={section_index}, central_type={central_value}, "
-            f"neighbors={len(validated_neighbors)}, "
-            f"subconstraints={len(validated_subconstraints)}"
-        )
-        if self._resolve_auto_write(auto_write):
-            self.write()
-        return section_index
 
     def set_coord_constraint(
         self,
@@ -2939,215 +2794,6 @@ class RmcPotDatFree:
 
         return constraints
 
-    def add_qn_constraint(
-        self,
-        central_type: int,
-        first_neighbor_type: int,
-        first_neighbor_minimum: Union[int, float],
-        first_neighbor_maximum: Union[int, float],
-        second_neighbors: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
-        coordination_number: int,
-        fraction: Union[int, float],
-        sigma: Union[int, float],
-        *,
-        sigma_mode: str = "normal",
-        auto_write: Optional[bool] = None,
-    ) -> int:
-        """Qn 第二近接制約を新しい ``[ SNC ]`` セクションとして追加する。
-
-        Args:
-            central_type: 中心原子の RMC タイプ番号。
-            first_neighbor_type: 第一近接原子の RMC タイプ番号。
-            first_neighbor_minimum: 中心-第一近接距離の下限 [Å]。
-            first_neighbor_maximum: 中心-第一近接距離の上限 [Å]。
-            second_neighbors: 第二近接原子ごとの
-                ``(atom_type, minimum, maximum)``。距離は第一近接原子から
-                第二近接原子までの範囲 [Å]。
-            coordination_number: 目標 Qn の n。
-            fraction: 制約を満たす中心原子の目標割合。0 以上 1 以下。
-            sigma: 制約の重みパラメータ。
-            sigma_mode: ``normal``、``master``、``scalable`` のいずれか。
-            auto_write: 更新後に ``*.dat`` を保存するかどうか。
-
-        Returns:
-            追加した ``[ SNC ]`` セクションの 0 始まりインデックス。
-
-        Raises:
-            ValueError: 原子タイプ、距離範囲、割合、sigma、または第二近接指定が
-                不正な場合。
-
-        Notes:
-            出力する必須キーワードは次の3種類である。
-
-            - ``CTYPE_FTYPE_FROM_TO``
-            - 1 行以上の ``STYPE_FROM_TO``
-            - ``COORDNUM_FRACT_SIGMA`` 系のいずれか1つ
-        """
-        central_value = self._validate_positive_atom_type(
-            central_type,
-            "central_type",
-        )
-        first_value = self._validate_positive_atom_type(
-            first_neighbor_type,
-            "first_neighbor_type",
-        )
-        first_minimum, first_maximum = self._validate_distance_range(
-            first_neighbor_minimum,
-            first_neighbor_maximum,
-            "first_neighbor_range",
-        )
-
-        if not second_neighbors:
-            raise ValueError("second_neighbors は 1 件以上必要です。")
-
-        coordination_value = int(coordination_number)
-        if coordination_value < 0:
-            raise ValueError("coordination_number は 0 以上で指定してください。")
-
-        fraction_value = float(fraction)
-        if fraction_value < 0.0 or fraction_value > 1.0:
-            raise ValueError("fraction は 0 以上 1 以下で指定してください。")
-
-        sigma_value = float(sigma)
-        if sigma_value <= 0.0:
-            raise ValueError("sigma は 0 より大きい値を指定してください。")
-
-        section_index = self.add_section("SNC")
-        section = self._find_sections("SNC")[section_index]
-
-        section["CTYPE_FTYPE_FROM_TO"] = [
-            self._fmt_sequence(
-                [
-                    central_value,
-                    first_value,
-                    first_minimum,
-                    first_maximum,
-                ]
-            )
-        ]
-
-        section["STYPE_FROM_TO"] = []
-        for atom_type, minimum, maximum in second_neighbors:
-            second_type = self._validate_positive_atom_type(
-                atom_type,
-                "second_neighbor atom_type",
-            )
-            second_minimum, second_maximum = self._validate_distance_range(
-                minimum,
-                maximum,
-                "second_neighbor_range",
-            )
-            section["STYPE_FROM_TO"].append(
-                self._fmt_sequence(
-                    [
-                        second_type,
-                        second_minimum,
-                        second_maximum,
-                    ]
-                )
-            )
-
-        sigma_key = self._sigma_keyword(
-            "COORDNUM_FRACT_SIGMA",
-            sigma_mode,
-        )
-        section[sigma_key] = [
-            self._fmt_sequence(
-                [
-                    coordination_value,
-                    fraction_value,
-                    sigma_value,
-                ]
-            )
-        ]
-
-        self._logger.info(
-            "[rmc_pot_dat_free] add_qn_constraint: "
-            f"index={section_index}, Q{coordination_value}"
-        )
-
-        if self._resolve_auto_write(auto_write):
-            self.write()
-
-        return section_index
-
-    def set_qn_constraint(
-        self,
-        index: int,
-        central_type: int,
-        first_neighbor_type: int,
-        first_neighbor_minimum: Union[int, float],
-        first_neighbor_maximum: Union[int, float],
-        second_neighbors: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
-        coordination_number: int,
-        fraction: Union[int, float],
-        sigma: Union[int, float],
-        *,
-        sigma_mode: str = "normal",
-        auto_write: Optional[bool] = None,
-    ) -> None:
-        """既存の Qn 第二近接制約を置き換える。
-
-        Args:
-            index: 置換対象の ``[ SNC ]`` セクション番号。
-            central_type: 中心原子の RMC タイプ番号。
-            first_neighbor_type: 第一近接原子の RMC タイプ番号。
-            first_neighbor_minimum: 中心-第一近接距離の下限 [Å]。
-            first_neighbor_maximum: 中心-第一近接距離の上限 [Å]。
-            second_neighbors: 第二近接タイプと距離範囲。
-            coordination_number: 目標 Qn の n。
-            fraction: 制約を満たす中心原子の目標割合。
-            sigma: 制約の重みパラメータ。
-            sigma_mode: sigma 指定方式。
-            auto_write: 更新後に保存するかどうか。
-
-        Raises:
-            IndexError: 指定した ``[ SNC ]`` セクションが存在しない場合。
-        """
-        sections = self._find_sections("SNC")
-        if index < 0 or index >= len(sections):
-            raise IndexError(f"SNC セクション index={index} は存在しません。")
-
-        self.remove_section("SNC", index)
-        new_index = self.add_qn_constraint(
-            central_type=central_type,
-            first_neighbor_type=first_neighbor_type,
-            first_neighbor_minimum=first_neighbor_minimum,
-            first_neighbor_maximum=first_neighbor_maximum,
-            second_neighbors=second_neighbors,
-            coordination_number=coordination_number,
-            fraction=fraction,
-            sigma=sigma,
-            sigma_mode=sigma_mode,
-            auto_write=False,
-        )
-
-        if new_index != index:
-            moved_section = self._find_sections("SNC")[new_index]
-            section_position = -1
-            count = -1
-            for position, (name, values) in enumerate(self._sections):
-                if name == "SNC":
-                    count += 1
-                    if values is moved_section:
-                        section_position = position
-                        break
-
-            if section_position >= 0:
-                name, values = self._sections.pop(section_position)
-                target_position = len(self._sections)
-                count = -1
-                for position, (current_name, _) in enumerate(self._sections):
-                    if current_name == "SNC":
-                        count += 1
-                        if count == index:
-                            target_position = position
-                            break
-                self._sections.insert(target_position, (name, values))
-
-        if self._resolve_auto_write(auto_write):
-            self.write()
-
     def remove_qn_constraint(
         self,
         index: int,
@@ -3165,21 +2811,137 @@ class RmcPotDatFree:
         if self._resolve_auto_write(auto_write):
             self.write()
 
+    def set_qn_constraint(
+        self,
+        central_type: int,
+        first_neighbor_type: int,
+        first_neighbor_minimum: Union[int, float],
+        first_neighbor_maximum: Union[int, float],
+        second_neighbors: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
+        coordination_number: int,
+        fraction: Union[int, float],
+        sigma: Union[int, float],
+        *,
+        index: int = 0,
+        sigma_mode: str = "normal",
+        auto_write: Optional[bool] = None,
+    ) -> int:
+        """Qn / ``[ SNC ]`` 制約を指定 index に設定する。
+
+        ``index`` は複数存在できる ``[ SNC ]`` のどのセクションを操作するかを
+        指定する。指定 index が存在すれば、そのセクションの内容だけを今回の
+        指定値で置き換える。存在しなければ、必要な位置まで ``[ SNC ]`` を
+        作成して設定する。
+
+        同じ index に同じ設定を繰り返してもセクション数は増えない。
+        他 index の ``[ SNC ]`` には触れない。
+        """
+        target_index = int(index)
+        if target_index < 0:
+            raise ValueError("index は 0 以上で指定してください。")
+
+        central_value = self._validate_positive_atom_type(
+            central_type,
+            "central_type",
+        )
+        first_value = self._validate_positive_atom_type(
+            first_neighbor_type,
+            "first_neighbor_type",
+        )
+        first_minimum, first_maximum = self._validate_distance_range(
+            first_neighbor_minimum,
+            first_neighbor_maximum,
+            "first_neighbor_range",
+        )
+
+        if not second_neighbors:
+            raise ValueError("second_neighbors は 1 件以上必要です。")
+
+        validated_second_neighbors: List[Tuple[int, float, float]] = []
+        for atom_type, minimum, maximum in second_neighbors:
+            second_type = self._validate_positive_atom_type(
+                atom_type,
+                "second_neighbor atom_type",
+            )
+            second_minimum, second_maximum = self._validate_distance_range(
+                minimum,
+                maximum,
+                "second_neighbor_range",
+            )
+            validated_second_neighbors.append(
+                (second_type, second_minimum, second_maximum)
+            )
+
+        coordination_value = int(coordination_number)
+        if coordination_value < 0:
+            raise ValueError("coordination_number は 0 以上で指定してください。")
+
+        fraction_value = float(fraction)
+        if not 0.0 <= fraction_value <= 1.0:
+            raise ValueError("fraction は 0 以上 1 以下で指定してください。")
+
+        sigma_value = float(sigma)
+        if sigma_value <= 0.0:
+            raise ValueError("sigma は 0 より大きい値を指定してください。")
+
+        sections = self._find_sections("SNC")
+        while len(sections) <= target_index:
+            self.add_section("SNC")
+            sections = self._find_sections("SNC")
+
+        section = sections[target_index]
+        sigma_key = self._sigma_keyword(
+            "COORDNUM_FRACT_SIGMA",
+            sigma_mode,
+        )
+
+        section.clear()
+        section["CTYPE_FTYPE_FROM_TO"] = [
+            self._fmt_sequence(
+                [
+                    central_value,
+                    first_value,
+                    first_minimum,
+                    first_maximum,
+                ]
+            )
+        ]
+        section["STYPE_FROM_TO"] = [
+            self._fmt_sequence([atom_type, minimum, maximum])
+            for atom_type, minimum, maximum in validated_second_neighbors
+        ]
+        section[sigma_key] = [
+            self._fmt_sequence(
+                [
+                    coordination_value,
+                    fraction_value,
+                    sigma_value,
+                ]
+            )
+        ]
+
+        self._logger.info(
+            "[rmc_pot_dat_free] set_qn_constraint: "
+            f"index={target_index}, Q{coordination_value}"
+        )
+
+        if self._resolve_auto_write(auto_write):
+            self.write()
+
+        return target_index
+
     def clear_qn_constraints(
         self,
         *,
         auto_write: Optional[bool] = None,
     ) -> None:
-        """すべての Qn 第二近接制約を削除する。
+        """すべての ``[ SNC ]`` を明示的に削除する。
 
-        Args:
-            auto_write: 更新後に保存するかどうか。
-
-        Notes:
-            従来名との互換メソッド。新しく Qn/SNC 一式を作り直す場合は
-            ``initialize_qn_constraints()`` を使用する。
+        通常の設定更新には使用しない。既存 ``[ SNC ]`` を意図的に全削除する
+        場合だけ呼び出す。
         """
-        self.initialize_qn_constraints(
+        self.initialize_sections(
+            "SNC",
             auto_write=auto_write,
         )
 
@@ -3559,8 +3321,7 @@ def main() -> None:
     dat = RmcPotDatFree(cfg_name="sample_free", auto_write=False)
     dat.set_comment("SiO2 SNC sample", auto_write=False)
     dat.set_density(0.0665715652, auto_write=False)
-    dat.initialize_qn_constraints(auto_write=False)
-    dat.add_qn_constraint(
+    dat.set_qn_constraint(
         central_type=1,
         first_neighbor_type=2,
         first_neighbor_minimum=1.40,
@@ -3569,6 +3330,7 @@ def main() -> None:
         coordination_number=4,
         fraction=0.994,
         sigma=1.0,
+        index=0,
         auto_write=False,
     )
     dat.write()
