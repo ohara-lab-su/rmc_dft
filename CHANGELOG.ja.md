@@ -3,6 +3,47 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.6.3
+
+### 自由形式の COORD / SNC 制約設定APIを整理
+
+- 自由形式 `RmcPotDatFree` における `[ COORD ]` および `[ SNC ]` の設定処理を整理しました。
+- 複数の `[ COORD ]` / `[ SNC ]` セクションを、0始まりの `index` で明示的に指定して設定できるよう統一しました。
+- `set_coord_constraint(index=...)` は、指定した `[ COORD ]` が既に存在する場合はそのセクションの内容を更新し、存在しない場合は新しく作成するようにしました。
+- `set_qn_constraint(index=...)` も同様に、指定した `[ SNC ]` が既に存在する場合はそのセクションの内容を更新し、存在しない場合は新しく作成するようにしました。
+- 同じ `index` に対して設定処理を繰り返しても `[ COORD ]` / `[ SNC ]` セクションが増殖しないようにしました。
+- 既存 `.dat` を読み込んで再設定する場合でも、指定していない他の制約セクションや設定を維持するようにしました。
+
+### COORD 制約
+
+- 1つの `[ COORD ]` セクション内で、複数の `NEIGH-TYPE_FROM_TO` を扱えるよう整理しました。
+- 同一の中心原子・近接原子定義に対して複数の配位数分率を指定する場合は、1つの `[ COORD ]` 内に複数の
+  `COORDNUM_FRACT_SIGMA` 系設定を保持する構造としました。
+- Si-O、Al-O、O- (Si,Al) など、独立した coordination constraint は別々の `[ COORD ]` セクションとして `index` で指定できます。
+
+### SNC / Qn 制約
+
+- `set_qn_constraint(index=...)` を `[ SNC ]` の標準設定APIとして整理しました。
+- 指定した `index` の `[ SNC ]` のみを書き換え、他の `[ SNC ]` セクションには影響しないようにしました。
+- SNC が存在しない `.dat` に対しても、指定した `index` の `[ SNC ]` を新規作成できるようにしました。
+
+### 後方互換性
+
+- 旧バージョンのスクリプトとの互換性を維持するため、以下の旧APIを後方互換用として維持しました。
+    - `add_coord_constraint()`
+    - `add_qn_constraint()`
+    - `initialize_qn_constraints()`
+- 旧APIは後方互換専用とし、実際の制約生成・検証・設定処理は新しい `set_*_constraint()` / `clear_*_constraints()`
+  側へ集約しました。
+- `add_coord_constraint()` は、現在の `[ COORD ]` セクション数を新しい `index` として `set_coord_constraint()` を呼び出します。
+- `add_qn_constraint()` は、現在の `[ SNC ]` セクション数を新しい `index` として `set_qn_constraint()` を呼び出します。
+- `initialize_qn_constraints()` は、現行の `clear_qn_constraints()` を呼び出す互換ラッパーとしました。
+- 旧 `add_*` APIは従来どおり末尾へ新しい制約を追加する動作を維持するため、既存 `.dat` に対して繰り返し実行する場合は制約が重複する可能性があります。
+- 旧形式のスクリプトで制約を作り直す場合は、従来どおり `clear_coord_constraints()` または `initialize_qn_constraints()`
+  による明示的な初期化を行ってから `add_*` APIを使用します。
+- 新規コードでは、繰り返し実行時の冪等性を確保できる `set_coord_constraint(index=...)` および
+  `set_qn_constraint(index=...)` を標準APIとして使用します。
+
 ## v0.6.2
 
 ### 固定形式・自由形式の初期化処理を整理

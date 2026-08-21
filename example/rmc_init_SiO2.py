@@ -299,7 +299,7 @@ def run_rmc_init(
         #     distribution_width=0.12,  # sigma in cos(theta)
         #     dcosth=0.05,
         #     sigma=0.01,
-        #     index=0,
+        #         index=0,
         # )
 
         # --- Zeolite: O-Si-O ---
@@ -312,7 +312,7 @@ def run_rmc_init(
         #     distribution_width=0.12,
         #     dcosth=0.05,
         #     sigma=0.03,
-        #     index=0,
+        #         index=0,
         # )
 
         # --- Zeolite: O-Al-O ---
@@ -325,7 +325,7 @@ def run_rmc_init(
         #     distribution_width=0.15,
         #     dcosth=0.05,
         #     sigma=0.03,
-        #     index=1,
+        #         index=1,
         # )
 
     ###################################
@@ -355,11 +355,11 @@ def run_rmc_init(
         #     subconstraints=[
         #         (4, 1.0, 0.01),
         #     ],
-        #     index=0,
+        #         index=0,
         # )
 
         # --- Zeolite: Al -> O, CN=4 ---
-        # rmc_dat.add_coord_constraint(
+        # rmc_dat.set_coord_constraint(
         #     central_type=2,  # Al
         #     neighbors=[
         #         (3, 1.55, 2.10),  # O
@@ -367,10 +367,11 @@ def run_rmc_init(
         #     subconstraints=[
         #         (4, 1.0, 0.01),
         #     ],
+        #         index=1,
         # )
 
         # --- Zeolite: O -> (Si + Al), total CN=2 ---
-        # rmc_dat.add_coord_constraint(
+        # rmc_dat.set_coord_constraint(
         #     central_type=3,  # O
         #     neighbors=[
         #         (1, 1.40, 1.90),  # Si
@@ -379,6 +380,7 @@ def run_rmc_init(
         #     subconstraints=[
         #         (2, 1.0, 0.01),
         #     ],
+        #         index=2,
         # )
 
     # ------------------------------------------------------------------
@@ -433,17 +435,16 @@ def run_rmc_init(
     # SiO2 Qn / SNC constraint
     #   自由フォーマットのみ
     # ------------------------------------------------------------------
-    # SNC を使用しない場合は、この initialize_qn_constraints() と
-    # 3個の add_qn_constraint() 呼び出しをまとめてコメントアウトする。
+    # SNC を使用しない場合は、該当する set_qn_constraint() 呼び出しを
+    # まとめてコメントアウトする。
     #
-    # Q4/Q3/Q2 は、それぞれ独立した [ SNC ] セクションとして出力される。
+    # Q5/Q4/Q3 は、それぞれ独立した [ SNC ] セクションとして出力される。
     # fraction は全中心 Si に対する目標割合で、百分率ではなく 0～1 で指定する。
     if rmc_dat.is_free_format:
         pass
-        rmc_dat.initialize_qn_constraints()
 
         # Q5 = 0.2 %
-        rmc_dat.add_qn_constraint(
+        rmc_dat.set_qn_constraint(
             central_type=1,
             first_neighbor_type=2,
             # first_neighbor_minimum=1.40,
@@ -457,10 +458,11 @@ def run_rmc_init(
             # sigma=1.0,
             # sigma=0.1,
             sigma=0.04,
+            index=0,
         )
 
         # Q4 = 99.4 %
-        rmc_dat.add_qn_constraint(
+        rmc_dat.set_qn_constraint(
             central_type=1,
             first_neighbor_type=2,
             # first_neighbor_minimum=1.40,
@@ -474,10 +476,11 @@ def run_rmc_init(
             # sigma=1.0,
             # sigma=0.1,
             sigma=0.04,
+            index=1,
         )
 
         # Q3 = 0.4 %
-        rmc_dat.add_qn_constraint(
+        rmc_dat.set_qn_constraint(
             central_type=1,
             first_neighbor_type=2,
             # first_neighbor_minimum=1.40,
@@ -491,6 +494,7 @@ def run_rmc_init(
             # sigma=1.0,
             # sigma=0.1,
             sigma=0.04,
+            index=2,
         )
 
     # ------------------------------------------------------------------
@@ -498,10 +502,9 @@ def run_rmc_init(
     #   T-O-T の相手そのものは固定しない。second neighbor は Si/Al の両方。
     # ------------------------------------------------------------------
     # if rmc_dat.is_free_format:
-    #     rmc_dat.initialize_qn_constraints()
 
     #     # Si: Q4, Si-O-(Si/Al)
-    #     rmc_dat.add_qn_constraint(
+    #     rmc_dat.set_qn_constraint(
     #         central_type=1,
     #         first_neighbor_type=3,  # O
     #         first_neighbor_minimum=1.40,
@@ -513,12 +516,13 @@ def run_rmc_init(
     #         coordination_number=4,
     #         fraction=1.0,
     #         sigma=0.03,
+    #         index=0,
     #     )
 
     #     # Al: Q4, Al-O-(Si/Al)
     #     # Loewenstein rule を課す場合だけ、下の Al second neighbor を消して
     #     # second_neighbors=[(1, 1.40, 1.90)] とする。
-    #     rmc_dat.add_qn_constraint(
+    #     rmc_dat.set_qn_constraint(
     #         central_type=2,
     #         first_neighbor_type=3,  # O
     #         first_neighbor_minimum=1.55,
@@ -530,6 +534,7 @@ def run_rmc_init(
     #         coordination_number=4,
     #         fraction=1.0,
     #         sigma=0.03,
+    #         index=1,
     #     )
 
     # 26 行目：1 回の move で動かす原子数（通常 1）を設定する

@@ -632,6 +632,21 @@ class RmcPotDatFree:
         if self._resolve_auto_write(auto_write):
             self.write()
 
+    def initialize_qn_constraints(
+        self,
+        *,
+        auto_write: Optional[bool] = None,
+    ) -> None:
+        """【後方互換専用】旧 Qn/SNC 初期化API。
+
+        旧バージョンの ``initialize_qn_constraints()`` を使用するスクリプトの
+        互換性維持のためだけに残す。新規コードでは通常使用しない。
+
+        実際の削除処理は現行API ``clear_qn_constraints()`` に委譲する。
+        このメソッド自身には SNC の削除処理を重複実装しない。
+        """
+        self.clear_qn_constraints(auto_write=auto_write)
+
     def add_section(self, section: str) -> int:
         """空の自由形式セクションを末尾へ追加する。
 
@@ -2532,6 +2547,42 @@ class RmcPotDatFree:
             )
         return constraints
 
+    def add_coord_constraint(
+        self,
+        central_type: int,
+        neighbors: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
+        subconstraints: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
+        *,
+        sigma_mode: str = "normal",
+        write_cnc_detail: bool = False,
+        auto_write: Optional[bool] = None,
+    ) -> int:
+        """【後方互換専用】旧 ``add_coord_constraint()`` API。
+
+        このメソッドは旧バージョンのスクリプトをそのまま実行するためだけに残す。
+        新規コードでは使用せず、``set_coord_constraint(index=...)`` を使用すること。
+
+        旧仕様どおり、現在の ``[ COORD ]`` セクション数を新しい ``index`` として
+        採用し、実際の設定処理は ``set_coord_constraint()`` に委譲する。
+        したがって COORD の生成・検証・書き込み処理の実体は新API側にのみ存在する。
+
+        注意:
+            この旧APIは呼ぶたびに末尾へ新しい ``[ COORD ]`` を作る。
+            同じ旧スクリプトを既存 dat に対して繰り返し実行すると重複し得る。
+            旧式運用で作り直す場合は、事前に ``clear_coord_constraints()`` を
+            明示的に呼び出すこと。
+        """
+        index = self.section_count("COORD")
+        return self.set_coord_constraint(
+            central_type=central_type,
+            neighbors=neighbors,
+            subconstraints=subconstraints,
+            index=index,
+            sigma_mode=sigma_mode,
+            write_cnc_detail=write_cnc_detail,
+            auto_write=auto_write,
+        )
+
     def set_coord_constraint(
         self,
         central_type: int,
@@ -2810,6 +2861,50 @@ class RmcPotDatFree:
         self._logger.info(f"[rmc_pot_dat_free] remove_qn_constraint: index={index}")
         if self._resolve_auto_write(auto_write):
             self.write()
+
+    def add_qn_constraint(
+        self,
+        central_type: int,
+        first_neighbor_type: int,
+        first_neighbor_minimum: Union[int, float],
+        first_neighbor_maximum: Union[int, float],
+        second_neighbors: Sequence[Tuple[int, Union[int, float], Union[int, float]]],
+        coordination_number: int,
+        fraction: Union[int, float],
+        sigma: Union[int, float],
+        *,
+        sigma_mode: str = "normal",
+        auto_write: Optional[bool] = None,
+    ) -> int:
+        """【後方互換専用】旧 ``add_qn_constraint()`` API。
+
+        このメソッドは旧バージョンのスクリプトをそのまま実行するためだけに残す。
+        新規コードでは使用せず、``set_qn_constraint(index=...)`` を使用すること。
+
+        旧仕様どおり、現在の ``[ SNC ]`` セクション数を新しい ``index`` として
+        採用し、実際の設定処理は ``set_qn_constraint()`` に委譲する。
+        SNC の生成・検証・書き込み処理の実体は新API側にのみ存在する。
+
+        注意:
+            この旧APIは呼ぶたびに末尾へ新しい ``[ SNC ]`` を作る。
+            同じ旧スクリプトを既存 dat に対して繰り返し実行すると重複し得る。
+            旧式運用では、従来どおり事前に ``initialize_qn_constraints()`` を
+            呼び出してから ``add_qn_constraint()`` を使用すること。
+        """
+        index = self.section_count("SNC")
+        return self.set_qn_constraint(
+            central_type=central_type,
+            first_neighbor_type=first_neighbor_type,
+            first_neighbor_minimum=first_neighbor_minimum,
+            first_neighbor_maximum=first_neighbor_maximum,
+            second_neighbors=second_neighbors,
+            coordination_number=coordination_number,
+            fraction=fraction,
+            sigma=sigma,
+            index=index,
+            sigma_mode=sigma_mode,
+            auto_write=auto_write,
+        )
 
     def set_qn_constraint(
         self,
