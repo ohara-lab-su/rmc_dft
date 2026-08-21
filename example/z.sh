@@ -39,9 +39,10 @@ cp --remove-destination $SCRIPT/make_number_density.py ./
 #cp --remove-destination $SCRIPT/rmc_vasp.py ./
 #cp --remove-destination $SCRIPT/clean_rmc.py ./
 #cp --remove-destination $SCRIPT/make_log_dirname.py ./
-#cp --remove-destination $SCRIPT/plot_fit.py ./
-#cp --remove-destination $SCRIPT/plot_multi_fit.py ./
-#cp --remove-destination $SCRIPT/plot_multi_hst.py ./
+cp --remove-destination $SCRIPT/plot_fit.py ./
+cp --remove-destination $SCRIPT/plot_multi_fit.py ./
+cp --remove-destination $SCRIPT/plot_multi_hst.py ./
+cp --remove-destination $SCRIPT/plot_multi_converge.py ./
 
 #####################
 # cp --remove-destination $SCRIPT/analyze_* ./
