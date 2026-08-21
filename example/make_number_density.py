@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 K.NAKADA, kengo.nakada@gmail.com
@@ -16,11 +17,14 @@ logger = XLogger(logger_name=__name__)
 config = Config(logger=logger)
 # config.element_info = ["Fe", "Si", "B"]
 # config.ratios = [82, 4, 14]
-config.element_info = ["Si", "O"]
-config.ratios = [1, 2]
-config.mass_density_g_cm3 = 2.214  # SiO2製法A: S1
+# config.element_info = ["Si", "O"]
+# config.ratios = [1, 2]
+config.element_info = ["Si", "Al", "O", "Na"]
+config.ratios = [488, 12, 1000, 12]
+# config.mass_density_g_cm3 = 2.214  # SiO2製法A: S1
 # config.mass_density_g_cm3 = 2.277 # SiO2製法B: S2
 # config.mass_density_g_cm3 = 2.113 # SiO2製法C: S7
+config.mass_density_g_cm3 = 1.9  # sial_40_cat_na_rho_1p9_1
 
 packmol = Packmol(logger=logger)
 

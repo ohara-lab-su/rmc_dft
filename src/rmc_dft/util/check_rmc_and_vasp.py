@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
 
 import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence

@@ -4,7 +4,10 @@
 TOP/ITP の読み込み、編集、検証、保存をこのモジュールだけで担当する。
 結合項では分子内のローカル原子番号を使い、``[ atoms ]`` のコメント部には
 最初と2番目の分子インスタンスに対応する RMC 原子 index を記録する。
+
+K.NAKADA
 """
+
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
@@ -105,8 +108,7 @@ class RmcPotDatTop:
         self._write_if_requested(auto_write)
 
     def load(self) -> None:
-        """既存ファイルを読み込む。
-        """
+        """既存ファイルを読み込む。"""
         if not self._path.exists():
             raise FileNotFoundError(str(self._path))
         self._items = []
@@ -114,7 +116,7 @@ class RmcPotDatTop:
         for source_line in self._path.read_text(encoding="utf-8").splitlines():
             stripped = source_line.strip()
             if stripped.startswith("[") and "]" in stripped:
-                name = stripped[1:stripped.index("]")].strip().lower()
+                name = stripped[1 : stripped.index("]")].strip().lower()
                 current = TopologySection(name)
                 self._items.append(current)
                 continue
@@ -142,8 +144,9 @@ class RmcPotDatTop:
         path.write_text("\n".join(output).rstrip() + "\n", encoding="utf-8")
         self._logger.info("[rmc_pot_dat_top] write %s" % path)
 
-
-    def add_raw_line(self, line: str = "", *, auto_write: Optional[bool] = None) -> None:
+    def add_raw_line(
+        self, line: str = "", *, auto_write: Optional[bool] = None
+    ) -> None:
         """raw line を追加する。
 
         Args:
@@ -292,7 +295,8 @@ class RmcPotDatTop:
         """
         target = str(name).strip().lower()
         self._items = [
-            item for item in self._items
+            item
+            for item in self._items
             if not isinstance(item, TopologySection) or item.name != target
         ]
         self._write_if_requested(auto_write)
@@ -351,14 +355,19 @@ class RmcPotDatTop:
             auto_write: auto_write に指定する値。
         """
         tokens = [
-            str(int(serial)), str(atom_type), str(int(residue_number)),
-            str(residue_name), str(atom_name), str(int(charge_group)),
+            str(int(serial)),
+            str(atom_type),
+            str(int(residue_number)),
+            str(residue_name),
+            str(atom_name),
+            str(int(charge_group)),
             self._number(charge),
         ]
         if mass is not None:
             tokens.append(self._number(mass))
         line = " ".join(tokens) + " ; %d %d" % (
-            int(first_rmc_index), int(second_rmc_index)
+            int(first_rmc_index),
+            int(second_rmc_index),
         )
         self.add_section_line("atoms", line, auto_write=auto_write)
 
@@ -389,8 +398,17 @@ class RmcPotDatTop:
             auto_write: auto_write に指定する値。
         """
         self.add_atom(
-            serial, atom_type, residue_number, residue_name, atom_name,
-            charge_group, charge, mass, 0, 0, auto_write=auto_write,
+            serial,
+            atom_type,
+            residue_number,
+            residue_name,
+            atom_name,
+            charge_group,
+            charge,
+            mass,
+            0,
+            0,
+            auto_write=auto_write,
         )
 
     def add_pair(
@@ -511,8 +529,14 @@ class RmcPotDatTop:
             auto_write: auto_write に指定する値。
         """
         values: List[Number] = [
-            atom_i, atom_j, atom_k, atom_l, 1,
-            equilibrium_degree, force_constant, multiplicity,
+            atom_i,
+            atom_j,
+            atom_k,
+            atom_l,
+            1,
+            equilibrium_degree,
+            force_constant,
+            multiplicity,
         ]
         if sigma is not None:
             values.append(sigma)
@@ -543,8 +567,13 @@ class RmcPotDatTop:
             auto_write: auto_write に指定する値。
         """
         values: List[Number] = [
-            atom_i, atom_j, atom_k, atom_l, 2,
-            equilibrium_degree, force_constant,
+            atom_i,
+            atom_j,
+            atom_k,
+            atom_l,
+            2,
+            equilibrium_degree,
+            force_constant,
         ]
         if sigma is not None:
             values.append(sigma)
@@ -655,7 +684,9 @@ class RmcPotDatTop:
         expected = {1: 2, 2: 2, 3: 2, 4: 3}
         type_id = int(function_type)
         if type_id not in expected or len(parameters) != expected[type_id]:
-            raise ValueError("virtual_sites3 のfunction typeまたはparameter数が不正です。")
+            raise ValueError(
+                "virtual_sites3 のfunction typeまたはparameter数が不正です。"
+            )
         values: List[Number] = [site, atom_i, atom_j, atom_k, type_id]
         values.extend(parameters)
         line = self._join(values)
@@ -781,7 +812,10 @@ class RmcPotDatTop:
         self.add_section("atoms", auto_write=False)
         for atom in atoms:
             serial = int(atom["serial"])
-            if serial not in first_instance_indices or serial not in second_instance_indices:
+            if (
+                serial not in first_instance_indices
+                or serial not in second_instance_indices
+            ):
                 raise ValueError("first/second instance mapping が不足しています。")
             self.add_atom(
                 serial=serial,
@@ -877,8 +911,7 @@ class RmcPotDatTop:
                     )
 
     def validate(self) -> None:
-        """現在の設定内容を検証する。
-        """
+        """現在の設定内容を検証する。"""
         self._validate_preprocessor()
         molecule_types: List[str] = []
         current_serials: Optional[set] = None
@@ -907,7 +940,9 @@ class RmcPotDatTop:
                     tokens = before.split()
                     mapping = after.split()
                     if len(tokens) < 7 or len(mapping) < 2:
-                        raise ValueError("[atoms]にはfirst/second RMC indexが必要です。")
+                        raise ValueError(
+                            "[atoms]にはfirst/second RMC indexが必要です。"
+                        )
                     serial = int(tokens[0])
                     if serial in current_serials:
                         raise ValueError("atom serialが重複しています: %d" % serial)
@@ -918,11 +953,15 @@ class RmcPotDatTop:
                         raise ValueError("RMC indexは0以上です。")
             elif item.name in ("pairs", "bonds", "angles", "dihedrals", "exclusions"):
                 if current_serials is None:
-                    raise ValueError("interaction sectionの前に[moleculetype]が必要です。")
+                    raise ValueError(
+                        "interaction sectionの前に[moleculetype]が必要です。"
+                    )
                 self._validate_local_indices(item, current_serials)
             elif item.name.startswith("virtual_sites"):
                 if current_serials is None:
-                    raise ValueError("virtual site sectionの前に[moleculetype]が必要です。")
+                    raise ValueError(
+                        "virtual site sectionの前に[moleculetype]が必要です。"
+                    )
                 self._validate_local_indices(item, current_serials)
             elif item.name == "system":
                 system_count += 1
@@ -974,8 +1013,7 @@ class RmcPotDatTop:
                     )
 
     def _validate_preprocessor(self) -> None:
-        """preprocessor を検証する。
-        """
+        """preprocessor を検証する。"""
         stack: List[str] = []
         for item in self._items:
             if not isinstance(item, str):
@@ -995,7 +1033,7 @@ class RmcPotDatTop:
 
     @staticmethod
     def _data_lines(section: TopologySection) -> List[str]:
-        """ data lines を実行する。
+        """data lines を実行する。
 
         Args:
             section: section に指定する値。
@@ -1004,13 +1042,14 @@ class RmcPotDatTop:
             処理結果。
         """
         return [
-            line.strip() for line in section.lines
+            line.strip()
+            for line in section.lines
             if line.strip() and not line.lstrip().startswith(";")
         ]
 
     @staticmethod
     def _split_semicolon(line: str) -> Tuple[str, str]:
-        """ split semicolon を実行する。
+        """split semicolon を実行する。
 
         Args:
             line: line に指定する値。
@@ -1025,7 +1064,7 @@ class RmcPotDatTop:
 
     @staticmethod
     def _tokens(line: str, *, keep_after_semicolon: bool = False) -> List[str]:
-        """ tokens を実行する。
+        """tokens を実行する。
 
         Args:
             line: line に指定する値。
@@ -1039,7 +1078,7 @@ class RmcPotDatTop:
 
     @staticmethod
     def _number(value: Number) -> str:
-        """ number を実行する。
+        """number を実行する。
 
         Args:
             value: value に指定する値。

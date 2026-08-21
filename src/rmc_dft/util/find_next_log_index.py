@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+"""
+K.NAKADA, kengo.nakada@gmail.com
+"""
+
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 import re

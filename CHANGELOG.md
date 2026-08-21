@@ -3,6 +3,53 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.6.3
+
+### Reorganized COORD / SNC Constraint APIs for Free-Format Input
+
+- Reorganized the `[ COORD ]` and `[ SNC ]` constraint APIs in the free-format `RmcPotDatFree` implementation.
+- Standardized explicit selection of multiple `[ COORD ]` / `[ SNC ]` sections using zero-based `index` values.
+- `set_coord_constraint(index=...)` now updates the specified `[ COORD ]` section if it already exists, or creates it if
+  it does not exist.
+- `set_qn_constraint(index=...)` now behaves similarly for `[ SNC ]` sections.
+- Repeated calls with the same `index` no longer increase the number of `[ COORD ]` / `[ SNC ]` sections.
+- When an existing `.dat` file is loaded and updated, constraint sections and settings at other indexes are preserved.
+
+### COORD Constraints
+
+- Reorganized the implementation so that a single `[ COORD ]` section can contain multiple `NEIGH-TYPE_FROM_TO` entries.
+- Multiple target coordination-number fractions for the same central/neighbor definition are represented by multiple
+  `COORDNUM_FRACT_SIGMA`-type entries within the same `[ COORD ]` section.
+- Independent coordination constraints, such as Si-O, Al-O, and O- (Si,Al), can be represented by separate `[ COORD ]`
+  sections selected explicitly by `index`.
+
+### SNC / Qn Constraints
+
+- `set_qn_constraint(index=...)` is now the standard API for configuring `[ SNC ]` Qn constraints.
+- Only the `[ SNC ]` section specified by `index` is updated; other `[ SNC ]` sections are left unchanged.
+- A new `[ SNC ]` section is created when the specified `index` does not yet exist.
+
+### Backward Compatibility
+
+- The following legacy APIs are retained exclusively for backward compatibility with scripts written for previous
+  versions:
+    - `add_coord_constraint()`
+    - `add_qn_constraint()`
+    - `initialize_qn_constraints()`
+- These legacy APIs are compatibility wrappers only. Constraint creation, validation, and update logic is implemented
+  exclusively in the current `set_*_constraint()` / `clear_*_constraints()` APIs.
+- `add_coord_constraint()` obtains the current number of `[ COORD ]` sections and delegates to `set_coord_constraint()`
+  using that value as the new `index`.
+- `add_qn_constraint()` obtains the current number of `[ SNC ]` sections and delegates to `set_qn_constraint()` using
+  that value as the new `index`.
+- `initialize_qn_constraints()` delegates to the current `clear_qn_constraints()` implementation.
+- The legacy `add_*` APIs preserve their original append behavior. Repeated execution against an existing `.dat` file
+  can therefore create duplicate constraint sections.
+- Legacy scripts that rebuild constraints should continue to explicitly clear the corresponding constraints with
+  `clear_coord_constraints()` or `initialize_qn_constraints()` before calling the legacy `add_*` APIs.
+- New code should use `set_coord_constraint(index=...)` and `set_qn_constraint(index=...)`, which provide stable
+  behavior across repeated executions.
+
 ## v0.6.2
 
 ### Unified fixed/free format initialization

@@ -1,7 +1,9 @@
-#!/usr/bin/env thon
+#!/usr/bin/env python
 """
+K.NAKADA, kengo.nakada@gmail.com
 最新の logNN_ をそのまま見て、次を決める
 """
+
 import os
 
 

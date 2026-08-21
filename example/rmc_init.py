@@ -71,7 +71,15 @@ def run_rmc_init(
     # 1 行目のコメント（系名）を設定する
     # rmc_dat.set_comment("comment FeSiB")
     # rmc_dat.set_comment("comment Li3PO4")
-    rmc_dat.set_comment("comment SiO2")
+
+    # --- SiO2 ---
+    # rmc_dat.set_comment("comment SiO2")
+
+    # --- Zeolite: Si488 Al12 O1000 Na12, Si/Al=40, Na/Al=1 ---
+    rmc_dat.set_comment(
+        "comment Si488 Al12 O1000 Na12 H-free zeolite; Si/Al=40; Na/Al=1"
+    )
+
     # rmc_dat.set_comment("comment LiSPC")
 
     ###################################
@@ -86,7 +94,10 @@ def run_rmc_init(
     # rmc_dat.set_density(0.0772877)
 
     # --- SiO2 製法A1 mass_density_g_cm3 = 2.214  # SiO2製法A: S1
-    rmc_dat.set_density(0.0665715652)
+    # rmc_dat.set_density(0.0665715652)
+
+    # --- Zeolite: Si488 Al12 O1000 Na12, cubic a=29.8080539703 A ---
+    rmc_dat.set_density(0.0570880440)
 
     # --- LiSPC
     # rmc_dat.set_density(0.0453277972)
@@ -126,9 +137,27 @@ def run_rmc_init(
     # rmc_dat.set_cutoffs([1.0, 1.0, 1.0])  # Si-Si, Si-O, O-O
     # rmc_dat.set_cutoffs([1.9, 1.1, 1.9])  # Si-Si, Si-O, O-O
     # rmc_dat.set_cutoffs([1.9, 1.1, 1.9])  # Si-Si, Si-O, O-O
+    # rmc_dat.set_cutoffs(
+    #     [1.9, 1.4, 1.9]
+    # )  # Si-Si, Si-O, O-O  # trial: Si-O cutoff 1.1 -> 1.4
+
+    # --- Zeolite ---
+    # partial order:
+    # Si-Si, Si-Al, Si-O, Si-Na, Al-Al, Al-O, Al-Na, O-O, O-Na, Na-Na
     rmc_dat.set_cutoffs(
-        [1.9, 1.4, 1.9]
-    )  # Si-Si, Si-O, O-O  # trial: Si-O cutoff 1.1 -> 1.4
+        [
+            2.10,  # Si-Si
+            2.20,  # Si-Al
+            1.35,  # Si-O
+            2.20,  # Si-Na
+            2.20,  # Al-Al
+            1.50,  # Al-O
+            2.20,  # Al-Na
+            2.00,  # O-O
+            1.90,  # O-Na
+            2.30,  # Na-Na
+        ]
+    )
 
     # ---- Li,S,P,C
     # rmc_dat.set_cutoffs(
@@ -156,7 +185,17 @@ def run_rmc_init(
     # rmc_dat.set_maximum_moves([0.01, 0.01, 0.01])  # 2026.02.16
 
     # --- SiO2
-    rmc_dat.set_maximum_moves([0.01, 0.01])
+    # rmc_dat.set_maximum_moves([0.01, 0.01])
+
+    # --- Zeolite: Si, Al, O, Na ---
+    rmc_dat.set_maximum_moves(
+        [
+            0.01,  # Si
+            0.01,  # Al
+            0.01,  # O
+            0.01,  # Na
+        ],
+    )
 
     # -- LiSPC
     # rmc_dat.set_maximum_moves(
@@ -176,10 +215,10 @@ def run_rmc_init(
     ###################################
     # 6行目: moveout を認めるかどうか？
     # カットオフ以下の位置での原子の存在を排除するか？認めるか？
-    # rmc_dat.set_moveout_option(True)
-    rmc_dat.set_moveout_option(
-        False
-    )  # trial: cutoff を通常の hard-sphere 条件として評価
+    rmc_dat.set_moveout_option(True)
+    # rmc_dat.set_moveout_option(
+    #     False
+    # )  # trial: cutoff を通常の hard-sphere 条件として評価
 
     ###################################
     # 9行目
@@ -237,21 +276,103 @@ def run_rmc_init(
     # rmc_dat.set_swap_settings(0.1, 1)  # trial: 10% of moves are Si-O swaps
     rmc_dat.set_swap_settings(0.0, 0)  # COORD trial: swap disabled
 
-    ###################################
-    # --- Si-O coordination constraint trial ---
-    # Si の first-neighbor O 配位を先に形成し、
-    # その上で SNC/Qn によって Si-O-Si network を形成させる。
+    # ------------------------------------------------------------------
+    # 角度拘束(free-format)
+    # ------------------------------------------------------------------
     if rmc_dat.is_free_format:
+        pass
+        # --- SiO2: O-Si-O ---
+        # rmc_dat.set_angle_constraint(
+        #     central_type=1,  # Si
+        #     neighbor1=(2, 1.40, 1.90),  # O
+        #     neighbor2=(2, 1.40, 1.90),  # O
+        #     distribution_type="GAUSSIAN",
+        #     angle_degrees=109.47,
+        #     distribution_width=0.12,  # sigma in cos(theta)
+        #     dcosth=0.05,
+        #     sigma=0.01,
+        #         index=0,
+        # )
+
+        # --- Zeolite: O-Si-O ---
+        # rmc_dat.set_angle_constraint(
+        #     central_type=1,  # Si
+        #     neighbor1=(3, 1.40, 1.90),  # O
+        #     neighbor2=(3, 1.40, 1.90),  # O
+        #     distribution_type="GAUSSIAN",
+        #     angle_degrees=109.47,
+        #     distribution_width=0.12,
+        #     dcosth=0.05,
+        #     sigma=0.03,
+        #         index=0,
+        # )
+
+        # --- Zeolite: O-Al-O ---
+        # rmc_dat.set_angle_constraint(
+        #     central_type=2,  # Al
+        #     neighbor1=(3, 1.55, 2.10),  # O
+        #     neighbor2=(3, 1.55, 2.10),  # O
+        #     distribution_type="GAUSSIAN",
+        #     angle_degrees=109.47,
+        #     distribution_width=0.15,
+        #     dcosth=0.05,
+        #     sigma=0.03,
+        #         index=1,
+        # )
+
+    ###################################
+    # Coordination constraint
+    if rmc_dat.is_free_format:
+        # --- SiO2 ---
+        # Si の first-neighbor O 配位を先に形成し、
+        # その上で SNC/Qn によって Si-O-Si network を形成させる。
+        # rmc_dat.set_coord_constraint(
+        #     central_type=1,  # Si
+        #     neighbors=[
+        #         (2, 1.40, 1.90),  # O: Si-O neighbor range [Å]
+        #     ],
+        #     subconstraints=[
+        #         (4, 0.998, 0.003),  # SiO4: 99.8 %
+        #         (5, 0.002, 0.012),  # SiO5: 0.2 %
+        #     ],
+        #         index=0,
+        # )
+
+        # --- Zeolite: Si -> O, CN=4 ---
         rmc_dat.set_coord_constraint(
             central_type=1,  # Si
             neighbors=[
-                (2, 1.40, 1.90),  # O: Si-O neighbour range [Å]
+                (3, 1.40, 1.90),  # O
             ],
             subconstraints=[
-                (4, 0.998, 0.003),  # SiO4: 99.8 %
-                (5, 0.002, 0.012),  # SiO5: 0.2 %
+                (4, 1.0, 0.01),
             ],
             index=0,
+        )
+
+        # --- Zeolite: Al -> O, CN=4 ---
+        rmc_dat.set_coord_constraint(
+            central_type=2,  # Al
+            neighbors=[
+                (3, 1.55, 2.10),  # O
+            ],
+            subconstraints=[
+                (4, 1.0, 0.01),
+            ],
+            index=1,
+        )
+
+        # --- Zeolite: O -> (Si + Al), total CN=2 ---
+        rmc_dat.set_coord_constraint(
+            central_type=3,  # O
+            neighbors=[
+                (1, 1.40, 1.90),  # Si
+                (2, 1.55, 2.10),  # Al
+            ],
+            subconstraints=[
+                (2, 1.0, 0.01),
+            ],
+            index=2,
         )
 
     # ------------------------------------------------------------------
@@ -288,7 +409,13 @@ def run_rmc_init(
         # element
         # element_info = config.element_info
         # rmc_dat.set_element_info(element_info)
-        rmc_dat.set_element_info(["Si", "O"])
+
+        # --- SiO2 ---
+        # rmc_dat.set_element_info(["Si", "O"])
+
+        # --- Zeolite: RMC type order 1=Si, 2=Al, 3=O, 4=Na ---
+        rmc_dat.set_element_info(["Si", "Al", "O", "Na"])
+
         # HST
         rmc_dat.set_history_buffer_size(200)
         # SAVE (固定フォーマットからの互換メソッドの方でセットされるのでなくてもいい)
@@ -299,64 +426,106 @@ def run_rmc_init(
     # SiO2 Qn / SNC constraint
     #   自由フォーマットのみ
     # ------------------------------------------------------------------
-    # SNC を使用しない場合は、この initialize_qn_constraints() と
-    # 3個の add_qn_constraint() 呼び出しをまとめてコメントアウトする。
+    # SNC を使用しない場合は、該当する set_qn_constraint() 呼び出しを
+    # まとめてコメントアウトする。
     #
-    # Q4/Q3/Q2 は、それぞれ独立した [ SNC ] セクションとして出力される。
+    # Q5/Q4/Q3 は、それぞれ独立した [ SNC ] セクションとして出力される。
     # fraction は全中心 Si に対する目標割合で、百分率ではなく 0～1 で指定する。
+    # if rmc_dat.is_free_format:
+    #     pass
+
+    #     # Q5 = 0.2 %
+    #     rmc_dat.set_qn_constraint(
+    #         central_type=1,
+    #         first_neighbor_type=2,
+    #         # first_neighbor_minimum=1.40,
+    #         # first_neighbor_maximum=1.90,
+    #         # second_neighbors=[(1, 1.40, 1.90)],
+    #         first_neighbor_minimum=1.45,
+    #         first_neighbor_maximum=1.80,
+    #         second_neighbors=[(1, 1.45, 1.80)],
+    #         coordination_number=5,
+    #         fraction=0.002,
+    #         # sigma=1.0,
+    #         # sigma=0.1,
+    #         sigma=0.04,
+    #         index=0,
+    #     )
+
+    #     # Q4 = 99.4 %
+    #     rmc_dat.set_qn_constraint(
+    #         central_type=1,
+    #         first_neighbor_type=2,
+    #         # first_neighbor_minimum=1.40,
+    #         # first_neighbor_maximum=1.90,
+    #         # second_neighbors=[(1, 1.40, 1.90)],
+    #         first_neighbor_minimum=1.45,
+    #         first_neighbor_maximum=1.80,
+    #         second_neighbors=[(1, 1.45, 1.80)],
+    #         coordination_number=4,
+    #         fraction=0.994,
+    #         # sigma=1.0,
+    #         # sigma=0.1,
+    #         sigma=0.04,
+    #         index=1,
+    #     )
+
+    #     # Q3 = 0.4 %
+    #     rmc_dat.set_qn_constraint(
+    #         central_type=1,
+    #         first_neighbor_type=2,
+    #         # first_neighbor_minimum=1.40,
+    #         # first_neighbor_maximum=1.90,
+    #         # second_neighbors=[(1, 1.40, 1.90)],
+    #         first_neighbor_minimum=1.45,
+    #         first_neighbor_maximum=1.80,
+    #         second_neighbors=[(1, 1.45, 1.80)],
+    #         coordination_number=3,
+    #         fraction=0.004,
+    #         # sigma=1.0,
+    #         # sigma=0.1,
+    #         sigma=0.04,
+    #         index=2,
+    #     )
+
+    # ------------------------------------------------------------------
+    # Zeolite SNC / Qn constraint
+    #   T-O-T の相手そのものは固定しない。second neighbor は Si/Al の両方。
+    # ------------------------------------------------------------------
     if rmc_dat.is_free_format:
-        pass
-        rmc_dat.initialize_qn_constraints()
 
-        # Q5 = 0.2 %
-        rmc_dat.add_qn_constraint(
+        # Si: Q4, Si-O-(Si/Al)
+        rmc_dat.set_qn_constraint(
             central_type=1,
-            first_neighbor_type=2,
-            # first_neighbor_minimum=1.40,
-            # first_neighbor_maximum=1.90,
-            # second_neighbors=[(1, 1.40, 1.90)],
-            first_neighbor_minimum=1.45,
-            first_neighbor_maximum=1.80,
-            second_neighbors=[(1, 1.45, 1.80)],
-            coordination_number=5,
-            fraction=0.002,
-            # sigma=1.0,
-            # sigma=0.1,
-            sigma=0.04,
-        )
-
-        # Q4 = 99.4 %
-        rmc_dat.add_qn_constraint(
-            central_type=1,
-            first_neighbor_type=2,
-            # first_neighbor_minimum=1.40,
-            # first_neighbor_maximum=1.90,
-            # second_neighbors=[(1, 1.40, 1.90)],
-            first_neighbor_minimum=1.45,
-            first_neighbor_maximum=1.80,
-            second_neighbors=[(1, 1.45, 1.80)],
+            first_neighbor_type=3,  # O
+            first_neighbor_minimum=1.40,
+            first_neighbor_maximum=1.90,
+            second_neighbors=[
+                (1, 1.40, 1.90),  # Si
+                (2, 1.55, 2.10),  # Al
+            ],
             coordination_number=4,
-            fraction=0.994,
-            # sigma=1.0,
-            # sigma=0.1,
-            sigma=0.04,
+            fraction=1.0,
+            sigma=0.03,
+            index=0,
         )
 
-        # Q3 = 0.4 %
-        rmc_dat.add_qn_constraint(
-            central_type=1,
-            first_neighbor_type=2,
-            # first_neighbor_minimum=1.40,
-            # first_neighbor_maximum=1.90,
-            # second_neighbors=[(1, 1.40, 1.90)],
-            first_neighbor_minimum=1.45,
-            first_neighbor_maximum=1.80,
-            second_neighbors=[(1, 1.45, 1.80)],
-            coordination_number=3,
-            fraction=0.004,
-            # sigma=1.0,
-            # sigma=0.1,
-            sigma=0.04,
+        # Al: Q4, Al-O-(Si/Al)
+        # Loewenstein rule を課す場合だけ、下の Al second neighbor を消して
+        # second_neighbors=[(1, 1.40, 1.90)] とする。
+        rmc_dat.set_qn_constraint(
+            central_type=2,
+            first_neighbor_type=3,  # O
+            first_neighbor_minimum=1.55,
+            first_neighbor_maximum=2.10,
+            second_neighbors=[
+                (1, 1.40, 1.90),  # Si
+                (2, 1.55, 2.10),  # Al
+            ],
+            coordination_number=4,
+            fraction=1.0,
+            sigma=0.03,
+            index=1,
         )
 
     # 26 行目：1 回の move で動かす原子数（通常 1）を設定する
