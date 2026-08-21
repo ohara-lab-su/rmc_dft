@@ -3,54 +3,247 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.6.4
+
+### RMC_POT 自由形式の構造拘束・ポテンシャル設定 API を拡張
+
+`RmcPotDatFree` の自由形式 `*.dat` 操作を拡張し、RMC_POT の構造拘束およびポテンシャル関連機能を Python API
+から統一的に設定できるよう整理しました。
+
+特に、ゼオライトなどの多成分ネットワーク構造を扱うことを想定し、COORD / SNC / COS に加えて BVS、tabulated pair
+potential、AENET の設定 API を整理・追加しました。
+
+### BVS（Bond Valence Sum）制約
+
+- RMC_POT の `[ BVS ]` セクションに対応しました。
+- 以下の BVS パラメータを Python API から設定できるようにしました。
+    - `CENT-TYPE_CHARGE`
+    - `NEIGH-TYPE_RMAX_R0_B_CHARGE`
+    - `VALENCE_SIGMA`
+    - `VALENCE_SIGMA-MASTER`
+    - `VALENCE_SIGMA-SCALABLE`
+- 1つの中心原子種に対して複数の近接原子種を指定できるようにしました。
+- BVS 制約の追加・取得・削除・全削除に対応しました。
+- BVS が atomic system を対象とする RMC_POT の制約であることを考慮し、高水準 API では FNC / bonded potential
+  と競合する設定を検出するようにしました。
+- non-bonded potential との併用は可能な構成としています。
+
+主な API:
+
+```python
+set_bvs_constraint(...)
+get_bvs_constraints(...)
+remove_bvs_constraint(...)
+clear_bvs_constraints(...)
+```
+
+### Tabulated pair potential
+
+- RMC_POT の `[ NBPOT ]` における `NB-TYPE = TABULATED` に対応しました。
+- 任意の原子種ペアに対して、距離依存の tabulated pair potential を設定できるようにしました。
+- 以下の RMC_POT キーワードに対応しました。
+    - `NB-TYPE = TABULATED`
+    - `CUTOFF-TAB`
+    - `TEMPERATURE`
+    - `IND_SIGMA_FILE`
+    - `IND_SIGMA-MASTER_FILE`
+    - `IND_SIGMA-SCALABLE_FILE`
+- potential 用 sigma の `m` / `s` / `ms` prefix を保持して読み書きできるようにしました。
+- pair potential 設定の取得および削除に対応しました。
+- RMC_POT 用 tabulated potential ファイルを Python から生成する機能を追加しました。
+- tabulated potential ファイルは RMC_POT の形式に従い、等間隔の距離 `r` とポテンシャルエネルギー `U(r)` を出力します。
+
+主な API:
+
+```python
+set_pair_potential(...)
+get_pair_potential_settings(...)
+clear_pair_potential(...)
+write_pair_potential_file(...)
+```
+
+### SNC API
+
+- `[ SNC ]` を直接表す API 名として `set_snc_constraint()` を追加しました。
+- 既存の `set_qn_constraint()` と同じ SNC 設定処理を使用し、実装を重複させない構成としました。
+- SNC の複数 `STYPE_FROM_TO` による複数第二近接原子種の指定をそのまま利用できます。
+- Si-O- (Si/Al)、Al-O- (Si/Al) のような多成分ネットワークの第二近接関係を表現できます。
+
+主な API:
+
+```python
+set_snc_constraint(...)
+get_snc_constraints(...)
+```
+
+`set_qn_constraint()` は引き続き利用可能です。
+
+### COS API
+
+- RMC_POT の `[ COS ]` を直接表す API 名として `set_cos_constraint()` を追加しました。
+- 既存の angle constraint 設定処理を利用し、同じ処理を重複実装しない構成としました。
+- O-Si-O、O-Al-O、Si-O-Si、Si-O-Al などの局所角度分布拘束を RMC_POT の COS constraint として設定できます。
+
+主な API:
+
+```python
+set_cos_constraint(...)
+get_cos_constraints(...)
+```
+
+既存の angle constraint API も引き続き利用可能です。
+
+### AENET / ANN potential API
+
+- 既存の RMC_POT `[ AENET ]` 対応を維持したまま、ANN potential として明示的に利用できる API 名を追加しました。
+- 新しい API は既存の AENET 設定処理を利用し、AENET と ANN で処理を重複させない構成としました。
+
+主な API:
+
+```python
+set_ann_potential(...)
+get_ann_potential_settings(...)
+```
+
+既存の `set_aenet_potential()` も引き続き利用可能です。
+
+### API・内部実装の整理
+
+- COORD / SNC / COS / BVS / pair potential / AENET を、自由形式 RMC_POT `*.dat` の構造拘束・ポテンシャル設定 API
+  として整理しました。
+- 同じ RMC_POT 機能に対して複数の API 名が存在する場合は、既存処理を共通実装として利用し、重複コードを作らない構成としました。
+- 既存の COORD / SNC / COS / AENET の動作を維持しながら、新しい高水準 API を追加しました。
+- 既存スクリプトとの後方互換性を維持しています。
+
 ## v0.6.3
 
 ### 自由形式の COORD / SNC 制約設定APIを整理
 
-- 自由形式 `RmcPotDatFree` における `[ COORD ]` および `[ SNC ]` の設定処理を整理しました。
-- 複数の `[ COORD ]` / `[ SNC ]` セクションを、0始まりの `index` で明示的に指定して設定できるよう統一しました。
-- `set_coord_constraint(index=...)` は、指定した `[ COORD ]` が既に存在する場合はそのセクションの内容を更新し、存在しない場合は新しく作成するようにしました。
-- `set_qn_constraint(index=...)` も同様に、指定した `[ SNC ]` が既に存在する場合はそのセクションの内容を更新し、存在しない場合は新しく作成するようにしました。
-- 同じ `index` に対して設定処理を繰り返しても `[ COORD ]` / `[ SNC ]` セクションが増殖しないようにしました。
-- 既存 `.dat` を読み込んで再設定する場合でも、指定していない他の制約セクションや設定を維持するようにしました。
+- 自由形式
+  `RmcPotDatFree`
+  における
+  `[COORD]`
+  および
+  `[SNC]`
+  の設定処理を整理しました。
+- 複数の
+  `[COORD]` / `[SNC]`
+  セクションを、0 始まりの
+  `index`
+  で明示的に指定して設定できるよう統一しました。
+- `set_coord_constraint(index=...)`
+  は、指定した
+  `[COORD]`
+  が既に存在する場合はそのセクションの内容を更新し、存在しない場合は新しく作成するようにしました。
+- `set_qn_constraint(index=...)`
+  も同様に、指定した
+  `[SNC]`
+  が既に存在する場合はそのセクションの内容を更新し、存在しない場合は新しく作成するようにしました。
+- 同じ
+  `index`
+  に対して設定処理を繰り返しても
+  `[COORD]` / `[SNC]`
+  セクションが増殖しないようにしました。
+- 既存
+  `.dat
+  ` を読み込んで再設定する場合でも、指定していない他の制約セクションや設定を維持するようにしました。
 
 ### COORD 制約
 
-- 1つの `[ COORD ]` セクション内で、複数の `NEIGH-TYPE_FROM_TO` を扱えるよう整理しました。
-- 同一の中心原子・近接原子定義に対して複数の配位数分率を指定する場合は、1つの `[ COORD ]` 内に複数の
-  `COORDNUM_FRACT_SIGMA` 系設定を保持する構造としました。
-- Si-O、Al-O、O- (Si,Al) など、独立した coordination constraint は別々の `[ COORD ]` セクションとして `index` で指定できます。
+- 1 つの
+  `[COORD]`
+  セクション内で、複数の
+  `NEIGH - TYPE_FROM_TO`
+  を扱えるよう整理しました。
+- 同一の中心原子・近接原子定義に対して複数の配位数分率を指定する場合は、1 つの
+  `[COORD]`
+  内に複数の
+  `COORDNUM_FRACT_SIGMA`
+  系設定を保持する構造としました。
+- Si - O、Al - O、O - (Si, Al)
+  など、独立した coordination constraint は別々の
+  `[COORD]`
+  セクションとして
+  `index`
+  で指定できます。
 
 ### SNC / Qn 制約
 
-- `set_qn_constraint(index=...)` を `[ SNC ]` の標準設定APIとして整理しました。
-- 指定した `index` の `[ SNC ]` のみを書き換え、他の `[ SNC ]` セクションには影響しないようにしました。
-- SNC が存在しない `.dat` に対しても、指定した `index` の `[ SNC ]` を新規作成できるようにしました。
+- `set_qn_constraint(index=...)`
+  を
+  `[SNC]`
+  の標準設定APIとして整理しました。
+- 指定した
+  `index`
+  の
+  `[SNC]`
+  のみを書き換え、他の
+  `[SNC]`
+  セクションには影響しないようにしました。
+- SNC が存在しない
+  `.dat
+  ` に対しても、指定した
+  `index`
+  の
+  `[SNC]`
+  を新規作成できるようにしました。
 
 ### 後方互換性
 
 - 旧バージョンのスクリプトとの互換性を維持するため、以下の旧APIを後方互換用として維持しました。
-    - `add_coord_constraint()`
-    - `add_qn_constraint()`
-    - `initialize_qn_constraints()`
-- 旧APIは後方互換専用とし、実際の制約生成・検証・設定処理は新しい `set_*_constraint()` / `clear_*_constraints()`
+- `add_coord_constraint()`
+- `add_qn_constraint()`
+- `initialize_qn_constraints()`
+- 旧APIは後方互換専用とし、実際の制約生成・検証・設定処理は新しい
+  `set_ * _constraint()` / `clear_ * _constraints()`
   側へ集約しました。
-- `add_coord_constraint()` は、現在の `[ COORD ]` セクション数を新しい `index` として `set_coord_constraint()` を呼び出します。
-- `add_qn_constraint()` は、現在の `[ SNC ]` セクション数を新しい `index` として `set_qn_constraint()` を呼び出します。
-- `initialize_qn_constraints()` は、現行の `clear_qn_constraints()` を呼び出す互換ラッパーとしました。
-- 旧 `add_*` APIは従来どおり末尾へ新しい制約を追加する動作を維持するため、既存 `.dat` に対して繰り返し実行する場合は制約が重複する可能性があります。
-- 旧形式のスクリプトで制約を作り直す場合は、従来どおり `clear_coord_constraints()` または `initialize_qn_constraints()`
-  による明示的な初期化を行ってから `add_*` APIを使用します。
-- 新規コードでは、繰り返し実行時の冪等性を確保できる `set_coord_constraint(index=...)` および
-  `set_qn_constraint(index=...)` を標準APIとして使用します。
+- `add_coord_constraint()`
+  は、現在の
+  `[COORD]`
+  セクション数を新しい
+  `index`
+  として
+  `set_coord_constraint()`
+  を呼び出します。
+- `add_qn_constraint()`
+  は、現在の
+  `[SNC]`
+  セクション数を新しい
+  `index`
+  として
+  `set_qn_constraint()`
+  を呼び出します。
+- `initialize_qn_constraints()`
+  は、現行の
+  `clear_qn_constraints()`
+  を呼び出す互換ラッパーとしました。
+- 旧
+  `add_ * ` APIは従来どおり末尾へ新しい制約を追加する動作を維持するため、既存
+  `.dat
+  ` に対して繰り返し実行する場合は制約が重複する可能性があります。
+- 旧形式のスクリプトで制約を作り直す場合は、従来どおり
+  `clear_coord_constraints()`
+  または
+  `initialize_qn_constraints()`
+  による明示的な初期化を行ってから
+  `add_ * ` APIを使用します。
+- 新規コードでは、繰り返し実行時の冪等性を確保できる
+  `set_coord_constraint(index=...)`
+  および
+  `set_qn_constraint(index=...)`
+  を標準APIとして使用します。
 
 ## v0.6.2
 
 ### 固定形式・自由形式の初期化処理を整理
 
-- `RmcPotDat` の初期化処理を見直し、固定形式・自由形式を共通の初期化インターフェースで扱えるよう整理しました。
-- 遅延初期化に対応し、`.dat` ファイルの生成・読込みは実際に初期化が必要になった時点で実行されるよう改善しました。
-- 既存の `.dat` ファイルが存在する場合は、自動的に形式（固定形式・自由形式）を判定し、その形式を利用するよう整理しました。
+- `RmcPotDat`
+  の初期化処理を見直し、固定形式・自由形式を共通の初期化インターフェースで扱えるよう整理しました。
+- 遅延初期化に対応し、`.dat
+` ファイルの生成・読込みは実際に初期化が必要になった時点で実行されるよう改善しました。
+- 既存の
+  `.dat
+  ` ファイルが存在する場合は、自動的に形式（固定形式・自由形式）を判定し、その形式を利用するよう整理しました。
 - 明示的な初期化と通常のワークフローによる自動初期化の両方に対応できるよう、初期化APIを整理しました。
 - 初期化後のパラメーター設定APIは従来どおり利用できるため、既存スクリプトからの設定方法を維持したまま利用できます。
 
@@ -58,13 +251,15 @@
 
 - FNC と cutoff の整合性チェックを汎用化し、SiO₂専用実装から任意の多成分系に対応。
 - FNC constraint type と cutoff 配列位置の固定対応を廃止し、FNC が実際に拘束する原子種ペアから対応する cutoff を決定するよう修正。
-- FNC/cutoff の整合性判定を、各拘束原子ペアごとに評価する方式へ変更。
-- 整合性判定条件を見直し、`rmin == cutoff` は許容し、`rmin < cutoff` の場合のみエラーとするよう修正。
+- FNC / cutoff の整合性判定を、各拘束原子ペアごとに評価する方式へ変更。
+- 整合性判定条件を見直し、`rmin == cutoff`
+  は許容し、`rmin < cutoff`
+  の場合のみエラーとするよう修正。
 - CFG の原子種判定処理を既存の CFG フォーマット実装に合わせて整理し、SiO₂固有の前提に依存しない実装へ変更。
 
 ## v0.6.0
 
-- [Qn 関係のプログラム](https://github.com/ohara-lab-su/qn/)を独自パッケージ化・分離
+- [Qn 関係のプログラム](https: // github.com / ohara - lab - su / qn /)を独自パッケージ化・分離
 
 ## v0.5.4
 
@@ -75,9 +270,17 @@ SiO2構造中のQn分布を、RMC_POT計算とは独立して解析するスク�
 #### 外部JSON設定の廃止
 
 - Qn解析条件を外部JSONファイルから読み込む方式を廃止しました。
-- 解析条件をスクリプト先頭の `QN_CONFIG` にまとめました。
-- 解析条件を変更するときは、スクリプト内の `QN_CONFIG` だけを編集します。
-- 外部の `aaa.json` などが存在しない場合に発生していた `FileNotFoundError` を解消しました。
+- 解析条件をスクリプト先頭の
+  `QN_CONFIG`
+  にまとめました。
+- 解析条件を変更するときは、スクリプト内の
+  `QN_CONFIG`
+  だけを編集します。
+- 外部の
+  `aaa.json`
+  などが存在しない場合に発生していた
+  `FileNotFoundError`
+  を解消しました。
 
 #### 構造ファイルの自動探索
 

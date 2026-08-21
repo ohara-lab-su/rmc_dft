@@ -3,6 +3,121 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.6.4
+
+### Extended RMC_POT free-format APIs for structural constraints and potentials
+
+Extended `RmcPotDatFree` to provide a more complete Python interface for structural constraints and potential-related
+features available in RMC_POT free-format `*.dat` files.
+
+In particular, support was expanded for multicomponent network structures such as zeolites by organizing and extending
+the APIs for COORD / SNC / COS, BVS, tabulated pair potentials, and AENET.
+
+### BVS (Bond Valence Sum) constraints
+
+- Added support for the RMC_POT `[ BVS ]` section.
+- Added Python API support for the following BVS parameters:
+    - `CENT-TYPE_CHARGE`
+    - `NEIGH-TYPE_RMAX_R0_B_CHARGE`
+    - `VALENCE_SIGMA`
+    - `VALENCE_SIGMA-MASTER`
+    - `VALENCE_SIGMA-SCALABLE`
+- Multiple neighbour atom types can be specified for a single central atom type.
+- Added APIs to add, retrieve, remove, and clear BVS constraints.
+- Since the RMC_POT BVS constraint is intended for atomic systems, the high-level API detects configurations conflicting
+  with FNC / bonded potentials.
+- BVS can be used together with non-bonded potentials.
+
+Main APIs:
+
+```python
+set_bvs_constraint(...)
+get_bvs_constraints(...)
+remove_bvs_constraint(...)
+clear_bvs_constraints(...)
+```
+
+### Tabulated pair potentials
+
+- Added support for `NB-TYPE = TABULATED` in the RMC_POT `[ NBPOT ]` section.
+- Arbitrary distance-dependent tabulated pair potentials can now be configured for atom-type pairs.
+- Added support for the following RMC_POT keywords:
+    - `NB-TYPE = TABULATED`
+    - `CUTOFF-TAB`
+    - `TEMPERATURE`
+    - `IND_SIGMA_FILE`
+    - `IND_SIGMA-MASTER_FILE`
+    - `IND_SIGMA-SCALABLE_FILE`
+- Potential sigma prefixes `m`, `s`, and `ms` are preserved when reading and writing settings.
+- Added APIs to retrieve and clear pair-potential settings.
+- Added a utility for generating RMC_POT tabulated potential files directly from Python.
+- Generated tabulated potential files contain equally spaced distance `r` values and potential energies `U(r)` in the
+  format expected by RMC_POT.
+
+Main APIs:
+
+```python
+set_pair_potential(...)
+get_pair_potential_settings(...)
+clear_pair_potential(...)
+write_pair_potential_file(...)
+```
+
+### SNC API
+
+- Added `set_snc_constraint()` as an API name directly corresponding to the RMC_POT `[ SNC ]` section.
+- The existing SNC implementation used by `set_qn_constraint()` is reused rather than duplicated.
+- Multiple second-neighbour atom types can be specified using multiple `STYPE_FROM_TO` entries.
+- This allows multicomponent network relationships such as Si-O- (Si/Al) and Al-O- (Si/Al) to be represented directly.
+
+Main APIs:
+
+```python
+set_snc_constraint(...)
+get_snc_constraints(...)
+```
+
+The existing `set_qn_constraint()` API remains available.
+
+### COS API
+
+- Added `set_cos_constraint()` as an API name directly corresponding to the RMC_POT `[ COS ]` section.
+- The existing angle-constraint implementation is reused without duplicating the underlying processing.
+- Local angular constraints such as O-Si-O, O-Al-O, Si-O-Si, and Si-O-Al can be configured as RMC_POT COS constraints.
+
+Main APIs:
+
+```python
+set_cos_constraint(...)
+get_cos_constraints(...)
+```
+
+The existing angle-constraint APIs remain available.
+
+### AENET / ANN potential API
+
+- Added ANN-oriented API names while preserving the existing RMC_POT `[ AENET ]` implementation.
+- The new APIs reuse the existing AENET configuration implementation rather than maintaining separate ANN and AENET
+  processing paths.
+
+Main APIs:
+
+```python
+set_ann_potential(...)
+get_ann_potential_settings(...)
+```
+
+The existing `set_aenet_potential()` API remains available.
+
+### API and implementation cleanup
+
+- Organized COORD / SNC / COS / BVS / pair potential / AENET as the main structural-constraint and potential APIs for
+  RMC_POT free-format `*.dat` files.
+- Where multiple API names refer to the same RMC_POT functionality, the implementation is shared to avoid duplicated
+  code.
+- Added the new high-level APIs without changing the existing behavior of COORD / SNC / COS / AENET.
+- Backward compatibility with existing scripts is maintained.
+
 ## v0.6.3
 
 ### Reorganized COORD / SNC Constraint APIs for Free-Format Input
