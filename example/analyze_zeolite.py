@@ -23,6 +23,9 @@ from rmc_dft.rmc_pot.util.zeolite import (
     ZeoliteCriteria,
     ZeoliteCutoffs,
     analyze_zeolite,
+    find_rmc_parameter_source,
+    load_zeolite_rmc_config,
+    rmc_config_to_cutoffs,
 )
 
 ##########
@@ -34,11 +37,30 @@ DEFAULT_CANDIDATES = (
     Path("CONTCAR"),
 )
 
-# 現在の RMC 設定に合わせた bond 判定 cutoff。
-CUTOFFS = ZeoliteCutoffs(
+# ----------------------------------------------------------------------
+# RMC parameter の取得
+# ----------------------------------------------------------------------
+# デフォルトは自動取得:
+#   1. *.dat
+#   2. rmc_init.py
+#   3. rmc_init*.py
+#
+# *.dat / rmc_init から Si->O, Al->O の COORD neighbour range と
+# element order を取得する。
+AUTO_RMC_PARAMETERS = True
+
+# 特定ファイルを使う場合だけ指定する。None なら上記優先順位で自動探索。
+RMC_PARAMETER_SOURCE = None
+
+# 手動値は fallback として残す。
+MANUAL_CUTOFFS = ZeoliteCutoffs(
     si_o=(1.40, 1.90),
     al_o=(1.55, 2.10),
 )
+
+# True にすると RMC_PARAMETER_SOURCE / 自動探索結果を使わず、
+# MANUAL_CUTOFFS を強制する。
+FORCE_MANUAL_CUTOFFS = False
 
 # RMC 途中構造の zeolite-like screening 閾値。
 # IZA の正式な framework 同定条件ではない。
@@ -52,6 +74,43 @@ CRITERIA = ZeoliteCriteria(
 MAX_RING_SIZE = 16
 CALCULATE_RINGS = True
 
+
+
+def resolve_cutoffs() -> tuple[ZeoliteCutoffs, str]:
+    """解析に使う T-O range を決定する。
+
+    Returns:
+        (cutoffs, source_description)
+    """
+    if FORCE_MANUAL_CUTOFFS:
+        return MANUAL_CUTOFFS, "manual (forced)"
+
+    parameter_source = None
+
+    if RMC_PARAMETER_SOURCE is not None:
+        parameter_source = Path(RMC_PARAMETER_SOURCE)
+        if not parameter_source.exists():
+            raise FileNotFoundError(
+                f"RMC parameter source が見つかりません: {parameter_source}"
+            )
+    elif AUTO_RMC_PARAMETERS:
+        parameter_source = find_rmc_parameter_source(".")
+
+    if parameter_source is None:
+        return MANUAL_CUTOFFS, "manual (RMC parameter source not found)"
+
+    try:
+        config = load_zeolite_rmc_config(parameter_source)
+        cutoffs = rmc_config_to_cutoffs(config)
+        source = (
+            f"{config.source}; "
+            f"elements={list(config.element_info)}"
+        )
+        return cutoffs, source
+    except (ValueError, SyntaxError, OSError) as exc:
+        print(f"[WARN] RMC parameter auto-read failed: {exc}")
+        print("[WARN] MANUAL_CUTOFFS を使用します。")
+        return MANUAL_CUTOFFS, f"manual (auto-read failed: {parameter_source})"
 
 def find_structure_file(argument_path: Optional[str]) -> Path:
     """解析する構造ファイルを決定する。"""
@@ -99,6 +158,7 @@ def _format_stat(stat: Mapping[str, object], unit: str) -> str:
 def print_report(
     result: Mapping[str, object],
     structure_path: Path,
+    cutoff_source: str,
 ) -> None:
     """解析結果を人が比較しやすい形で表示する。"""
     coordination = result["coordination"]
@@ -116,6 +176,9 @@ def print_report(
     print(f"Structure : {structure_path}")
     print(f"Atoms     : {int(result['atom_count'])}")
     print(f"Volume    : {float(result['volume_A3']):.6f} Å^3")
+    print(f"RMC param : {cutoff_source}")
+    print(f"Si-O range: {tuple(result['cutoffs']['si_o'])} Å")
+    print(f"Al-O range: {tuple(result['cutoffs']['al_o'])} Å")
     print(
         "Framework density : "
         f"{float(result['framework_density_T_per_1000A3']):.6f} "
@@ -222,10 +285,11 @@ def main() -> None:
 
     structure_path = find_structure_file(argument_path)
     structure = Structure.from_file(str(structure_path))
+    cutoffs, cutoff_source = resolve_cutoffs()
 
     result = analyze_zeolite(
         structure=structure,
-        cutoffs=CUTOFFS,
+        cutoffs=cutoffs,
         criteria=CRITERIA,
         max_ring_size=MAX_RING_SIZE,
         calculate_rings=CALCULATE_RINGS,
@@ -234,6 +298,7 @@ def main() -> None:
     print_report(
         result=result,
         structure_path=structure_path,
+        cutoff_source=cutoff_source,
     )
 
 

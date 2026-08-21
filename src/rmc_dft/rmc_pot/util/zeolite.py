@@ -28,6 +28,9 @@ IZA による framework type の正式な同定ではない。
 from __future__ import annotations
 
 from collections import Counter, defaultdict, deque
+import ast
+from pathlib import Path
+import re
 from dataclasses import asdict, dataclass
 from itertools import combinations
 from math import acos, degrees
@@ -61,6 +64,331 @@ class ZeoliteCutoffs:
         if symbol == "Al":
             return self.al_o
         raise ValueError(f"T atom ではありません: {symbol}")
+
+
+@dataclass(frozen=True)
+class ZeoliteRmcConfig:
+    """RMC 設定から取得したゼオライト解析用パラメータ。
+
+    ``source`` は値を取得した ``*.dat`` または ``rmc_init*.py`` を示す。
+    ``element_info`` は RMC type の順序で、1-origin の type 番号を元素へ
+    対応付けるために使用する。
+
+    ``ZeoliteCutoffs`` に変換するときは、COORD に指定された
+    Si->O / Al->O の neighbour range をそのまま解析 bond range として使う。
+    """
+
+    source: str
+    element_info: Tuple[str, ...]
+    si_o: Optional[BondRange] = None
+    al_o: Optional[BondRange] = None
+
+
+def _strip_rmc_comment(line: str) -> str:
+    """RMC free-format のコメントを除いて strip する。"""
+    # RMC_POT free-format では # / ! をコメントとして扱う入力が存在するため、
+    # 解析側ではどちらも行末コメントとして安全側に除去する。
+    for marker in ("#", "!"):
+        if marker in line:
+            line = line.split(marker, 1)[0]
+    return line.strip()
+
+
+def _parse_free_format_sections(text: str) -> List[Tuple[str, List[str]]]:
+    """RMC_POT free-format ``[ TAG ]`` セクションを順序保持で読む。"""
+    sections: List[Tuple[str, List[str]]] = []
+    current_name: Optional[str] = None
+    current_lines: List[str] = []
+
+    section_pattern = re.compile(r"^\s*\[\s*([A-Za-z0-9_-]+)\s*\]\s*$")
+
+    def flush() -> None:
+        nonlocal current_name, current_lines
+        if current_name is not None:
+            sections.append((current_name.upper(), current_lines))
+        current_name = None
+        current_lines = []
+
+    for raw_line in text.splitlines():
+        match = section_pattern.match(raw_line)
+        if match:
+            flush()
+            current_name = match.group(1)
+            continue
+
+        if current_name is not None:
+            line = _strip_rmc_comment(raw_line)
+            if line:
+                current_lines.append(line)
+
+    flush()
+    return sections
+
+
+def _split_key_values(line: str) -> Tuple[str, List[str]]:
+    """RMC free-format の KEY value... または KEY = value... を分解する。"""
+    cleaned = line.replace("=", " ").replace(":", " ")
+    tokens = cleaned.split()
+    if not tokens:
+        return "", []
+    return tokens[0].upper(), tokens[1:]
+
+
+def load_zeolite_rmc_config_from_dat(path: str | Path) -> ZeoliteRmcConfig:
+    """RMC_POT free-format ``*.dat`` から解析用パラメータを取得する。
+
+    取得対象:
+        - ``[ GENERAL ] / CHEMICAL-SYMBOLS``
+        - ``[ COORD ] / CENT-TYPE``
+        - ``[ COORD ] / NEIGH-TYPE_FROM_TO``
+
+    Si->O および Al->O の COORD neighbour range をゼオライト解析の
+    T-O bond range として使用する。
+
+    Raises:
+        ValueError: 必要な element 情報または COORD range が取得できない場合。
+    """
+    path = Path(path)
+    text = path.read_text(encoding="utf-8", errors="replace")
+    sections = _parse_free_format_sections(text)
+
+    element_info: Optional[Tuple[str, ...]] = None
+
+    for section_name, lines in sections:
+        if section_name != "GENERAL":
+            continue
+        for line in lines:
+            key, values = _split_key_values(line)
+            if key == "CHEMICAL-SYMBOLS" and values:
+                element_info = tuple(values)
+
+    if not element_info:
+        raise ValueError(
+            f"{path}: [ GENERAL ] CHEMICAL-SYMBOLS を取得できません。"
+        )
+
+    type_to_element = {
+        index + 1: symbol
+        for index, symbol in enumerate(element_info)
+    }
+
+    ranges: Dict[str, BondRange] = {}
+
+    for section_name, lines in sections:
+        if section_name != "COORD":
+            continue
+
+        central_type: Optional[int] = None
+        neighbors: List[Tuple[int, float, float]] = []
+
+        for line in lines:
+            key, values = _split_key_values(line)
+
+            if key == "CENT-TYPE" and values:
+                central_type = int(values[0])
+
+            elif key == "NEIGH-TYPE_FROM_TO" and len(values) >= 3:
+                neighbors.append(
+                    (
+                        int(values[0]),
+                        float(values[1]),
+                        float(values[2]),
+                    )
+                )
+
+        if central_type is None:
+            continue
+
+        central_element = type_to_element.get(central_type)
+
+        for neighbor_type, minimum, maximum in neighbors:
+            neighbor_element = type_to_element.get(neighbor_type)
+
+            if central_element == "Si" and neighbor_element == "O":
+                ranges["Si"] = (minimum, maximum)
+            elif central_element == "Al" and neighbor_element == "O":
+                ranges["Al"] = (minimum, maximum)
+
+    if "Si" not in ranges:
+        raise ValueError(f"{path}: COORD の Si -> O range を取得できません。")
+    if "Al" not in ranges:
+        raise ValueError(f"{path}: COORD の Al -> O range を取得できません。")
+
+    return ZeoliteRmcConfig(
+        source=str(path),
+        element_info=element_info,
+        si_o=ranges["Si"],
+        al_o=ranges["Al"],
+    )
+
+
+def _ast_literal(node: ast.AST) -> object:
+    """安全に評価可能な Python literal のみ取り出す。"""
+    return ast.literal_eval(node)
+
+
+def _active_method_calls(
+    tree: ast.AST,
+    method_name: str,
+) -> List[ast.Call]:
+    """コメントアウトされていない指定メソッド呼び出しを AST から取得する。"""
+    calls: List[ast.Call] = []
+
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+
+        func = node.func
+        if (
+            isinstance(func, ast.Attribute)
+            and func.attr == method_name
+        ):
+            calls.append(node)
+
+    calls.sort(key=lambda call: getattr(call, "lineno", 0))
+    return calls
+
+
+def _keyword_literal(call: ast.Call, name: str) -> object:
+    for keyword in call.keywords:
+        if keyword.arg == name:
+            return _ast_literal(keyword.value)
+    raise KeyError(name)
+
+
+def load_zeolite_rmc_config_from_init(path: str | Path) -> ZeoliteRmcConfig:
+    """``rmc_init*.py`` の有効な RmcPotDat 設定から解析条件を取得する。
+
+    Python ファイルは実行しない。AST で、
+    ``set_element_info()`` と ``set_coord_constraint()`` の
+    コメントアウトされていない呼び出しだけを読む。
+
+    これにより rmc_init 自体に副作用があっても解析時には実行されない。
+    """
+    path = Path(path)
+    source = path.read_text(encoding="utf-8")
+    tree = ast.parse(source, filename=str(path))
+
+    element_calls = _active_method_calls(tree, "set_element_info")
+    if not element_calls:
+        raise ValueError(f"{path}: set_element_info() が見つかりません。")
+
+    # rmc_init では過去設定がコメントとして残るため、AST に現れる
+    # 最後の有効 call を現在設定として採用する。
+    element_call = element_calls[-1]
+    if not element_call.args:
+        raise ValueError(f"{path}: set_element_info() の引数を取得できません。")
+
+    element_info = tuple(str(x) for x in _ast_literal(element_call.args[0]))
+    type_to_element = {
+        index + 1: symbol
+        for index, symbol in enumerate(element_info)
+    }
+
+    ranges: Dict[str, BondRange] = {}
+
+    for call in _active_method_calls(tree, "set_coord_constraint"):
+        try:
+            central_type = int(_keyword_literal(call, "central_type"))
+            neighbors = _keyword_literal(call, "neighbors")
+        except (KeyError, ValueError, TypeError):
+            continue
+
+        central_element = type_to_element.get(central_type)
+
+        for neighbor in neighbors:
+            if len(neighbor) < 3:
+                continue
+
+            neighbor_type = int(neighbor[0])
+            minimum = float(neighbor[1])
+            maximum = float(neighbor[2])
+            neighbor_element = type_to_element.get(neighbor_type)
+
+            if central_element == "Si" and neighbor_element == "O":
+                ranges["Si"] = (minimum, maximum)
+            elif central_element == "Al" and neighbor_element == "O":
+                ranges["Al"] = (minimum, maximum)
+
+    if "Si" not in ranges:
+        raise ValueError(
+            f"{path}: active set_coord_constraint() から Si -> O range を取得できません。"
+        )
+    if "Al" not in ranges:
+        raise ValueError(
+            f"{path}: active set_coord_constraint() から Al -> O range を取得できません。"
+        )
+
+    return ZeoliteRmcConfig(
+        source=str(path),
+        element_info=element_info,
+        si_o=ranges["Si"],
+        al_o=ranges["Al"],
+    )
+
+
+def rmc_config_to_cutoffs(config: ZeoliteRmcConfig) -> ZeoliteCutoffs:
+    """RMC 設定を ``ZeoliteCutoffs`` に変換する。"""
+    if config.si_o is None or config.al_o is None:
+        raise ValueError(
+            f"{config.source}: Si-O / Al-O の両 range が必要です。"
+        )
+
+    return ZeoliteCutoffs(
+        si_o=config.si_o,
+        al_o=config.al_o,
+    )
+
+
+def find_rmc_parameter_source(
+    directory: str | Path = ".",
+) -> Optional[Path]:
+    """解析ディレクトリから RMC parameter source を自動探索する。
+
+    優先順位:
+        1. ``*.dat``
+        2. ``rmc_init.py``
+        3. ``rmc_init*.py``
+
+    ``*.dat`` が複数ある場合は basename が ``aaa.dat`` のものを優先し、
+    それ以外は名前順の最初を返す。
+    """
+    directory = Path(directory)
+
+    dat_files = sorted(directory.glob("*.dat"))
+    if dat_files:
+        for path in dat_files:
+            if path.name == "aaa.dat":
+                return path
+        return dat_files[0]
+
+    exact_init = directory / "rmc_init.py"
+    if exact_init.exists():
+        return exact_init
+
+    init_files = sorted(directory.glob("rmc_init*.py"))
+    if init_files:
+        return init_files[0]
+
+    return None
+
+
+def load_zeolite_rmc_config(
+    source: str | Path,
+) -> ZeoliteRmcConfig:
+    """``*.dat`` または ``rmc_init*.py`` を拡張子から自動判定して読む。"""
+    source = Path(source)
+
+    if source.suffix.lower() == ".dat":
+        return load_zeolite_rmc_config_from_dat(source)
+
+    if source.suffix.lower() == ".py":
+        return load_zeolite_rmc_config_from_init(source)
+
+    raise ValueError(
+        f"未対応の RMC parameter source です: {source} "
+        "(*.dat または *.py を指定してください)"
+    )
 
 
 @dataclass(frozen=True)
