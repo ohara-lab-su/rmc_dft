@@ -110,8 +110,20 @@ def run_rmc(
             logger.error("**Error**: FNC and cutoff are inconsistent.")
             return False
 
-        # rmc.run(cfg_name=config.cfg_name)
-        if not rmc.run():
+        # RMC_POT の終了方法に関係なく後処理を行う。
+        # Ctrl+C の場合も rmc.run() から KeyboardInterrupt が抜ける前に
+        # 途中まで出力された *.cfg などを rmc_dir に退避する。
+        try:
+            run_ok = rmc.run()
+        finally:
+            if postprocess:
+                rmc.postprocess(
+                    log_dir=rmc_dir,
+                    cfg_name=config.cfg_name,
+                    element_info=config.element_info,
+                )
+
+        if not run_ok:
             logger.error("**Error**: RMC_POT execution failed.")
             return False
 
@@ -131,18 +143,6 @@ def run_rmc(
             loop = 0  # とりあえず None 以外の数字
         ###################################################
 
-        # ---------------------------
-        # backup folder がすでにある前提
-        # ---------------------------
-        # rmc.postprocess()  ## backup and output xxx.vasp
-
-        if postprocess:
-            # カレントフォルダで回すだけだと必要ない
-            rmc.postprocess(
-                log_dir=rmc_dir,
-                cfg_name=config.cfg_name,
-                element_info=config.element_info,
-            )  # backup(loop番号つき), cfg --> xxx.vasp
         logger.info("[rmc] end")
 
         # auto_converge True: なんか失敗した
@@ -222,11 +222,15 @@ if __name__ == "__main__":
         logger=logger_,
     )
 
-    run_rmc(
-        config=config_,
-        rmc_log=rmc_log_,
-        rmc_dat=rmc_dat_,
-        auto_converge=False,
-        msg=msg_,
-        logger=logger_,
-    )
+    try:
+        run_rmc(
+            config=config_,
+            rmc_log=rmc_log_,
+            rmc_dat=rmc_dat_,
+            auto_converge=False,
+            msg=msg_,
+            logger=logger_,
+        )
+    except KeyboardInterrupt:
+        logger_.warning("[rmc] Exit by Ctrl+C.")
+        sys.exit(130)
