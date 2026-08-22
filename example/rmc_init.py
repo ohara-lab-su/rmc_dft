@@ -277,6 +277,53 @@ def run_rmc_init(
     rmc_dat.set_swap_settings(0.0, 0)  # COORD trial: swap disabled
 
     # ------------------------------------------------------------------
+    # FNC / topology を使用する場合だけ、次のどちらかを有効にする。
+    # ------------------------------------------------------------------
+    # 何も呼ばなければ、自由形式側の初期値は FNC-TYPE=NONE であり、
+    # [ BPOT ] も作成されないため、FNC も topology も使用しない。
+    #
+    # aaa.fnc を使用する場合:
+    # rmc_dat.set_fnc_switch(3)
+    #
+    # aaa.top を使用する場合:
+    # rmc_dat.set_fnc_switch(4)
+
+    # ------------------------------------------------------------------
+    # FNC ファイルの距離範囲を RMC 実行前に変更する。
+    #   固定フォーマットで FNC/TOP を用いたときの FNC/TOP の値設定
+    # ------------------------------------------------------------------
+    # 作成時は、packmol_util つかっていたらそれで、初期設定はされている
+    # その値を、rmc するときに rmc 毎に変えるなどするには、
+    # ペア指定は変えず、constraint type ごとの rmin/rmax だけを書き換える。
+
+    # rmc_dat.set_fnc_distance_ranges(
+    #     {
+    #         # 1: (1.24, 1.37),  # P-O
+    #         # 2: (2.02, 2.25),  # O-O
+    #         # 1: (1.20, 1.45),  # P-O
+    #         1: (1.20, 1.8),  # P-O
+    #     }
+    # )
+
+    # 自由形式フォーマットだと element 情報が必須となる
+    if rmc_dat.is_free_format:
+        # element
+        # element_info = config.element_info
+        # rmc_dat.set_element_info(element_info)
+
+        # --- SiO2 ---
+        # rmc_dat.set_element_info(["Si", "O"])
+
+        # --- Zeolite: RMC type order 1=Si, 2=Al, 3=O, 4=Na ---
+        rmc_dat.set_element_info(["Si", "Al", "O", "Na"])
+
+        # HST
+        rmc_dat.set_history_buffer_size(200)
+        # SAVE (固定フォーマットからの互換メソッドの方でセットされるのでなくてもいい)
+        # HST-STEP-FACTOR は独立した時間ではなく、SAVE-TIME を基準にした倍率
+        # rmc_dat.set_display_update_interval(1)
+
+    # ------------------------------------------------------------------
     # 角度拘束(free-format)
     # ------------------------------------------------------------------
     if rmc_dat.is_free_format:
@@ -374,53 +421,6 @@ def run_rmc_init(
             ],
             index=2,
         )
-
-    # ------------------------------------------------------------------
-    # FNC / topology を使用する場合だけ、次のどちらかを有効にする。
-    # ------------------------------------------------------------------
-    # 何も呼ばなければ、自由形式側の初期値は FNC-TYPE=NONE であり、
-    # [ BPOT ] も作成されないため、FNC も topology も使用しない。
-    #
-    # aaa.fnc を使用する場合:
-    # rmc_dat.set_fnc_switch(3)
-    #
-    # aaa.top を使用する場合:
-    # rmc_dat.set_fnc_switch(4)
-
-    # ------------------------------------------------------------------
-    # FNC ファイルの距離範囲を RMC 実行前に変更する。
-    #   固定フォーマットで FNC/TOP を用いたときの FNC/TOP の値設定
-    # ------------------------------------------------------------------
-    # 作成時は、packmol_util つかっていたらそれで、初期設定はされている
-    # その値を、rmc するときに rmc 毎に変えるなどするには、
-    # ペア指定は変えず、constraint type ごとの rmin/rmax だけを書き換える。
-
-    # rmc_dat.set_fnc_distance_ranges(
-    #     {
-    #         # 1: (1.24, 1.37),  # P-O
-    #         # 2: (2.02, 2.25),  # O-O
-    #         # 1: (1.20, 1.45),  # P-O
-    #         1: (1.20, 1.8),  # P-O
-    #     }
-    # )
-
-    # 自由形式フォーマットだと element 情報が必須となる
-    if rmc_dat.is_free_format:
-        # element
-        # element_info = config.element_info
-        # rmc_dat.set_element_info(element_info)
-
-        # --- SiO2 ---
-        # rmc_dat.set_element_info(["Si", "O"])
-
-        # --- Zeolite: RMC type order 1=Si, 2=Al, 3=O, 4=Na ---
-        rmc_dat.set_element_info(["Si", "Al", "O", "Na"])
-
-        # HST
-        rmc_dat.set_history_buffer_size(200)
-        # SAVE (固定フォーマットからの互換メソッドの方でセットされるのでなくてもいい)
-        # HST-STEP-FACTOR は独立した時間ではなく、SAVE-TIME を基準にした倍率
-        # rmc_dat.set_display_update_interval(1)
 
     # ------------------------------------------------------------------
     # SiO2 Qn / SNC constraint
