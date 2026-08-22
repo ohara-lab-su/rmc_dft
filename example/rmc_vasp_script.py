@@ -120,7 +120,11 @@ if __name__ == "__main__":
             # log0_rmc は rmc_init.py、それ以降は rmc_init_N.py を
             # 各 RMC 実行直前にファイルから読み込む。
             # ファイルが存在しなければ実行しない。
-            rmc_init_file = "rmc_init.py" if msg_rmc == 0 else f"rmc_init_{msg_rmc}.py"
+            if msg_rmc == 0:
+                rmc_init_file = "rmc_init.py"
+            else:
+                rmc_init_file = f"rmc_init_{msg_rmc}.py"
+
             if os.path.isfile(rmc_init_file):
                 rmc_init_namespace = runpy.run_path(rmc_init_file)
                 rmc_init_namespace["run_rmc_init"](
