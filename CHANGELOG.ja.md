@@ -3,6 +3,26 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.6.6
+
+### RMC 実行回数に応じた初期化スクリプト
+
+- RMC-DFT の各 RMC 実行直前に、実行回数に対応する初期化スクリプトを実行できるようにした。
+- RMC のログ番号と初期化スクリプトを以下のように対応させた。
+    - `log0_rmc` → `rmc_init.py`
+    - `log1_rmc` → `rmc_init_1.py`
+    - `log2_rmc` → `rmc_init_2.py`
+    - `logN_rmc` → `rmc_init_N.py`
+- 対応する `rmc_init_N.py` が存在しない場合は初期化処理をスキップし、そのまま RMC を実行する。
+- RMC-DFT 起動時にすべての `rmc_init_N.py` を用意しておく必要はなく、各 RMC 実行直前に対象ファイルの存在を確認するようにした。
+- 初期化スクリプトは通常のモジュール import ではなく、実行直前に `.py` ファイルとして毎回ロードするようにした。
+    - RMC-DFT 実行中に後続回用の `rmc_init_N.py` を追加できる。
+    - 対象回の実行前であれば、`rmc_init_N.py` の変更内容をそのまま反映できる。
+- RMC の実行回数には RMC-DFT のループカウンタではなく、実際の `logN_rmc` の番号を使用する。
+    - RMC-DFT を restart した場合でも、既存ログに続く正しい `rmc_init_N.py` が選択される。
+- この制御は RMC-DFT の反復を管理する `rmc_vasp_script.py` 側で行い、単発 RMC 実行を担当する `rmc.py`
+  には実行回数管理を持たせない構成とした。
+
 ## v0.6.5
 
 ### Ctrl+C 終了時の後処理
