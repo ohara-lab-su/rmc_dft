@@ -3,6 +3,21 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.6.5
+
+### Ctrl+C 終了時の後処理
+
+- `rmc.py` の RMC_POT 実行部分の終了処理を修正。
+- `rmc.run()` の実行を `try` / `finally` で囲み、RMC_POT の終了方法にかかわらず `postprocess()` が実行されるようにした。
+- `Ctrl+C` (`KeyboardInterrupt`) で RMC を中断した場合でも、RMCp.exe が停止するまでに生成された途中の `*.cfg`
+  などを通常終了時と同じログディレクトリへ保存する。
+- 正常終了、`Ctrl+C`
+  による中断、その他の例外発生時で後処理を共通化した。
+- `KeyboardInterrupt` やその他の例外は `finally`
+  で後処理を実行した後、そのまま上位へ伝播する。
+- 従来の通常終了後の `postprocess()`
+  呼び出しは削除し、後処理の重複を避けた。
+
 ## v0.6.4
 
 ### RMC_POT 自由形式の構造拘束・ポテンシャル設定 API を拡張

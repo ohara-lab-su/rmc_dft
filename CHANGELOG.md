@@ -3,6 +3,20 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.6.5
+
+### Post-processing on Ctrl+C termination
+
+- Updated the RMC_POT termination handling in `rmc.py`.
+- Wrapped the `rmc.run()` execution in `try` / `finally` so that
+  `postprocess()` is executed regardless of how RMC_POT terminates.
+- When RMC is interrupted with `Ctrl+C` (`KeyboardInterrupt`), intermediate files such as `*.cfg` generated before
+  RMCp.exe stops are now saved to the same log directory used for normal termination.
+- Unified post-processing for normal termination, `Ctrl+C`
+  interruption, and other exceptions.
+- `KeyboardInterrupt` and other exceptions continue to propagate after the post-processing in `finally` has completed.
+- Removed the previous `postprocess()` call after normal execution to avoid duplicate post-processing.
+
 ## v0.6.4
 
 ### Extended RMC_POT free-format APIs for structural constraints and potentials
