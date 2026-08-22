@@ -11,6 +11,7 @@ import os
 import sys
 import shutil
 import subprocess
+import runpy
 
 # ----- QnNetworkBuilder
 # from rmc_dft.rmc_pot.qn import QnNetworkBuilder
@@ -40,7 +41,6 @@ from rmc_dft.util import check_restart_rmc_vasp as check_restart_rmc_vasp
 from x_logger import XLogger
 
 # for local
-from rmc_init import run_rmc_init
 from rmc import run_rmc
 from rmc_vasp import run_vasp
 from rmc_vasp_init import run_vasp_init
@@ -112,19 +112,26 @@ if __name__ == "__main__":
         # ------------------- RMC ------------------------
         if start_mode == "RMC":
 
-            # RMC のパラメーターを毎回作る
-            run_rmc_init(
-                config=config,
-                rmc_dat=rmc_dat,
-                logger=logger,
-            )
+            # msg の連番番号を作る
+            log_dir_rmc = next_log_dir_name("rmc")
+            msg_rmc = int(log_dir_rmc.split("_")[0].replace("log", ""))
+
+            # RMC のパラメーターを作る
+            # log0_rmc は rmc_init.py、それ以降は rmc_init_N.py を
+            # 各 RMC 実行直前にファイルから読み込む。
+            # ファイルが存在しなければ実行しない。
+            rmc_init_file = "rmc_init.py" if msg_rmc == 0 else f"rmc_init_{msg_rmc}.py"
+            if os.path.isfile(rmc_init_file):
+                rmc_init_namespace = runpy.run_path(rmc_init_file)
+                rmc_init_namespace["run_rmc_init"](
+                    config=config,
+                    rmc_dat=rmc_dat,
+                    logger=logger,
+                )
+
             # 富岳対応 (キャッシュ対策)
             subprocess.run(["sleep", "5"], check=True)
             subprocess.run(["ls", "-la", "./"], check=True)
-
-            # msg のレン版番号を作る
-            log_dir_rmc = next_log_dir_name("rmc")
-            msg_rmc = int(log_dir_rmc.split("_")[0].replace("log", ""))
 
             # 保存フォルダ名はそれぞれの run_rmc 内部で決まる
             run_rmc(

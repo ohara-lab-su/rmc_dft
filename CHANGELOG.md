@@ -3,6 +3,30 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.6.6
+
+### Initialization scripts for individual RMC runs
+
+- Added support for running an initialization script corresponding to each RMC run immediately before that run starts in
+  RMC-DFT.
+- RMC log indices are mapped to initialization scripts as follows:
+    - `log0_rmc` → `rmc_init.py`
+    - `log1_rmc` → `rmc_init_1.py`
+    - `log2_rmc` → `rmc_init_2.py`
+    - `logN_rmc` → `rmc_init_N.py`
+- If the corresponding `rmc_init_N.py` does not exist, the initialization step is skipped and the RMC run proceeds
+  normally.
+- All `rmc_init_N.py` files no longer need to exist when RMC-DFT is started; the corresponding file is checked
+  immediately before each RMC run.
+- Initialization scripts are loaded directly from the `.py` file immediately before execution instead of relying on a
+  normal module import.
+    - A later-run `rmc_init_N.py` can therefore be added while RMC-DFT is already running.
+    - Changes to `rmc_init_N.py` are reflected as long as they are made before the corresponding RMC run starts.
+- The actual `logN_rmc` index is used to determine the RMC run number instead of the RMC-DFT loop counter.
+    - When RMC-DFT is restarted, the correct `rmc_init_N.py` corresponding to the next log index is selected.
+- This run-index control is kept in `rmc_vasp_script.py`, which manages the RMC-DFT iteration, rather than adding
+  run-count management to `rmc.py`, which is responsible for a single RMC execution.
+
 ## v0.6.5
 
 ### Post-processing on Ctrl+C termination
