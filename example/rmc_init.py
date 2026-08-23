@@ -208,9 +208,14 @@ def run_rmc_init(
     # )
 
     ###################################
-    # 5 行目：r spacing を設定する(動径のビン幅)
-    # rのステップ(Δr)
-    rmc_dat.set_r_spacing(0.025)
+    # 14 (温度因子)
+    # σ（実験データの許容誤差の標準偏差）
+    #    小さいほど「ズレ」を許さず、結果的により厳しくフィットさせようとする。
+    # rmc_dat.set_sigma_factor(5e-4)
+    # rmc_dat.set_sigma_factor(1e-5)
+    # rmc_dat.set_sigma_factor(1e-2)  # 2026.02.16
+    # rmc_dat.set_sigma_factor(1e-7)
+    rmc_dat.set_sigma_factor(0.05)
 
     ###################################
     # 6行目: moveout を認めるかどうか？
@@ -234,18 +239,6 @@ def run_rmc_init(
     # rmc_dat.set_time_and_save(720, 1)
 
     ###################################
-    # 10 行目：データ種の使用フラグ（g(r), neutron, x-ray, EXAFS）を設定する
-    rmc_dat.set_data_flags([0, 0, 1, 0])
-
-    ###################################
-    # 実験データファイル名（11 行目）を設定する
-    # デフォルト値は config.yaml で書く(ここで書いた値のほうが優先される)
-    # rmc_dat.set_exp_filename(config.rmc_exp_filename)
-    # rmc_dat.set_exp_filename("ascast.xsq")
-    # rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
-    # rmc_dat.set_exp_filename("as_cast_0305.xsq")
-
-    ###################################
     # 12 (データ範囲)
     # ---- FeSiB
     # rmc_dat.set_exp_range(1, 1091, auto_write=True)
@@ -259,14 +252,21 @@ def run_rmc_init(
     # rmc_dat.set_exp_range(50, 1092)
 
     ###################################
-    # 14 (温度因子)
-    # σ（実験データの許容誤差の標準偏差）
-    #    小さいほど「ズレ」を許さず、結果的により厳しくフィットさせようとする。
-    # rmc_dat.set_sigma_factor(5e-4)
-    # rmc_dat.set_sigma_factor(1e-5)
-    # rmc_dat.set_sigma_factor(1e-2)  # 2026.02.16
-    # rmc_dat.set_sigma_factor(1e-7)
-    rmc_dat.set_sigma_factor(0.05)
+    # 5 行目：r spacing を設定する(動径のビン幅)
+    # rのステップ(Δr)
+    rmc_dat.set_r_spacing(0.025)
+
+    ###################################
+    # 10 行目：データ種の使用フラグ（g(r), neutron, x-ray, EXAFS）を設定する
+    rmc_dat.set_data_flags([0, 0, 1, 0])
+
+    ###################################
+    # 実験データファイル名（11 行目）を設定する
+    # デフォルト値は config.yaml で書く(ここで書いた値のほうが優先される)
+    # rmc_dat.set_exp_filename(config.rmc_exp_filename)
+    # rmc_dat.set_exp_filename("ascast.xsq")
+    # rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
+    # rmc_dat.set_exp_filename("as_cast_0305.xsq")
 
     ###################################
     # swap

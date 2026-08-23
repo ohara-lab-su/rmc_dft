@@ -216,9 +216,14 @@ def run_rmc_init(
     # )
 
     ###################################
-    # 5 行目：r spacing を設定する(動径のビン幅)
-    # rのステップ(Δr)
-    rmc_dat.set_r_spacing(0.025)
+    # 14 (温度因子)
+    # σ（実験データの許容誤差の標準偏差）
+    #    小さいほど「ズレ」を許さず、結果的により厳しくフィットさせようとする。
+    # rmc_dat.set_sigma_factor(5e-4)
+    # rmc_dat.set_sigma_factor(1e-5)
+    # rmc_dat.set_sigma_factor(1e-2)  # 2026.02.16
+    # rmc_dat.set_sigma_factor(1e-7)
+    rmc_dat.set_sigma_factor(0.05)
 
     ###################################
     # 6行目: moveout を認めるかどうか？
@@ -242,18 +247,6 @@ def run_rmc_init(
     # rmc_dat.set_time_and_save(720, 1)
 
     ###################################
-    # 10 行目：データ種の使用フラグ（g(r), neutron, x-ray, EXAFS）を設定する
-    rmc_dat.set_data_flags([0, 0, 1, 0])
-
-    ###################################
-    # 実験データファイル名（11 行目）を設定する
-    # デフォルト値は config.yaml で書く(ここで書いた値のほうが優先される)
-    # rmc_dat.set_exp_filename(config.rmc_exp_filename)
-    # rmc_dat.set_exp_filename("ascast.xsq")
-    # rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
-    # rmc_dat.set_exp_filename("as_cast_0305.xsq")
-
-    ###################################
     # 12 (データ範囲)
     # ---- FeSiB
     # rmc_dat.set_exp_range(1, 1091, auto_write=True)
@@ -267,14 +260,21 @@ def run_rmc_init(
     # rmc_dat.set_exp_range(50, 1092)
 
     ###################################
-    # 14 (温度因子)
-    # σ（実験データの許容誤差の標準偏差）
-    #    小さいほど「ズレ」を許さず、結果的により厳しくフィットさせようとする。
-    # rmc_dat.set_sigma_factor(5e-4)
-    # rmc_dat.set_sigma_factor(1e-5)
-    # rmc_dat.set_sigma_factor(1e-2)  # 2026.02.16
-    # rmc_dat.set_sigma_factor(1e-7)
-    rmc_dat.set_sigma_factor(0.05)
+    # 5 行目：r spacing を設定する(動径のビン幅)
+    # rのステップ(Δr)
+    rmc_dat.set_r_spacing(0.025)
+
+    ###################################
+    # 10 行目：データ種の使用フラグ（g(r), neutron, x-ray, EXAFS）を設定する
+    rmc_dat.set_data_flags([0, 0, 1, 0])
+
+    ###################################
+    # 実験データファイル名（11 行目）を設定する
+    # デフォルト値は config.yaml で書く(ここで書いた値のほうが優先される)
+    # rmc_dat.set_exp_filename(config.rmc_exp_filename)
+    # rmc_dat.set_exp_filename("ascast.xsq")
+    # rmc_dat.set_exp_filename("HB1M_250_251224.xsq")
+    # rmc_dat.set_exp_filename("as_cast_0305.xsq")
 
     ###################################
     # swap
@@ -283,6 +283,54 @@ def run_rmc_init(
     # Si-Si, Si-O, O-O
     # rmc_dat.set_swap_settings(0.1, 1)  # trial: 10% of moves are Si-O swaps
     rmc_dat.set_swap_settings(0.0, 0)  # COORD trial: swap disabled
+
+    # ------------------------------------------------------------------
+    # FNC / topology を使用する場合だけ、次のどちらかを有効にする。
+    # ------------------------------------------------------------------
+    # 何も呼ばなければ、自由形式側の初期値は FNC-TYPE=NONE であり、
+    # [ BPOT ] も作成されないため、FNC も topology も使用しない。
+    #
+    # aaa.fnc を使用する場合:
+    # rmc_dat.set_fnc_switch(3)
+    #
+    # aaa.top を使用する場合:
+    # rmc_dat.set_fnc_switch(4)
+
+    # ------------------------------------------------------------------
+    # FNC ファイルの距離範囲を RMC 実行前に変更する。
+    #   固定フォーマットで FNC/TOP を用いたときの FNC/TOP の値設定
+    # ------------------------------------------------------------------
+    # 作成時は、packmol_util つかっていたらそれで、初期設定はされている
+    # その値を、rmc するときに rmc 毎に変えるなどするには、
+    # ペア指定は変えず、constraint type ごとの rmin/rmax だけを書き換える。
+
+    # rmc_dat.set_fnc_distance_ranges(
+    #     {
+    #         # 1: (1.24, 1.37),  # P-O
+    #         # 2: (2.02, 2.25),  # O-O
+    #         # 1: (1.20, 1.45),  # P-O
+    #         1: (1.20, 1.8),  # P-O
+    #     }
+    # )
+
+    # 自由形式フォーマットだと element 情報が必須となる
+    if rmc_dat.is_free_format:
+        pass
+        # element
+        # element_info = config.element_info
+        # rmc_dat.set_element_info(element_info)
+
+        # --- SiO2 ---
+        rmc_dat.set_element_info(["Si", "O"])
+
+        # --- Zeolite: RMC type order 1=Si, 2=Al, 3=O, 4=Na ---
+        # rmc_dat.set_element_info(["Si", "Al", "O", "Na"])
+
+        # HST
+        rmc_dat.set_history_buffer_size(200)
+        # SAVE (固定フォーマットからの互換メソッドの方でセットされるのでなくてもいい)
+        # HST-STEP-FACTOR は独立した時間ではなく、SAVE-TIME を基準にした倍率
+        # rmc_dat.set_display_update_interval(1)
 
     # ------------------------------------------------------------------
     # 角度拘束(free-format)
@@ -382,54 +430,6 @@ def run_rmc_init(
         #     ],
         #         index=2,
         # )
-
-    # ------------------------------------------------------------------
-    # FNC / topology を使用する場合だけ、次のどちらかを有効にする。
-    # ------------------------------------------------------------------
-    # 何も呼ばなければ、自由形式側の初期値は FNC-TYPE=NONE であり、
-    # [ BPOT ] も作成されないため、FNC も topology も使用しない。
-    #
-    # aaa.fnc を使用する場合:
-    # rmc_dat.set_fnc_switch(3)
-    #
-    # aaa.top を使用する場合:
-    # rmc_dat.set_fnc_switch(4)
-
-    # ------------------------------------------------------------------
-    # FNC ファイルの距離範囲を RMC 実行前に変更する。
-    #   固定フォーマットで FNC/TOP を用いたときの FNC/TOP の値設定
-    # ------------------------------------------------------------------
-    # 作成時は、packmol_util つかっていたらそれで、初期設定はされている
-    # その値を、rmc するときに rmc 毎に変えるなどするには、
-    # ペア指定は変えず、constraint type ごとの rmin/rmax だけを書き換える。
-
-    # rmc_dat.set_fnc_distance_ranges(
-    #     {
-    #         # 1: (1.24, 1.37),  # P-O
-    #         # 2: (2.02, 2.25),  # O-O
-    #         # 1: (1.20, 1.45),  # P-O
-    #         1: (1.20, 1.8),  # P-O
-    #     }
-    # )
-
-    # 自由形式フォーマットだと element 情報が必須となる
-    if rmc_dat.is_free_format:
-        pass
-        # element
-        # element_info = config.element_info
-        # rmc_dat.set_element_info(element_info)
-
-        # --- SiO2 ---
-        rmc_dat.set_element_info(["Si", "O"])
-
-        # --- Zeolite: RMC type order 1=Si, 2=Al, 3=O, 4=Na ---
-        # rmc_dat.set_element_info(["Si", "Al", "O", "Na"])
-
-        # HST
-        rmc_dat.set_history_buffer_size(200)
-        # SAVE (固定フォーマットからの互換メソッドの方でセットされるのでなくてもいい)
-        # HST-STEP-FACTOR は独立した時間ではなく、SAVE-TIME を基準にした倍率
-        # rmc_dat.set_display_update_interval(1)
 
     # ------------------------------------------------------------------
     # SiO2 Qn / SNC constraint
