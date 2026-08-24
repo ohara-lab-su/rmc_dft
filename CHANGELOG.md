@@ -3,6 +3,71 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.7
+
+## Reorganized RMC / VASP initialization
+
+Reorganized the initialization flow so that RMC and VASP parameters for the next loop can be changed independently while
+an RMC-DFT run is in progress.
+
+### RMC
+
+When RMC is executed from `rmc_vasp_script.py`, the initialization file corresponding to the current RMC loop number is
+loaded immediately before that RMC run.
+
+```text
+log0_rmc -> rmc_init.py
+log1_rmc -> rmc_init_1.py
+log2_rmc -> rmc_init_2.py
+...
+```
+
+This allows parameters for the next RMC loop to be changed during an RMC-DFT run by creating or editing the
+corresponding `rmc_init_N.py` before that loop starts.
+
+When `rmc.py` is executed directly, it continues to use `rmc_init.py`.
+
+### VASP
+
+The VASP initialization flow has been made symmetric with the RMC initialization flow.
+
+When VASP is executed from `rmc_vasp_script.py`, the initialization file corresponding to the current VASP loop number
+is loaded immediately before that VASP run.
+
+```text
+log0_dft -> rmc_vasp_init.py
+log1_dft -> rmc_vasp_init_1.py
+log2_dft -> rmc_vasp_init_2.py
+...
+```
+
+This allows parameters for the next VASP loop to be changed during an RMC-DFT run by creating or editing the
+corresponding `rmc_vasp_init_N.py` before that loop starts.
+
+When `rmc_vasp.py` is executed directly, it uses `rmc_vasp_init.py`.
+
+### Removed duplicate VASP initialization
+
+Removed the separate first-run VASP initialization path using `run_vasp_init_safe()` from `rmc_vasp_script.py`.
+
+VASP initialization is now handled only by the corresponding `rmc_vasp_init_N.py` immediately before each loop,
+preventing INCAR and related settings from being applied through multiple initialization paths.
+
+The logic in `rmc_vasp.py` that dynamically searched for `rmc_vasp_init_N.py` was also removed, giving each component a
+clear responsibility:
+
+```text
+Direct execution:
+rmc.py      -> rmc_init.py
+rmc_vasp.py -> rmc_vasp_init.py
+
+RMC-DFT loop:
+rmc_vasp_script.py -> rmc_init_N.py      -> run_rmc()
+rmc_vasp_script.py -> rmc_vasp_init_N.py -> run_vasp()
+```
+
+This makes the RMC and VASP initialization flows consistent and symmetric.
+
 ## v0.6.6
 
 ### Initialization scripts for individual RMC runs

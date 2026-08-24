@@ -22,6 +22,7 @@ RMC と DFT の収束状況を同一 Figure に並べて描画
   のいずれかをコメントアウトで切り替え
 
 """
+
 from typing import Dict, List, Optional, Tuple, Union
 import os
 import numpy as np
@@ -30,7 +31,8 @@ import matplotlib.pyplot as plt
 from rmc_dft import RmcPotHst, VaspOutcar
 from x_logger import XLogger
 
-import make_log_dirname
+# 旧仕様
+# import make_log_dirname
 
 
 def read_chi2_from_dir(

@@ -27,7 +27,6 @@ from rmc_dft import (
 )
 from x_logger import XLogger
 
-from rmc_vasp_init import run_vasp_init
 from rmc_dft.util import next_log_dir_name as next_log_dir_name
 
 
@@ -104,6 +103,8 @@ def run_vasp(
 
 
 if __name__ == "__main__":
+    from rmc_vasp_init import run_vasp_init
+
     """"""
     # RUN-mode (MPI, mpi-command, local などは config.yml で定義)
     config_ = Config("config.yml")
@@ -118,11 +119,10 @@ if __name__ == "__main__":
     # POSCAR (構造) は事前に用意しておく
     #
 
-    # VASP の INPUT を毎回作る/KPOINTS/POTCARは一回だけ作る)
+    # VASP のパラメーターを作る
     run_vasp_init(
-        config_,
+        config=config_,
         vasp_incar=vasp_incar_,
-        # vasp_kpoints=vasp_kpoints_,
         logger=logger_,
     )
     # 富岳対応 (cache対策)

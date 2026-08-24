@@ -43,8 +43,6 @@ from x_logger import XLogger
 # for local
 from rmc import run_rmc
 from rmc_vasp import run_vasp
-from rmc_vasp_init import run_vasp_init
-from rmc_vasp_init_safe import run_vasp_init_safe
 
 if __name__ == "__main__":
     logger = XLogger(
@@ -106,7 +104,6 @@ if __name__ == "__main__":
     vasp_kpoints = VaspKpoints(config=config, logger=logger)
 
     i = 0
-    vasp_step = 0
     for i in range(start_loop, start_loop + max_rmc_dft_loop):
         # for i in range(start_loop, max_rmc_dft_loop):
         # ------------------- RMC ------------------------
@@ -166,17 +163,6 @@ if __name__ == "__main__":
         # ------------------- DFT ------------------------
         if start_mode == "VASP":
 
-            vasp_step += 1
-
-            if vasp_step == 1:
-                # VASP の INPUT を毎回作る/KPOINTS/POTCARは一回だけ作る)
-                run_vasp_init_safe(
-                    config,
-                    vasp_incar=vasp_incar,
-                    vasp_kpoints=vasp_kpoints,
-                    logger=logger,
-                )
-
             # 富岳対応 (キャッシュ対策)
             subprocess.run(["sleep", "5"], check=True)
             subprocess.run(["ls", "-la", "./"], check=True)
@@ -184,6 +170,24 @@ if __name__ == "__main__":
             # msg の連番番号を作る
             log_dir_vasp = next_log_dir_name("dft")
             msg_vasp = int(log_dir_vasp.split("_")[0].replace("log", ""))
+
+            # VASP のパラメーターを作る
+            # log0_dft は rmc_vasp_init.py、それ以降は rmc_vasp_init_N.py を
+            # 各 VASP 実行直前にファイルから読み込む。
+            # ファイルが存在しなければ実行しない。
+            if msg_vasp == 0:
+                rmc_vasp_init_file = "rmc_vasp_init.py"
+            else:
+                rmc_vasp_init_file = f"rmc_vasp_init_{msg_vasp}.py"
+
+            if os.path.isfile(rmc_vasp_init_file):
+                rmc_vasp_init_namespace = runpy.run_path(rmc_vasp_init_file)
+                rmc_vasp_init_namespace["run_vasp_init"](
+                    config,
+                    vasp_incar=vasp_incar,
+                    vasp_kpoints=vasp_kpoints,
+                    logger=logger,
+                )
 
             # 保存フォルダ名はそれぞれの run_vasp 内部で決まる
             run_vasp(
