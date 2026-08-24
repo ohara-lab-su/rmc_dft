@@ -3,6 +3,65 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.7
+
+## RMC / VASP 初期化処理の整理
+
+RMC-DFT のループ実行中に、次のループで使用する RMC および VASP のパラメーターを個別に変更できるよう、初期化処理を整理した。
+
+### RMC
+
+`rmc_vasp_script.py` から RMC を実行する場合、各 RMC ループの直前に、そのループ番号に対応する初期化ファイルを読み込む。
+
+```text
+log0_rmc -> rmc_init.py
+log1_rmc -> rmc_init_1.py
+log2_rmc -> rmc_init_2.py
+...
+```
+
+これにより、RMC-DFT の実行中でも次のループに対応する `rmc_init_N.py` を作成・編集することで、次回の RMC のパラメーターを変更できる。
+
+`rmc.py` を単独実行する場合は、従来どおり `rmc_init.py` を使用する。
+
+### VASP
+
+VASP 側についても RMC 側と同じ構造に統一した。
+
+`rmc_vasp_script.py` から VASP を実行する場合、各 VASP ループの直前に、そのループ番号に対応する初期化ファイルを読み込む。
+
+```text
+log0_dft -> rmc_vasp_init.py
+log1_dft -> rmc_vasp_init_1.py
+log2_dft -> rmc_vasp_init_2.py
+...
+```
+
+これにより、RMC-DFT の実行中でも次のループに対応する `rmc_vasp_init_N.py` を作成・編集することで、次回の VASP
+のパラメーターを変更できる。
+
+`rmc_vasp.py` を単独実行する場合は、`rmc_vasp_init.py` を使用する。
+
+### VASP 初期化の二重実行を解消
+
+従来の `rmc_vasp_script.py` にあった `run_vasp_init_safe()` による初回 VASP 用の別経路の初期化処理を削除した。
+
+VASP の初期化処理を各ループ直前の `rmc_vasp_init_N.py` に一本化し、INCAR などの設定が複数の初期化処理から重複して適用されないようにした。
+
+また、`rmc_vasp.py` 自身が `rmc_vasp_init_N.py` を動的に探索する処理を削除し、責務を以下のように整理した。
+
+```text
+単独実行:
+rmc.py      -> rmc_init.py
+rmc_vasp.py -> rmc_vasp_init.py
+
+RMC-DFT ループ:
+rmc_vasp_script.py -> rmc_init_N.py      -> run_rmc()
+rmc_vasp_script.py -> rmc_vasp_init_N.py -> run_vasp()
+```
+
+これにより、RMC と VASP で初期化処理の構造を統一した。
+
 ## v0.6.6
 
 ### RMC 実行回数に応じた初期化スクリプト
