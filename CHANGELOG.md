@@ -3,6 +3,50 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.8
+
+## Added manual RMC-VASP execution sequences
+
+Added `rmc_vasp_script_sequence.py` as a separate script for manually specifying the execution order of RMC and VASP
+runs, while keeping the standard
+`rmc_vasp_script.py` unchanged.
+
+The manual sequence is defined separately in
+`rmc_vasp_script_sequence_dat.py`, so the execution order can be changed without editing the main sequence script.
+
+For example:
+
+```python
+manual_sequence = [
+    "rmc_init_1.py",
+    "rmc_init_2.py",
+    "rmc_vasp_init_3.py",
+    "rmc_init_4.py",
+    "rmc_init_5.py",
+    "rmc_vasp_init_6.py",
+]
+```
+
+This executes the following sequence:
+
+```text
+rmc_init_1.py      -> log1_rmc
+rmc_init_2.py      -> log2_rmc
+rmc_vasp_init_3.py -> log3_dft
+rmc_init_4.py      -> log4_rmc
+rmc_init_5.py      -> log5_rmc
+rmc_vasp_init_6.py -> log6_dft
+```
+
+The number in each `init_N.py` file is kept consistent with the corresponding
+`logN_*` directory number.
+
+After the manual sequence is completed, execution returns to the normal RMC-DFT loop and continues alternating between
+RMC and VASP.
+
+The standard `rmc_vasp_script.py` remains available for normal execution.
+`rmc_vasp_script_sequence.py` is used only when a manually defined execution sequence is required.
+
 # v0.6.7
 
 ## Reorganized RMC / VASP initialization

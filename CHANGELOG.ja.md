@@ -3,6 +3,45 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.8
+
+## RMC-VASP 手動シーケンス実行機能を追加
+
+通常の `rmc_vasp_script.py` とは別に、RMC と VASP の実行順序を手動で指定できる
+`rmc_vasp_script_sequence.py` を追加した。
+
+手動シーケンスの設定は `rmc_vasp_script_sequence_dat.py` に分離し、 実行スクリプト本体を書き換えずに実行順序を変更できる。
+
+例えば、以下のように指定する。
+
+```python
+manual_sequence = [
+    "rmc_init_1.py",
+    "rmc_init_2.py",
+    "rmc_vasp_init_3.py",
+    "rmc_init_4.py",
+    "rmc_init_5.py",
+    "rmc_vasp_init_6.py",
+]
+```
+
+この場合、以下の順序で実行する。
+
+```text
+rmc_init_1.py      -> log1_rmc
+rmc_init_2.py      -> log2_rmc
+rmc_vasp_init_3.py -> log3_dft
+rmc_init_4.py      -> log4_rmc
+rmc_init_5.py      -> log5_rmc
+rmc_vasp_init_6.py -> log6_dft
+```
+
+`init_N.py` の番号と `logN_*` の番号は対応させる。
+
+手動シーケンスの実行終了後は、通常の RMC-DFT ループに戻り、 RMC と VASP の交互実行を継続する。
+
+通常実行用の `rmc_vasp_script.py` は従来どおり残し、 手動シーケンスが必要な場合のみ `rmc_vasp_script_sequence.py` を使用する。
+
 # v0.6.7
 
 ## RMC / VASP 初期化処理の整理
