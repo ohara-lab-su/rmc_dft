@@ -3,6 +3,11 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.10
+
+- bugfix
+- plot系で引数省略時に aaa としたのと同じ様になるようにした
+
 # v0.6.9
 
 ## `plot_multi_converge.py` の RMC/DFT ログ配置を改善

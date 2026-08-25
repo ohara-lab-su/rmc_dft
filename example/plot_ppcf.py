@@ -3,6 +3,7 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 """
+
 import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import matplotlib.pyplot as plt
@@ -44,7 +45,12 @@ def plot_ppcf(
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv) == 2:
+    if len(sys.argv) == 1:
+        # 引数省略時は "aaa" を指定した場合と同じ動作
+        cfg_name_: str = "aaa"
+        plot_ppcf(cfg_name_, target_dir=None)
+
+    elif len(sys.argv) == 2:
         # カレントフォルダで cfg_name を指定
         cfg_name_: str = sys.argv[1]
         plot_ppcf(cfg_name_, target_dir=None)
