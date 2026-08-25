@@ -3,6 +3,73 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.11
+
+## Added execution modes for RMC-VASP sequence runs
+
+Added an option to `rmc_vasp_script_sequence.py` to control what happens after the manually defined sequence has
+completed.
+
+The option is configured in `rmc_vasp_script_sequence_dat.py`.
+
+```python
+continue_rmc_dft = False
+```
+
+### `continue_rmc_dft = False`
+
+Only the operations listed in `manual_sequence` are executed. The program terminates when the manual sequence is
+complete.
+
+In this mode, `rmc_vasp_script_sequence.py` can be used as a supplementary tool for running only selected RMC/VASP steps
+alongside the normal RMC-DFT workflow.
+
+Example:
+
+```python
+continue_rmc_dft = False
+
+manual_sequence = [
+    "rmc_init_1.py",
+    "rmc_init_2.py",
+    "rmc_vasp_init_3.py",
+]
+```
+
+Only these three operations are executed, and no additional normal RMC-DFT loop is started.
+
+### `continue_rmc_dft = True`
+
+After completing the operations listed in `manual_sequence`, execution continues into the normal RMC-DFT loop.
+
+In this mode, `rmc_vasp_script_sequence.py` can be used as an alternative to the normal `rmc_vasp_script.py`.
+
+```python
+continue_rmc_dft = True
+```
+
+After the manual sequence is complete, the normal RMC-DFT loop resumes from RMC.
+
+## Unified the sequence configuration filename
+
+The manual sequence configuration file is now consistently named:
+
+```text
+rmc_vasp_script_sequence_dat.py
+```
+
+`rmc_vasp_script_sequence.py` reads the following settings from this file:
+
+```python
+continue_rmc_dft
+manual_sequence
+```
+
+This allows the sequence functionality to be used in two distinct ways:
+
+- as a supplementary manual sequence for the normal workflow
+- as a replacement entry point that continues into the normal RMC-DFT loop
+
 # v0.6.10
 
 - bugfix
