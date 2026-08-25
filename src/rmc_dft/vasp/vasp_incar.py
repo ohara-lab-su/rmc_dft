@@ -49,10 +49,30 @@ class VaspIncar:
 
         if os.path.exists(self.incar_name):
             self.load()
+        else:
+            self.create_incar_file()
 
     # ==============================
     # 基本入出力
     # ==============================
+
+    def create_incar_file(self) -> bool:
+        """空の INCAR を新規作成する。
+
+        Returns:
+            新規作成した場合は True。
+            既に INCAR が存在する場合は上書きせず False。
+        """
+        if os.path.exists(self.incar_name):
+            return False
+
+        self._lines = []
+        self._incar = Incar()
+        with open(self.incar_name, "w") as f:
+            pass
+
+        self._logger.info(f"[VaspIncar] Created INCAR: {self.incar_name}")
+        return True
 
     def load(self) -> None:
         """
@@ -95,6 +115,15 @@ class VaspIncar:
         """整形ルール統一"""
         return f"{tag:<15} = {value}\n"
 
+    def _resolve_auto_write(self, auto_write: Optional[bool]) -> bool:
+        """メソッド単位の自動保存指定を解決する。
+
+        None の場合だけ、インスタンス生成時の auto_write を使用する。
+        """
+        if auto_write is None:
+            return self.auto_write
+        return bool(auto_write)
+
     # ==============================
     # 値操作（pymatgen互換）
     # ==============================
@@ -122,6 +151,8 @@ class VaspIncar:
         self,
         tag: str,
         value: Any,
+        *,
+        auto_write: Optional[bool] = True,
     ) -> None:
         """
         値設定。コメント保持したまま編集。
@@ -154,13 +185,24 @@ class VaspIncar:
             self._config.vasp_incar_tags[tag] = value
             ##########
 
-        if self.auto_write:
+        if self._resolve_auto_write(auto_write):
             self.write()
 
-    def set_tag(self, tag: str, value: Any) -> None:
-        self.set(tag, value)
+    def set_tag(
+        self,
+        tag: str,
+        value: Any,
+        *,
+        auto_write: Optional[bool] = True,
+    ) -> None:
+        self.set(tag, value, auto_write=auto_write)
 
-    def remove(self, tag: str) -> None:
+    def remove(
+        self,
+        tag: str,
+        *,
+        auto_write: Optional[bool] = True,
+    ) -> None:
         """指定タグを削除"""
         idx = self._find_line_index(tag)
         if idx is not None:
@@ -174,7 +216,7 @@ class VaspIncar:
             if self._config is not None and self._config.vasp_incar_tags is not None:
                 self._config.vasp_incar_tags.pop(tag, None)
 
-            if self.auto_write:
+            if self._resolve_auto_write(auto_write):
                 self.write()
 
     def reload(self) -> None:
