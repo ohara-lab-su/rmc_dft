@@ -3,6 +3,38 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.9
+
+## `plot_multi_converge.py` の RMC/DFT ログ配置を改善
+
+`plot_multi_converge.py` を、RMC と DFT のログが必ず交互に存在するとは限らない実行シーケンスに対応させました。
+
+- `logN_rmc` と `logN_dft` をログ番号順に判定し、RMC/DFT が連続する場合にも対応。
+- convergence グラフは従来どおり、上段に RMC、下段に DFT を表示。
+- RMC の直後に DFT が続く場合は、対応する RMC と DFT を同じ列に配置。
+- RMC が連続する場合は、それぞれを上段の独立した列に配置。
+- DFT が連続する場合は、それぞれを下段の独立した列に配置。
+- 対応する RMC または DFT が存在しない列は空欄として扱う。
+- RMC/DFT のデータ数を同数と仮定していた処理を廃止し、任意の RMC/DFT 実行シーケンスを描画可能にした。
+
+例えば、
+
+```text
+log0_rmc
+log1_rmc
+log2_dft
+log3_dft
+log4_rmc
+log5_dft
+```
+
+の場合、以下のように配置されます。
+
+```text
+RMC: log0  log1  (空)  log4
+DFT: (空)  log2  log3  log5
+```
+
 # v0.6.8
 
 ## RMC-VASP 手動シーケンス実行機能を追加

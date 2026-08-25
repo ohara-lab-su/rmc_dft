@@ -3,6 +3,39 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.9
+
+## Improved RMC/DFT log layout in `plot_multi_converge.py`
+
+Updated `plot_multi_converge.py` to support execution sequences where RMC and DFT logs do not necessarily alternate.
+
+- Detect `logN_rmc` and `logN_dft` in log-number order, including consecutive RMC or DFT runs.
+- The convergence plot continues to display RMC results in the upper row and DFT results in the lower row.
+- When a DFT run immediately follows an RMC run, the corresponding RMC and DFT results are aligned in the same column.
+- Consecutive RMC runs are placed in separate columns in the upper row.
+- Consecutive DFT runs are placed in separate columns in the lower row.
+- Columns without a corresponding RMC or DFT result are left empty.
+- Removed the assumption that the numbers of RMC and DFT datasets are equal, allowing arbitrary RMC/DFT execution
+  sequences to be plotted.
+
+For example,
+
+```text
+log0_rmc
+log1_rmc
+log2_dft
+log3_dft
+log4_rmc
+log5_dft
+```
+
+is arranged as:
+
+```text
+RMC: log0  log1  (empty)  log4
+DFT: (empty)  log2  log3  log5
+```
+
 # v0.6.8
 
 ## Added manual RMC-VASP execution sequences
