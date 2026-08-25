@@ -16,7 +16,7 @@ import re
 
 # ----- QnNetworkBuilder
 # from rmc_dft.rmc_pot.qn import QnNetworkBuilder
-from qn.qn_network_builder import QnNetworkBuilder
+# from qn.qn_network_builder import QnNetworkBuilder
 
 # ----------------------
 
@@ -125,8 +125,7 @@ if __name__ == "__main__":
 
             if msg_rmc != expected_msg:
                 raise RuntimeError(
-                    f"{init_file} と次のログ番号が一致しません: "
-                    f"{log_dir_rmc}"
+                    f"{init_file} と次のログ番号が一致しません: " f"{log_dir_rmc}"
                 )
 
             if not os.path.isfile(init_file):
@@ -168,8 +167,7 @@ if __name__ == "__main__":
 
             if msg_vasp != expected_msg:
                 raise RuntimeError(
-                    f"{init_file} と次のログ番号が一致しません: "
-                    f"{log_dir_vasp}"
+                    f"{init_file} と次のログ番号が一致しません: " f"{log_dir_vasp}"
                 )
 
             if not os.path.isfile(init_file):
