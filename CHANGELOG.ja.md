@@ -3,6 +3,74 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.11
+
+## RMC-VASP sequence 実行モードを追加
+
+`rmc_vasp_script_sequence.py` に、手動シーケンス実行後の動作を切り替えるオプションを追加した。
+
+設定は `rmc_vasp_script_sequence_dat.py` に記述する。
+
+```python
+continue_rmc_dft = False
+```
+
+### `continue_rmc_dft = False`
+
+`manual_sequence` に記述した処理だけを実行し、シーケンス終了後にプログラムを終了する。
+
+このモードでは `rmc_vasp_script_sequence.py` を、通常の RMC-DFT スクリプトを補完するための手動シーケンス実行用として使用できる。
+
+例:
+
+```python
+continue_rmc_dft = False
+
+manual_sequence = [
+    "rmc_init_1.py",
+    "rmc_init_2.py",
+    "rmc_vasp_init_3.py",
+]
+```
+
+この場合、指定した3処理のみを実行し、それ以上の通常 RMC-DFT 処理は行わない。
+
+### `continue_rmc_dft = True`
+
+`manual_sequence` に記述した処理を実行した後、通常の RMC-DFT ループへ移行する。
+
+このモードでは `rmc_vasp_script_sequence.py` 自体を、通常の `rmc_vasp_script.py` の代替として使用できる。
+
+```python
+continue_rmc_dft = True
+```
+
+手動シーケンス終了後は RMC から通常の RMC-DFT ループを再開する。
+
+## sequence 設定ファイル名を統一
+
+手動シーケンスの設定ファイル名を
+
+```text
+rmc_vasp_script_sequence_dat.py
+```
+
+に統一した。
+
+`rmc_vasp_script_sequence.py` はこの設定ファイルから以下を読み込む。
+
+```python
+continue_rmc_dft
+manual_sequence
+```
+
+これにより、sequence 機能を
+
+- 通常スクリプトを補完するための手動実行
+- 通常スクリプトの代わりとして継続実行
+
+の2通りで使い分けられるようになった。
+
 # v0.6.10
 
 - bugfix

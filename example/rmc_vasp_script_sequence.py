@@ -109,8 +109,9 @@ if __name__ == "__main__":
     #
     # 普段編集するのは rmc_vasp_sequence.py のみ。
     #####################################################
-    sequence_namespace = runpy.run_path("rmc_vasp_sequence.py")
+    sequence_namespace = runpy.run_path("rmc_vasp_script_sequence_dat.py")
     manual_sequence = sequence_namespace["manual_sequence"]
+    continue_rmc_dft = sequence_namespace.get("continue_rmc_dft", False)
 
     for init_file in manual_sequence:
         rmc_match = re.fullmatch(r"rmc_init_(\d+)\.py", init_file)
@@ -206,7 +207,15 @@ if __name__ == "__main__":
                 f"を指定してください: {init_file}"
             )
 
-    # 手動シーケンス終了後は通常の RMC-DFT を RMC から再開する
+    # 手動シーケンスだけで終了する場合
+    if not continue_rmc_dft:
+        logger.info("[SEQUENCE] manual sequence finished")
+        logger.info("[SEQUENCE] continue_rmc_dft = False: stop")
+        sys.exit(0)
+
+    # continue_rmc_dft = True の場合のみ、
+    # 手動シーケンス終了後に通常の RMC-DFT を RMC から再開する
+    logger.info("[SEQUENCE] continue_rmc_dft = True: continue normal RMC-DFT")
     start_mode = "RMC"
 
     i = 0
