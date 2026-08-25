@@ -84,6 +84,12 @@ def _hide_yticklabels_except_first(axes_row) -> None:
 def find_rmc_dft_pairs(
     base_dir: str,
 ) -> List[Dict[str, str]]:
+    """logX_rmc / logX_dft を描画列単位に整理する。
+
+    連続した RMC または DFT はそれぞれ独立した列に配置する。
+    RMC の直後が DFT の場合だけ、同じ列の上段・下段として揃える。
+    """
+
     records: List[Tuple[int, str, str]] = []
 
     for name in os.listdir(base_dir):
@@ -106,39 +112,40 @@ def find_rmc_dft_pairs(
             continue
 
         stage = parts[1]
-        if stage != "rmc":
-            if stage != "dft":
-                continue
+        if stage not in ("rmc", "dft"):
+            continue
 
         records.append((index, stage, name))
 
     records.sort(key=lambda item: item[0])
 
-    pairs: List[Dict[str, str]] = []
-    pending_rmc: Optional[Tuple[int, str]] = None
+    columns: List[Dict[str, str]] = []
+    previous_stage: Optional[str] = None
 
     for index, stage, name in records:
         if stage == "rmc":
-            pending_rmc = (index, name)
-            continue
-
-        if stage == "dft":
-            if pending_rmc is None:
-                continue
-
-            rmc_index, rmc_name = pending_rmc
-            pairs.append(
+            columns.append(
                 {
-                    "index": f"{rmc_index}->{index}",
-                    "rmc": rmc_name,
-                    "dft": name,
+                    "index": str(index),
+                    "rmc": name,
+                    "dft": "",
                 }
             )
+        else:
+            if previous_stage == "rmc" and columns[-1]["dft"] == "":
+                columns[-1]["dft"] = name
+            else:
+                columns.append(
+                    {
+                        "index": str(index),
+                        "rmc": "",
+                        "dft": name,
+                    }
+                )
 
-            pending_rmc = None
+        previous_stage = stage
 
-    return pairs
-
+    return columns
 
 def plot_multi_converge(
     log_pairs: List[Dict[str, str]],
@@ -150,8 +157,9 @@ def plot_multi_converge(
 
     Args:
         log_pairs (List[Dict[str, str]]):
-            log_search.find_log_pairs(base_dir) と同形式のリスト。
-            各要素は {"index","rmc","dft"} を持つ。
+            find_rmc_dft_pairs(base_dir) と同形式のリスト。
+            各要素は {"index", "rmc", "dft"} を持ち、
+            rmc または dft は空文字の場合がある。
         cfg_name (str):
             RMC_POT の cfg 名（拡張子なし）。
         base_dir (str):
@@ -165,8 +173,7 @@ def plot_multi_converge(
 
     logger = logger or XLogger()
 
-    hst_data: List[Tuple[str, list, list]] = []
-    en_data: List[Tuple[str, np.ndarray]] = []
+    plot_columns: List[Dict[str, object]] = []
 
     hst_ymin: float = float("inf")
     hst_ymax: float = float("-inf")
@@ -175,44 +182,56 @@ def plot_multi_converge(
     en_ymax: float = float("-inf")
 
     for pair in log_pairs:
-        idx_str: str = pair.get("index", "")
         rmc_dir_name: str = pair.get("rmc", "")
         dft_dir_name: str = pair.get("dft", "")
 
-        rmc_dir_path: str = os.path.join(base_dir, rmc_dir_name)
-        dft_dir_path: str = os.path.join(base_dir, dft_dir_name)
+        column: Dict[str, object] = {
+            "rmc_title": "",
+            "rmc_data": None,
+            "dft_title": "",
+            "dft_data": None,
+        }
 
-        title: str = f"log{idx_str}"
+        if rmc_dir_name:
+            rmc_dir_path = os.path.join(base_dir, rmc_dir_name)
+            h = read_chi2_from_dir(rmc_dir_path, cfg_name)
 
-        h = read_chi2_from_dir(rmc_dir_path, cfg_name)
-        if h is False:
-            continue
+            if h is not False:
+                steps, chi2 = h
+                column["rmc_title"] = rmc_dir_name.split("_", 1)[0]
+                column["rmc_data"] = (steps, chi2)
 
-        steps, chi2 = h
-        hst_data.append((title, steps, chi2))
+                if len(chi2) > 0:
+                    hst_ymin = min(hst_ymin, min(chi2))
+                    hst_ymax = max(hst_ymax, max(chi2))
 
-        if len(chi2) > 0:
-            hst_ymin = min(hst_ymin, min(chi2))
-            hst_ymax = max(hst_ymax, max(chi2))
+        if dft_dir_name:
+            dft_dir_path = os.path.join(base_dir, dft_dir_name)
+            e = read_energy_from_dir(dft_dir_path)
 
-        e = read_energy_from_dir(dft_dir_path)
-        if e is False:
-            continue
+            if e is not False:
+                energies = e
+                column["dft_title"] = dft_dir_name.split("_", 1)[0]
+                column["dft_data"] = energies
 
-        energies = e
-        en_data.append((title, energies))
+                if energies.size > 0:
+                    en_ymin = min(en_ymin, float(np.min(energies)))
+                    en_ymax = max(en_ymax, float(np.max(energies)))
 
-        if energies.size > 0:
-            en_ymin = min(en_ymin, float(np.min(energies)))
-            en_ymax = max(en_ymax, float(np.max(energies)))
+        plot_columns.append(column)
 
-    if len(hst_data) == 0 or len(en_data) == 0:
+    if not plot_columns:
+        logger.error("有効なログディレクトリが見つかりませんでした。")
+        return
+
+    if all(
+        column["rmc_data"] is None and column["dft_data"] is None
+        for column in plot_columns
+    ):
         logger.error("有効なデータが見つかりませんでした。")
         return
 
-    n: int = min(len(hst_data), len(en_data))
-    hst_data = hst_data[:n]
-    en_data = en_data[:n]
+    n: int = len(plot_columns)
 
     fig, axes = plt.subplots(
         nrows=2,
@@ -223,30 +242,54 @@ def plot_multi_converge(
     if n == 1:
         axes = np.array([[axes[0]], [axes[1]]])
 
-    for col, (title, steps, chi2) in enumerate(hst_data):
+    for col, column in enumerate(plot_columns):
         ax = axes[0, col]
-        ax.plot(steps, chi2)
-        ax.set_title(title)
-        if hst_ymin != float("inf"):
-            ax.set_ylim(hst_ymin, hst_ymax)
-        ax.set_xlabel("Step")
-        ax.grid(True)
+        rmc_data = column["rmc_data"]
 
-    axes[0, 0].set_ylabel("Chi^2")
-    _hide_yticklabels_except_first(axes[0])
+        if rmc_data is None:
+            ax.axis("off")
+        else:
+            steps, chi2 = rmc_data
+            ax.plot(steps, chi2)
+            ax.set_title(str(column["rmc_title"]))
+            if hst_ymin != float("inf"):
+                ax.set_ylim(hst_ymin, hst_ymax)
+            ax.set_xlabel("Step")
+            ax.grid(True)
 
-    for col, (title, energies) in enumerate(en_data):
+    visible_rmc_axes = [
+        axes[0, col]
+        for col, column in enumerate(plot_columns)
+        if column["rmc_data"] is not None
+    ]
+    if visible_rmc_axes:
+        visible_rmc_axes[0].set_ylabel("Chi^2")
+        _hide_yticklabels_except_first(visible_rmc_axes)
+
+    for col, column in enumerate(plot_columns):
         ax = axes[1, col]
-        x = np.arange(energies.size, dtype=int)
-        ax.plot(x, energies)
-        ax.set_title(title)
-        if en_ymin != float("inf"):
-            ax.set_ylim(en_ymin, en_ymax)
-        ax.set_xlabel("SCF step")
-        ax.grid(True)
+        dft_data = column["dft_data"]
 
-    axes[1, 0].set_ylabel("Energy [eV]")
-    _hide_yticklabels_except_first(axes[1])
+        if dft_data is None:
+            ax.axis("off")
+        else:
+            energies = dft_data
+            x = np.arange(energies.size, dtype=int)
+            ax.plot(x, energies)
+            ax.set_title(str(column["dft_title"]))
+            if en_ymin != float("inf"):
+                ax.set_ylim(en_ymin, en_ymax)
+            ax.set_xlabel("SCF step")
+            ax.grid(True)
+
+    visible_dft_axes = [
+        axes[1, col]
+        for col, column in enumerate(plot_columns)
+        if column["dft_data"] is not None
+    ]
+    if visible_dft_axes:
+        visible_dft_axes[0].set_ylabel("Energy [eV]")
+        _hide_yticklabels_except_first(visible_dft_axes)
 
     fig.suptitle("RMC (top)  /  DFT (bottom)", fontsize=16, y=0.98)
 
@@ -258,31 +301,3 @@ def plot_multi_converge(
 
     fig.savefig("plot_multi_converge.png", dpi=300)
     print("Saved: plot_multi_converge.png")
-
-
-if __name__ == "__main__":
-    logger_ = XLogger(log_level="debug", logger_name="rmc_run")
-
-    # -------------------- 設定 --------------------
-    cfg_name_: str = "aaa"
-    base_dir_: str = "."
-
-    # -------------------- log_pairs（手動） --------------------
-    # log_pairs_: List[Dict[str, str]] = [
-    #     {"index": "0", "rmc": "log0_rmc", "dft": "log0_dft"},
-    #     {"index": "1", "rmc": "log1_rmc", "dft": "log1_dft"},
-    # ]
-
-    # -------------------- log_pairs（自動） --------------------
-    # 旧仕様
-    # log_pairs_ = make_log_dirname.find_log_pairs(base_dir_)
-
-    # 紳士用
-    log_pairs_ = find_rmc_dft_pairs(base_dir_)
-
-    plot_multi_converge(
-        log_pairs_,
-        cfg_name_,
-        base_dir_,
-        logger_,
-    )
