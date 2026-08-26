@@ -4,22 +4,12 @@
 :maxdepth: 4
 :caption: Contents:
 
-rmc/rmc_theory_explained
-rmc/rmcpot_cfg_explained
-rmc/rmcpot_input_explained
-rmc/rmcpot_output_explained
-dft/dft_theory_explained
-packmol/packmol
-rmc_dft/rmc
-rmc_dft/dft_vasp
-rmc_dft/rmc_dft
-rmc_dft/rmc_dft_sequence
-qn/1_intro
-qn/2_qn_network
-qn/3_fnc
-qn/4_top
-qn/5_json
-qn/5_next
+rmc/index
+dft/index
+packmol/index
+rmc_dft/index
+top_fnc/index
+qn/index
 ```
 
 このセクションでは RMC-DFT の使い方を段階的に説明します。
