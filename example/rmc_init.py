@@ -33,6 +33,13 @@ from rmc_dft.util import poscar2cfg
 from rmc_dft.util import next_log_dir_name as next_log_dir_name
 from x_logger import XLogger
 
+# ---------------------------------------------------------
+# rmc_init_N.py として使用した場合:
+# True  : 次の RMC run でもこの init_N.py を再読込して使用する
+# False : 次の RMC run では通常の rmc_init.py に戻る
+CONTINUE_NUMBERED_INIT = False
+# ---------------------------------------------------------
+
 
 def run_rmc_init(
     config: Config,

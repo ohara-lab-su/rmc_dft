@@ -4,6 +4,7 @@ K.NAKADA, kengo.nakada@gmail.com
 
 rmc_dft 用の VASP 入力ファイル
 """
+
 import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import subprocess
@@ -26,6 +27,13 @@ from rmc_dft import (
     RmcPotHst,
     RmcPotPpcf,
 )
+
+# ---------------------------------------------------------
+# rmc_vasp_init_N.py として使用した場合:
+# True  : 次の VASP run でもこの init_N.py を再読込して使用する
+# False : 次の VASP run では通常の rmc_vasp_init.py に戻る
+CONTINUE_NUMBERED_INIT = False
+# ---------------------------------------------------------
 
 
 def run_vasp_init(
@@ -81,6 +89,13 @@ def run_vasp_init(
     # ------------------
     if vasp_incar is None:
         vasp_incar = VaspIncar(config=config, logger=logger)
+
+    # ---------------------------------------------------------
+    # RMC 側の rmc_dat.init() と同じ意味の初期化。
+    # 既存 INCAR があれば読み込み、無ければ新規作成する。
+    # 一度初期化済みなら何もしない。
+    vasp_incar.init()
+    # ---------------------------------------------------------
 
     logger.info("== make INCAR")
     vasp_incar.set_tag("EDIFF", 1e-04)

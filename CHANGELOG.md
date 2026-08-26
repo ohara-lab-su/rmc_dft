@@ -3,6 +3,175 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.12
+
+## RMC / VASP init handling, symmetry, and restart fixes
+
+Reworked init handling for repeated RMC--DFT runs and restart operation so that RMC and VASP follow the same basic
+input-initialization model.
+
+The main bug fixed in this release was that, when an existing `INCAR`
+was present and an RMC--DFT calculation was restarted, the normal
+`rmc_vasp_init.py` was not applied and VASP parameters could not be updated.
+
+### `VaspIncar` initialization
+
+Implemented a formal `VaspIncar.init()` method corresponding to the role of `RmcPotDat.init()` on the RMC side.
+
+Initialization now behaves as follows.
+
+- If `INCAR` already exists:
+    - Read the existing `INCAR` as the initial input.
+    - `init()` itself does not overwrite the existing file.
+- If `INCAR` does not exist:
+    - Create an initial `INCAR` and load it.
+- If the object has already been initialized:
+    - Repeated calls to `init()` do not reinitialize it.
+    - Repeated initialization calls are therefore safe.
+- INCAR tag modification remains the responsibility of `set()` /
+  `set_tag()`, not `init()`.
+
+This separates input-file initialization from parameter modification for both RMC `*.dat` files and the VASP `INCAR`.
+
+### Updating an existing `INCAR`
+
+An existing `INCAR` is now retained as the initial state, while tags specified by `rmc_vasp_init.py` can still be
+updated through
+`set_tag()`.
+
+VASP init is no longer skipped merely because an `INCAR` already exists.
+
+This allows parameters such as `EDIFF`, `EDIFFG`, `IBRION`, and `SIGMA`
+to be changed on an existing `INCAR`, including during restart operation.
+
+### `rmc_vasp_init.py`
+
+`rmc_vasp_init.py` now calls `vasp_incar.init()` before applying VASP parameter settings.
+
+Corresponding to the RMC-side initialization,
+
+``` python
+rmc_dat.init(...)
+```
+
+the VASP side now uses
+
+``` python
+vasp_incar.init()
+```
+
+as its formal input initialization.
+
+An intermediate inconsistent implementation that called the nonexistent
+
+``` python
+vasp_incar.init(prefer_existing=True)
+```
+
+has also been removed.
+
+`prefer_existing` is related to RMC Free/Fixed format selection and is not carried over into VASP `INCAR`
+initialization.
+
+### Normal and numbered init files
+
+Normal init files and run-number-specific init files are supported symmetrically for RMC and VASP.
+
+- RMC
+    - `rmc_init.py`
+    - `rmc_init_N.py`
+- VASP
+    - `rmc_vasp_init.py`
+    - `rmc_vasp_init_N.py`
+
+Run number `N` corresponds to the common sequential run number shared by RMC and DFT.
+
+If a numbered init file corresponding to the current run exists, that numbered init is used.
+
+In ordinary operation without numbered init files, the normal init file is used.
+
+### Continuing a numbered init
+
+A numbered init file can specify whether it is used only for the current run or continues to be used for subsequent runs
+of the same type.
+
+Both RMC and VASP use:
+
+``` python
+CONTINUE_NUMBERED_INIT = False
+```
+
+When `False`:
+
+- The numbered init is used only for the current run.
+- The next run of the same type returns to the normal `rmc_init.py` /
+  `rmc_vasp_init.py`.
+
+When `True`:
+
+- The numbered init continues to be used for subsequent runs of the same type.
+- It remains active until another numbered init is encountered.
+
+This behavior is controlled from the init file itself rather than through execution parameters in `rmc_vasp_script.py`,
+`rmc.py`, or
+`rmc_vasp.py`.
+
+### Dynamic loading of init files
+
+Init files are loaded from disk immediately before each run.
+
+Therefore, while an RMC--DFT script is running, the following files can be edited:
+
+- `rmc_init.py`
+- `rmc_init_N.py`
+- `rmc_vasp_init.py`
+- `rmc_vasp_init_N.py`
+
+The updated file is read the next time that init is used.
+
+The init mechanism intentionally does not use a normal Python import that would fix the init module at process startup.
+
+### Init behavior during restart
+
+Removed restart-specific behavior that disabled the normal VASP init.
+
+In particular, fixed the case where a normal workflow using only
+`rmc_vasp_init.py`, with no numbered `rmc_vasp_init_N.py`, failed to apply `rmc_vasp_init.py` after restart.
+
+Restart now follows the same init-selection rules as normal execution.
+
+As a result, an `INCAR` that already exists before restart can be loaded as the initial state, updated by the settings
+in `rmc_vasp_init.py`, and then used for the VASP run.
+
+### Symmetric RMC / VASP behavior
+
+Init handling was reorganized so that RMC and VASP follow the same basic model wherever applicable.
+
+- Existing input files are used as the initial input.
+- An initial input file is created when no input file exists.
+- `init()` is responsible for establishing the input file.
+- Parameter modification is handled by setters.
+- Both normal and numbered init files are supported.
+- Continuation of numbered init files is controlled from the init file.
+- Init files are dynamically reloaded for each applicable run.
+- Restart uses the same rules as normal execution.
+
+### Simplification of internal control flow
+
+The following unnecessary or incorrect mechanisms considered during development are not used, or were removed:
+
+- disabling the normal VASP init specifically during restart
+- special `use_base_vasp_init` control
+- historical searches through previous numbered init files
+- unnecessary helper functions used only for init selection
+- unnecessary init-control parameters in the execution scripts
+- carrying the RMC-specific `prefer_existing` mechanism into VASP
+- treating YAML as an INCAR-tag update mechanism
+- treating init processing as a special "delta application" mechanism
+
+Existing valid RMC / VASP execution logic, setters, postprocessing, and log backup behavior are retained. Changes are
+limited to the input initialization and init-selection behavior required for this fix.
+
 # v0.6.11
 
 ## Added execution modes for RMC-VASP sequence runs
