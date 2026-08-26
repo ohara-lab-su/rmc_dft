@@ -33,17 +33,12 @@ from rmc_dft.util import poscar2cfg
 from rmc_dft.util import next_log_dir_name as next_log_dir_name
 from x_logger import XLogger
 
-# ----------------------------------------------------------
-# 番号付き init の継続制御
-#
-# このファイルを rmc_init_N.py として使う場合だけ参照される。
-# False: この番号付き init はその run だけ使用し、次の RMC run は
-#        rmc_init.py で再初期化する。
-# True : 次の番号付き rmc_init_M.py が現れるまで、現在の *.dat を
-#        継続して使用し、rmc_init.py は実行しない。
-# 通常の rmc_init.py として使う場合、この値は無視される。
+# ---------------------------------------------------------
+# rmc_init_N.py として使用した場合:
+# True  : 次の RMC run でもこの init_N.py を再読込して使用する
+# False : 次の RMC run では通常の rmc_init.py に戻る
 CONTINUE_NUMBERED_INIT = False
-# ----------------------------------------------------------
+# ---------------------------------------------------------
 
 
 def run_rmc_init(

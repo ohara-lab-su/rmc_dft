@@ -44,36 +44,6 @@ from x_logger import XLogger
 from rmc import run_rmc
 from rmc_vasp import run_vasp
 
-
-def _last_numbered_init_continues(prefix: str, current_run: int) -> bool:
-    """直前の番号付き init が継続指定かを返す。"""
-    for run_no in range(current_run - 1, -1, -1):
-        init_file = f"{prefix}_{run_no}.py"
-        if not os.path.isfile(init_file):
-            continue
-
-        namespace = runpy.run_path(init_file)
-        return bool(namespace.get("CONTINUE_NUMBERED_INIT", False))
-
-    return False
-
-
-def _select_init_file(base_file: str, prefix: str, current_run: int) -> Optional[str]:
-    """現在 run で実行する init を決定する。
-
-    現在 run の番号付き init があればそれを使う。
-    無ければ、直前の番号付き init が継続指定なら現在入力を継続する。
-    それ以外は基本 init を使う。
-    """
-    numbered_file = f"{prefix}_{current_run}.py"
-    if os.path.isfile(numbered_file):
-        return numbered_file
-
-    if _last_numbered_init_continues(prefix, current_run):
-        return None
-
-    return base_file
-
 if __name__ == "__main__":
     logger = XLogger(
         log_level="debug",
@@ -133,6 +103,9 @@ if __name__ == "__main__":
     vasp_incar = VaspIncar(config=config, logger=logger)
     vasp_kpoints = VaspKpoints(config=config, logger=logger)
 
+    rmc_init_file = "rmc_init.py"
+    rmc_vasp_init_file = "rmc_vasp_init.py"
+
     i = 0
     for i in range(start_loop, start_loop + max_rmc_dft_loop):
         # for i in range(start_loop, max_rmc_dft_loop):
@@ -143,20 +116,26 @@ if __name__ == "__main__":
             log_dir_rmc = next_log_dir_name("rmc")
             msg_rmc = int(log_dir_rmc.split("_")[0].replace("log", ""))
 
+            # ----------------------------------------------------------------
             # RMC のパラメーターを作る
-            rmc_init_file = _select_init_file(
-                base_file="rmc_init.py",
-                prefix="rmc_init",
-                current_run=msg_rmc,
-            )
+            # 現在 run の番号付き init があれば使用する。
+            # 無ければ、現在選択中の init を毎回ファイルから再読込する。
+            numbered_rmc_init_file = f"rmc_init_{msg_rmc}.py"
+            if os.path.isfile(numbered_rmc_init_file):
+                rmc_init_file = numbered_rmc_init_file
 
-            if rmc_init_file is not None and os.path.isfile(rmc_init_file):
+            if os.path.isfile(rmc_init_file):
                 rmc_init_namespace = runpy.run_path(rmc_init_file)
                 rmc_init_namespace["run_rmc_init"](
                     config=config,
                     rmc_dat=rmc_dat,
                     logger=logger,
                 )
+
+                if rmc_init_file != "rmc_init.py":
+                    if not rmc_init_namespace.get("CONTINUE_NUMBERED_INIT", False):
+                        rmc_init_file = "rmc_init.py"
+            # ----------------------------------------------------------------
 
             # 富岳対応 (キャッシュ対策)
             subprocess.run(["sleep", "5"], check=True)
@@ -199,17 +178,15 @@ if __name__ == "__main__":
             log_dir_vasp = next_log_dir_name("dft")
             msg_vasp = int(log_dir_vasp.split("_")[0].replace("log", ""))
 
+            # ----------------------------------------------------------------
             # VASP のパラメーターを作る
-            rmc_vasp_init_file = _select_init_file(
-                base_file="rmc_vasp_init.py",
-                prefix="rmc_vasp_init",
-                current_run=msg_vasp,
-            )
+            # 現在 run の番号付き init があれば使用する。
+            # 無ければ、現在選択中の init を毎回ファイルから再読込する。
+            numbered_vasp_init_file = f"rmc_vasp_init_{msg_vasp}.py"
+            if os.path.isfile(numbered_vasp_init_file):
+                rmc_vasp_init_file = numbered_vasp_init_file
 
-            if (
-                rmc_vasp_init_file is not None
-                and os.path.isfile(rmc_vasp_init_file)
-            ):
+            if os.path.isfile(rmc_vasp_init_file):
                 rmc_vasp_init_namespace = runpy.run_path(rmc_vasp_init_file)
                 rmc_vasp_init_namespace["run_vasp_init"](
                     config,
@@ -217,6 +194,14 @@ if __name__ == "__main__":
                     vasp_kpoints=vasp_kpoints,
                     logger=logger,
                 )
+
+                if rmc_vasp_init_file != "rmc_vasp_init.py":
+                    if not rmc_vasp_init_namespace.get(
+                        "CONTINUE_NUMBERED_INIT",
+                        False,
+                    ):
+                        rmc_vasp_init_file = "rmc_vasp_init.py"
+            # ----------------------------------------------------------------
 
             # 保存フォルダ名はそれぞれの run_vasp 内部で決まる
             run_vasp(

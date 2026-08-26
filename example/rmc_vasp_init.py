@@ -28,17 +28,12 @@ from rmc_dft import (
     RmcPotPpcf,
 )
 
-# ----------------------------------------------------------
-# 番号付き init の継続制御
-#
-# このファイルを rmc_vasp_init_N.py として使う場合だけ参照される。
-# False: この番号付き init はその run だけ使用し、次の VASP run は
-#        rmc_vasp_init.py で再初期化する。
-# True : 次の番号付き rmc_vasp_init_M.py が現れるまで、現在の INCAR を
-#        継続して使用し、rmc_vasp_init.py は実行しない。
-# 通常の rmc_vasp_init.py として使う場合、この値は無視される。
+# ---------------------------------------------------------
+# rmc_vasp_init_N.py として使用した場合:
+# True  : 次の VASP run でもこの init_N.py を再読込して使用する
+# False : 次の VASP run では通常の rmc_vasp_init.py に戻る
 CONTINUE_NUMBERED_INIT = False
-# ----------------------------------------------------------
+# ---------------------------------------------------------
 
 
 def run_vasp_init(
