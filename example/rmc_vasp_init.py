@@ -28,6 +28,24 @@ from rmc_dft import (
 )
 
 
+# ----------------------------------------------------------------------
+# 番号付き init の継続モード
+#
+# このファイルを rmc_vasp_init_N.py として使用するときに有効。
+#
+# False:
+#   この番号付き init はその run だけで使用する。
+#   次の VASP run に番号付き init が無ければ rmc_vasp_init.py を再実行する。
+#
+# True:
+#   この番号付き init を実行した後、その入力状態を次の VASP run 以降も継続する。
+#   次の rmc_vasp_init_M.py が現れるまで rmc_vasp_init.py は再実行しない。
+#
+# 通常の rmc_vasp_init.py として使用するとき、この値は動作に影響しない。
+# ----------------------------------------------------------------------
+CONTINUE_NUMBERED_INIT = False
+
+
 def run_vasp_init(
     config: Config,
     *,

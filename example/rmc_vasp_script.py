@@ -44,6 +44,49 @@ from x_logger import XLogger
 from rmc import run_rmc
 from rmc_vasp import run_vasp
 
+
+def _numbered_init_continue(init_prefix: str, current_run: int) -> bool:
+    """
+    current_run より前で最後に存在する番号付き init の
+    CONTINUE_NUMBERED_INIT を返す。
+
+    番号付き init が無い場合、またはフラグ未定義の場合は False。
+    """
+    for run_no in range(current_run - 1, -1, -1):
+        init_file = f"{init_prefix}_{run_no}.py"
+        if not os.path.isfile(init_file):
+            continue
+
+        namespace = runpy.run_path(init_file)
+        return bool(namespace.get("CONTINUE_NUMBERED_INIT", False))
+
+    return False
+
+
+def _select_init_file(
+    *,
+    base_init_file: str,
+    numbered_prefix: str,
+    current_run: int,
+) -> Optional[str]:
+    """
+    現在 run で実行する init ファイルを決める。
+
+    1. 現在 run の番号付き init があれば、それを実行する。
+    2. 無ければ、直前の番号付き init が継続モードなら何も実行しない。
+    3. それ以外は基本 init を実行する。
+    """
+    numbered_init_file = f"{numbered_prefix}_{current_run}.py"
+
+    if os.path.isfile(numbered_init_file):
+        return numbered_init_file
+
+    if _numbered_init_continue(numbered_prefix, current_run):
+        return None
+
+    return base_init_file
+
+
 if __name__ == "__main__":
     logger = XLogger(
         log_level="debug",
@@ -113,16 +156,21 @@ if __name__ == "__main__":
             log_dir_rmc = next_log_dir_name("rmc")
             msg_rmc = int(log_dir_rmc.split("_")[0].replace("log", ""))
 
-            # RMC のパラメーターを作る
-            # log0_rmc は rmc_init.py、それ以降は rmc_init_N.py を
-            # 各 RMC 実行直前にファイルから読み込む。
-            # ファイルが存在しなければ実行しない。
-            if msg_rmc == 0:
-                rmc_init_file = "rmc_init.py"
-            else:
-                rmc_init_file = f"rmc_init_{msg_rmc}.py"
+            # RMC init
+            #
+            # - 現在 run の rmc_init_N.py があれば、それを使用する。
+            # - 番号付き init の CONTINUE_NUMBERED_INIT=True が継続中なら、
+            #   現在の *.dat をそのまま使用し、基本 init は実行しない。
+            # - それ以外は rmc_init.py を実行する。
+            #
+            # restart でも同じ規則を使用する。
+            rmc_init_file = _select_init_file(
+                base_init_file="rmc_init.py",
+                numbered_prefix="rmc_init",
+                current_run=msg_rmc,
+            )
 
-            if os.path.isfile(rmc_init_file):
+            if rmc_init_file is not None and os.path.isfile(rmc_init_file):
                 rmc_init_namespace = runpy.run_path(rmc_init_file)
                 rmc_init_namespace["run_rmc_init"](
                     config=config,
@@ -171,16 +219,24 @@ if __name__ == "__main__":
             log_dir_vasp = next_log_dir_name("dft")
             msg_vasp = int(log_dir_vasp.split("_")[0].replace("log", ""))
 
-            # VASP のパラメーターを作る
-            # log0_dft は rmc_vasp_init.py、それ以降は rmc_vasp_init_N.py を
-            # 各 VASP 実行直前にファイルから読み込む。
-            # ファイルが存在しなければ実行しない。
-            if msg_vasp == 0:
-                rmc_vasp_init_file = "rmc_vasp_init.py"
-            else:
-                rmc_vasp_init_file = f"rmc_vasp_init_{msg_vasp}.py"
+            # VASP init
+            #
+            # - 現在 run の rmc_vasp_init_N.py があれば、それを使用する。
+            # - 番号付き init の CONTINUE_NUMBERED_INIT=True が継続中なら、
+            #   現在の INCAR をそのまま使用し、基本 init は実行しない。
+            # - それ以外は rmc_vasp_init.py を実行する。
+            #
+            # restart でも同じ規則を使用する。
+            rmc_vasp_init_file = _select_init_file(
+                base_init_file="rmc_vasp_init.py",
+                numbered_prefix="rmc_vasp_init",
+                current_run=msg_vasp,
+            )
 
-            if os.path.isfile(rmc_vasp_init_file):
+            if (
+                rmc_vasp_init_file is not None
+                and os.path.isfile(rmc_vasp_init_file)
+            ):
                 rmc_vasp_init_namespace = runpy.run_path(rmc_vasp_init_file)
                 rmc_vasp_init_namespace["run_vasp_init"](
                     config,
