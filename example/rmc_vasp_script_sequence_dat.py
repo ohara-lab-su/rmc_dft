@@ -13,6 +13,10 @@ continue_rmc_dft:
         manual_sequence を実行した後、
         rmc_vasp_script_sequence.py の通常 RMC-DFT ループへ移る。
         sequence script 単独で一連の計算を継続させる場合。
+
+        manual_sequence の最後に使用した各 RMC/VASP 番号付き init で
+        CONTINUE_NUMBERED_INIT=True の場合、その init を通常ループでも継続する。
+        False の場合は通常の rmc_init.py / rmc_vasp_init.py に戻る。
 """
 
 # False: sequence に書いた処理だけで終了

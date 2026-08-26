@@ -4,6 +4,7 @@ K.NAKADA, kengo.nakada@gmail.com
 
 rmc_dft 用の VASP 入力ファイル
 """
+
 import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import subprocess
@@ -26,6 +27,13 @@ from rmc_dft import (
     RmcPotHst,
     RmcPotPpcf,
 )
+
+# ---------------------------------------------------------
+# rmc_vasp_init_N.py として使用した場合:
+# True  : 次の VASP run でもこの init_N.py を再読込して使用する
+# False : 次の VASP run では通常の rmc_vasp_init.py に戻る
+CONTINUE_NUMBERED_INIT = False
+# ---------------------------------------------------------
 
 
 def run_vasp_init_normal(
