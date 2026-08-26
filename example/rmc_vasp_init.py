@@ -90,6 +90,13 @@ def run_vasp_init(
     if vasp_incar is None:
         vasp_incar = VaspIncar(config=config, logger=logger)
 
+    # ---------------------------------------------------------
+    # RMC 側の rmc_dat.init() と同じ意味の初期化。
+    # 既存 INCAR があれば読み込み、無ければ新規作成する。
+    # 一度初期化済みなら何もしない。
+    vasp_incar.init()
+    # ---------------------------------------------------------
+
     logger.info("== make INCAR")
     vasp_incar.set_tag("EDIFF", 1e-04)
     vasp_incar.set_tag("EDIFFG", 1e-03)

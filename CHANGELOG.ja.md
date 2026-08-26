@@ -3,6 +3,173 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.12
+
+## RMC / VASP init 処理の整理・対称化と restart 対応
+
+RMC--DFT の繰り返し実行および restart 時の init 処理を見直し、RMC と VASP で同じ考え方で扱えるように修正した。
+
+特に、既存の `INCAR` が存在する状態で restart した場合に、通常の
+`rmc_vasp_init.py` が適用されず、VASP パラメーターを変更できない問題を修正した。
+
+### `VaspIncar` の初期化処理
+
+RMC 側の `RmcPotDat.init()` と同じ役割を持つ、正式な `VaspIncar.init()`
+を実装した。
+
+初期化時の動作は以下の通り。
+
+- `INCAR` が存在する場合
+    - 既存の `INCAR` を初期入力として読み込む。
+    - `init()` 自体では既存ファイルを書き換えない。
+- `INCAR` が存在しない場合
+    - 初期 `INCAR` を新規作成して読み込む。
+- 一度初期化済みの場合
+    - 再度 `init()` を呼んでも再初期化しない。
+    - 繰り返し呼び出しても安全な動作とした。
+- `INCAR` のタグ変更は `init()` ではなく、従来通り `set()` /
+  `set_tag()` が担当する。
+
+これにより、RMC の `*.dat` と VASP の `INCAR`
+について、入力ファイルの初期化とパラメーター変更の役割を分離した。
+
+### 既存 `INCAR` の更新
+
+既存 `INCAR`
+がある場合でも、その内容を初期状態として保持した上で、`rmc_vasp_init.py`
+から指定されたタグを `set_tag()` により更新できるようにした。
+
+既存 `INCAR` が存在することを理由に VASP init を省略しない。
+
+この修正により、restart 時を含め、既存 `INCAR` に対して
+`EDIFF`、`EDIFFG`、`IBRION`、`SIGMA` などの指定を変更できる。
+
+### `rmc_vasp_init.py` の修正
+
+`rmc_vasp_init.py` では、VASP パラメーターを設定する前に
+`vasp_incar.init()` を実行するようにした。
+
+RMC 側の、
+
+``` python
+rmc_dat.init(...)
+```
+
+に対応する初期化処理として、
+
+``` python
+vasp_incar.init()
+```
+
+を使用する。
+
+開発途中で存在していた、実装されていない
+
+``` python
+vasp_incar.init(prefer_existing=True)
+```
+
+を呼び出す不整合も解消した。
+
+`prefer_existing` は RMC の Free/Fixed format 選択に関係する機能であり、VASP の `INCAR` 初期化には持ち込まない。
+
+### 通常 init と番号付き init
+
+RMC と VASP の両方で、通常 init と run 番号付き init を扱えるように整理した。
+
+- RMC
+    - `rmc_init.py`
+    - `rmc_init_N.py`
+- VASP
+    - `rmc_vasp_init.py`
+    - `rmc_vasp_init_N.py`
+
+run 番号 `N` は RMC / DFT 共通の通し番号に対応する。
+
+現在 run に対応する番号付き init が存在する場合は、その番号付き init を使用する。
+
+番号付き init が使用されていない通常運用では、通常 init を使用する。
+
+### 番号付き init の継続制御
+
+番号付き init を、その run のみで使用するか、次の同種 run 以降も継続して使用するかを init ファイル側で指定できるようにした。
+
+RMC / VASP ともに以下を使用する。
+
+``` python
+CONTINUE_NUMBERED_INIT = False
+```
+
+`False` の場合：
+
+- 番号付き init は現在 run のみで使用する。
+- 次の同種 run では通常の `rmc_init.py` / `rmc_vasp_init.py` に戻る。
+
+`True` の場合：
+
+- 使用した番号付き init を次の同種 run でも使用する。
+- 次の番号付き init が現れるまで、その init ファイルを継続して使用する。
+
+この動作制御は `rmc_vasp_script.py`、`rmc.py`、`rmc_vasp.py`
+の実行パラメーターではなく、init 側に置く設計とした。
+
+### init ファイルの動的読み込み
+
+init ファイルは各 run の実行直前にファイルから読み込む。
+
+そのため、RMC--DFT スクリプトの実行中でも、
+
+- `rmc_init.py`
+- `rmc_init_N.py`
+- `rmc_vasp_init.py`
+- `rmc_vasp_init_N.py`
+
+を変更でき、次にその init が使用される時点で変更内容が反映される。
+
+init を通常の Python import によって起動時に固定する方式にはしていない。
+
+### restart 時の init 動作
+
+restart 専用に VASP init を無効化する処理を廃止した。
+
+特に、番号付き `rmc_vasp_init_N.py`
+を使用していない通常運用において、restart 後に `rmc_vasp_init.py`
+が全く適用されない問題を修正した。
+
+restart でも通常実行と同じ init 選択規則を使用する。
+
+これにより、restart 前から存在する `INCAR`
+を初期状態として読み込み、`rmc_vasp_init.py`
+の設定で必要なタグを更新してから VASP を実行できる。
+
+### RMC / VASP の対称化
+
+init 関係について、RMC と VASP を可能な限り同じ考え方で扱うように整理した。
+
+- 既存入力ファイルを初期入力として使用する。
+- 入力ファイルが無い場合は初期ファイルを作成する。
+- `init()` は入力ファイルを確定する初期化を担当する。
+- パラメーター変更は setter が担当する。
+- 通常 init と番号付き init を使用できる。
+- 番号付き init の継続可否は init 側で指定する。
+- init ファイルは run ごとに動的に再読み込みする。
+- restart でも同じ規則を使用する。
+
+### 内部処理の単純化
+
+検討途中で導入した以下の不要な処理・設計は採用しない、または除去した。
+
+- restart 時だけ基本 VASP init を無効化する処理
+- `use_base_vasp_init` による特殊制御
+- 過去の番号付き init を遡って検索する履歴探索
+- init 選択のためだけの不要な補助関数
+- script 側への不要な init 動作パラメーター
+- VASP への RMC 固有 `prefer_existing` の持ち込み
+- YAML を INCAR タグ更新機構として扱う処理
+- init を「差分適用」として扱う処理
+
+既存の正常な RMC / VASP 実行処理、setter、postprocess、ログ保存などは維持し、init と入力ファイル管理に必要な部分のみを修正した。
+
 # v0.6.11
 
 ## RMC-VASP sequence 実行モードを追加

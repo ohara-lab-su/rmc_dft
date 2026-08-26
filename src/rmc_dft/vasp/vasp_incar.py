@@ -47,10 +47,42 @@ class VaspIncar:
         # pymatgen Incar()
         self._incar: Incar = Incar()
 
+        # RmcPotDat と同じく、コンストラクタでは入力ファイルを確定しない。
+        # 実際の初期化は init() で一度だけ行う。
+        self._initialized: bool = False
+
+    def init(self) -> None:
+        """INCAR を一度だけ初期化する。
+
+        RmcPotDat.init() と同じ役割を持つ。
+
+        - 既存 INCAR がある場合:
+          そのファイルを読み込み、現在の入力として使用する。
+          ファイル内容は変更しない。
+        - INCAR がない場合:
+          空の INCAR を新規作成し、それを現在の入力として使用する。
+        - 一度初期化済みの場合:
+          何もしない。
+
+        このメソッドは入力ファイルを確定するだけであり、
+        INCAR タグの変更は set()/set_tag() が担当する。
+        """
+        if self._initialized:
+            self._logger.info(
+                f"[VaspIncar] INCAR is already initialized: {self.incar_name}"
+            )
+            return
+
         if os.path.exists(self.incar_name):
             self.load()
         else:
             self.create_incar_file()
+            self.load()
+
+    def _ensure_initialized(self) -> None:
+        """未初期化の場合だけ init() を実行する。"""
+        if not self._initialized:
+            self.init()
 
     # ==============================
     # 基本入出力
@@ -83,6 +115,7 @@ class VaspIncar:
 
         # pymatgen Incar()
         self._incar = Incar.from_file(self.incar_name)
+        self._initialized = True
         self._logger.info(f"[VaspIncar] Loaded INCAR: {self.incar_name}")
 
     def write(self) -> None:
@@ -142,6 +175,7 @@ class VaspIncar:
         Returns:
             Any:
         """
+        self._ensure_initialized()
         return self._incar.get(tag, default)
 
     def get_tag(self, tag: str, default: Any = None) -> Any:
@@ -164,6 +198,8 @@ class VaspIncar:
         Returns:
             None:
         """
+        self._ensure_initialized()
+
         idx = self._find_line_index(tag)
         new_line = self._format_line(tag, value)
 
@@ -204,6 +240,7 @@ class VaspIncar:
         auto_write: Optional[bool] = True,
     ) -> None:
         """指定タグを削除"""
+        self._ensure_initialized()
         idx = self._find_line_index(tag)
         if idx is not None:
             del self._lines[idx]
@@ -225,6 +262,7 @@ class VaspIncar:
 
     def export_dict(self) -> Dict[str, Any]:
         """内部Incar辞書を返す"""
+        self._ensure_initialized()
         return dict(self._incar)
 
     def diff_with(self, other: "VaspIncar") -> Dict[str, Tuple[Any, Any]]:
@@ -244,6 +282,9 @@ class VaspIncar:
                 値が異なるタグだけを含む辞書。
                 キーがタグ名、値は ``(self 側の値, other 側の値)`` のタプル。
         """
+        self._ensure_initialized()
+        other._ensure_initialized()
+
         diff: Dict[str, Tuple[Any, Any]] = {}
 
         keys = set(self._incar.keys()) | set(other._incar.keys())
