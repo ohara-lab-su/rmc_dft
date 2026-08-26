@@ -3,6 +3,71 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.13
+
+## sequence の現行 init 処理への追従
+
+`rmc_vasp_script_sequence.py` を、現行の `rmc_vasp_script.py` で導入された init 選択・継続処理に追従させた。
+
+### `CONTINUE_NUMBERED_INIT` への対応
+
+sequence 実行後に `continue_rmc_dft=True` で通常の RMC-DFT ループへ移行する場合について、番号付き init
+の継続状態を正しく引き継ぐように修正した。
+
+RMC / VASP の両方で、manual sequence の最後に使用した番号付き init の
+
+```python
+CONTINUE_NUMBERED_INIT
+```
+
+を参照する。
+
+- `True`
+    - 使用した番号付き init を通常 RMC-DFT ループでも継続する。
+- `False`
+    - 通常の `rmc_init.py` / `rmc_vasp_init.py` に戻る。
+
+RMC と VASP で同じ動作となるようにした。
+
+### 通常 RMC-DFT ループの init 選択処理を更新
+
+sequence 内の通常 RMC-DFT ループについて、古い init 選択処理を現行 `rmc_vasp_script.py` と同じ動作へ更新した。
+
+各 run では、
+
+- 現在の通し番号に対応する `rmc_init_N.py` / `rmc_vasp_init_N.py` が存在すれば、それを使用する。
+- 番号付き init が存在しなければ、現在選択されている init を使用する。
+- `CONTINUE_NUMBERED_INIT=False` の番号付き init を使用した後は、通常 init に戻る。
+- `CONTINUE_NUMBERED_INIT=True` の場合は、その番号付き init を継続する。
+
+### init ファイルの動的読み込みを維持
+
+init ファイルは各 run の実行直前に `runpy.run_path()` で読み込む既存方式を維持した。
+
+そのため、sequence の実行中でも、
+
+- `rmc_init.py`
+- `rmc_init_N.py`
+- `rmc_vasp_init.py`
+- `rmc_vasp_init_N.py`
+
+を変更でき、次にその init が使用される時点で変更内容が反映される。
+
+### sequence 設定ファイルの説明を更新
+
+`rmc_vasp_script_sequence_dat.py` の説明を現行動作に合わせて更新した。
+
+`continue_rmc_dft=True` の場合に、manual sequence で最後に使用した番号付き init の `CONTINUE_NUMBERED_INIT` が、その後の通常
+RMC-DFT ループへ引き継がれることを明記した。
+
+また、編集対象となる sequence 設定ファイル名の説明を現在のファイル名に修正した。
+
+### その他
+
+sequence 固有の manual sequence 機能や既存の実行処理は維持し、現行 `rmc_vasp_script.py` との init 処理の不整合部分のみを修正した。
+
+新しい補助関数は追加していない。
+
 # v0.6.12
 
 ## RMC / VASP init 処理の整理・対称化と restart 対応

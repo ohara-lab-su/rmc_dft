@@ -3,6 +3,76 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+# v0.6.13
+
+## Synchronize sequence init handling with the current implementation
+
+Updated `rmc_vasp_script_sequence.py` to follow the current init-selection and init-continuation behavior implemented in
+`rmc_vasp_script.py`.
+
+### Support for `CONTINUE_NUMBERED_INIT`
+
+Fixed the transition from the manual sequence to the normal RMC-DFT loop when `continue_rmc_dft=True` so that the
+continuation state of numbered init files is preserved correctly.
+
+For both RMC and VASP, the sequence now checks
+
+```python
+CONTINUE_NUMBERED_INIT
+```
+
+from the numbered init file most recently used by the manual sequence.
+
+- `True`
+    - Continue using that numbered init in the subsequent normal RMC-DFT loop.
+- `False`
+    - Return to the normal `rmc_init.py` / `rmc_vasp_init.py`.
+
+RMC and VASP now follow the same behavior.
+
+### Updated init selection in the normal RMC-DFT loop
+
+The old init-selection logic in the sequence script's normal RMC-DFT loop has been updated to match the current
+`rmc_vasp_script.py`.
+
+For each run:
+
+- If `rmc_init_N.py` / `rmc_vasp_init_N.py` corresponding to the current sequential run number exists, that numbered
+  init is used.
+- If no numbered init exists for the current run, the currently selected init is used.
+- After a numbered init with `CONTINUE_NUMBERED_INIT=False`, execution returns to the normal init.
+- With `CONTINUE_NUMBERED_INIT=True`, the numbered init remains active.
+
+### Preserve dynamic loading of init files
+
+The existing design in which init files are loaded with `runpy.run_path()` immediately before each applicable run has
+been retained.
+
+Therefore, even while a sequence is running, the following files can be modified:
+
+- `rmc_init.py`
+- `rmc_init_N.py`
+- `rmc_vasp_init.py`
+- `rmc_vasp_init_N.py`
+
+Changes are reflected the next time the corresponding init file is used.
+
+### Updated sequence configuration documentation
+
+Updated the documentation in `rmc_vasp_script_sequence_dat.py` to match the current behavior.
+
+The documentation now explicitly states that, when `continue_rmc_dft=True`, the `CONTINUE_NUMBERED_INIT` setting of the
+last numbered init used by the manual sequence is carried into the subsequent normal RMC-DFT loop.
+
+The documented filename of the sequence configuration file was also corrected to the current filename.
+
+### Other changes
+
+The existing manual-sequence functionality and execution flow are retained. Only the parts that had fallen out of sync
+with the current init handling in `rmc_vasp_script.py` were updated.
+
+No new helper functions were added.
+
 # v0.6.12
 
 ## RMC / VASP init handling, symmetry, and restart fixes
