@@ -10,7 +10,10 @@ rmc/rmcpot_input_explained
 rmc/rmcpot_output_explained
 dft/dft_theory_explained
 packmol/packmol
-rmc_dft/quick_start
+rmc_dft/rmc
+rmc_dft/dft_vasp
+rmc_dft/rmc_dft
+rmc_dft/rmc_dft_sequence
 qn/1_intro
 qn/2_qn_network
 qn/3_fnc
