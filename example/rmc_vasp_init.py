@@ -4,6 +4,7 @@ K.NAKADA, kengo.nakada@gmail.com
 
 rmc_dft 用の VASP 入力ファイル
 """
+
 import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import subprocess
@@ -27,23 +28,17 @@ from rmc_dft import (
     RmcPotPpcf,
 )
 
-
-# ----------------------------------------------------------------------
-# 番号付き init の継続モード
+# ----------------------------------------------------------
+# 番号付き init の継続制御
 #
-# このファイルを rmc_vasp_init_N.py として使用するときに有効。
-#
-# False:
-#   この番号付き init はその run だけで使用する。
-#   次の VASP run に番号付き init が無ければ rmc_vasp_init.py を再実行する。
-#
-# True:
-#   この番号付き init を実行した後、その入力状態を次の VASP run 以降も継続する。
-#   次の rmc_vasp_init_M.py が現れるまで rmc_vasp_init.py は再実行しない。
-#
-# 通常の rmc_vasp_init.py として使用するとき、この値は動作に影響しない。
-# ----------------------------------------------------------------------
+# このファイルを rmc_vasp_init_N.py として使う場合だけ参照される。
+# False: この番号付き init はその run だけ使用し、次の VASP run は
+#        rmc_vasp_init.py で再初期化する。
+# True : 次の番号付き rmc_vasp_init_M.py が現れるまで、現在の INCAR を
+#        継続して使用し、rmc_vasp_init.py は実行しない。
+# 通常の rmc_vasp_init.py として使う場合、この値は無視される。
 CONTINUE_NUMBERED_INIT = False
+# ----------------------------------------------------------
 
 
 def run_vasp_init(

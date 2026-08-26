@@ -45,15 +45,10 @@ from rmc import run_rmc
 from rmc_vasp import run_vasp
 
 
-def _numbered_init_continue(init_prefix: str, current_run: int) -> bool:
-    """
-    current_run より前で最後に存在する番号付き init の
-    CONTINUE_NUMBERED_INIT を返す。
-
-    番号付き init が無い場合、またはフラグ未定義の場合は False。
-    """
+def _last_numbered_init_continues(prefix: str, current_run: int) -> bool:
+    """直前の番号付き init が継続指定かを返す。"""
     for run_no in range(current_run - 1, -1, -1):
-        init_file = f"{init_prefix}_{run_no}.py"
+        init_file = f"{prefix}_{run_no}.py"
         if not os.path.isfile(init_file):
             continue
 
@@ -63,29 +58,21 @@ def _numbered_init_continue(init_prefix: str, current_run: int) -> bool:
     return False
 
 
-def _select_init_file(
-    *,
-    base_init_file: str,
-    numbered_prefix: str,
-    current_run: int,
-) -> Optional[str]:
+def _select_init_file(base_file: str, prefix: str, current_run: int) -> Optional[str]:
+    """現在 run で実行する init を決定する。
+
+    現在 run の番号付き init があればそれを使う。
+    無ければ、直前の番号付き init が継続指定なら現在入力を継続する。
+    それ以外は基本 init を使う。
     """
-    現在 run で実行する init ファイルを決める。
+    numbered_file = f"{prefix}_{current_run}.py"
+    if os.path.isfile(numbered_file):
+        return numbered_file
 
-    1. 現在 run の番号付き init があれば、それを実行する。
-    2. 無ければ、直前の番号付き init が継続モードなら何も実行しない。
-    3. それ以外は基本 init を実行する。
-    """
-    numbered_init_file = f"{numbered_prefix}_{current_run}.py"
-
-    if os.path.isfile(numbered_init_file):
-        return numbered_init_file
-
-    if _numbered_init_continue(numbered_prefix, current_run):
+    if _last_numbered_init_continues(prefix, current_run):
         return None
 
-    return base_init_file
-
+    return base_file
 
 if __name__ == "__main__":
     logger = XLogger(
@@ -156,17 +143,10 @@ if __name__ == "__main__":
             log_dir_rmc = next_log_dir_name("rmc")
             msg_rmc = int(log_dir_rmc.split("_")[0].replace("log", ""))
 
-            # RMC init
-            #
-            # - 現在 run の rmc_init_N.py があれば、それを使用する。
-            # - 番号付き init の CONTINUE_NUMBERED_INIT=True が継続中なら、
-            #   現在の *.dat をそのまま使用し、基本 init は実行しない。
-            # - それ以外は rmc_init.py を実行する。
-            #
-            # restart でも同じ規則を使用する。
+            # RMC のパラメーターを作る
             rmc_init_file = _select_init_file(
-                base_init_file="rmc_init.py",
-                numbered_prefix="rmc_init",
+                base_file="rmc_init.py",
+                prefix="rmc_init",
                 current_run=msg_rmc,
             )
 
@@ -219,17 +199,10 @@ if __name__ == "__main__":
             log_dir_vasp = next_log_dir_name("dft")
             msg_vasp = int(log_dir_vasp.split("_")[0].replace("log", ""))
 
-            # VASP init
-            #
-            # - 現在 run の rmc_vasp_init_N.py があれば、それを使用する。
-            # - 番号付き init の CONTINUE_NUMBERED_INIT=True が継続中なら、
-            #   現在の INCAR をそのまま使用し、基本 init は実行しない。
-            # - それ以外は rmc_vasp_init.py を実行する。
-            #
-            # restart でも同じ規則を使用する。
+            # VASP のパラメーターを作る
             rmc_vasp_init_file = _select_init_file(
-                base_init_file="rmc_vasp_init.py",
-                numbered_prefix="rmc_vasp_init",
+                base_file="rmc_vasp_init.py",
+                prefix="rmc_vasp_init",
                 current_run=msg_vasp,
             )
 
