@@ -11,7 +11,6 @@ from x_logger import XLogger
 
 
 class Config:
-
     max_rmc_dft_loop: int = 10
 
     N_tot: int = 400  # セルサイズ(原子数)
@@ -110,7 +109,8 @@ class Config:
             yaml_path = os.environ.get("RMC_DFT_CONFIG_YAML")
             if yaml_path is None:
                 return
-        with open(yaml_path, "r") as f:
+        # with open(yaml_path, "r") as f:
+        with open(yaml_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
         for k, v in data.items():
             if hasattr(cls, k):
