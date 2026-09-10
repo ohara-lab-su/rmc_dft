@@ -86,10 +86,10 @@ class Config:
     auto_write: bool = True
 
     def __init__(
-            self,
-            yaml_path: Optional[str] = None,
-            *,
-            logger: Optional[XLogger] = XLogger(),
+        self,
+        yaml_path: Optional[str] = None,
+        *,
+        logger: Optional[XLogger] = XLogger(),
     ):
         """
 
