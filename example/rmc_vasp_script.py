@@ -2,8 +2,9 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 
-RMC-DFT のUIクラスを使わずに直接 rmc_pot, vasp 関係のクラスを起動して
-RMC-VASP を構成する 実用 sample script
+RMC と VASP を交互に実行する RMC-DFT 計算スクリプト。
+各実行番号に対応する rmc_init_N.py / rmc_vasp_init_N.py があれば自動的に使用する。
+通常開始および restart に対応する
 """
 
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence

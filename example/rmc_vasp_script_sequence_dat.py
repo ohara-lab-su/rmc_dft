@@ -24,8 +24,8 @@ continue_rmc_dft:
 continue_rmc_dft = False
 
 manual_sequence = [
-    "rmc_init_1.py",
-    "rmc_init_2.py",
+    # "rmc_init_1.py",
+    # "rmc_init_2.py",
     "rmc_vasp_init_3.py",
     "rmc_init_4.py",
     "rmc_init_5.py",

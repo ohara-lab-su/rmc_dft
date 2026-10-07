@@ -2,8 +2,9 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 
-RMC-DFT のUIクラスを使わずに直接 rmc_pot, vasp 関係のクラスを起動して
-RMC-VASP を構成する 実用 sample script
+番号付き init ファイルで指定した順序に従って RMC / VASP を実行するスクリプト。
+実行順序は rmc_vasp_script_sequence_dat.py の manual_sequence から読み込む。
+指定シーケンス終了後、通常の RMC-DFT 交互実行へ継続することもできる。
 """
 
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
