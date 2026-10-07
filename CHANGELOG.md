@@ -3,6 +3,23 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.7.0 - 2026-10-07
+
+### Changed
+
+- Separated the RMC-related functionality from `rmc_dft` into the independent `rmc_util` package, starting with
+  `rmc_util` v0.0.0.
+- Removed the RMC implementation from `rmc_dft`. The implementation is now maintained in `rmc_util`.
+- Advanced the `rmc_dft` version from v0.6.13 to v0.7.0 to mark this package split.
+
+### Compatibility
+
+- The existing `rmc_dft.rmc_pot` import paths are intended to remain available temporarily through package
+  initialization that redirects imports to `rmc_util`.
+- Using RMC functionality through `rmc_dft` therefore requires `rmc_util` to be installed.
+- New code should import RMC functionality directly from `rmc_util`. The legacy import paths are transitional and may be
+  removed in a future release.
+
 # v0.6.13
 
 ## Synchronize sequence init handling with the current implementation

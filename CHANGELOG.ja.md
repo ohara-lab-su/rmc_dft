@@ -3,6 +3,20 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.7.0 - 2026-10-07
+
+### 変更
+
+- `rmc_dft` v0.6.13 までに含まれていた RMC 関連機能を、独立した `rmc_util` パッケージ（初期バージョン v0.0.0）へ分離。
+- RMC の実装本体を `rmc_dft` から削除し、`rmc_util` 側に集約。
+- このパッケージ分離を区切りとして、`rmc_dft` のバージョンを v0.6.13 から v0.7.0 に更新。
+
+### 互換性
+
+- 従来の `rmc_dft.rmc_pot` 以下の import パスは、パッケージの `__init__.py` から `rmc_util` へ転送することで、移行期間中は維持する方針。
+- `rmc_dft` 経由で RMC 関連機能を使用する場合も、`rmc_util` のインストールが必要。
+- 新規コードでは `rmc_util` からの直接 import を推奨。旧 import パスは暫定的な互換措置であり、将来廃止する可能性がある。
+
 # v0.6.13
 
 ## sequence の現行 init 処理への追従
