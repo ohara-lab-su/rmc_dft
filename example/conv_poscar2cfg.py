@@ -4,27 +4,25 @@ K.NAKADA, kengo.nakada@gmail.com
 
 poscar2cfg を呼び出すだけ
 """
+
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 import os
 import sys
 import shutil
 
-from rmc_dft import (
+# from rmc_dft import (
+from rmc_util import (
     Config,
-    Vasp,
-    VaspIncar,
-    VaspKpoints,
-    VaspOutcar,
-    VaspLog,
     RmcPot,
     RmcPotLog,
     RmcPotDat,
     RmcPotFit,
     RmcPotPpcf,
 )
-from rmc_dft.vasp.util.poscar2cfg import poscar2cfg
-from x_logger import XLogger
 
+# from rmc_dft.vasp.util.poscar2cfg import poscar2cfg
+from rmc_util.util.poscar2cfg import poscar2cfg
+from x_logger import XLogger
 
 if __name__ == "__main__":
     logger = XLogger(

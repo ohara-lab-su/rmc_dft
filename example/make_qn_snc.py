@@ -5,7 +5,8 @@ K.NAKADA, kengo.nakada@gmail.com
 SiO2 の Q4/Q3/Q2 割合を指定した自由形式 RMC_POT *.dat 作成例。
 """
 
-from rmc_dft.rmc_pot.rmc_pot_dat_free import RmcPotDatFree
+# from rmc_dft.rmc_pot.rmc_pot_dat_free import RmcPotDatFree
+from rmc_util.rmc_pot_dat_free import RmcPotDatFree
 
 OUTPUT_NAME = "sio2_qn"
 

@@ -22,6 +22,8 @@ from rmc_dft import (
     VaspOutcar,
     VaspPotcarBuilder,
     VaspLog,
+)
+from rmc_util import (
     RmcPot,
     RmcPotLog,
     RmcPotDat,  # fixed-format *.dat
@@ -29,7 +31,10 @@ from rmc_dft import (
     RmcPotHst,
     RmcPotPpcf,
 )
-from rmc_dft.util import poscar2cfg
+
+# from rmc_dft.util import poscar2cfg
+from rmc_util.util import poscar2cfg
+
 from rmc_dft.util import next_log_dir_name as next_log_dir_name
 from x_logger import XLogger
 

@@ -3,6 +3,10 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/shimane-dev/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.7.2 - 2026-10-07
+
+- rmc_util への機能分離に対する対応のバグを修正 (未完？)
+
 ## v0.7.1 - 2026-10-07
 
 - ブランチ清掃

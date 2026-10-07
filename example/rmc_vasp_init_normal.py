@@ -20,6 +20,8 @@ from rmc_dft import (
     VaspOutcar,
     VaspPotcarBuilder,
     VaspLog,
+)
+from rmc_util import (
     RmcPot,
     RmcPotLog,
     RmcPotDat,

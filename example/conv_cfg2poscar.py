@@ -8,10 +8,13 @@ Usage:
     conv_cfg2poscar.py aaa Si,O
     conv_cfg2poscar.py config.yml
 """
+
 import sys
 
-from rmc_dft.config import Config
-from rmc_dft import RmcPot, RmcPotLog
+# from rmc_dft.config import Config
+# from rmc_dft import RmcPot, RmcPotLog
+from rmc_util.config import Config
+from rmc_util import RmcPot, RmcPotLog
 from x_logger import XLogger
 
 

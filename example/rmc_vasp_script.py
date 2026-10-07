@@ -27,6 +27,8 @@ from rmc_dft import (
     VaspOutcar,
     VaspPotcarBuilder,
     VaspLog,
+)
+from rmc_util import (
     RmcPot,
     RmcPotLog,
     RmcPotDat,
@@ -34,7 +36,9 @@ from rmc_dft import (
     RmcPotHst,
     RmcPotPpcf,
 )
-from rmc_dft.util import poscar2cfg, contcar2cfg
+from rmc_util.util import poscar2cfg, contcar2cfg
+
+# from rmc_dft.util import poscar2cfg, contcar2cfg
 from rmc_dft.util import next_log_dir_name as next_log_dir_name
 from rmc_dft.util import check_restart_rmc_vasp as check_restart_rmc_vasp
 

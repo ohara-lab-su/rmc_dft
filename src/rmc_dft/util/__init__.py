@@ -8,7 +8,9 @@ from rmc_dft.vasp.util.poscar2cfg import (
     contcar2cfg,
     convert_to_cfg,
 )
-from rmc_dft.rmc_pot.util.cfg2poscar import cfg2poscar
+
+# from rmc_dft.rmc_pot.util.cfg2poscar import cfg2poscar
+from rmc_util.util.cfg2poscar import cfg2poscar
 from rmc_dft.vasp.util.ensure_vasp5_format import ensure_vasp5_format
 
 # from rmc_dft.util.check_restart_rmc_vasp import check_restart_rmc_vasp

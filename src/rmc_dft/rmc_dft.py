@@ -2,14 +2,22 @@
 """
 K.NAKADA, kengo.nakada@gmail.com
 """
+
 import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
-from rmc_dft.rmc_pot import RmcPot, RmcPotLog
+# ------- RMC
+# from rmc_dft.rmc_pot import RmcPot, RmcPotLog
+from rmc_util.rmc_pot import RmcPot, RmcPotLog
+from rmc_util.util import poscar2cfg
+from rmc_util.util import ensure_vasp5_format
+
+# ----- DFT
 from rmc_dft.vasp import Vasp, VaspLog
 from rmc_dft.config import Config
-from rmc_dft.util import poscar2cfg
-from rmc_dft.util import ensure_vasp5_format
+
+# from rmc_dft.util import poscar2cfg
+# from rmc_dft.util import ensure_vasp5_format
 
 from x_logger import XLogger
 
