@@ -19,6 +19,7 @@ dependencies = [
     #"x_logger",
     "xlogger-py",
     "packmol_util",
+    "rmc_util",
     # fnc
     "pymatgen",
     # basic
