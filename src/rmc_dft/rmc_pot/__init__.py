@@ -2,11 +2,32 @@
 K.NAKADA, kengo.nakada@gmail.com
 """
 
-from rmc_dft.rmc_pot.rmc_pot import RmcPot
-from rmc_dft.rmc_pot.rmc_pot_dat import RmcPotDat
-from rmc_dft.rmc_pot.rmc_pot_dat_fixed import RmcPotDatFixed
-from rmc_dft.rmc_pot.rmc_pot_dat_free import RmcPotDatFree
-from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
-from rmc_dft.rmc_pot.rmc_pot_fit import RmcPotFit
-from rmc_dft.rmc_pot.rmc_pot_hst import RmcPotHst
-from rmc_dft.rmc_pot.rmc_pot_ppcf import RmcPotPpcf
+# from rmc_dft.rmc_pot.rmc_pot import RmcPot
+# from rmc_dft.rmc_pot.rmc_pot_dat import RmcPotDat
+# from rmc_dft.rmc_pot.rmc_pot_dat_fixed import RmcPotDatFixed
+# from rmc_dft.rmc_pot.rmc_pot_dat_free import RmcPotDatFree
+# from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
+# from rmc_dft.rmc_pot.rmc_pot_fit import RmcPotFit
+# from rmc_dft.rmc_pot.rmc_pot_hst import RmcPotHst
+# from rmc_dft.rmc_pot.rmc_pot_ppcf import RmcPotPpcf
+
+import sys
+import importlib
+
+modules = [
+    "rmc_pot",
+    "rmc_pot_dat",
+    "rmc_pot_dat_fixed",
+    "rmc_pot_dat_fnc",
+    "rmc_pot_dat_free",
+    "rmc_pot_dat_top",
+    "rmc_pot_fit",
+    "rmc_pot_hst",
+    "rmc_pot_log",
+    "rmc_pot_ppcf",
+    "rmc_pot_snc",
+]
+
+for name in modules:
+    module = importlib.import_module("rmc_util." + name)
+    sys.modules[__name__ + "." + name] = module
