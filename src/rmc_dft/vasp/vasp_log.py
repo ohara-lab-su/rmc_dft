@@ -3,6 +3,7 @@
 K.KOBAYASHI
 K.NAKADA, kengo.nakada@gmail.com
 """
+
 import os
 import sys
 
@@ -218,6 +219,7 @@ class VaspLog:
             "CONTCAR",
             "POSCAR",
             "KPOINTS",
+            "rmc_vasp_init.py",
         ]
 
         for file_name in files_to_copy:
