@@ -3,6 +3,13 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.7.5 - 2026-10-12
+
+- README を現行の `rmc_dft` の実装とパッケージ構成に合わせて更新。
+- `rmc_util` 分離後の `rmc_dft` と `rmc_util` の役割分担を整理。
+- 現在の実動構成が RMC_POT + VASP であること、および restart、番号付き init、sequence など現行ワークフローの説明を更新。
+- 将来的に特定の RMC / DFT コードへ依存しない構成とし、DFT に加えて MLP などの構造緩和手法も扱えるようにする設計方針を追記。
+
 ## v0.7.4 - 2026-10-08
 
 - LICENSE つけ忘れ対応
