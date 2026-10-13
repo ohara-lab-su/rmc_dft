@@ -3,6 +3,10 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.7.6 - 2026-10-13
+
+- VASP でのbackup に INCAR を忘れてた問題 (rmc_vasp_init.py をコピーしていたので大きな問題ではないが、不便である)
+
 ## v0.7.5 - 2026-10-12
 
 - README を現行の `rmc_dft` の実装とパッケージ構成に合わせて更新。
