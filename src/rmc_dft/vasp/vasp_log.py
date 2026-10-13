@@ -219,6 +219,7 @@ class VaspLog:
             "CONTCAR",
             "POSCAR",
             "KPOINTS",
+            "INCAR",
             "rmc_vasp_init.py",
         ]
 
