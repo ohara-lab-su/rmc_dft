@@ -3,8 +3,8 @@ requires = ["setuptools>=71.0", "coloredlogs"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "rmc_dft"
-version = "0.7.6"
+name = "rmc-dft"
+version = "0.7.7"
 
 description = "rmc_dft is a Python package for performing Reverse Monte Carlo modeling and ab initio molecular dynamics / relaxation using VASP code."
 authors = [
@@ -18,7 +18,7 @@ dependencies = [
     # my-modules
     #"x_logger",
     "xlogger-py",
-    "packmol_util",
+    "packmol-util",
     "rmc_util",
     # fnc
     "pymatgen",
