@@ -3,6 +3,27 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.7.10 — 2026-10-22
+
+### 修正
+
+- `VaspPoscar._read_poscar()` において、Cartesian形式の原子座標にもPOSCARのスケール係数を適用するよう修正。従来は格子ベクトルだけがスケーリングされ、Cartesian形式の原子位置が誤っていた。
+- POSCARの負の単一スケール値（目標セル体積、Å³）に対応。元の格子行列式から等方スケール係数を計算し、格子ベクトルとCartesian原子座標に適用する。
+- POSCARの3成分スケール値に対応。各Cartesian成分に対応する係数を格子ベクトルとCartesian原子座標へ適用する。
+- ゼロスケール、非正の3成分スケール、非有限値、特異格子を検出する。
+
+### 影響範囲
+
+- **単一スケール係数が `1.0` の場合、従来のCartesian座標のスケーリング漏れは顕在化しない。** この条件では修正前後の原子位置は一致する。
+- Direct形式の原子座標はスケーリングしない。セルのスケールだけが原子位置のCartesian表現に反映される。
+- POSCAR読み込み時に原子座標を周期セル内へ折り返さない。
+- `get_scale()` はPOSCARに記述された元の値（単一値、または3成分のリスト）を返す。負の体積指定を含め、元の入力値を保持する。
+  `get_lattice_constant()` は有効な一様係数を返し、3成分指定では一様係数が存在しないため `1.0` を返す。
+
+### 検証
+
+- 正の単一係数、負の体積指定、3成分指定についてDirect/Cartesian座標を数値検査。スケール `1.0` およびセル外Direct座標の保持も検査（計7ケース）。
+
 ## v0.7.9
 
 - `check_pair_distances()` を汎用幾何操作として提供。

@@ -58,14 +58,56 @@ class VaspPoscar:
         # label
         self._label: str = lines[0]
 
-        # scale factor
-        self._scale: float = float(lines[1].strip())
+        # 【追加・修正】POSCARのスケール指定を1値または3値として解析する。
+        # 旧実装のfloat(lines[1])では3成分指定を読めず、負値を
+        # そのまま格子に掛けると「目標体積」の意味を取り違えるため。
+        # 1値の正数は一様倍率、負数は目標セル体積（Å^3）、
+        # 3値はCartesianのx, y, z成分ごとの倍率を意味する。
+        scale_values: List[float] = [float(value) for value in lines[1].split()]
+        if len(scale_values) != 1 and len(scale_values) != 3:
+            raise ValueError("POSCAR scale line must contain one or three numbers")
+        if not np.all(np.isfinite(scale_values)):
+            raise ValueError("POSCAR scale factors must be finite")
 
-        # lattice parameter (scale factor を掛けたもの)
-        self._lattice: np.array = np.array(
-            [[float(x) for x in lines[i].split()] for i in range(2, 5)]
+        # 【追加】スケール適用前の格子を保持し、体積指定の倍率算出と
+        # ゼロ体積・特異格子の検出に使用する。
+        lattice_unscaled: np.ndarray = np.array(
+            [[float(x) for x in lines[i].split()] for i in range(2, 5)],
+            dtype=float,
         )
-        self._lattice *= self._scale  # ここでスケールを掛け算
+        if lattice_unscaled.shape != (3, 3):
+            raise ValueError("POSCAR must contain three lattice vectors")
+        determinant: float = float(np.linalg.det(lattice_unscaled))
+        if not np.isfinite(determinant) or abs(determinant) < 1.0e-14:
+            raise ValueError("POSCAR lattice vectors must be linearly independent")
+
+        # 【追加】実際に適用する3成分の倍率と、POSCARに書かれた
+        # 元の指定値を別々に保持する。負の体積指定では両者は異なる。
+        self._scale_factors: np.ndarray
+        self._scale_specification: List[float] = scale_values.copy()
+        if len(scale_values) == 3:
+            if any(value <= 0.0 for value in scale_values):
+                raise ValueError("Three POSCAR scale factors must be positive")
+            self._scale_factors = np.array(scale_values, dtype=float)
+            # 【変更】3成分指定には一意の一様倍率がない。
+            # 既存のget_lattice_constant()との互換性のため、
+            # _scaleは1.0とし、実倍率は_scale_factorsに保持する。
+            self._scale = 1.0
+        else:
+            scale_value: float = scale_values[0]
+            if scale_value == 0.0:
+                raise ValueError("POSCAR scale factor must be nonzero")
+            if scale_value < 0.0:
+                # 【追加】負の指定値は倍率ではなく目標体積である。
+                # |det(A0)| * s^3 = 目標体積から正の一様倍率sを求める。
+                scale_value = (abs(scale_value) / abs(determinant)) ** (1.0 / 3.0)
+            self._scale = scale_value
+            self._scale_factors = np.full(3, scale_value, dtype=float)
+
+        # 【修正】格子ベクトルは行、Cartesian成分は列に配置される。
+        # 3成分指定は「各格子ベクトルごと」ではなく「各Cartesian成分ごと」
+        # に掛ける必要があるため、列方向に_scale_factorsを適用する。
+        self._lattice = lattice_unscaled * self._scale_factors
 
         # element (VASP5以上ならば必ず存在する)
         # 元素記号のリスト
@@ -96,8 +138,14 @@ class VaspPoscar:
         # 記録されている内部座標がどのモードなのか？ Direct ならば True
         self._is_direct = coord_mode.startswith("d")
 
-        # direct 変換
+        # 【バグ修正】Cartesian指定の入力座標にもPOSCARの倍率を掛ける。
+        # 旧実装は格子だけを拡大して未スケールのCartesian座標を
+        # Directに変換していたため、s != 1.0では原子位置が誤った。
+        # まずCartesian成分をスケールし、次に拡大済み格子の逆行列で
+        # Directへ変換する。Direct指定は無次元なので倍率を掛けない。
+        # なお単一倍率s = 1.0では旧実装のこのバグは顕在化しない。
         if not self._is_direct:
+            coords = coords * self._scale_factors
             inv_lattice = np.linalg.inv(self._lattice)
             coords = coords @ inv_lattice
 
@@ -269,11 +317,18 @@ class VaspPoscar:
         return self._label
 
     def get_lattice_constant(self) -> float:
-        """格子定数(scale factor)を返す"""
+        """有効な一様倍率を返す。3成分指定時は互換値1.0を返す。"""
+        # 【変更】負の体積指定では算出した一様倍率を返す。
+        # 3成分指定の実倍率は単一値にできないため、この値では表さない。
         return self._scale
 
-    def get_scale(self) -> float:
-        return self._scale
+    def get_scale(self) -> Any:
+        """POSCARの元のスケール指定を返す（単一値または3成分リスト）。"""
+        # 【追加・変更】計算に使った有効倍率ではなく入力行の指定を返す。
+        # 負の体積指定を元の値のまま取得でき、3成分指定も保持できる。
+        if len(self._scale_specification) == 3:
+            return self._scale_specification.copy()
+        return self._scale_specification[0]
 
     def get_inv_lattice(self):
         """scale も含めた"""
