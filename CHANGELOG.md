@@ -3,6 +3,34 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.7.10 — 2026-10-22
+
+### Fixed
+
+- Corrected `VaspPoscar._read_poscar()` to apply the POSCAR scale factor to Cartesian atomic coordinates as well as
+  lattice vectors. Previously, Cartesian atomic positions were incorrectly left unscaled.
+- Added support for a negative single scale value specifying the target cell volume in Å³. The uniform scale is
+  calculated from the determinant of the unscaled lattice and applied to both lattice vectors and Cartesian positions.
+- Added support for three scale factors, applied component-wise along Cartesian axes to lattice vectors and Cartesian
+  atomic positions.
+- Added validation for zero scale factors, nonpositive three-component factors, nonfinite factors, and singular
+  lattices.
+
+### Impact
+
+- **When the single scale factor is `1.0`, the previous Cartesian-coordinate scaling bug does not manifest.** Atomic
+  positions are unchanged by this fix in that case.
+- Direct coordinates remain dimensionless and are not scaled; the scaled lattice determines their Cartesian positions.
+- Atomic coordinates are not wrapped into the primary periodic cell when reading POSCAR files.
+- `get_scale()` returns the original POSCAR scale specification (a scalar or a three-element list), including a negative
+  target-volume value. `get_lattice_constant()` returns the effective uniform scale; it returns `1.0` for three-factor
+  specifications, for which no uniform scale exists.
+
+### Verification
+
+- Numerically tested Direct and Cartesian positions with positive scalar, negative volume, and three-component scale
+  specifications, plus scale `1.0` and preservation of out-of-cell Direct coordinates (seven cases).
+
 ## v0.7.9
 
 - Added check_pair_distances () as a general-purpose geometry utility.
