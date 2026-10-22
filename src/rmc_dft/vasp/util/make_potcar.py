@@ -3,8 +3,8 @@
 K.NAKADA, kengo.nakada@gmail.com
 """
 
+import sys
 from rmc_dft.vasp.vasp_potcar import VaspPotcarBuilder
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

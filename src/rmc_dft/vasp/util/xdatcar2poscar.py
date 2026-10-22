@@ -92,6 +92,8 @@ def xdatcar2poscar(
 
 
 if __name__ == "__main__":
+    import logger
+
     if len(sys.argv) < 2:
         logger.info("Usage: python xdatcar2poscar.py <base_name>")
         sys.exit(1)
