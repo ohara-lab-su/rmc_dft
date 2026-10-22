@@ -3,6 +3,10 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.7.9
+
+- Added check_pair_distances () as a general-purpose geometry utility.
+
 ## v0.7.8 — 2026-10-22
 
 ### Added
