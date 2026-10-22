@@ -3,12 +3,30 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.7.8 — 2026-10-22
+
+### Added
+
+- Added `rmc_dft.vasp.util.cell_geometry`, providing cell-volume calculations, Direct/Cartesian coordinate conversions,
+  wrapping into the periodic cell, minimum-image displacement vectors, and periodic interatomic distances for NumPy
+  arrays.
+- POSCAR input continues to use the existing `VaspPoscar` implementation; no new POSCAR parser has been introduced.
+
+### Notes
+
+- This ZIP contains only added or modified files. The existing `vasp_poscar.py` is unchanged.
+- Minimum-image searches are performed within the specified image-search radius. For highly distorted lattices, the
+  search radius may need to be adjusted.
+- Training-candidate generation for `aenet_env` is provided in a separate ZIP.
+
 ## v0.7.5 - 2026-10-12
 
 - Updated the README to match the current `rmc_dft` implementation and package structure.
 - Clarified the roles of `rmc_dft` and `rmc_util` after separation of the RMC_POT utility layer.
-- Updated documentation of the current RMC_POT + VASP workflow, including restart handling, numbered init files, and sequence execution.
-- Documented the design direction toward independence from specific RMC/DFT codes and future support for structural-relaxation backends such as MLPs in addition to DFT.
+- Updated documentation of the current RMC_POT + VASP workflow, including restart handling, numbered init files, and
+  sequence execution.
+- Documented the design direction toward independence from specific RMC/DFT codes and future support for
+  structural-relaxation backends such as MLPs in addition to DFT.
 
 ## v0.7.0 - 2026-10-07
 

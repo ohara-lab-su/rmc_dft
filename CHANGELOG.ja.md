@@ -3,6 +3,19 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.7.8 — 2026-10-22
+
+### 追加
+
+- `rmc_dft.vasp.util.cell_geometry` を追加。セル体積、Direct/Cartesian座標変換、周期セル内への折り返し、最短画像ベクトル、周期原子間距離をNumPy配列に対して提供。
+- POSCAR読み込みは既存の `VaspPoscar` を利用し、新しいPOSCARパーサーは追加しない。
+
+### 注意
+
+- 本ZIPは追加・修正ファイルのみ。既存の `vasp_poscar.py` は変更しない。
+- 最短画像探索は指定された画像探索半径の範囲内で行う。強く歪んだ格子では探索半径を検討すること。
+- aenet_env の教師候補生成は別ZIPで提供する。
+
 ## v0.7.6 - 2026-10-13
 
 - VASP でのbackup に INCAR を忘れてた問題 (rmc_vasp_init.py をコピーしていたので大きな問題ではないが、不便である)
