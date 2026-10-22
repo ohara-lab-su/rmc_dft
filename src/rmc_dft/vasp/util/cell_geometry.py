@@ -6,7 +6,7 @@ POSCARの読み込みは既存の rmc_dft.vasp.vasp_poscar.VaspPoscar を使用�
 """
 
 from itertools import product
-from typing import Tuple
+from typing import List, Dict, Optional, Tuple
 import numpy as np
 
 
@@ -22,7 +22,9 @@ def _lattice(
     return lattice
 
 
-def cell_volume(cell: np.ndarray) -> float:
+def cell_volume(
+    cell: np.ndarray,
+) -> float:
     """周期セルの体積を返す（格子がÅならÅ³）。"""
     return abs(float(np.linalg.det(_lattice(cell))))
 
@@ -86,7 +88,8 @@ def minimum_image_vector(
         if squared < best_squared:
             best = vec
             best_squared = squared
-    assert best is not None
+    if best is None:
+        raise RuntimeError("周期画像の探索に失敗しました")
     return best
 
 
@@ -98,3 +101,30 @@ def periodic_distance(
 ) -> float:
     """2点の周期最短距離（Å）。"""
     return float(np.linalg.norm(minimum_image_vector(a, b, cell, search_radius)))
+
+
+def check_pair_distances(
+    symbols: List[str],
+    positions: np.ndarray,
+    cell: np.ndarray,
+    minimums: Dict[str, float],
+    fallback: Optional[float] = None,
+) -> Tuple[bool, float]:
+    """周期距離に基づき、全原子対の下限距離を検証する。"""
+    shortest = float("inf")
+    for i in range(len(symbols)):
+        for j in range(i + 1, len(symbols)):
+            key = "-".join(sorted((symbols[i], symbols[j])))
+            if key in minimums:
+                threshold = minimums[key]
+            elif fallback is not None:
+                threshold = fallback
+            else:
+                raise ValueError(f"距離閾値が未設定です: {key}")
+            distance = periodic_distance(positions[i], positions[j], cell)
+            shortest = min(shortest, distance)
+            if not np.isfinite(distance):
+                return False, shortest
+            if distance < threshold:
+                return False, shortest
+    return True, shortest
