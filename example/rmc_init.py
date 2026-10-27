@@ -14,7 +14,7 @@ import sys
 import shutil
 import re
 
-from rmc_dft import (
+from vasp_util import (
     Config,
     Vasp,
     VaspIncar,
@@ -85,6 +85,7 @@ def run_rmc_init(
 
     # --- SiO2 ---
     # rmc_dat.set_comment("comment SiO2")
+    # rmc_dat.set_comment("comment SiO2 type-A")
 
     # --- Zeolite: Si488 Al12 O1000 Na12, Si/Al=40, Na/Al=1 ---
     rmc_dat.set_comment(
@@ -146,7 +147,6 @@ def run_rmc_init(
     # peak Si-Si:2.7-2.70, Si-O:1.5-1.55, O-O: 2.3-2.4
     # rmc_dat.set_cutoffs([2.40, 1.25, 2.10])  # Si-Si, Si-O, O-O
     # rmc_dat.set_cutoffs([1.0, 1.0, 1.0])  # Si-Si, Si-O, O-O
-    # rmc_dat.set_cutoffs([1.9, 1.1, 1.9])  # Si-Si, Si-O, O-O
     # rmc_dat.set_cutoffs([1.9, 1.1, 1.9])  # Si-Si, Si-O, O-O
     # rmc_dat.set_cutoffs(
     #     [1.9, 1.4, 1.9]
