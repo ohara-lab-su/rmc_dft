@@ -1,25 +1,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DOCS_DIR="$SCRIPT_DIR"
+DOCS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$DOCS_DIR/.." && pwd)"
-SRC_DIR="$ROOT_DIR/src"
+PACKAGE_DIR="$ROOT_DIR/src/rmc_dft"
+OUTPUT_DIR="$DOCS_DIR/_build/html"
 
-####################
-PKG_NAME="rmc_dft"   # パッケージ名を明示
-####################
+if [[ ! -d "$PACKAGE_DIR" ]]; then
+  echo "Package not found: $PACKAGE_DIR" >&2
+  exit 1
+fi
+export PYTHONPATH="$ROOT_DIR/src:${PYTHONPATH:-}"
+rm -rf "$OUTPUT_DIR"
+mkdir -p "$OUTPUT_DIR"
 
-export PYTHONPATH="$SRC_DIR:${PYTHONPATH:-}"
+for lang in en ja; do
+  SOURCE_DIR="$DOCS_DIR/$lang"
+  [[ -f "$SOURCE_DIR/index.md" ]] || { echo "Missing $SOURCE_DIR/index.md" >&2; exit 1; }
+  mkdir -p "$SOURCE_DIR/api"
+  sphinx-apidoc --force --module-first -o "$SOURCE_DIR/api" "$PACKAGE_DIR"
+  # /en/ と /ja/ は独立した Sphinx サイトとして生成する。
+  sphinx-build -b html -c "$DOCS_DIR" -D "language=$lang" \
+    "$SOURCE_DIR" "$OUTPUT_DIR/$lang"
+done
+# 英語のルートはリダイレクトではなく、同一ソースから独立にビルドする。
+sphinx-build -b html -c "$DOCS_DIR" -D language=en \
+  "$DOCS_DIR/en" "$OUTPUT_DIR"
 
-echo "Cleaning build..."
-rm -rf "$DOCS_DIR/_build" "$DOCS_DIR/api"
-mkdir -p "$DOCS_DIR/api"
-
-echo "Generating API stubs with sphinx-apidoc..."
-sphinx-apidoc -o "$DOCS_DIR/api" "$SRC_DIR/$PKG_NAME" -f --module-first
-
-echo "Building HTML..."
-sphinx-build -b html "$DOCS_DIR" "$DOCS_DIR/_build/html"
-
-echo "Done."
+# 静的ファイルの配置
+if [[ -f "$DOCS_DIR/_robots.txt" ]]; then
+  cp "$DOCS_DIR/_robots.txt" "$OUTPUT_DIR/robots.txt"
+fi
+touch "$OUTPUT_DIR/.nojekyll"
+for file in "$OUTPUT_DIR/index.html" "$OUTPUT_DIR/en/index.html" "$OUTPUT_DIR/ja/index.html"; do
+  [[ -s "$file" ]] || { echo "Missing output: $file" >&2; exit 1; }
+done
