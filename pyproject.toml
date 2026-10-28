@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rmc-dft"
-version = "0.7.10"
+version = "0.7.12"
 
 description = "rmc_dft is a Python package for performing Reverse Monte Carlo modeling and ab initio molecular dynamics / relaxation using VASP code."
 authors = [
@@ -16,10 +16,10 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     # my-modules
-    #"x_logger",
     "xlogger-py",
     "packmol-util",
     "rmc-util",
+    "vasp-util",
     # fnc
     "pymatgen",
     # basic
@@ -52,3 +52,11 @@ line-length = 88
 
 [tool.isort]
 profile = "black"
+[project.scripts]
+rmc_dft = "rmc_dft.install:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+rmc_dft = ["scripts/**/*"]

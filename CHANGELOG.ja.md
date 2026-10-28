@@ -1,7 +1,16 @@
 # CHANGELOG
+- `rmc_dft install` は `run` に限らず、8カテゴリのいずれも指定でき、指定カテゴリ以下の全ファイルをカレントディレクトリへ配置する。
 
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
+
+- `all` を指定すると8カテゴリすべてをカテゴリ別ディレクトリにコピーする。個別ファイル指定はサポートしない。
+
+## v0.7.12 — 2026-10-28
+
+### 追加
+
+- 同梱サンプルをカレントディレクトリへコピーする `rmc_dft install` コマンドを追加。
 
 ## v0.7.10 — 2026-10-22
 

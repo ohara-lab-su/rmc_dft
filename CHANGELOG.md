@@ -1,7 +1,16 @@
 # CHANGELOG
+- `rmc_dft install` supports all eight script categories, copying every file in the selected category to the current directory.
 
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
+
+- `all` copies all eight categories preserving category directories. Individual file paths are not supported.
+
+## v0.7.12 — 2026-10-28
+
+### Added
+
+- Added the `rmc_dft install` command to copy packaged example scripts to the current directory.
 
 ## v0.7.10 — 2026-10-22
 
