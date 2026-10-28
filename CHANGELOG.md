@@ -3,6 +3,20 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
 
+## v0.7.11 — 2026-10-28
+
+### Added and changed
+
+- Added `rmc_dft install` to copy editable scripts from the installed distribution to the working directory, optionally selecting `run`, `plot`, `make`, `check`, `tool`, `get`, `analyze`, `convert`, or `edit`.
+- Existing files are preserved unless `--force` is specified, consistent with the RMC and VASP utility packages.
+- Declared the CLI in `[project.scripts]` and explicitly listed distributed templates in `[tool.setuptools.data-files]` in `pyproject.toml`.
+- Designated `scripts/` as the source of distributed templates, keeping `example/` for research examples. No preparation script or automatic TOML rewriting is used.
+- Documented the install command's purpose and usage in the README.
+
+### Note
+
+- Template source files must be placed in `scripts/<category>/` before building. Migration of the script contents and wheel installation testing remain to be completed.
+
 ## v0.7.10 — 2026-10-22
 
 ### Fixed
@@ -1808,3 +1822,9 @@ changed midway, the classes became large.
 ## v0.0.x nakada
 
 - Prepared the skeleton structure: subprocess, class, and basic method structure.
+
+## Unreleased
+
+- Added categorized `rmc_dft install [category]` script installation and a repository preparation utility.
+
+- Script distribution is now declared explicitly in `pyproject.toml`; removed the `prepare_scripts.py` workflow.

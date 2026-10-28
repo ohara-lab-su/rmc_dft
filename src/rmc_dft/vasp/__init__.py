@@ -2,15 +2,15 @@
 K.NAKADA, kengo.nakada@gmail.com
 """
 
-from rmc_dft.vasp.vasp import Vasp
-from rmc_dft.vasp.vasp_incar import VaspIncar
-from rmc_dft.vasp.vasp_kpoints import VaspKpoints
-from rmc_dft.vasp.vasp_potcar import VaspPotcarBuilder
-from rmc_dft.vasp.vasp_log import VaspLog
-from rmc_dft.vasp.vasp_outcar import VaspOutcar
+from vasp_util.vasp import Vasp
+from vasp_util.vasp_incar import VaspIncar
+from vasp_util.vasp_kpoints import VaspKpoints
+from vasp_util.vasp_potcar import VaspPotcarBuilder
+from vasp_util.vasp_log import VaspLog
+from vasp_util.vasp_outcar import VaspOutcar
 
-from rmc_dft.vasp.vasp_poscar import VaspPoscar
-from rmc_dft.vasp.vasp_poscar_analyzer import VaspPoscarAnalyzer
+from vasp_util.vasp_poscar import VaspPoscar
+from vasp_util.vasp_poscar_analyzer import VaspPoscarAnalyzer
 
 # from .vasp import Vasp
 # from .collect_result import VaspLog
