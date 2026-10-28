@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rmc_dft.rmc_dft &mdash; Project  ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c033477b"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Project
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">rmc_dft</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/rmc_dft.html">rmc_dft package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rmc_dft.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rmc_dft.packmol.html">rmc_dft.packmol package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rmc_dft.util.html">rmc_dft.util package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rmc_dft.vasp.html">rmc_dft.vasp package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rmc_dft.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rmc_dft.html#module-rmc_dft.config">rmc_dft.config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rmc_dft.html#rmc_dft.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rmc_dft.html#module-rmc_dft.rmc_dft">rmc_dft.rmc_dft module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft"><code class="docutils literal notranslate"><span class="pre">RmcDft</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rmc_dft.html#module-rmc_dft.util">rmc_dft.util module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">チュートリアル</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc/rmc_theory_explained.html">RMCとは</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc/rmc_theory_explained.html#id1">シミュレーティッド・アニーリング(焼きなまし法)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc/rmcpot_cfg_explained.html">RMC POTのcfgファイルの説明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/rmc/rmcpot_cfg_explained.html#aaa-cfg">例：aaa.cfg の一部</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/rmc/rmcpot_cfg_explained.html#id1">各セクションの説明（順に）</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/rmc/rmcpot_cfg_explained.html#id2">実務メモ / チェックリスト</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc/rmcpot_input_explained.html">RMCPOT のインプットファイル解説</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc/rmcpot_input_explained.html#cfg">cfgファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc/rmcpot_input_explained.html#sq">sqファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc/rmcpot_input_explained.html#dat">datファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc/rmcpot_output_explained.html">RMC POT のアウトプットファイル（解説）</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/rmc/rmcpot_output_explained.html#id1">共通の注意点</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/rmc/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/packmol/packmol.html">pypackmol (in RMC_DFT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/packmol/packmol.html#pacmol">pacmol公式サイト</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/packmol/packmol.html#linux">linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/packmol/packmol.html#for-mac">for Mac</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/packmol/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/rmc_dft/quick_start.html">quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/rmc_dft/quick_start.html#install">install</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Project</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">rmc_dft.rmc_dft</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>rmc_dft.rmc_dft のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">K.NAKADA, kengo.nakada@gmail.com</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.rmc_pot</span><span class="w"> </span><span class="kn">import</span> <span class="n">RmcPot</span><span class="p">,</span> <span class="n">RmcPotLog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.vasp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Vasp</span><span class="p">,</span> <span class="n">VaspLog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">poscar2cfg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_vasp5_format</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">x_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">XLogger</span>
+
+
+<div class="viewcode-block" id="RmcDft">
+<a class="viewcode-back" href="../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RmcDft</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">rmc_code</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># &quot;RmcPot&quot;</span>
+        <span class="n">dft_code</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># &quot;Vasp&quot;,</span>
+        <span class="n">max_rmc_dft_loop</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(),</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">XLogger</span> <span class="o">=</span> <span class="n">XLogger</span><span class="p">(),</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">cfg_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        RMCとDFTの統合実行クラス。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rmc_code (str): RMCコード名 (&quot;RmcPot&quot;, &quot;RmcProfile&quot; など)</span>
+<span class="sd">            dft_code (str): DFTコード名 (&quot;Vasp&quot;, &quot;QE&quot; など)</span>
+<span class="sd">            max_rmc_dft_loop (int): RMC-DFTループの最大回数</span>
+<span class="sd">            config (Config): 設定オブジェクト</span>
+<span class="sd">            logger (XLogger): ロガー（指定がなければ新規作成）</span>
+<span class="sd">            cfg_name (str): CFGファイルのベース名</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="k">if</span> <span class="n">rmc_code</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rmc_code</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">rmc_code</span>
+        <span class="k">if</span> <span class="n">dft_code</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dft_code</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dft_code</span>
+        <span class="k">if</span> <span class="n">cfg_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cfg_name</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">cfg_name</span>
+        <span class="k">if</span> <span class="n">max_rmc_dft_loop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">max_rmc_dft_loop</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">max_rmc_dft_loop</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cfg_name</span> <span class="o">=</span> <span class="n">cfg_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_rmc_dft_loop</span> <span class="o">=</span> <span class="n">max_rmc_dft_loop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dft_code</span> <span class="o">=</span> <span class="n">dft_code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rmc_code</span> <span class="o">=</span> <span class="n">rmc_code</span>
+
+        <span class="c1"># --- RMC部分の動的生成 ---</span>
+        <span class="n">rmc_log_class</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rmc_code</span><span class="si">}</span><span class="s2">Log&quot;</span><span class="p">)</span>
+        <span class="n">rmc_class</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rmc_code</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rmc_log_class</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">rmc_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown RMC code: </span><span class="si">{</span><span class="n">rmc_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># self._rmc_log = rmc_log_class(</span>
+        <span class="c1">#     config=self._config,</span>
+        <span class="c1">#     logger=logger,</span>
+        <span class="c1"># )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rmc</span> <span class="o">=</span> <span class="n">rmc_class</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># --- DFT部分の動的生成 ---</span>
+        <span class="n">dft_log_class</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dft_code</span><span class="si">}</span><span class="s2">Log&quot;</span><span class="p">)</span>
+        <span class="n">dft_class</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dft_code</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dft_log_class</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">dft_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown DFT code: </span><span class="si">{</span><span class="n">dft_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># self._dft_log = dft_log_class(</span>
+        <span class="c1">#     self._config,</span>
+        <span class="c1">#     logger=logger,</span>
+        <span class="c1"># )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dft</span> <span class="o">=</span> <span class="n">dft_class</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="RmcDft.set_cfg_name">
+<a class="viewcode-back" href="../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft.set_cfg_name">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_cfg_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cfg_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">cfg_name</span></div>
+
+
+<div class="viewcode-block" id="RmcDft.set_max_rmc_dft_loop">
+<a class="viewcode-back" href="../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft.set_max_rmc_dft_loop">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_max_rmc_dft_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_rmc_dft_loop</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_rmc_dft_loop</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">max_rmc_dft_loop</span></div>
+
+
+<div class="viewcode-block" id="RmcDft.init">
+<a class="viewcode-back" href="../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft.init">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># self._dft.init(cfg_name)</span>
+        <span class="c1"># self._rmc.init(cfg_name)</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="RmcDft.preprocess">
+<a class="viewcode-back" href="../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft.preprocess">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># self._dft.preprocess(cfg_name)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dft</span><span class="o">.</span><span class="n">preprocess</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="RmcDft.postprocess">
+<a class="viewcode-back" href="../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft.postprocess">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">postprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># self._dft.postprocess(cfg_name)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dft</span><span class="o">.</span><span class="n">postprocess</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="RmcDft.run">
+<a class="viewcode-back" href="../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft.run">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+        <span class="n">max_rmc_dft_loop</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">XLogger</span><span class="p">]</span> <span class="o">=</span> <span class="n">XLogger</span><span class="p">(),</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mode (str):</span>
+<span class="sd">            max_rmc_dft_loop:</span>
+<span class="sd">            logger (XLogger):</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== run(</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">max_rmc_dft_loop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">max_rmc_dft_loop</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_rmc_dft_loop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">max_rmc_dft_loop</span> <span class="o">=</span> <span class="n">max_rmc_dft_loop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;max_rmc_dft_loop = </span><span class="si">{</span><span class="n">max_rmc_dft_loop</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># コンストラクで Config() から cfg_name にとってくる形</span>
+        <span class="n">cfg_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg_name</span>
+
+        <span class="n">digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">max_rmc_dft_loop</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_rmc_dft_loop</span><span class="p">):</span>
+
+            <span class="n">log_rmc_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">rmc_log_dir</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">log_dft_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">dft_log_dir</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="c1"># log_rmc_dir = f&quot;log{str(i).zfill(digits)}&quot;</span>
+            <span class="c1"># log_dft_dir = f&quot;log{str(i).zfill(digits)}&quot;</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">log_dft_dir</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">log_dft_dir</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rmc_code</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="si">}</span><span class="s2">, log_dir=</span><span class="si">{</span><span class="n">log_rmc_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># self._rmc.run(cfg_name=cfg_name)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rmc</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rmc</span><span class="o">.</span><span class="n">postprocess</span><span class="p">(</span>
+                <span class="n">log_dir</span><span class="o">=</span><span class="n">log_rmc_dir</span><span class="p">,</span>  <span class="c1"># loop での名前変更に対応</span>
+                <span class="c1"># cfg_name=cfg_name,</span>
+                <span class="c1"># element_info=&quot;label.txt&quot;,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;== </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dft_code</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="si">}</span><span class="s2">, mode=</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">, log_dir=</span><span class="si">{</span><span class="n">log_dft_dir</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dft</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dft</span><span class="o">.</span><span class="n">postprocess</span><span class="p">(</span>
+                <span class="n">log_dir</span><span class="o">=</span><span class="n">log_dft_dir</span><span class="p">,</span>  <span class="c1"># loop での名前変更に対応</span>
+                <span class="c1"># cfg_name=cfg_name,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;loop end &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;run end&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RmcDft.poscar2cfg">
+<a class="viewcode-back" href="../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft.poscar2cfg">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">poscar2cfg</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cfg_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">posscar_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">posscar_name</span><span class="p">:</span>
+            <span class="n">posscar_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cfg_name</span><span class="si">}</span><span class="s2">.vasp&quot;</span>
+
+        <span class="c1"># CFG ファイルを作る</span>
+        <span class="n">poscar2cfg</span><span class="p">(</span><span class="n">cfg_name</span><span class="o">=</span><span class="n">cfg_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;RmcPot&quot;</span><span class="p">:</span> <span class="n">RmcPot</span><span class="p">,</span>
+        <span class="s2">&quot;RmcPotLog&quot;</span><span class="p">:</span> <span class="n">RmcPotLog</span><span class="p">,</span>
+        <span class="s2">&quot;Vasp&quot;</span><span class="p">:</span> <span class="n">Vasp</span><span class="p">,</span>
+        <span class="s2">&quot;VaspLog&quot;</span><span class="p">:</span> <span class="n">VaspLog</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">_logger</span> <span class="o">=</span> <span class="n">XLogger</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="n">logger_name</span><span class="o">=</span><span class="s2">&quot;rmc_vasp_run&quot;</span><span class="p">)</span>
+
+    <span class="n">_config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+    <span class="c1"># rmc_dft = RmcDft(</span>
+    <span class="c1">#     rmc_code=&quot;RmcPot&quot;,</span>
+    <span class="c1">#     dft_code=&quot;Vasp&quot;,</span>
+    <span class="c1">#     cfg_name=&quot;aaa&quot;,</span>
+    <span class="c1">#     max_rmc_dft_loop=5,</span>
+    <span class="c1">#     logger=_logger,</span>
+    <span class="c1"># )</span>
+
+    <span class="n">rmc_dft</span> <span class="o">=</span> <span class="n">RmcDft</span><span class="p">(</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">_config</span><span class="p">,</span>
+        <span class="n">logger</span><span class="o">=</span><span class="n">_logger</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># RMCの初期構造を POSCAR から作る</span>
+    <span class="n">rmc_dft</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">cfg_name</span><span class="p">)</span>
+    <span class="n">rmc_dft</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

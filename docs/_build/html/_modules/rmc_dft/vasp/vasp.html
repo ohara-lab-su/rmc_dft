@@ -1,0 +1,841 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rmc_dft.vasp.vasp &mdash; Project  ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=c033477b"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Project
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">rmc_dft</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/rmc_dft.html">rmc_dft package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.packmol.html">rmc_dft.packmol package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.util.html">rmc_dft.util package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.vasp.html">rmc_dft.vasp package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#module-rmc_dft.config">rmc_dft.config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.html#rmc_dft.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#module-rmc_dft.rmc_dft">rmc_dft.rmc_dft module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft"><code class="docutils literal notranslate"><span class="pre">RmcDft</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#module-rmc_dft.util">rmc_dft.util module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/index.html">チュートリアル</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmc_theory_explained.html">RMCとは</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmc_theory_explained.html#id1">シミュレーティッド・アニーリング(焼きなまし法)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html">RMC POTのcfgファイルの説明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html#aaa-cfg">例：aaa.cfg の一部</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html#id1">各セクションの説明（順に）</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html#id2">実務メモ / チェックリスト</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html">RMCPOT のインプットファイル解説</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html#cfg">cfgファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html#sq">sqファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html#dat">datファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html">RMC POT のアウトプットファイル（解説）</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#id1">共通の注意点</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/packmol/packmol.html">pypackmol (in RMC_DFT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#pacmol">pacmol公式サイト</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#linux">linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#for-mac">for Mac</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html">quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html#install">install</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Project</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">rmc_dft.vasp.vasp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>rmc_dft.vasp.vasp のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">K.KOBAYASHI</span>
+<span class="sd">K.NAKADA, kengo.nakada@gmail.com</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read</span><span class="p">,</span> <span class="n">write</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.vasp.vasp_incar</span><span class="w"> </span><span class="kn">import</span> <span class="n">VaspIncar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.vasp.vasp_kpoints</span><span class="w"> </span><span class="kn">import</span> <span class="n">VaspKpoints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.vasp.vasp_log</span><span class="w"> </span><span class="kn">import</span> <span class="n">VaspLog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.vasp.util.poscar2cfg</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">vasp2cfg</span><span class="p">,</span>
+    <span class="n">contcar2cfg</span><span class="p">,</span>
+    <span class="n">poscar2cfg</span><span class="p">,</span>
+    <span class="n">convert_to_cfg</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># util</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.vasp.util.copy_contcar_to_vasp</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy_contcar_to_vasp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.vasp.util.copy_vasp_to_poscar</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy_vasp_to_poscar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.vasp.util.xdatcar2poscar</span><span class="w"> </span><span class="kn">import</span> <span class="n">xdatcar2poscar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.vasp.util.ensure_vasp5_format</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_vasp5_format</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.vasp.util.make_potcar</span><span class="w"> </span><span class="kn">import</span> <span class="n">VaspPotcarBuilder</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">x_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">XLogger</span>
+
+<span class="c1"># vasp.py 冒頭（class 外）</span>
+
+
+<div class="viewcode-block" id="Vasp">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Vasp</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    RMD-DFT  のため VASP構造作成 / VASPパラメータ入力 / 実行 /解析用のクラス</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">incar_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;INCAR&quot;</span><span class="p">,</span>
+        <span class="n">kpoints_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;KPOINTS&quot;</span><span class="p">,</span>
+        <span class="n">vasp_log</span><span class="p">:</span> <span class="n">VaspLog</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># instance (データー解析用)</span>
+        <span class="n">vasp_incar</span><span class="p">:</span> <span class="n">VaspIncar</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vasp_kpoints</span><span class="p">:</span> <span class="n">VaspKpoints</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(),</span>  <span class="c1"># instance</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">XLogger</span><span class="p">]</span> <span class="o">=</span> <span class="n">XLogger</span><span class="p">(),</span>  <span class="c1"># instance</span>
+        <span class="n">auto_write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">vasp_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">dft_bin</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mpi_cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mpi_flag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_procs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">job_cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">make_default_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        config インスタンを与えると終わり</span>
+
+<span class="sd">        (*) 歴史的経緯で複雑になっているが、config 与えれば終わり</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            incar_name (str): INCAR</span>
+<span class="sd">            kpoints_name (str): KPOINTS</span>
+<span class="sd">            vasp_log (VaspLog): VASP の log 解析管理 instance</span>
+<span class="sd">            vasp_incar (VaspIncar):</span>
+<span class="sd">            vasp_kpoints (VaspKpoints):</span>
+<span class="sd">            config (Config): 全てのインスタンスが同じ Config</span>
+<span class="sd">            logger (XLogger): ろがー、全てのインスタンスが同じ XLogger</span>
+<span class="sd">            auto_write (bool):</span>
+<span class="sd">            vasp_name (str): POSCAR などに関連する系の識別名（例: &quot;aaa.vasp&quot; or &quot;POSCAR）</span>
+<span class="sd">            dft_bin (str): 実行バイナリ（例: &quot;vasp_std&quot;）</span>
+<span class="sd">            mpi_cmd (str): 例 &quot;mpirun&quot; (configがあればいらない)</span>
+<span class="sd">            mpi_flag (str): 例 &quot;-np&quot; (configがあればいらない)</span>
+<span class="sd">            num_procs (int): 並列数 (configがあればいらない)</span>
+<span class="sd">            job_cmd (str): ジョブ投入コマンド（None ならローカル実行）</span>
+<span class="sd">            make_default_input (bool): インプットファイルを自動作成(既存があるときはそっちを優先)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;== create Vasp()&quot;</span><span class="p">)</span>
+
+        <span class="c1"># INCAR ファイルのOUTファイル入出力インスタンスの移譲を受ける</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span> <span class="n">Config</span> <span class="o">=</span> <span class="n">config</span>
+
+        <span class="c1"># INCAR/KPOINTS/</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">incar_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">kpoints_name</span>
+
+        <span class="c1"># write?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">auto_write</span>
+
+        <span class="c1"># aaa.vasp</span>
+        <span class="k">if</span> <span class="n">vasp_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vasp_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">vasp_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vasp_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">vasp_name</span>
+
+        <span class="c1"># VASP 実行系設定</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">dft_bin</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">dft_bin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpi_cmd</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">mpi_cmd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpi_flag</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">mpi_flag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_procs</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">num_procs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">job_cmd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">job_cmd</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">job_cmd</span>
+        <span class="c1"># self.job_cmd = job_cmd</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dft_bin=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mpi_cmd=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mpi_flag=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_procs=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;job_cmd=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">job_cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># --- VaspLog() instance ---</span>
+        <span class="k">if</span> <span class="n">vasp_log</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vasp_log</span> <span class="o">=</span> <span class="n">VaspLog</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vasp_log</span><span class="p">:</span> <span class="n">VaspLog</span> <span class="o">=</span> <span class="n">vasp_log</span>
+
+        <span class="c1"># --- INCAR ---</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_incar_defaults</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="c1"># INCAR デフォルト値定義</span>
+            <span class="s2">&quot;EDIFF&quot;</span><span class="p">:</span> <span class="mf">1e-04</span><span class="p">,</span>
+            <span class="s2">&quot;EDIFFG&quot;</span><span class="p">:</span> <span class="mf">1e-05</span><span class="p">,</span>
+            <span class="s2">&quot;ISTART&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;ISMEAR&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;SIGMA&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">&quot;NSW&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;NELM&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+            <span class="s2">&quot;IBRION&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;ISIF&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;LREAL&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">vasp_incar</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vasp_incar</span> <span class="o">=</span> <span class="n">VaspIncar</span><span class="p">(</span>
+                <span class="n">incar_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="p">,</span>
+                <span class="n">auto_write</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_incar</span><span class="p">:</span> <span class="n">VaspIncar</span> <span class="o">=</span> <span class="n">vasp_incar</span>
+
+        <span class="c1"># --- KPOINTS ---</span>
+        <span class="k">if</span> <span class="n">vasp_kpoints</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vasp_kpoints</span> <span class="o">=</span> <span class="n">VaspKpoints</span><span class="p">(</span>
+                <span class="n">kpoints_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">,</span>
+                <span class="n">auto_write</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auto_write</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="p">:</span> <span class="n">VaspKpoints</span> <span class="o">=</span> <span class="n">vasp_kpoints</span>
+
+        <span class="k">if</span> <span class="n">make_default_input</span><span class="p">:</span>
+            <span class="c1"># INCAR が存在すれば読み込み、なければデフォルトで新規作成</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incar_name</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_incar_defaults</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;set </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_incar</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+            <span class="c1"># KPOINTS: 既存があれば読み取り優先。</span>
+            <span class="c1"># 無ければデフォルトで生成（Monkhorst-Pack 1 1 1, shift 0 0 0）</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints_name</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="s2">&quot;Monkhorst-Pack&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="o">.</span><span class="n">set_grid</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="o">.</span><span class="n">set_shift</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+
+    <span class="c1"># --- 委譲メソッド群 (INCAR) ---</span>
+<div class="viewcode-block" id="Vasp.get_tag">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.get_tag">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;INCAR の値を取得&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Vasp.set_tag">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.set_tag">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_tag</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        INCAR の値を設定</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            set_tag(&quot;NSW&quot;, 1)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str):</span>
+<span class="sd">            value (Any):</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">valeue</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="n">valeue</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_incar</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Vasp.remove_tag">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.remove_tag">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;INCAR の項目を削除&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_incar</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Vasp.reload_incar">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.reload_incar">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reload_incar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;INCAR を再読込&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_incar</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Vasp.export_incar_dict">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.export_incar_dict">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_incar_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;INCAR を辞書で取得&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_incar</span><span class="o">.</span><span class="n">export_dict</span><span class="p">()</span></div>
+
+
+    <span class="c1"># --- 委譲メソッド群 (KPOINTS) ---</span>
+<div class="viewcode-block" id="Vasp.get_kpoints">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.get_kpoints">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_kpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;KPOINTS の値取得（grid/gamma/comment）&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Vasp.set_kpoints">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.set_kpoints">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_kpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        KPOINTS 値設定。</span>
+<span class="sd">        明示設定は既存ファイルより優先して上書き。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Vasp.reload_kpoints">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.reload_kpoints">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reload_kpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;KPOINTS 再読込&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="o">.</span><span class="n">reload_kpoints</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Vasp.export_kpoints_dict">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.export_kpoints_dict">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_kpoints_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;KPOINTS を辞書で取得&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpoints</span><span class="o">.</span><span class="n">export_dict</span><span class="p">()</span></div>
+
+
+    <span class="c1">#</span>
+    <span class="c1"># RMC-DFT の VASP 側の init/preprocess/postprocess</span>
+    <span class="c1">#</span>
+
+<div class="viewcode-block" id="Vasp.init">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.init">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cfg_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        POSCAR から cfg を作る</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg_name (str): 出力する cfg_name.cfg</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== init()&quot;</span><span class="p">)</span></div>
+
+
+        <span class="c1"># if cfg_name is None:</span>
+        <span class="c1">#     cfg_name = self._vasp_name</span>
+        <span class="c1"># self._logger.info(f&quot;cfg_name={cfg_name})&quot;)</span>
+
+        <span class="c1"># # POSCAR から CFG を作成</span>
+        <span class="c1"># self._logger.info(f&quot;== poscar2cfg(cfg_name={cfg_name})&quot;)</span>
+        <span class="c1"># self.poscar2cfg(cfg_name=cfg_name)</span>
+
+<div class="viewcode-block" id="Vasp.cat">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.cat">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cat</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Warning] </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Vasp.preprocess">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.preprocess">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">preprocess</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">vasp_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">element_info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        vasp 前処理</span>
+
+<span class="sd">        基本的に Vasp Class は相手がなんであれ動くようにする</span>
+<span class="sd">        それは入力が常に VASP であることを仮定していて、</span>
+<span class="sd">        相手のプログラム側の postprocess or convert してから動かすことを全手とする</span>
+
+<span class="sd">        *) 構造変換関係は Vasp() では自動で preprocess に入れない。誤解が生じやすい</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            vasp_name (str): xxx.vasp 名前における xxxに相当する名前</span>
+<span class="sd">            element_info (str):</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;== preprocess()&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vasp_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vasp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vasp_name</span>
+
+        <span class="c1"># 実行スクリプトのあるディレクトリを基準にする</span>
+        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;script_dir = </span><span class="si">{</span><span class="n">script_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;INCAR&quot;</span><span class="p">,</span> <span class="s2">&quot;KPOINTS&quot;</span><span class="p">,</span> <span class="s2">&quot;POTCAR&quot;</span><span class="p">,</span> <span class="s2">&quot;POSCAR&quot;</span><span class="p">]:</span>
+            <span class="n">target_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;target_path = </span><span class="si">{</span><span class="n">target_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># 実験のファイル存在チェック</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">target_path</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**Error**: </span><span class="si">{</span><span class="n">target_path</span><span class="si">}</span><span class="s2"> が見つかりません。&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Vasp.postprocess">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.postprocess">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">postprocess</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">log_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cfg_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        後処理</span>
+
+<span class="sd">        1) DATA-collect</span>
+<span class="sd">        2) BACKUP</span>
+<span class="sd">        3) CONTCAR --&gt; POSCAR</span>
+<span class="sd">        4) CONTCAR --&gt; CFG (for RMC_POT)</span>
+
+
+<span class="sd">        Args:</span>
+<span class="sd">            log_dir (str): VASP_log_dir_name デフォルトは config() から dft_log_dir を取得</span>
+<span class="sd">            cfg_name (str): POSCAR -&gt; cfg_name.cfg (デフォルトは config() から cfg_name を取得する)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;== postprocess()&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">log_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">log_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">dft_log_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;log_dir(VASP)=</span><span class="si">{</span><span class="n">log_dir</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">cfg_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cfg_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">cfg_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cfg_name=</span><span class="si">{</span><span class="n">cfg_name</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># DATA-collect</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vasp_log</span><span class="o">.</span><span class="n">collect_result</span><span class="p">()</span>
+
+        <span class="c1"># BACKUP-DATA</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vasp_log</span><span class="o">.</span><span class="n">backup_result</span><span class="p">(</span><span class="n">log_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">)</span>
+
+        <span class="c1"># CONTCAR -&gt; POSCAR</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="s2">&quot;CONTCAR&quot;</span><span class="p">,</span> <span class="s2">&quot;POSCAR&quot;</span><span class="p">)</span>
+
+        <span class="c1"># CONTCAR -&gt; CFG</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== contcar2cfg(cfg_name=</span><span class="si">{</span><span class="n">cfg_name</span><span class="si">}</span><span class="s2">.cfg)&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contcar2cfg</span><span class="p">(</span><span class="n">cfg_name</span><span class="o">=</span><span class="n">cfg_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="c1">#</span>
+    <span class="c1"># VASP run</span>
+    <span class="c1">#</span>
+
+<div class="viewcode-block" id="Vasp.run">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.run">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">job_cmd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">blocking</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        VASP を実行する</span>
+
+<span class="sd">        local 実行</span>
+<span class="sd">        FI_PROVIDER=&quot;TCP&quot;</span>
+<span class="sd">        I_MPI_FABRICS=&quot;shm:tcp&quot;</span>
+<span class="sd">        I_MPI_DEBUG=&quot;5&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mode (str): &quot;local&quot; dft_bin</span>
+<span class="sd">                        &quot;mpi&quot; mpi_cmd + mpi_flag + num_procs + dft_bin</span>
+<span class="sd">                        &quot;job&quot; job_cmd + dft_bin</span>
+<span class="sd">            job_cmd (str): ジョブコマンド(mode=job時に使う)</span>
+<span class="sd">                        　　優先順番</span>
+<span class="sd">                           instance(job_cmd=xxx)&lt; set_job_cmd(xxx) &lt; run(job_cmd=xxx)</span>
+<span class="sd">            blocking (bool):  subprocessをブロッキングで起動(default: True)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 正しく終わったデー</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;=== run(mode=</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">) ===&quot;</span><span class="p">)</span>
+
+        <span class="c1"># すべてのモードで共通の環境変数を定義</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">run_mode</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== local mpi mode&quot;</span><span class="p">)</span>
+            <span class="c1"># MPI build された vasp を local で動かすためのもの (infinibandを使わない)</span>
+            <span class="n">env</span><span class="p">[</span><span class="s2">&quot;FI_PROVIDER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;tcp&quot;</span>
+            <span class="n">env</span><span class="p">[</span><span class="s2">&quot;I_MPI_FABRICS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;shm:tcp&quot;</span>
+            <span class="n">env</span><span class="p">[</span><span class="s2">&quot;I_MPI_DEBUG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;5&quot;</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mpirun&quot;</span><span class="p">,</span> <span class="s2">&quot;-np&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+            <span class="c1"># cmd = [self.dft_bin]</span>
+
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mpi&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== mpi mode&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mpi_cmd = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mpi_flag = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dft_bin = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_procs = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span><span class="p">))</span>
+
+            <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;job&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== job mode&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">job_cmd</span><span class="p">:</span>
+                <span class="n">job_cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">job_cmd</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">job_cmd</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># raise ValueError(f&quot;**Error**: 未知の mode: {mode}&quot;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**Error**: 未知の mode: </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># dft_bin がパス上に存在するか確認</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;job&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;**Error**: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dft_bin</span><span class="si">}</span><span class="s2"> が見つかりません。PATHを確認してください。&quot;</span>
+                <span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;move = </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># self._logger.info(f&quot;env = {json.dumps(env, indent=2)}&quot;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cmd = </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**Error**: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;  VASP実行中にエラーが発生&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;  --&gt; 距離が近すぎることで電子密度がおかい&gt;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;  --&gt; 行列問題の解法で転けたとか&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;強制STOP ではなくて、そのままRMC側に戻して、ハンドリングする&quot;</span>
+            <span class="p">)</span>
+            <span class="c1"># sys.exit(1)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;=== run()&quot;</span><span class="p">)</span>
+        <span class="c1"># subprocess.run(f&quot;{Config.dft_bin}&quot;, check=True, shell=True)</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;mpirun&quot;</span><span class="p">,</span> <span class="s2">&quot;-np&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">num_procs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">dft_bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="c1">#</span>
+    <span class="c1"># VASP 側の設定</span>
+    <span class="c1">#</span>
+
+<div class="viewcode-block" id="Vasp.set_mpi">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.set_mpi">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_mpi</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mpi_cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mpi_flag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_procs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;MPI設定書き換え&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mpi_cmd</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">=</span> <span class="n">mpi_cmd</span>
+        <span class="k">if</span> <span class="n">num_procs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_procs</span> <span class="o">=</span> <span class="n">num_procs</span>
+        <span class="k">if</span> <span class="n">mpi_flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mpi_flag</span> <span class="o">=</span> <span class="n">mpi_flag</span></div>
+
+
+<div class="viewcode-block" id="Vasp.set_job_cmd">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.set_job_cmd">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_job_cmd</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">job_cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">job_cmd</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">job_cmd</span> <span class="o">=</span> <span class="n">job_cmd</span></div>
+
+
+    <span class="c1">#</span>
+    <span class="c1"># for VASP</span>
+    <span class="c1">#</span>
+
+<div class="viewcode-block" id="Vasp.ensure_vasp5_format">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.ensure_vasp5_format">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ensure_vasp5_format</span><span class="p">(</span>
+        <span class="n">poscar_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">element_info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">XLogger</span><span class="p">]</span> <span class="o">=</span> <span class="n">XLogger</span><span class="p">(),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">element_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">element_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">element_info</span>
+        <span class="k">return</span> <span class="n">ensure_vasp5_format</span><span class="p">(</span><span class="n">poscar_name</span><span class="p">,</span> <span class="n">element_info</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Vasp.make_potential">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.make_potential">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_potential</span><span class="p">(</span>
+        <span class="n">elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">output</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;POTCAR&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        VaspPotcarBuilder クラスを使って POTCAR を生成</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            elements (list):  Li Mn O など</span>
+<span class="sd">            output (str): ディクトリ付きならば bb/POTCAR などと書けばいい</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># builder = VaspPotcarBuilder(&quot;~/potpaw_PBE.64&quot;)</span>
+        <span class="c1"># path = Path(output).expanduser()</span>
+        <span class="c1"># if path.is_dir():</span>
+        <span class="c1">#     path = path / &quot;POTCAR&quot;</span>
+        <span class="n">builder</span> <span class="o">=</span> <span class="n">PotcarBuilder</span><span class="p">(</span><span class="s2">&quot;~/potpaw_PBE.64&quot;</span><span class="p">)</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
+        <span class="c1"># builder.build(elements, output=str(path))</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Vasp.convert_to_cfg">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.convert_to_cfg">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_to_cfg</span><span class="p">(</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;aaa&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">convert_to_cfg</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="c1">#</span>
+    <span class="c1"># Utilities for vasp</span>
+    <span class="c1">#</span>
+
+<div class="viewcode-block" id="Vasp.contcar2cfg">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.contcar2cfg">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">contcar2cfg</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cfg_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;aaa&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        convert CONTCAR to CFG</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg_name (str):</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== poscar2cfg(</span><span class="si">{</span><span class="n">cfg_name</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="n">contcar2cfg</span><span class="p">(</span><span class="n">cfg_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Vasp.poscar2cfg">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.poscar2cfg">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">poscar2cfg</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cfg_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;aaa&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert VASP POSCAR を RMC CFG 形式に変換する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg_name: str = &quot;aaa&quot;: Name of the output file without extension.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 正しく終わったデー</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== poscar2cfg(</span><span class="si">{</span><span class="n">cfg_name</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="c1"># xdatcar2poscar(cfg_name)</span>
+        <span class="k">return</span> <span class="n">poscar2cfg</span><span class="p">(</span><span class="n">cfg_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Vasp.xdatcar2poscar">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.xdatcar2poscar">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">xdatcar2poscar</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copy XDATCAR to a new file with the specified name (... .vasp).</span>
+<span class="sd">        最終結果だけならば CONTCAR で十分</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_name (str): Name of the new file to create. Without extension.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 正しく終わったデー</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== xdatcar2poscar(</span><span class="si">{</span><span class="n">input_name</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xdatcar2poscar</span><span class="p">(</span><span class="n">input_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Vasp.pdb2poscar">
+<a class="viewcode-back" href="../../../api/rmc_dft.vasp.html#rmc_dft.vasp.vasp.Vasp.pdb2poscar">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pdb2poscar</span><span class="p">(</span>
+        <span class="n">pdb_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;aaa&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="n">read</span><span class="p">((</span><span class="nb">str</span> <span class="o">+</span> <span class="s2">&quot;.pdb&quot;</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;pdb&quot;</span><span class="p">)</span>
+        <span class="n">write</span><span class="p">((</span><span class="nb">str</span> <span class="o">+</span> <span class="s2">&quot;.vasp&quot;</span><span class="p">),</span> <span class="n">atoms</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;vasp&quot;</span><span class="p">,</span> <span class="n">direct</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">_logger</span> <span class="o">=</span> <span class="n">XLogger</span><span class="p">()</span>
+    <span class="n">_vasp_log</span> <span class="o">=</span> <span class="n">VaspLog</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="n">_logger</span><span class="p">)</span>
+    <span class="n">vasp</span> <span class="o">=</span> <span class="n">Vasp</span><span class="p">(</span>
+        <span class="n">vasp_log</span><span class="o">=</span><span class="n">_vasp_log</span><span class="p">,</span>
+        <span class="n">vasp_name</span><span class="o">=</span><span class="s2">&quot;INCAR&quot;</span><span class="p">,</span>
+        <span class="n">mpi_cmd</span><span class="o">=</span><span class="s2">&quot;mpirun&quot;</span><span class="p">,</span>
+        <span class="n">mpi_flag</span><span class="o">=</span><span class="s2">&quot;-np&quot;</span><span class="p">,</span>
+        <span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">dft_bin</span><span class="o">=</span><span class="s2">&quot;vasp_std&quot;</span><span class="p">,</span>
+        <span class="n">job_cmd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="o">=</span><span class="n">_logger</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">vasp</span><span class="o">.</span><span class="n">NSW</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">vasp</span><span class="o">.</span><span class="n">EDIFF</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">vasp</span><span class="o">.</span><span class="n">EDIFFG</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">vasp</span><span class="o">.</span><span class="n">get_EDIFFG</span><span class="p">())</span>
+    <span class="c1"># print(vasp.to_incar())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

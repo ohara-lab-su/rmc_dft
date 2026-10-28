@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rmc_dft.rmc_pot.rmc_pot_fit &mdash; Project  ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=c033477b"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Project
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">rmc_dft</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/rmc_dft.html">rmc_dft package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.packmol.html">rmc_dft.packmol package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.util.html">rmc_dft.util package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.vasp.html">rmc_dft.vasp package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#module-rmc_dft.config">rmc_dft.config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.html#rmc_dft.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#module-rmc_dft.rmc_dft">rmc_dft.rmc_dft module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft"><code class="docutils literal notranslate"><span class="pre">RmcDft</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#module-rmc_dft.util">rmc_dft.util module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/index.html">チュートリアル</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmc_theory_explained.html">RMCとは</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmc_theory_explained.html#id1">シミュレーティッド・アニーリング(焼きなまし法)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html">RMC POTのcfgファイルの説明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html#aaa-cfg">例：aaa.cfg の一部</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html#id1">各セクションの説明（順に）</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html#id2">実務メモ / チェックリスト</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html">RMCPOT のインプットファイル解説</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html#cfg">cfgファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html#sq">sqファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html#dat">datファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html">RMC POT のアウトプットファイル（解説）</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#id1">共通の注意点</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/packmol/packmol.html">pypackmol (in RMC_DFT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#pacmol">pacmol公式サイト</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#linux">linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#for-mac">for Mac</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html">quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html#install">install</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Project</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">rmc_dft.rmc_pot.rmc_pot_fit</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>rmc_dft.rmc_pot.rmc_pot_fit のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">K.NAKADA, kengo.nakada@gmail.com</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rmc_dft.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">x_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">XLogger</span>
+
+
+<div class="viewcode-block" id="RmcPotFit">
+<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RmcPotFit</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    RMC_POT の .fit ファイルを読み取って、</span>
+<span class="sd">    Q, F(Q)、renormalized F(Q)_exp などを保持するクラス。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cfg_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(),</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">XLogger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg_name (str): cfg_name.fit (.fitを含むフルのファイル名)</span>
+<span class="sd">            config (Config):</span>
+<span class="sd">            logger (XLogger):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span> <span class="ow">or</span> <span class="n">XLogger</span><span class="p">(</span><span class="n">logger_name</span><span class="o">=</span><span class="s2">&quot;RmcPotFit&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cfg_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg_name</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">cfg_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cfg_name</span><span class="si">}</span><span class="s2">.fit&quot;</span>
+
+        <span class="c1"># データ格納</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F_calc</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F_exp_renorm</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F_exp_orig</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># 読み取り</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_fit</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RmcPotFit.read_fit">
+<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.read_fit">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_fit</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        .fit ファイルを読み取り、主要データ列を格納する。</span>
+
+<span class="sd">        self.filename: fullname</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== read_fit(</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+        <span class="c1"># データブロックは &quot;Total F(Q)&quot; 以降に並ぶため、それを探す</span>
+        <span class="n">data_started</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">data_line_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;\s*([0-9.eE+-]+)\s+([0-9.eE+-]+)\s+([0-9.eE+-]+)\s+([0-9.eE+-]+)\s+([0-9.eE+-]+)&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;Total F(Q)&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">data_started</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">data_started</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">data_line_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="n">q</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="n">f_calc</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+                    <span class="n">f_exp_ren</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+                    <span class="n">f_exp_orig</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+                    <span class="n">bg</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">F_calc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f_calc</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">F_exp_renorm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f_exp_ren</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">F_exp_orig</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f_exp_orig</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bg</span><span class="p">)</span></div>
+
+
+    <span class="c1"># S(Q) に変換するためのメソッド</span>
+<div class="viewcode-block" id="RmcPotFit.get_S_calc">
+<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.get_S_calc">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_S_calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;S_calc(Q) = F_calc + 1&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">f</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">F_calc</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="RmcPotFit.get_S_exp">
+<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.get_S_exp">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_S_exp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;S_exp(Q) = renormalized F_exp + 1&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">f</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">F_exp_renorm</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="RmcPotFit.get_S_exp_original">
+<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.get_S_exp_original">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_S_exp_original</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;S_exp_original(Q) = original F_exp + 1&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">f</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">F_exp_orig</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="RmcPotFit.as_dict">
+<a class="viewcode-back" href="../../../api/rmc_dft.rmc_pot.html#rmc_dft.rmc_pot.rmc_pot_fit.RmcPotFit.as_dict">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;辞書形式で返したい場合に使用&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;Q&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">,</span>
+            <span class="s2">&quot;F_calc&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">F_calc</span><span class="p">,</span>
+            <span class="s2">&quot;F_exp_renorm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">F_exp_renorm</span><span class="p">,</span>
+            <span class="s2">&quot;F_exp_orig&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">F_exp_orig</span><span class="p">,</span>
+            <span class="s2">&quot;background&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="p">,</span>
+            <span class="s2">&quot;S_calc&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_S_calc</span><span class="p">(),</span>
+            <span class="s2">&quot;S_exp&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_S_exp</span><span class="p">(),</span>
+            <span class="s2">&quot;S_exp_orig&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_S_exp_original</span><span class="p">(),</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

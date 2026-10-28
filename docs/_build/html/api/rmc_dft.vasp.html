@@ -1,0 +1,1452 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rmc_dft.vasp package &mdash; Project  ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=c033477b"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=4755f45a"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="rmc_dft.vasp.util package" href="rmc_dft.vasp.util.html" />
+    <link rel="prev" title="rmc_dft.util package" href="rmc_dft.util.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Project
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">rmc_dft</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="rmc_dft.html">rmc_dft package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="rmc_dft.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.packmol.html">rmc_dft.packmol package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.util.html">rmc_dft.util package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">rmc_dft.vasp package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.html#module-rmc_dft.config">rmc_dft.config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.html#rmc_dft.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.html#module-rmc_dft.rmc_dft">rmc_dft.rmc_dft module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rmc_dft.html#rmc_dft.rmc_dft.RmcDft"><code class="docutils literal notranslate"><span class="pre">RmcDft</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.html#module-rmc_dft.util">rmc_dft.util module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">チュートリアル</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmc_theory_explained.html">RMCとは</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmc_theory_explained.html#id1">シミュレーティッド・アニーリング(焼きなまし法)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_cfg_explained.html">RMC POTのcfgファイルの説明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmc/rmcpot_cfg_explained.html#aaa-cfg">例：aaa.cfg の一部</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmc/rmcpot_cfg_explained.html#id1">各セクションの説明（順に）</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmc/rmcpot_cfg_explained.html#id2">実務メモ / チェックリスト</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_input_explained.html">RMCPOT のインプットファイル解説</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_input_explained.html#cfg">cfgファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_input_explained.html#sq">sqファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_input_explained.html#dat">datファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html">RMC POT のアウトプットファイル（解説）</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#id1">共通の注意点</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/packmol/packmol.html">pypackmol (in RMC_DFT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#pacmol">pacmol公式サイト</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#linux">linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#for-mac">for Mac</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rmc_dft/quick_start.html">quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/rmc_dft/quick_start.html#install">install</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Project</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">rmc_dft</a></li>
+          <li class="breadcrumb-item"><a href="rmc_dft.html">rmc_dft package</a></li>
+      <li class="breadcrumb-item active">rmc_dft.vasp package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/rmc_dft.vasp.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-rmc_dft.vasp">
+<span id="rmc-dft-vasp-package"></span><h1>rmc_dft.vasp package<a class="headerlink" href="#module-rmc_dft.vasp" title="Link to this heading"></a></h1>
+<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rmc_dft.vasp.util.html">rmc_dft.vasp.util package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.util.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.util.html#module-rmc_dft.vasp.util.copy_contcar_to_vasp">rmc_dft.vasp.util.copy_contcar_to_vasp module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.util.html#rmc_dft.vasp.util.copy_contcar_to_vasp.copy_contcar_to_vasp"><code class="docutils literal notranslate"><span class="pre">copy_contcar_to_vasp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.util.html#module-rmc_dft.vasp.util.copy_vasp_to_poscar">rmc_dft.vasp.util.copy_vasp_to_poscar module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.util.html#rmc_dft.vasp.util.copy_vasp_to_poscar.copy_vasp_to_poscar"><code class="docutils literal notranslate"><span class="pre">copy_vasp_to_poscar()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.util.html#module-rmc_dft.vasp.util.ensure_vasp5_format">rmc_dft.vasp.util.ensure_vasp5_format module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.util.html#rmc_dft.vasp.util.ensure_vasp5_format.ensure_vasp5_format"><code class="docutils literal notranslate"><span class="pre">ensure_vasp5_format()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.util.html#module-rmc_dft.vasp.util.make_potcar">rmc_dft.vasp.util.make_potcar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.util.html#module-rmc_dft.vasp.util.poscar2cfg">rmc_dft.vasp.util.poscar2cfg module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.util.html#rmc_dft.vasp.util.poscar2cfg.contcar2cfg"><code class="docutils literal notranslate"><span class="pre">contcar2cfg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.util.html#rmc_dft.vasp.util.poscar2cfg.convert_to_cfg"><code class="docutils literal notranslate"><span class="pre">convert_to_cfg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.util.html#rmc_dft.vasp.util.poscar2cfg.poscar2cfg"><code class="docutils literal notranslate"><span class="pre">poscar2cfg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.util.html#rmc_dft.vasp.util.poscar2cfg.vasp2cfg"><code class="docutils literal notranslate"><span class="pre">vasp2cfg()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rmc_dft.vasp.util.html#module-rmc_dft.vasp.util.xdatcar2poscar">rmc_dft.vasp.util.xdatcar2poscar module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rmc_dft.vasp.util.html#rmc_dft.vasp.util.xdatcar2poscar.xdatcar2poscar"><code class="docutils literal notranslate"><span class="pre">xdatcar2poscar()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rmc_dft.vasp.vasp">
+<span id="rmc-dft-vasp-vasp-module"></span><h2>rmc_dft.vasp.vasp module<a class="headerlink" href="#module-rmc_dft.vasp.vasp" title="Link to this heading"></a></h2>
+<p>K.KOBAYASHI
+K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Vasp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">incar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INCAR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kpoints_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'KPOINTS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_incar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_kpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Config()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpi_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpi_flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_default_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>RMD-DFT  のため VASP構造作成 / VASPパラメータ入力 / 実行 /解析用のクラス</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>incar_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>kpoints_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>vasp_log</strong> (<a class="reference internal" href="#rmc_dft.vasp.vasp_log.VaspLog" title="rmc_dft.vasp.vasp_log.VaspLog"><em>VaspLog</em></a>)</p></li>
+<li><p><strong>vasp_incar</strong> (<a class="reference internal" href="#rmc_dft.vasp.vasp_incar.VaspIncar" title="rmc_dft.vasp.vasp_incar.VaspIncar"><em>VaspIncar</em></a>)</p></li>
+<li><p><strong>vasp_kpoints</strong> (<a class="reference internal" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints" title="rmc_dft.vasp.vasp_kpoints.VaspKpoints"><em>VaspKpoints</em></a>)</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="rmc_dft.html#rmc_dft.config.Config" title="rmc_dft.config.Config"><em>Config</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>x_logger.XLogger</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>auto_write</strong> (<em>bool</em>)</p></li>
+<li><p><strong>vasp_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>dft_bin</strong> (<em>str</em>)</p></li>
+<li><p><strong>mpi_cmd</strong> (<em>str</em>)</p></li>
+<li><p><strong>mpi_flag</strong> (<em>str</em>)</p></li>
+<li><p><strong>num_procs</strong> (<em>int</em>)</p></li>
+<li><p><strong>job_cmd</strong> (<em>str</em>)</p></li>
+<li><p><strong>make_default_input</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.cat">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.cat"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.cat" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.contcar2cfg">
+<span class="sig-name descname"><span class="pre">contcar2cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aaa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.contcar2cfg"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.contcar2cfg" title="Link to this definition"></a></dt>
+<dd><p>convert CONTCAR to CFG</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cfg_name</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.convert_to_cfg">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convert_to_cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aaa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.convert_to_cfg"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.convert_to_cfg" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.ensure_vasp5_format">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ensure_vasp5_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">poscar_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.ensure_vasp5_format"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.ensure_vasp5_format" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>poscar_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>element_info</strong> (<em>str</em><em> | </em><em>Sequence</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>logger</strong> (<em>x_logger.XLogger</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.export_incar_dict">
+<span class="sig-name descname"><span class="pre">export_incar_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.export_incar_dict"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.export_incar_dict" title="Link to this definition"></a></dt>
+<dd><p>INCAR を辞書で取得</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.export_kpoints_dict">
+<span class="sig-name descname"><span class="pre">export_kpoints_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.export_kpoints_dict"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.export_kpoints_dict" title="Link to this definition"></a></dt>
+<dd><p>KPOINTS を辞書で取得</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.get_kpoints">
+<span class="sig-name descname"><span class="pre">get_kpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.get_kpoints"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.get_kpoints" title="Link to this definition"></a></dt>
+<dd><p>KPOINTS の値取得（grid/gamma/comment）</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.get_tag">
+<span class="sig-name descname"><span class="pre">get_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.get_tag"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.get_tag" title="Link to this definition"></a></dt>
+<dd><p>INCAR の値を取得</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.init">
+<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.init"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.init" title="Link to this definition"></a></dt>
+<dd><p>POSCAR から cfg を作る</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cfg_name</strong> (<em>str</em>) -- 出力する cfg_name.cfg</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.make_potential">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'POTCAR'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.make_potential"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.make_potential" title="Link to this definition"></a></dt>
+<dd><p>VaspPotcarBuilder クラスを使って POTCAR を生成</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elements</strong> (<em>list</em>) -- Li Mn O など</p></li>
+<li><p><strong>output</strong> (<em>str</em>) -- ディクトリ付きならば bb/POTCAR などと書けばいい</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.pdb2poscar">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pdb2poscar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aaa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.pdb2poscar"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.pdb2poscar" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pdb_name</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.poscar2cfg">
+<span class="sig-name descname"><span class="pre">poscar2cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aaa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.poscar2cfg"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.poscar2cfg" title="Link to this definition"></a></dt>
+<dd><p>Convert VASP POSCAR を RMC CFG 形式に変換する</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cfg_name</strong> (<em>str</em>) -- str = &quot;aaa&quot;: Name of the output file without extension.</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>正しく終わったデー</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.postprocess">
+<span class="sig-name descname"><span class="pre">postprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.postprocess"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.postprocess" title="Link to this definition"></a></dt>
+<dd><p>後処理</p>
+<ol class="arabic simple">
+<li><p>DATA-collect</p></li>
+<li><p>BACKUP</p></li>
+<li><p>CONTCAR --&gt; POSCAR</p></li>
+<li><p>CONTCAR --&gt; CFG (for RMC_POT)</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log_dir</strong> (<em>str</em>) -- VASP_log_dir_name デフォルトは config() から dft_log_dir を取得</p></li>
+<li><p><strong>cfg_name</strong> (<em>str</em>) -- POSCAR -&gt; cfg_name.cfg (デフォルトは config() から cfg_name を取得する)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.preprocess">
+<span class="sig-name descname"><span class="pre">preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vasp_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.preprocess"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.preprocess" title="Link to this definition"></a></dt>
+<dd><p>vasp 前処理</p>
+<p>基本的に Vasp Class は相手がなんであれ動くようにする
+それは入力が常に VASP であることを仮定していて、
+相手のプログラム側の postprocess or convert してから動かすことを全手とする</p>
+<p><a href="#id1"><span class="problematic" id="id2">*</span></a>) 構造変換関係は Vasp() では自動で preprocess に入れない。誤解が生じやすい</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vasp_name</strong> (<em>str</em>) -- xxx.vasp 名前における xxxに相当する名前</p></li>
+<li><p><strong>element_info</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.reload_incar">
+<span class="sig-name descname"><span class="pre">reload_incar</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.reload_incar"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.reload_incar" title="Link to this definition"></a></dt>
+<dd><p>INCAR を再読込</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.reload_kpoints">
+<span class="sig-name descname"><span class="pre">reload_kpoints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.reload_kpoints"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.reload_kpoints" title="Link to this definition"></a></dt>
+<dd><p>KPOINTS 再読込</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.remove_tag">
+<span class="sig-name descname"><span class="pre">remove_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.remove_tag"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.remove_tag" title="Link to this definition"></a></dt>
+<dd><p>INCAR の項目を削除</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.run"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.run" title="Link to this definition"></a></dt>
+<dd><p>VASP を実行する</p>
+<p>local 実行
+FI_PROVIDER=&quot;TCP&quot;
+I_MPI_FABRICS=&quot;shm:tcp&quot;
+I_MPI_DEBUG=&quot;5&quot;</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>str</em>) -- &quot;local&quot; dft_bin
+&quot;mpi&quot; mpi_cmd + mpi_flag + num_procs + dft_bin
+&quot;job&quot; job_cmd + dft_bin</p></li>
+<li><p><strong>job_cmd</strong> (<em>str</em>) -- <p>ジョブコマンド(mode=job時に使う)
+優先順番</p>
+<blockquote>
+<div><p>instance(job_cmd=xxx)&lt; set_job_cmd(xxx) &lt; run(job_cmd=xxx)</p>
+</div></blockquote>
+</p></li>
+<li><p><strong>blocking</strong> (<em>bool</em>) -- subprocessをブロッキングで起動(default: True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>正しく終わったデー</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.set_job_cmd">
+<span class="sig-name descname"><span class="pre">set_job_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.set_job_cmd"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.set_job_cmd" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>job_cmd</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.set_kpoints">
+<span class="sig-name descname"><span class="pre">set_kpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.set_kpoints"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.set_kpoints" title="Link to this definition"></a></dt>
+<dd><p>KPOINTS 値設定。
+明示設定は既存ファイルより優先して上書き。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.set_mpi">
+<span class="sig-name descname"><span class="pre">set_mpi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mpi_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpi_flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.set_mpi"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.set_mpi" title="Link to this definition"></a></dt>
+<dd><p>MPI設定書き換え</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mpi_cmd</strong> (<em>str</em>)</p></li>
+<li><p><strong>mpi_flag</strong> (<em>str</em>)</p></li>
+<li><p><strong>num_procs</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.set_tag">
+<span class="sig-name descname"><span class="pre">set_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.set_tag"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.set_tag" title="Link to this definition"></a></dt>
+<dd><p>INCAR の値を設定</p>
+<p class="rubric">サンプル</p>
+<p>set_tag(&quot;NSW&quot;, 1)</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>value</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp.Vasp.xdatcar2poscar">
+<span class="sig-name descname"><span class="pre">xdatcar2poscar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp.html#Vasp.xdatcar2poscar"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp.Vasp.xdatcar2poscar" title="Link to this definition"></a></dt>
+<dd><p>Copy XDATCAR to a new file with the specified name (... .vasp).
+最終結果だけならば CONTCAR で十分</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_name</strong> (<em>str</em>) -- Name of the new file to create. Without extension.</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>正しく終わったデー</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rmc_dft.vasp.vasp_incar">
+<span id="rmc-dft-vasp-vasp-incar-module"></span><h2>rmc_dft.vasp.vasp_incar module<a class="headerlink" href="#module-rmc_dft.vasp.vasp_incar" title="Link to this heading"></a></h2>
+<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VaspIncar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INCAR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>VASP INCAR 編集を一元管理するクラス。
+pymatgen.Incar による値操作と、コメント保持を両立する。</p>
+<dl class="simple">
+<dt>主な特徴:</dt><dd><ul class="simple">
+<li><p>既存INCARファイルを安全に読み込み、コメント/空行を保持。</p></li>
+<li><p>値の追加・更新・削除をサポート。</p></li>
+<li><p>pymatgen.Incar 互換インターフェース (get/set/remove/export)。</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>incar_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>logger</strong> (<em>x_logger.XLogger</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>auto_write</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar._find_line_index">
+<span class="sig-name descname"><span class="pre">_find_line_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar._find_line_index"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar._find_line_index" title="Link to this definition"></a></dt>
+<dd><p>指定タグの行番号を返す
+実際の INCAR に、指定のタグがどの行にあるのか？を調べる</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tag</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>int | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar._format_line">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_format_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar._format_line"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar._format_line" title="Link to this definition"></a></dt>
+<dd><p>整形ルール統一</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag</strong> (<em>str</em>)</p></li>
+<li><p><strong>value</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.export_dict">
+<span class="sig-name descname"><span class="pre">export_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.export_dict"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.export_dict" title="Link to this definition"></a></dt>
+<dd><p>内部Incar辞書を返す</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Dict</em>[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.get"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.get" title="Link to this definition"></a></dt>
+<dd><p>値取得。存在しない場合はdefaultを返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag</strong> (<em>str</em>)</p></li>
+<li><p><strong>default</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.get_tag">
+<span class="sig-name descname"><span class="pre">get_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.get_tag"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.get_tag" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag</strong> (<em>str</em>)</p></li>
+<li><p><strong>default</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Any</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.load"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.load" title="Link to this definition"></a></dt>
+<dd><p>ファイルを読み込み、pymatgen.Incarとテキスト行を両方保持</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.reload">
+<span class="sig-name descname"><span class="pre">reload</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.reload"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.reload" title="Link to this definition"></a></dt>
+<dd><p>再読込（外部修正反映）</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.remove"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.remove" title="Link to this definition"></a></dt>
+<dd><p>指定タグを削除</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tag</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.set"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.set" title="Link to this definition"></a></dt>
+<dd><p>値設定。コメント保持したまま編集。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag</strong> (<em>str</em>) -- INCAR のキー</p></li>
+<li><p><strong>value</strong> (<em>Any</em>) -- value</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.set_tag">
+<span class="sig-name descname"><span class="pre">set_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.set_tag"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.set_tag" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag</strong> (<em>str</em>)</p></li>
+<li><p><strong>value</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_incar.VaspIncar.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_incar.html#VaspIncar.write"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_incar.VaspIncar.write" title="Link to this definition"></a></dt>
+<dd><p>内部linesを書き戻し</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rmc_dft.vasp.vasp_kpoints">
+<span id="rmc-dft-vasp-vasp-kpoints-module"></span><h2>rmc_dft.vasp.vasp_kpoints module<a class="headerlink" href="#module-rmc_dft.vasp.vasp_kpoints" title="Link to this heading"></a></h2>
+<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<section id="vaspkpoints">
+<h3>VaspKpoints<a class="headerlink" href="#vaspkpoints" title="Link to this heading"></a></h3>
+<p>pymatgen.io.vasp.inputs.Kpoints を薄くラップした KPOINTS 管理クラス。</p>
+<p>設計方針
+- 既存 KPOINTS があれば読み取って内部状態へ反映（ファイル構造は pymatgen に準拠）。
+- 既存 KPOINTS が無ければ既定値（Monkhorst-Pack / 1 1 1 / shift 0 0 0 / &quot;K-Points&quot;）で開始。
+- set_* 系で内部状態を更新。auto_write=True のときは更新都度ファイルへ書き出し。
+- write() 明示呼び出しで現在の内部状態を KPOINTS ファイルへ保存。
+- _build_kpoints() は引数を取らず、内部状態のみを参照して Kpoints を構築。
+- pymatgen の現行I/F（gamma_automatic / monkhorst_automatic）を使用。</p>
+<p>注意
+- モード名は &quot;Gamma&quot; または &quot;Monkhorst-Pack&quot; を想定（先頭大文字）。
+- グリッド/シフトは常に長さ3の整数タプルとして厳格に保持。</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VaspKpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kpoints_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'KPOINTS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>KPOINTS ファイルの読み書きと、モード/グリッド/シフト/コメントの管理を行う。</p>
+<p>既定動作
+- 既存 KPOINTS があれば読み取り優先。
+- 無い場合は &quot;Monkhorst-Pack&quot;, grid=(1,1,1), shift=(0,0,0), comment=&quot;K-Points&quot; で初期化。</p>
+<dl class="simple">
+<dt>Aargs:</dt><dd><p>kpoints_name (str): KPOINTS ファイル名（絶対パス推奨）。
+auto_write (bool): True の場合、set_* 呼び出しで都度ファイルへ保存。
+logger (XLogger): 任意のロガー（info/debug を想定）。None 可。</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kpoints_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>logger</strong> (<em>x_logger.XLogger</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>auto_write</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints._build_kpoints">
+<span class="sig-name descname"><span class="pre">_build_kpoints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints._build_kpoints"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints._build_kpoints" title="Link to this definition"></a></dt>
+<dd><p>内部状態（mode/grid/shift/comment）に基づき Kpoints を構築する。
+現行 pymatgen I/F に合わせ、automatic は使用せず gamma_automatic / monkhorst_automatic を利用。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Kpoints</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.export_dict">
+<span class="sig-name descname"><span class="pre">export_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.export_dict"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.export_dict" title="Link to this definition"></a></dt>
+<dd><p>現在の内部状態を辞書で返す（ロギング/デバッグ用）。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_comment">
+<span class="sig-name descname"><span class="pre">get_comment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.get_comment"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_comment" title="Link to this definition"></a></dt>
+<dd><p>先頭コメントを返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_grid">
+<span class="sig-name descname"><span class="pre">get_grid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.get_grid"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_grid" title="Link to this definition"></a></dt>
+<dd><p>k-point グリッド (kx, ky, kz) を返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Tuple</em>[int, int, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_mode">
+<span class="sig-name descname"><span class="pre">get_mode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.get_mode"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_mode" title="Link to this definition"></a></dt>
+<dd><p>現在のモード（&quot;Gamma&quot; or &quot;Monkhorst-Pack&quot;）を返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_shift">
+<span class="sig-name descname"><span class="pre">get_shift</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.get_shift"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.get_shift" title="Link to this definition"></a></dt>
+<dd><p>シフト (sx, sy, sz) を返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Tuple</em>[int, int, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.load"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.load" title="Link to this definition"></a></dt>
+<dd><p>既存の KPOINTS を読み込む</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_comment">
+<span class="sig-name descname"><span class="pre">set_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.set_comment"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_comment" title="Link to this definition"></a></dt>
+<dd><p>先頭コメントを設定する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> (<em>str</em>)</p></li>
+<li><p><strong>auto_write</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_grid">
+<span class="sig-name descname"><span class="pre">set_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.set_grid"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_grid" title="Link to this definition"></a></dt>
+<dd><p>k-point グリッド (kx, ky, kz) を設定する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kx</strong> (<em>int</em>)</p></li>
+<li><p><strong>ky</strong> (<em>int</em>)</p></li>
+<li><p><strong>kz</strong> (<em>int</em>)</p></li>
+<li><p><strong>auto_write</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_mode">
+<span class="sig-name descname"><span class="pre">set_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.set_mode"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_mode" title="Link to this definition"></a></dt>
+<dd><p>モードを設定する。大文字小文字はそのまま保存するが、想定は &quot;Gamma&quot; / &quot;Monkhorst-Pack&quot;。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>str</em>)</p></li>
+<li><p><strong>auto_write</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_shift">
+<span class="sig-name descname"><span class="pre">set_shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_write</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.set_shift"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.set_shift" title="Link to this definition"></a></dt>
+<dd><p>シフト (sx, sy, sz) を設定する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sx</strong> (<em>int</em>)</p></li>
+<li><p><strong>sy</strong> (<em>int</em>)</p></li>
+<li><p><strong>sz</strong> (<em>int</em>)</p></li>
+<li><p><strong>auto_write</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.update"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.update" title="Link to this definition"></a></dt>
+<dd><p>複数項目をまとめて更新する。指定されたもののみ反映。
+auto_write=True のときは更新後に書き出し。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>grid</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>shift</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>comment</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_kpoints.VaspKpoints.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_kpoints.html#VaspKpoints.write"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_kpoints.VaspKpoints.write" title="Link to this definition"></a></dt>
+<dd><p>現在の内部状態を KPOINTS ファイルへ書き出す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rmc_dft.vasp.vasp_log">
+<span id="rmc-dft-vasp-vasp-log-module"></span><h2>rmc_dft.vasp.vasp_log module<a class="headerlink" href="#module-rmc_dft.vasp.vasp_log" title="Link to this heading"></a></h2>
+<p>K.KOBAYASHI
+K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_log.VaspLog">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VaspLog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_log.html#VaspLog"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_log.VaspLog" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>VASP の出力ファイルを計算後に整理・解析するクラス</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>logger</strong> (<em>x_logger.XLogger</em><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_log.VaspLog._copy_either">
+<span class="sig-name descname"><span class="pre">_copy_either</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_log.html#VaspLog._copy_either"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_log.VaspLog._copy_either" title="Link to this definition"></a></dt>
+<dd><p>通常 or .gz を copy。必要に応じて .gz 拡張子を付与</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<em>Path</em>)</p></li>
+<li><p><strong>dst</strong> (<em>Path</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_log.VaspLog._exists_either">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_exists_either</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_log.html#VaspLog._exists_either"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_log.VaspLog._exists_either" title="Link to this definition"></a></dt>
+<dd><p>通常 or .gz のどちらかが存在するか</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>Path</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_log.VaspLog._move_either">
+<span class="sig-name descname"><span class="pre">_move_either</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_log.html#VaspLog._move_either"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_log.VaspLog._move_either" title="Link to this definition"></a></dt>
+<dd><p>通常 or .gz を move。必要に応じて .gz 拡張子を付与</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<em>Path</em>)</p></li>
+<li><p><strong>dst</strong> (<em>Path</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_log.VaspLog.backup_result">
+<span class="sig-name descname"><span class="pre">backup_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_log.html#VaspLog.backup_result"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_log.VaspLog.backup_result" title="Link to this definition"></a></dt>
+<dd><p>Copy VASP log files to the specified directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>log_dir</strong> (<em>str</em>) -- Directory to copy the log files to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_log.VaspLog.clean">
+<span class="sig-name descname"><span class="pre">clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_log.html#VaspLog.clean"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_log.VaspLog.clean" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>suffixes</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_log.VaspLog.collect_result">
+<span class="sig-name descname"><span class="pre">collect_result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_log.html#VaspLog.collect_result"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_log.VaspLog.collect_result" title="Link to this definition"></a></dt>
+<dd><p>VASPのログからひつようなじょうほうをとりだして、保存する
+This function is used to grep energy from OUTCAR file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_log.VaspLog.get_E0">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_E0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'OSZICAR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grep_E0_OSZICAR.txt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'E0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_log.html#VaspLog.get_E0"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_log.VaspLog.get_E0" title="Link to this definition"></a></dt>
+<dd><p>OSZICAR から E0 を取り出して、ファイル保存する
+(廃止予定)</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_filename</strong> (<em>str</em>)</p></li>
+<li><p><strong>output_filename</strong> (<em>str</em>)</p></li>
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_log.VaspLog.remove_file">
+<span class="sig-name descname"><span class="pre">remove_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_log.html#VaspLog.remove_file"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_log.VaspLog.remove_file" title="Link to this definition"></a></dt>
+<dd><p>存在するファイルを削除</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_log.VaspLog.remove_pattern">
+<span class="sig-name descname"><span class="pre">remove_pattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_log.html#VaspLog.remove_pattern"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_log.VaspLog.remove_pattern" title="Link to this definition"></a></dt>
+<dd><p>ワイルドカードパターンで一致するファイルを削除</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pattern</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_log.VaspLog.vcopy">
+<span class="sig-name descname"><span class="pre">vcopy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_log.html#VaspLog.vcopy"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_log.VaspLog.vcopy" title="Link to this definition"></a></dt>
+<dd><p>Vcopy と同等の整理処理を実行（Vcopy2 は未実装）。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>suffix</strong> (<em>str</em>) -- 付与する接尾辞（例: &quot;A1&quot; など）</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rmc_dft.vasp.vasp_outcar">
+<span id="rmc-dft-vasp-vasp-outcar-module"></span><h2>rmc_dft.vasp.vasp_outcar module<a class="headerlink" href="#module-rmc_dft.vasp.vasp_outcar" title="Link to this heading"></a></h2>
+<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VaspOutcar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="simple">
+<dt>VASP OUTCAR から</dt><dd><ul class="simple">
+<li><p>エネルギー (free, without entropy, sigma-&gt;0)</p></li>
+<li><p>原子位置</p></li>
+<li><p>力</p></li>
+<li><p>原子ごとの磁気モーメント (s, p, d, total)</p></li>
+<li><p>全体の磁気モーメント (total)</p></li>
+</ul>
+</dd>
+</dl>
+<p>を取り出して保持するクラス。</p>
+<dl class="simple">
+<dt>イオンステップの配列長は (NSW + 1) とする:</dt><dd><p>NSW = 0 -&gt; ステップ 0 のみ (要素数 1)
+NSW = 1 -&gt; ステップ 0,1    (要素数 2)
+一般に -&gt; ステップ 0..NSW (要素数 NSW+1)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar._guess_nions">
+<span class="sig-name descname"><span class="pre">_guess_nions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar._guess_nions"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar._guess_nions" title="Link to this definition"></a></dt>
+<dd><p>NIONS 行が見つからない場合のフォールバック: 最初の
+POSITION TOTAL-FORCE ブロックから原子数を推定する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar._parse_energy">
+<span class="sig-name descname"><span class="pre">_parse_energy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar._parse_energy"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar._parse_energy" title="Link to this definition"></a></dt>
+<dd><p>&quot;FREE ENERGIE OF THE ION-ELECTRON SYSTEM&quot; ブロックから
+free energy (TOTEN), without entropy, sigma-&gt;0 を取り出す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar._parse_magmom">
+<span class="sig-name descname"><span class="pre">_parse_magmom</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar._parse_magmom"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar._parse_magmom" title="Link to this definition"></a></dt>
+<dd><p>&quot;magnetization (x)&quot; ブロックから
+原子ごとの (s, p, d, total) と
+total magnetization を取り出す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar._parse_pos_force">
+<span class="sig-name descname"><span class="pre">_parse_pos_force</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar._parse_pos_force"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar._parse_pos_force" title="Link to this definition"></a></dt>
+<dd><p>&quot;POSITION&quot; &quot;TOTAL-FORCE&quot; ブロックから
+位置と力を取り出す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar._read_int">
+<span class="sig-name descname"><span class="pre">_read_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar._read_int"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar._read_int" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>default</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar._shrink_ion_steps">
+<span class="sig-name descname"><span class="pre">_shrink_ion_steps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar._shrink_ion_steps"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar._shrink_ion_steps" title="Link to this definition"></a></dt>
+<dd><p>実際に検出できたイオンステップ数まで配列を切り詰める。
+NSW=0 の場合も最低 1 にする。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy">
+<span class="sig-name descname"><span class="pre">get_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ionstep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterstep</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'e0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_energy"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy" title="Link to this definition"></a></dt>
+<dd><p>指定イオンステップ・指定 iter のエネルギーを返す。</p>
+<dl class="simple">
+<dt>mode:</dt><dd><p>&quot;e0&quot;     : energy without entropy
+&quot;toten&quot;  : free energy TOTEN
+&quot;sigma0&quot; : energy(sigma-&gt;0)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ionstep</strong> (<em>int</em>)</p></li>
+<li><p><strong>iterstep</strong> (<em>int</em>)</p></li>
+<li><p><strong>mode</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy_flat">
+<span class="sig-name descname"><span class="pre">get_energy_flat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'e0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_energy_flat"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy_flat" title="Link to this definition"></a></dt>
+<dd><p>イオンステップと iter をすべてまとめた 1 次元配列を返す。
+NaN は除く。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy_ionstep">
+<span class="sig-name descname"><span class="pre">get_energy_ionstep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'e0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_energy_ionstep"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy_ionstep" title="Link to this definition"></a></dt>
+<dd><p>各イオンステップごとの「最後の iter のエネルギー」を
+1 次元配列で返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy_matrix">
+<span class="sig-name descname"><span class="pre">get_energy_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'e0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_energy_matrix"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_energy_matrix" title="Link to this definition"></a></dt>
+<dd><p>イオンステップ × iter のエネルギー配列を返す。
+未使用部分は NaN を含む。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_forces">
+<span class="sig-name descname"><span class="pre">get_forces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ionstep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_forces"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_forces" title="Link to this definition"></a></dt>
+<dd><p>指定イオンステップの力 (nions, 3) を返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ionstep</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_ionstep_count">
+<span class="sig-name descname"><span class="pre">get_ionstep_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_ionstep_count"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_ionstep_count" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_iter_count">
+<span class="sig-name descname"><span class="pre">get_iter_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ionstep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_iter_count"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_iter_count" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ionstep</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_magmom_atom">
+<span class="sig-name descname"><span class="pre">get_magmom_atom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ionstep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_magmom_atom"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_magmom_atom" title="Link to this definition"></a></dt>
+<dd><p>指定イオンステップの原子ごとの磁気モーメント
+(nions, 4) を返す。列順は (s, p, d, total)。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ionstep</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_magmom_total">
+<span class="sig-name descname"><span class="pre">get_magmom_total</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ionstep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_magmom_total"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_magmom_total" title="Link to this definition"></a></dt>
+<dd><p>指定イオンステップの全体磁気モーメント total を返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ionstep</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_outcar.VaspOutcar.get_positions">
+<span class="sig-name descname"><span class="pre">get_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ionstep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_outcar.html#VaspOutcar.get_positions"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_outcar.VaspOutcar.get_positions" title="Link to this definition"></a></dt>
+<dd><p>指定イオンステップの原子位置 (nions, 3) を返す。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ionstep</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rmc_dft.vasp.vasp_potcar">
+<span id="rmc-dft-vasp-vasp-potcar-module"></span><h2>rmc_dft.vasp.vasp_potcar module<a class="headerlink" href="#module-rmc_dft.vasp.vasp_potcar" title="Link to this heading"></a></h2>
+<p>K.NAKADA, <a class="reference external" href="mailto:kengo&#46;nakada&#37;&#52;&#48;gmail&#46;com">kengo<span>&#46;</span>nakada<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<p>POTCAR 自動生成クラス
+ex) make_poscar.py Li Mn O</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_potcar.VaspPotcarBuilder">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VaspPotcarBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'~/potpaw_PBE.64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">XLogger()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_potcar.html#VaspPotcarBuilder"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_potcar.VaspPotcarBuilder" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>指定された元素リストから最適なポテンシャルを選び、
+一つの POTCAR に連結して出力するクラス。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_dir</strong> (<em>str</em>)</p></li>
+<li><p><strong>logger</strong> (<em>x_logger.XLogger</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_potcar.VaspPotcarBuilder.build">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poscar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'POTCAR'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_potcar.html#VaspPotcarBuilder.build"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_potcar.VaspPotcarBuilder.build" title="Link to this definition"></a></dt>
+<dd><p>指定元素リストから POTCAR を構築して出力する。</p>
+<dl class="simple">
+<dt>判定規則:</dt><dd><ul class="simple">
+<li><p>poscar_name が区切り記号で終わる、または実在するディレクトリ -&gt; ディレクトリ扱い（中に POTCAR）</p></li>
+<li><p>上記以外 -&gt; ファイル扱い（親ディレクトリを作成）</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elements</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>poscar_name</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rmc_dft.vasp.vasp_potcar.VaspPotcarBuilder.choose_potential">
+<span class="sig-name descname"><span class="pre">choose_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rmc_dft/vasp/vasp_potcar.html#VaspPotcarBuilder.choose_potential"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#rmc_dft.vasp.vasp_potcar.VaspPotcarBuilder.choose_potential" title="Link to this definition"></a></dt>
+<dd><p>最適な POTCAR のファイルパスを返す</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>element</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rmc_dft.util.html" class="btn btn-neutral float-left" title="rmc_dft.util package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rmc_dft.vasp.util.html" class="btn btn-neutral float-right" title="rmc_dft.vasp.util package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

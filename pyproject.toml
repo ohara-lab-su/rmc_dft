@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rmc-dft"
-version = "0.7.11"
+version = "0.7.10"
 
 description = "rmc_dft is a Python package for performing Reverse Monte Carlo modeling and ab initio molecular dynamics / relaxation using VASP code."
 authors = [
@@ -52,68 +52,3 @@ line-length = 88
 
 [tool.isort]
 profile = "black"
-[project.scripts]
-rmc_dft = "rmc_dft.install:main"
-
-
-
-[tool.setuptools.data-files]
-"share/rmc_dft/scripts/run" = [
-    "scripts/run/rmc_vasp_script_sequence_dat.py",
-    "scripts/run/_RMC_DFT_dft_run.py",
-]
-"share/rmc_dft/scripts/plot" = [
-    "scripts/plot/plot_distance_histgram.py",
-    "scripts/plot/plot_energy.py",
-    "scripts/plot/plot_fit.py",
-    "scripts/plot/plot_hst.py",
-    "scripts/plot/plot_multi_converge.py",
-    "scripts/plot/plot_multi_energy.py",
-    "scripts/plot/plot_multi_fit.py",
-    "scripts/plot/plot_multi_hst.py",
-    "scripts/plot/plot_ppcf.py",
-    "scripts/plot/plot_ppcf2.py",
-    "scripts/plot/plot_rmc_hst_converge.py",
-    "scripts/plot/plot_rmc_log_converge.py",
-]
-"share/rmc_dft/scripts/make" = [
-    "scripts/make/make_amorphous_random.py",
-    "scripts/make/make_analyze_qn.py",
-    "scripts/make/make_composition_ratio.py",
-    "scripts/make/make_log_dirname.py",
-    "scripts/make/make_mass_density.py",
-    "scripts/make/make_number_density.py",
-    "scripts/make/make_qn_fnc_top.py",
-    "scripts/make/make_qn_snc.py",
-    "scripts/make/qn_config.json",
-]
-"share/rmc_dft/scripts/check" = [
-    "scripts/check/check_rmc_chi.py",
-    "scripts/check/check_rmc_finalized.py",
-    "scripts/check/check_vasp_distance.py",
-    "scripts/check/check_vasp_finalized.py",
-]
-"share/rmc_dft/scripts/get" = [
-    "scripts/get/get_force.py",
-    "scripts/get/get_force_converge.py",
-    "scripts/get/get_position.py",
-]
-"share/rmc_dft/scripts/analyze" = [
-    "scripts/analyze/analyze_sio2_qn.py",
-    "scripts/analyze/analyze_zeolite.py",
-    "scripts/analyze/diff_incar.py",
-]
-"share/rmc_dft/scripts/convert" = [
-    "scripts/convert/conv_cfg2poscar.py",
-    "scripts/convert/conv_poscar2cfg.py",
-]
-"share/rmc_dft/scripts/edit" = [
-    "scripts/edit/data_edit_dat.py",
-    "scripts/edit/data_edit_incar.py",
-    "scripts/edit/data_edit_kpoints.py",
-    "scripts/edit/data_edit_potcar.py",
-]
-"share/rmc_dft/scripts/tools" = [
-    "scripts/tool/clean_dft.py",
-    "scripts/tool/clean_rmc.py",
-]
