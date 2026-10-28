@@ -1,197 +1,74 @@
-# rmc_dft
+# packmol_util
 
-[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/README.md)
-[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/README.ja.md)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/packmol_util/blob/main/README.md)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/packmol_util/blob/main/README.ja.md)
 
-`rmc_dft` is a Python package for constructing and running RMC-DFT workflows that alternate the generation of three-dimensional structural models consistent with experimental data using Reverse Monte Carlo (RMC) and energy/force-based structural relaxation using DFT.
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Fpackmol_util-181717?logo=github)](https://github.com/ohara-lab-su/packmol_util/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/packmol_util/en/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.en.html)
 
-The current working implementation uses **RMC_POT + VASP**. It contains the practical machinery required for repeated RMC/VASP calculations, parameter updates, restart handling, per-run initialization scripts, and result archiving.
 
-## Current status
 
-Originally, `rmc_dft` contained both the RMC_POT utility layer and the RMC-DFT workflow implementation.
+A **Python utility kit for automatically generating amorphous initial structures (POSCAR)** for first-principles calculations (VASP) and molecular dynamics (MD) simulations using Packmol.
 
-In v0.7.0, the RMC_POT input, execution, and analysis functionality was separated into the independent [`rmc_util`](https://pypi.org/project/rmc-util/) package. The current `rmc_dft` package is responsible for the VASP side and the RMC-DFT workflow, while RMC_POT handling is provided by `rmc_util`.
+By specifying only the stoichiometric ratio, density (mass density or number density), and total number of atoms, this tool automatically completes the full workflow: generating the Packmol input file, running Packmol, and outputting a POSCAR in VASP format with Direct coordinates.
 
-New code should import RMC_POT-related classes directly from `rmc_util`.
+---
+
+## 💡 Features
+
+1. **Intuitive density specification**
+   - Packmol itself does not interpret density or atomic weights, but this tool performs the required internal calculations and determines the cubic cell length $L$ that satisfies the specified density.
+2. **Exclusion radius specification by element symbol**
+   - This hides Packmol's inconvenient atom-index-based specification inside XYZ files. Interatomic avoidance distances can be controlled using an intuitive element-name-based dictionary, such as `{"P": 0.25, "O": 1.05}`.
+3. **Preservation of molecular units (geometries)**
+   - For systems such as $\text{Li}_3\text{PO}_4$, amorphization through mixing and packing can be performed while preserving intramolecular bond lengths, such as those in $\text{PO}_4$ tetrahedra.
+4. **Extremely simple high-level API**
+   - By using `AmorphousBuilder`, the cumbersome file relay workflow (`.inp` construction $\rightarrow$ external execution $\rightarrow$ coordinate conversion) can be condensed into only a few lines of script.
+
+---
+
+## 📁 Directory structure
+
+```text
+src/
+├── packmol_util/
+│
+│   ├── __init__.py          # Package initialization file
+│   ├── builder.py           # High-level integrated builder (AmorphousBuilder) ★NEW
+│   ├── model.py             # Template XYZ generation and structure-definition module
+│   ├── packmol.py           # Core density calculation, Packmol execution, and POSCAR conversion
+│   ├── packmol_inp.py       # Parsing engine for constructing packmol.inp
+│   ├── param.py             # Atomic weights and physical constants for the periodic table
+
+└── example/                 # Location for material-specific generation scripts
+    ├── Li3PO4/
+    │   └── make_Li3PO4.py
+    └── FeSiB/
+        └── make_FeSiB.py
+```
+
+## Example
 
 ```python
-from rmc_dft import Config, Vasp, VaspIncar, VaspKpoints
-from rmc_util import RmcPot, RmcPotDat, RmcPotHst
-```
+from packmol_util.builder import AmorphousBuilder
+from packmol_util.model import write_single_atom_xyz
 
-This separation gives the packages distinct roles: standalone RMC_POT handling belongs to `rmc_util`, while workflows combining RMC and DFT belong to `rmc_dft`.
+for symbol in ("Fe", "Si", "B"):
+    write_single_atom_xyz(f"{symbol}.xyz", symbol)
 
-## Installation
-
-Install the released package from PyPI:
-
-```bash
-pip install rmc-dft
-```
-
-Current RMC_POT-based workflows use `rmc_util`.
-
-The RMC_POT and VASP executables themselves are not included in this package. They must be installed and configured separately to run the current RMC-DFT workflow.
-
-## Current functionality
-
-### Iterative RMC_POT / VASP execution
-
-The current production workflow alternates RMC_POT and VASP calculations:
-
-```text
-initial structure
-      |
-      v
-   RMC_POT
-      |
-      v
-     VASP
-      |
-      v
-   RMC_POT
-      |
-      v
-     VASP
-      |
-     ...
-```
-
-The RMC side uses classes such as `RmcPot`, `RmcPotDat`, `RmcPotLog`, and `RmcPotHst` from `rmc_util`. The DFT side uses classes such as `Vasp`, `VaspIncar`, `VaspKpoints`, and `VaspLog` from `rmc_dft`.
-
-### Scripted calculation parameters
-
-RMC and VASP parameters can be modified from Python initialization scripts.
-
-The current workflow mainly uses:
-
-```text
-rmc_init.py
-rmc_vasp_init.py
-```
-
-Numbered initialization files can be used to change parameters for specific runs:
-
-```text
-rmc_init_N.py
-rmc_vasp_init_N.py
-```
-
-`CONTINUE_NUMBERED_INIT` controls whether a numbered initialization remains active for subsequent runs or returns to the normal initialization file. Initialization files are loaded immediately before the corresponding run, allowing later calculation parameters to be changed while a long RMC-DFT calculation is still running.
-
-### Restart
-
-Restart utilities inspect saved RMC/VASP results and determine whether execution should resume from the RMC or VASP stage.
-
-Results are archived in per-run directories such as `rmc_log*` and `dft_log*`, providing the state required for continued calculations and inspection of calculation history.
-
-### VASP handling
-
-The current VASP implementation includes functionality for:
-
-- reading and updating `INCAR`
-- configuring `KPOINTS`
-- building `POTCAR`
-- local, MPI, and job-based VASP execution
-- reading VASP output such as `OUTCAR`
-- archiving calculation results
-- transferring structures between POSCAR/CONTCAR and RMC CFG
-- helper analysis of structures, atomic motion, and forces
-
-## `RmcDft`
-
-`RmcDft` is the integrated class for alternating RMC and DFT calculations.
-
-```python
-from rmc_dft import Config, RmcDft
-
-config = Config("config.yml")
-
-rmc_dft = RmcDft(
-    config=config,
+builder = AmorphousBuilder(
+    symbols=["Fe", "Si", "B"], ratios=[80, 9, 11],
+    total_atom_count=500, minimum_separation=2.0,
+    mass_density=7.35,
 )
-
-rmc_dft.run()
+for symbol, ratio in zip(builder.symbols, builder.ratios):
+    builder.add_template(f"{symbol}.xyz", ratio * builder.multiplier)
+builder.build("FeSiB")
 ```
 
-`Config` currently contains backend-selection settings such as:
+The outputs are `FeSiB_packmol.inp`, `FeSiB_packmol.xyz`, `FeSiB_packmol.log`, `POSCAR`, and `POSCAR.vasp`. An `.fnc` file is written when FNC pairs are registered. The POSCAR filenames are fixed. `AmorphousBuilder` adjusts the requested atom count to a nearby integer multiple of the stoichiometric ratio sum when needed.
 
-```python
-rmc_code = "RmcPot"
-dft_code = "Vasp"
-```
+## Packmol and documentation
 
-and `RmcDft` has a structure for selecting RMC and DFT implementations by name.
-
-However, **the backends actually connected at present are RMC_POT and VASP**. Other names such as RMCProfile or Quantum ESPRESSO are not currently available simply by changing these configuration values.
-
-## Practical RMC-DFT scripts
-
-The current working code also includes lower-level workflow scripts in addition to the `RmcDft` class.
-
-`rmc_vasp_script.py` handles alternating RMC/VASP execution, restart, numbered initialization files, and log-directory management.
-
-`rmc_vasp_script_sequence.py` supports manually specified RMC/VASP execution sequences as well as continuation into the normal RMC-DFT loop.
-
-Some files retain the historical `rmc_vasp` name. The package and the overall workflow are now named `rmc_dft`.
-
-## Design goal and future direction
-
-The essential idea of RMC-DFT is not to permanently bind the workflow to one RMC program and one DFT program. The workflow consists of:
-
-1. using RMC to generate a three-dimensional structural model consistent with experimental data,
-2. using DFT to relax that structure according to energy and atomic forces, and
-3. repeatedly transferring the structure between these two stages.
-
-The current implementation realizes this workflow with RMC_POT and VASP. The longer-term design goal of `rmc_dft` is to make the workflow independent of a specific **RMC code or DFT code**.
-
-The energy/force-based relaxation stage also does not necessarily have to remain DFT-only. For systems where it is appropriate, the intended architecture should allow structural relaxation using a machine-learning potential (MLP). This would allow DFT and MLP relaxation to be selected according to the required accuracy, system size, and computational cost.
-
-Conceptually, the intended future architecture is:
-
-```text
-                    RMC modeling / experimental-data fitting
-                              |
-                    +---------+---------+
-                    |                   |
-                 RMC_POT            other RMC
-                    |                   |
-                    +---------+---------+
-                              |
-                           structure
-                              |
-                    +---------+---------+
-                    |                   |
-                    DFT                MLP
-              (VASP, etc.)      structure relaxation
-                    |                   |
-                    +---------+---------+
-                              |
-                           structure
-                              |
-                             ...
-```
-
-This is a **design goal**, not a statement that all of these backends are already implemented. The currently operational backends are RMC_POT and VASP.
-
-## Relationship with `rmc_util`
-
-General RMC_POT functionality has been separated into `rmc_util`.
-
-`rmc_util` can be used independently for RMC_POT fixed/free-format input handling, structural constraints, execution, and analysis of log, HST, FIT, and PPCF output.
-
-`rmc_dft` uses that layer for the RMC side and focuses on structure transfer between RMC and DFT, iterative execution, restart handling, VASP calculation setup and execution, and overall workflow control.
-
-This separation allows the general RMC_POT functionality to be reused outside RMC-DFT while keeping `rmc_dft` focused on the coupled workflow.
-
-## Documentation
-
-- [API documentation](docs/_build/html/api/modules.html)
-- [Tutorials](docs/_build/html/tutorials/index.html)
-
-## References
-
-- [rmc_util on PyPI](https://pypi.org/project/rmc-util/)
-- [RMC_POT](https://www.szfki.hu/~nphys/rmc++/opening.html)
-- [VASP](https://www.vasp.at/)
+The Packmol executable must be installed separately. See the [English tutorial](https://ohara-lab-su.github.io/packmol_util/en/tutorial.html) for installation and input format, the [reference](https://ohara-lab-su.github.io/packmol_util/en/reference.html) for API and FNC details, and the [design philosophy](https://ohara-lab-su.github.io/packmol_util/en/philosophy.html) for component responsibilities.

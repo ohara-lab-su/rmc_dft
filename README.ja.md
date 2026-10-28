@@ -1,225 +1,73 @@
-# rmc_dft
+# packmol_util
 
-[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/README.md)
-[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/README.ja.md)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/packmol_util/blob/main/README.md)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/packmol_util/blob/main/README.ja.md)
 
-`rmc_dft` は、Reverse Monte Carlo（RMC）による実験データを再現する3次元構造モデルの生成と、
-DFT によるエネルギー・原子間力に基づく構造緩和を交互に行う RMC-DFT
-ワークフローを Python から構築・実行するためのパッケージです。
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Fpackmol_util-181717?logo=github)](https://github.com/ohara-lab-su/packmol_util/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/packmol_util/ja/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/)
 
-現在の実装は **RMC_POT + VASP** を実動系としており、
-RMC と VASP の反復実行、入力条件の更新、restart、実行ごとの初期化スクリプト、
-計算結果の保存など、実際の
-RMC-DFT 計算を継続的に運用するための機能を含んでいます。
+Packmol を用いて、第一原理計算（VASP）や分子動力学（MD）シミュレーションのためのアモルファス初期構造（POSCAR）を生成する Python ライブラリです。
 
-## 現在の位置づけ
+組成比、総原子数、質量密度または数密度を入力し、Packmol 入力ファイルの作成、実行、XYZ から POSCAR（Direct 座標）への変換を行います。単原子テンプレートと分子ユニットの両方を扱い、RMC_POT の FNC ファイルも生成できます。
 
-`rmc_dft` は当初、RMC_POT の操作機能と RMC-DFT ワークフローの両方を同じパッケージ内に持っていました。
+## 特徴
 
-v0.7.0 で RMC_POT の入力・実行・解析に関する機能を独立した [`rmc_util`](https://pypi.org/project/rmc-util/)
-パッケージへ分離しました。現在の `rmc_dft` は、VASP 側の操作と RMC-DFT ワークフローの制御を担当し、RMC_POT のハンドリングには
-`rmc_util` を利用します。
+- 組成と質量密度または数密度から立方セルの一辺長を計算します。
+- 元素記号別の packing radius を XYZ の原子番号指定に変換します。
+- PO4 などの構造ユニットを XYZ テンプレートとして配置します。
+- `AmorphousBuilder` が入力作成、Packmol 実行、POSCAR 変換を連続して処理します。
 
-新しいコードでは RMC_POT 関連クラスを `rmc_util` から直接 import します。
+## ディレクトリ構成
 
-```python
-from rmc_dft import Config, Vasp, VaspIncar, VaspKpoints
-from rmc_util import RmcPot, RmcPotDat, RmcPotHst
+```text
+src/
+├── packmol_util/
+│   ├── __init__.py
+│   ├── builder.py
+│   ├── model.py
+│   ├── packmol.py
+│   ├── packmol_inp.py
+│   └── param.py
+└── example/
+    ├── Li3PO4/
+    │   └── make_Li3PO4.py
+    └── FeSiB/
+        └── make_FeSiB.py
 ```
-
-この分離により、RMC_POT 単独の操作は `rmc_util`、RMC と DFT を組み合わせた計算フローは `rmc_dft` という役割分担になっています。
 
 ## インストール
 
-PyPI からインストールします。
-
-```bash
-pip install rmc-dft
+```sh
+pip install packmol-util
 ```
 
-RMC_POT を利用する現在のワークフローでは `rmc_util` を使用します。
+Packmol 本体は別途導入が必要です。[Packmol 公式リポジトリ](https://github.com/m3g/packmol)を参照し、実行ファイルを PATH に置くか `packmol_bin` で指定してください。ビルド手順と入力形式は[チュートリアル](https://ohara-lab-su.github.io/packmol_util/ja/tutorial.html)に記載しています。
 
-RMC_POT および VASP の実行バイナリそのものはこのパッケージには含まれません。現在の RMC-DFT
-計算を実行するには、それぞれの実行環境を別途用意する必要があります。
-
-## 現在実装されている主な機能
-
-### RMC_POT / VASP の反復実行
-
-現在の実運用コードでは、RMC_POT と VASP を交互に実行します。
-
-基本的な流れは、
-
-```text
-initial structure
-      |
-      v
-   RMC_POT
-      |
-      v
-     VASP
-      |
-      v
-   RMC_POT
-      |
-      v
-     VASP
-      |
-     ...
-```
-
-です。
-
-RMC 側では `rmc_util` の `RmcPot`、`RmcPotDat`、`RmcPotLog`、`RmcPotHst` などを利用し、DFT 側では `rmc_dft` の `Vasp`、
-`VaspIncar`、`VaspKpoints`、`VaspLog` などを利用します。
-
-### 計算条件のスクリプト化
-
-RMC と VASP の条件は、実行スクリプトから変更できます。
-
-現在のワークフローでは主に、
-
-```text
-rmc_init.py
-rmc_vasp_init.py
-```
-
-を用いて RMC / VASP の計算条件を設定します。
-
-さらに、
-
-```text
-rmc_init_N.py
-rmc_vasp_init_N.py
-```
-
-のような番号付き init を用意することで、特定の RMC / VASP run だけ異なる条件を適用できます。
-
-番号付き init では `CONTINUE_NUMBERED_INIT` により、その設定を次の run に引き継ぐか、通常の init に戻すかを指定できます。init
-ファイルは実行直前に読み込まれるため、長い RMC-DFT 計算の途中でも、その後の計算条件を変更できます。
-
-### restart
-
-RMC / VASP の保存済み結果を調べ、RMC または VASP のどちらから再開すべきかを判断する restart 処理を持っています。
-
-計算結果は `rmc_log*` / `dft_log*` などの実行ごとのディレクトリへ保存され、継続計算や計算履歴の確認に利用されます。
-
-### VASP 入力と結果のハンドリング
-
-現在の VASP 実装には、たとえば以下が含まれます。
-
-- `INCAR` の読み書きとパラメータ更新
-- `KPOINTS` の設定
-- `POTCAR` の構築
-- VASP の local / MPI / job 実行
-- `OUTCAR` などの結果読み取り
-- 計算結果の保存
-- POSCAR / CONTCAR と RMC の CFG の受け渡し
-- 構造・原子移動・force 解析のための補助機能
-
-## `RmcDft` クラス
-
-`RmcDft` は RMC と DFT を交互に実行するための統合クラスです。
+## 使用例：Fe–Si–B
 
 ```python
-from rmc_dft import Config, RmcDft
+from packmol_util.builder import AmorphousBuilder
+from packmol_util.model import write_single_atom_xyz
 
-config = Config("config.yml")
+for element in ("Fe", "Si", "B"):
+    write_single_atom_xyz(f"{element}.xyz", element)
 
-rmc_dft = RmcDft(
-    config=config,
+builder = AmorphousBuilder(
+    symbols=["Fe", "Si", "B"], ratios=[80, 9, 11],
+    total_atom_count=500, minimum_separation=2.0, mass_density=7.35,
 )
-
-rmc_dft.run()
+for element, ratio in zip(builder.symbols, builder.ratios):
+    builder.add_template(f"{element}.xyz", ratio * builder.multiplier)
+builder.build("FeSiB")
 ```
 
-`Config` には現在、
+Packmol 入力・XYZ・ログと `POSCAR`、`POSCAR.vasp` が生成されます。総原子数が組成比の合計で割り切れない場合は自動調整されます。POSCAR のファイル名は現行実装では固定です。
 
-```python
-rmc_code = "RmcPot"
-dft_code = "Vasp"
-```
+## 分子ユニットと RMC 用 FNC
 
-というコード選択用の設定があり、`RmcDft` 側も RMC / DFT 実装を名前から選択する構造を持っています。
+`write_tetrahedral_unit_xyz()` で PO4 などの構造テンプレートを生成できます。`add_template()` に `fnc_pairs_in_template`、`fnc_distance_ranges`、`fnc_output_constraint_types` を指定すると、テンプレート内局所番号を最終 POSCAR の原子番号に対応付け、FNC 拘束を出力できます。分子内の幾何と Packmol の配置用排除半径は別の設定です。
 
-ただし、 **現時点で実際に接続されている実装は RMC_POT と VASP です**。RMCProfile や Quantum ESPRESSO
-などを設定名だけで利用できる状態ではありません。
+詳細は[チュートリアル](https://ohara-lab-su.github.io/packmol_util/ja/tutorial.html)、[設計思想](https://ohara-lab-su.github.io/packmol_util/ja/philosophy.html)、[リファレンス](https://ohara-lab-su.github.io/packmol_util/ja/reference.html)を参照してください。
 
-## RMC-DFT 実運用スクリプト
 
-現在の実運用では、`RmcDft` クラスだけでなく、より細かな実行制御を行うスクリプトも使用しています。
-
-`rmc_vasp_script.py` は、RMC と VASP の交互実行、restart、番号付き init、ログディレクトリ管理などを行います。
-
-`rmc_vasp_script_sequence.py` では、通常の単純な RMC → VASP の繰り返しだけでなく、あらかじめ指定した RMC / VASP の実行
-sequence を組むことができます。その後に通常の RMC-DFT loop を継続することもできます。
-
-これらには歴史的な理由から `rmc_vasp` という名前が残っています。現在のパッケージ名とワークフロー全体の名称は `rmc_dft`
-です。
-
-## 設計目的と今後の方向
-
-RMC-DFT の本質は、特定の RMC コードと特定の DFT コードを固定して呼び出すことではなく、
-
-1. RMC により、実験データと整合する3次元構造モデルを生成する
-2. DFT により、エネルギー・原子間力に基づいてその構造を緩和する
-3. 両者の間で構造を受け渡しながら反復する
-
-という計算フローにあります。
-
-現在は RMC_POT と VASP を用いてこのワークフローを実装していますが、`rmc_dft` の設計上の目的は、最終的には特定の **RMC コードや
-DFT コードに依存しない**形へ拡張することです。
-
-エネルギー・力に基づく構造緩和側についても、必ず第一原理 DFT
-で行う必要がない場合には、機械学習ポテンシャル（MLP）などによる構造緩和を選択できる構成を想定しています。これにより、大規模系や多数の反復を必要とする場合に、DFT
-と MLP を目的・精度・計算量に応じて使い分けられるワークフローを目指します。
-
-概念的には、将来的に次のような構成を対象とします。
-
-```text
-                    RMC modeling / experimental-data fitting
-                              |
-                    +---------+---------+
-                    |                   |
-                 RMC_POT            other RMC
-                    |                   |
-                    +---------+---------+
-                              |
-                           structure
-                              |
-                    +---------+---------+
-                    |                   |
-                    DFT                MLP
-              (VASP, etc.)      structure relaxation
-                    |                   |
-                    +---------+---------+
-                              |
-                           structure
-                              |
-                             ...
-```
-
-これは **将来の設計目標**であり、現在すべてのバックエンドが実装済みという意味ではありません。現状の実動バックエンドは
-RMC_POT と VASP です。
-
-## `rmc_util` との関係
-
-RMC_POT 関連の汎用機能は `rmc_util` に分離されています。
-
-`rmc_util` は、RMC_POT の fixed / free format の入力、構造制約、実行、ログ・HST・FIT・PPCF の解析などを単独でも利用できるライブラリです。
-
-`rmc_dft` はそれらを利用して、RMC と DFT の間の構造受け渡し、反復実行、restart、VASP 側の計算条件と実行、全体のワークフロー制御を担当します。
-
-この分離により、RMC_POT の汎用機能を RMC-DFT 以外からも利用できる一方、`rmc_dft` 側では RMC-DFT
-ワークフローそのものの実装に集中できる構成になっています。
-
-## ドキュメント
-
-- [API ドキュメント](docs/_build/html/api/modules.html)
-- [チュートリアル](docs/_build/html/tutorials/index.html)
-
-## 参考
-
-- [rmc_util on PyPI](https://pypi.org/project/rmc-util/)
-- [RMC_POT](https://www.szfki.hu/~nphys/rmc++/opening.html)
-- [VASP](https://www.vasp.at/)
