@@ -14,7 +14,7 @@ import sys
 import shutil
 import re
 
-from rmc_dft import (
+from vasp_util import (
     Config,
     Vasp,
     VaspIncar,
@@ -33,9 +33,11 @@ from rmc_util import (
 )
 from rmc_util.util import poscar2cfg
 
-# from rmc_dft.util import poscar2cfg
-
+######################################
+# from vasp_util.util import poscar2cfg
 from rmc_dft.util import next_log_dir_name as next_log_dir_name
+
+######################################
 from x_logger import XLogger
 
 
