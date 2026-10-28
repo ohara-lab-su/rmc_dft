@@ -2,14 +2,12 @@
 import importlib
 import sys
 
-from rmc_util.util.cfg2poscar import cfg2poscar
-
 modules = [
     "cfg2poscar",
     "gromacs_top_to_rmc_top",
     "zeolite",
 ]
 
-# for name in modules:
-#     module = importlib.import_module("rmc_util.util." + name)
-#     sys.modules[__name__ + "." + name] = module
+for name in modules:
+    module = importlib.import_module("rmc_util.util." + name)
+    sys.modules[__name__ + "." + name] = module

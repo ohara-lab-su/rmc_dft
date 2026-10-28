@@ -3,20 +3,6 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
 
-## v0.7.11 — 2026-10-28
-
-### 追加・変更
-
-- `rmc_dft install` を追加。インストール済みの編集用スクリプトを作業ディレクトリへコピーする。`run`、`plot`、`make`、`check`、`tool`、`get`、`analyze`、`convert`、`edit` のカテゴリーを指定可能。
-- 既存ファイルは保持し、`--force` 指定時のみ上書きする。RMC・VASP の各ユーティリティと同じ利用形態とした。
-- `pyproject.toml` の `[project.scripts]` にコマンドを登録し、`[tool.setuptools.data-files]` に配布スクリプトを明示列挙。
-- `scripts/` を配布スクリプトの正本とし、`example/` を研究用サンプルとして区別。自動分類・事前生成スクリプトは使用しない。
-- README にインストールコマンドの役割と使用方法を追記。
-
-### 注意
-
-- 配布するスクリプトの実体を `scripts/<category>/` に配置してからビルドする必要がある。スクリプト本体の移行と、実環境でのwheelインストール検証は別途必要。
-
 ## v0.7.10 — 2026-10-22
 
 ### 修正
@@ -1814,8 +1800,3 @@ RMC-DFT の example スクリプト rmc_vasp_script.py に組み込み
 ## v0.0.x nakada
 
 - 雛形構造を準備 (subprocess & class & method 基本構造)
-## 未リリース
-
-- `rmc_dft install [カテゴリー]` によるスクリプトの分類配置と、配布準備用ツールを追加。
-
-- スクリプト配布対象を `pyproject.toml` に明示記述し、`prepare_scripts.py` による事前生成方式を廃止。

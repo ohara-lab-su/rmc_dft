@@ -1,0 +1,768 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rmc_dft.packmol.packmol &mdash; Project  ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=c033477b"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Project
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">rmc_dft</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/rmc_dft.html">rmc_dft package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.packmol.html">rmc_dft.packmol package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.rmc_pot.html">rmc_dft.rmc_pot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.util.html">rmc_dft.util package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.vasp.html">rmc_dft.vasp package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#module-rmc_dft.config">rmc_dft.config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.html#rmc_dft.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#module-rmc_dft.rmc_dft">rmc_dft.rmc_dft module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rmc_dft.html#rmc_dft.rmc_dft.RmcDft"><code class="docutils literal notranslate"><span class="pre">RmcDft</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rmc_dft.html#module-rmc_dft.util">rmc_dft.util module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/index.html">チュートリアル</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmc_theory_explained.html">RMCとは</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmc_theory_explained.html#id1">シミュレーティッド・アニーリング(焼きなまし法)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html">RMC POTのcfgファイルの説明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html#aaa-cfg">例：aaa.cfg の一部</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html#id1">各セクションの説明（順に）</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_cfg_explained.html#id2">実務メモ / チェックリスト</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html">RMCPOT のインプットファイル解説</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html#cfg">cfgファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html#sq">sqファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_input_explained.html#dat">datファイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html">RMC POT のアウトプットファイル（解説）</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#id1">共通の注意点</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#fit-s-q">.fit ファイル — 構造因子S(Q)へのフィッティング状況</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#hst">.hstファイル — Χの値。フィッティングの進み具合</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#gij-r">二対分布関数 gij(r)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc/rmcpot_output_explained.html#id2">原子配置（3次元モデリング）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/packmol/packmol.html">pypackmol (in RMC_DFT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#pacmol">pacmol公式サイト</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#linux">linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#for-mac">for Mac</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#packmol-inp">入力ファイル(packmol.inp)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/packmol/packmol.html#pypacmol">pypacmol</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html">quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/rmc_dft/quick_start.html#install">install</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Project</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">rmc_dft.packmol.packmol</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>rmc_dft.packmol.packmol のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">K.NAKADA, kengo.nakada@gmail.com</span>
+<span class="sd">make_amorphous.py</span>
+
+<span class="sd">Fe–Si–B アモルファス初期構造を Packmol により生成するための</span>
+<span class="sd">入力ファイル (packmol.inp) を作成するスクリプト。</span>
+
+<span class="sd">本スクリプトは、以下の 3 点を外部入力とする：</span>
+
+<span class="sd">    1. 化学量論比（整数比）</span>
+<span class="sd">    2. 密度 [g/cm^3] または 数密度 [1/Å^3] のいずれか一方</span>
+<span class="sd">    3. セル内の総原子数 N_tot</span>
+
+<span class="sd">Packmol は密度・化学量論比の概念を持たないため、本スクリプト側で</span>
+<span class="sd">原子数とセル一辺長 L を計算し、Packmol 形式の inside box 指定に変換する。</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">x_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">XLogger</span>
+
+<span class="n">NA</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">6.02214076e23</span>  <span class="c1"># アボガドロ数 [1/mol]</span>
+<span class="n">A3_TO_CM3</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-24</span>  <span class="c1"># 1 Å³ = 1e-24 cm³</span>
+
+
+<span class="c1"># -------------------------------------------------------------</span>
+<span class="c1"># 原子量 (g/mol)</span>
+<span class="c1"># -------------------------------------------------------------</span>
+<span class="n">ATOMIC_WEIGHTS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1">#   &quot;H&quot;: 1.00794,</span>
+    <span class="c1">#   &quot;He&quot;: 4.002602,</span>
+    <span class="c1">#   &quot;Li&quot;: 6.941,</span>
+    <span class="c1">#   &quot;Be&quot;: 9.012182,</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="mf">10.811</span><span class="p">,</span>
+    <span class="c1">#   &quot;C&quot;: 12.0107,</span>
+    <span class="c1">#   &quot;N&quot;: 14.0067,</span>
+    <span class="c1">#   &quot;O&quot;: 15.9994,</span>
+    <span class="c1">#   &quot;F&quot;: 18.9984032,</span>
+    <span class="c1">#   &quot;Ne&quot;: 20.1797,</span>
+    <span class="c1">#   &quot;Na&quot;: 22.98976928,</span>
+    <span class="c1">#   &quot;Mg&quot;: 24.3050,</span>
+    <span class="c1">#   &quot;Al&quot;: 26.9815386,</span>
+    <span class="s2">&quot;Si&quot;</span><span class="p">:</span> <span class="mf">28.0855</span><span class="p">,</span>
+    <span class="c1">#   &quot;P&quot;: 30.973762,</span>
+    <span class="c1">#   &quot;S&quot;: 32.065,</span>
+    <span class="c1">#   &quot;Cl&quot;: 35.453,</span>
+    <span class="c1">#   &quot;Ar&quot;: 39.948,</span>
+    <span class="c1">#   &quot;K&quot;: 39.0983,</span>
+    <span class="c1">#   &quot;Ca&quot;: 40.078,</span>
+    <span class="c1">#   &quot;Sc&quot;: 44.955912,</span>
+    <span class="c1">#   &quot;Ti&quot;: 47.867,</span>
+    <span class="c1">#   &quot;V&quot;: 50.9415,</span>
+    <span class="c1">#   &quot;Cr&quot;: 51.9961,</span>
+    <span class="c1">#   &quot;Mn&quot;: 54.938045,</span>
+    <span class="s2">&quot;Fe&quot;</span><span class="p">:</span> <span class="mf">55.845</span><span class="p">,</span>
+    <span class="c1">#   &quot;Co&quot;: 58.933195,</span>
+    <span class="c1">#   &quot;Ni&quot;: 58.6934,</span>
+    <span class="c1">#   &quot;Cu&quot;: 63.546,</span>
+    <span class="c1">#   &quot;Zn&quot;: 65.409,</span>
+    <span class="c1">#   &quot;Ga&quot;: 69.723,</span>
+    <span class="c1">#   &quot;Ge&quot;: 72.64,</span>
+    <span class="c1">#   &quot;As&quot;: 74.92160,</span>
+    <span class="c1">#   &quot;Se&quot;: 78.96,</span>
+    <span class="c1">#   &quot;Br&quot;: 79.904,</span>
+    <span class="c1">#   &quot;Kr&quot;: 83.798,</span>
+    <span class="c1">#   &quot;Rb&quot;: 85.4678,</span>
+    <span class="c1">#   &quot;Sr&quot;: 87.62,</span>
+    <span class="c1">#   &quot;Y&quot;: 88.90585,</span>
+    <span class="c1">#   &quot;Zr&quot;: 91.224,</span>
+    <span class="c1">#   &quot;Nb&quot;: 92.90638,</span>
+    <span class="c1">#   &quot;Mo&quot;: 95.96,</span>
+    <span class="c1">#   &quot;Ru&quot;: 101.07,</span>
+    <span class="c1">#   &quot;Rh&quot;: 102.90550,</span>
+    <span class="c1">#   &quot;Pd&quot;: 106.42,</span>
+    <span class="c1">#   &quot;Ag&quot;: 107.8682,</span>
+    <span class="c1">#   &quot;Cd&quot;: 112.411,</span>
+    <span class="c1">#   &quot;In&quot;: 114.818,</span>
+    <span class="c1">#   &quot;Sn&quot;: 118.710,</span>
+    <span class="c1">#   &quot;Sb&quot;: 121.760,</span>
+    <span class="c1">#   &quot;Te&quot;: 127.60,</span>
+    <span class="c1">#   &quot;I&quot;: 126.90447,</span>
+    <span class="c1">#   &quot;Xe&quot;: 131.293,</span>
+    <span class="c1">#   &quot;Cs&quot;: 132.9054519,</span>
+    <span class="c1">#   &quot;Ba&quot;: 137.327,</span>
+    <span class="c1">#   &quot;La&quot;: 138.90547,</span>
+    <span class="c1">#   &quot;Ce&quot;: 140.116,</span>
+    <span class="c1">#   &quot;Pr&quot;: 140.90765,</span>
+    <span class="c1">#   &quot;Nd&quot;: 144.242,</span>
+    <span class="c1">#   &quot;Sm&quot;: 150.36,</span>
+    <span class="c1">#   &quot;Eu&quot;: 151.964,</span>
+    <span class="c1">#   &quot;Gd&quot;: 157.25,</span>
+    <span class="c1">#   &quot;Tb&quot;: 158.92535,</span>
+    <span class="c1">#   &quot;Dy&quot;: 162.500,</span>
+    <span class="c1">#   &quot;Ho&quot;: 164.93032,</span>
+    <span class="c1">#   &quot;Er&quot;: 167.259,</span>
+    <span class="c1">#   &quot;Tm&quot;: 168.93421,</span>
+    <span class="c1">#   &quot;Yb&quot;: 173.04,</span>
+    <span class="c1">#   &quot;Lu&quot;: 174.967,</span>
+    <span class="c1">#   &quot;Hf&quot;: 178.49,</span>
+    <span class="c1">#   &quot;Ta&quot;: 180.94788,</span>
+    <span class="c1">#   &quot;W&quot;: 183.84,</span>
+    <span class="c1">#   &quot;Re&quot;: 186.207,</span>
+    <span class="c1">#   &quot;Os&quot;: 190.23,</span>
+    <span class="c1">#   &quot;Ir&quot;: 192.217,</span>
+    <span class="c1">#   &quot;Pt&quot;: 195.084,</span>
+    <span class="c1">#   &quot;Au&quot;: 196.966569,</span>
+    <span class="c1">#   &quot;Hg&quot;: 200.59,</span>
+    <span class="c1">#   &quot;Tl&quot;: 204.3833,</span>
+    <span class="c1">#   &quot;Pb&quot;: 207.2,</span>
+    <span class="c1">#   &quot;Bi&quot;: 208.98040,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="Packmol">
+<a class="viewcode-back" href="../../../api/rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Packmol</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    amorphous構造を作成するのに助けになるメソッドなど</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># &quot;packmol.inp&quot;,</span>
+        <span class="n">output_xyz</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># &quot;amorphous.xyz&quot;,</span>
+        <span class="n">output_log</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">packmol_bin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># &quot;/Users/nakada/packmol/bin/packmol&quot;,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">XLogger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_file:</span>
+<span class="sd">            output_xyz:</span>
+<span class="sd">            output_log:</span>
+<span class="sd">            packmol_bin (str): bin と言いながら path 指定</span>
+<span class="sd">            logger:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">:</span> <span class="n">XLogger</span> <span class="o">=</span> <span class="n">logger</span> <span class="ow">or</span> <span class="n">XLogger</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">input_file</span> <span class="ow">or</span> <span class="s2">&quot;packmol.inp&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_xyz</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">output_xyz</span> <span class="ow">or</span> <span class="s2">&quot;amorphous.xyz&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_log</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">output_log</span> <span class="ow">or</span> <span class="s2">&quot;packmol.log&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">packmol_bin</span> <span class="o">=</span> <span class="n">packmol_bin</span> <span class="ow">or</span> <span class="s2">&quot;/Users/nakada/packmol/bin/packmol&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;input_file: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output_xyz: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_xyz</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output_log: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_log</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;packmol_bin: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">packmol_bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Packmol.get_atomic_weight">
+<a class="viewcode-back" href="../../../api/rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.get_atomic_weight">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_atomic_weight</span><span class="p">(</span>
+        <span class="n">element</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;元素記号から原子量を取得する。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            element (str):</span>
+<span class="sd">                元素記号（例: &quot;Fe&quot;, &quot;Si&quot;, &quot;B&quot;）。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float:</span>
+<span class="sd">                原子量 [g/mol]。</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError:</span>
+<span class="sd">                対応する元素記号がテーブルに存在しない場合。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ATOMIC_WEIGHTS</span><span class="p">[</span><span class="n">element</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Packmol.average_atomic_weight">
+<a class="viewcode-back" href="../../../api/rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.average_atomic_weight">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">average_atomic_weight</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">symbols</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">ratios</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;化学量論比から平均原子量を計算する。</span>
+
+<span class="sd">        たとえば Fe80Si9B11 の場合は::</span>
+
+<span class="sd">            symbols = [&quot;Fe&quot;, &quot;Si&quot;, &quot;B&quot;]</span>
+<span class="sd">            ratios  = [80, 9, 11]</span>
+
+<span class="sd">        のように与える。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            symbols (Sequence[str]): 元素記号の並び。</span>
+<span class="sd">            ratios (Sequence[int]): 各元素の化学量論比に対応する整数比。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float:</span>
+<span class="sd">                平均原子量 [g/mol]。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;== average_atomic_weight()&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ratios</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;symbols と ratios の長さが一致していません。&quot;</span><span class="p">)</span>
+
+        <span class="n">total_atoms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ratios</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">total_atoms</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ratios の合計が 0 以下です。&quot;</span><span class="p">)</span>
+
+        <span class="n">total_mass</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">ratio</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">ratios</span><span class="p">):</span>
+            <span class="n">atomic_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_atomic_weight</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+            <span class="n">total_mass</span> <span class="o">+=</span> <span class="n">atomic_weight</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">ratio</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">total_mass</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">total_atoms</span><span class="p">)</span></div>
+
+
+    <span class="c1"># @staticmethod</span>
+    <span class="c1"># def number_density_from_rho(</span>
+    <span class="c1">#     M_avg: float,</span>
+    <span class="c1">#     rho_g_cm3: float,</span>
+    <span class="c1"># ) -&gt; float:</span>
+    <span class="c1">#     &quot;&quot;&quot;密度から数密度を計算する。</span>
+    <span class="c1">#     数密度 n [1/Å^3] は、平均原子量 M_avg を用いて次式で与えられる::</span>
+    <span class="c1">#     n = rho * NA / M_avg * A3_TO_CM3</span>
+    <span class="c1">#     Args:</span>
+    <span class="c1">#         M_avg (float): 平均原子量 [g/mol]。</span>
+    <span class="c1">#         rho_g_cm3 (float): 質量密度 [g/cm^3]。</span>
+
+    <span class="c1">#     Returns:</span>
+    <span class="c1">#         float:</span>
+    <span class="c1">#             数密度 n [1/Å^3]。</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     return rho_g_cm3 * NA * A3_TO_CM3 / M_avg</span>
+
+<div class="viewcode-block" id="Packmol.number_density_from_rho">
+<a class="viewcode-back" href="../../../api/rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.number_density_from_rho">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">number_density_from_rho</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">symbols</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">ratios</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">rho_g_cm3</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        質量密度から数密度 n [1/Å^3] を計算する。</span>
+
+<span class="sd">        *) 旧版と仕様変更したので注意</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            symbols (Sequence[str]): 元素記号の並び。</span>
+<span class="sd">            ratios (Sequence[int]): 各元素の化学量論比。</span>
+<span class="sd">            rho_g_cm3 (float): 質量密度 ρ [g/cm^3]。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float:</span>
+<span class="sd">                数密度 n [1/Å^3]。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;== number_density_from_rho()&quot;</span><span class="p">)</span>
+        <span class="n">M_avg</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">average_atomic_weight</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">ratios</span><span class="p">)</span>
+        <span class="c1"># n = rho * NA / M * (cm^3→Å^3 の変換係数)</span>
+        <span class="k">return</span> <span class="n">rho_g_cm3</span> <span class="o">*</span> <span class="n">NA</span> <span class="o">*</span> <span class="n">A3_TO_CM3</span> <span class="o">/</span> <span class="n">M_avg</span></div>
+
+
+    <span class="c1"># @staticmethod</span>
+    <span class="c1"># def rho_from_number_density(</span>
+    <span class="c1">#     M_avg: float,</span>
+    <span class="c1">#     n_per_A3: float,</span>
+    <span class="c1"># ) -&gt; float:</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     数密度から密度を計算する。</span>
+    <span class="c1">#     Args:</span>
+    <span class="c1">#         M_avg (float): 平均原子量 [g/mol]。</span>
+    <span class="c1">#         n_per_A3 (float): 数密度 n [1/Å^3]。</span>
+    <span class="c1">#     Returns:</span>
+    <span class="c1">#         float: 質量密度 ρ [g/cm^3]。</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     return n_per_A3 * M_avg / (NA * A3_TO_CM3)</span>
+
+<div class="viewcode-block" id="Packmol.rho_from_number_density">
+<a class="viewcode-back" href="../../../api/rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.rho_from_number_density">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rho_from_number_density</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">symbols</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">ratios</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">n_per_A3</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        数密度 n [1/Å^3] から質量密度 ρ [g/cm^3] を計算する。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            symbols (Sequence[str]):</span>
+<span class="sd">                元素記号の並び。</span>
+<span class="sd">            ratios (Sequence[int]):</span>
+<span class="sd">                各元素の化学量論比。</span>
+<span class="sd">            n_per_A3 (float):</span>
+<span class="sd">                数密度 n [1/Å^3]。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: 質量密度 ρ [g/cm^3]。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;== rho_from_number_density()&quot;</span><span class="p">)</span>
+        <span class="n">M_avg</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">average_atomic_weight</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">ratios</span><span class="p">)</span>
+        <span class="c1"># ρ = n * M / (NA * A3_TO_CM3)</span>
+        <span class="k">return</span> <span class="n">n_per_A3</span> <span class="o">*</span> <span class="n">M_avg</span> <span class="o">/</span> <span class="p">(</span><span class="n">NA</span> <span class="o">*</span> <span class="n">A3_TO_CM3</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Packmol.cell_length_from_number_density">
+<a class="viewcode-back" href="../../../api/rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.cell_length_from_number_density">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cell_length_from_number_density</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">N_tot</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">n_per_A3</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;総原子数と数密度から立方体セル長 L [Å] を計算する。</span>
+
+<span class="sd">        数密度からセル一辺長 L を計算する。立方体セルを仮定し、</span>
+
+<span class="sd">            V = N_tot / n</span>
+<span class="sd">            L = V^(1/3)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            N_tot (int): セル内の総原子数。</span>
+<span class="sd">            n_per_A3 (float): 数密度 n [1/Å^3]。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: 立方体セルの一辺の長さ L [Å]。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;== cell_length_from_number_density()&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">N_tot</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;N_tot は正の整数である必要があります。&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_per_A3</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;数密度 n_per_A3 は正の値である必要があります。&quot;</span><span class="p">)</span>
+
+        <span class="n">volume_A3</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">N_tot</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_per_A3</span>
+        <span class="n">L</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">volume_A3</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">L</span></div>
+
+
+<div class="viewcode-block" id="Packmol.compute_element_counts">
+<a class="viewcode-back" href="../../../api/rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.compute_element_counts">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_element_counts</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">symbols</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">ratios</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">N_tot</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;化学量論比と N_tot から各元素の原子数を決める。</span>
+
+<span class="sd">        数値的な意味</span>
+
+<span class="sd">        1. 各元素の「理想的な原子数」を</span>
+<span class="sd">               N_tot * ratio_i / sum(ratios)</span>
+<span class="sd">           として実数で計算する。</span>
+<span class="sd">        2. その整数部分を「最低限その元素に入れるべき原子数」とみなす。</span>
+<span class="sd">        3. まだ入っていない原子（remainder = N_tot - sum(floor)）を数える。</span>
+<span class="sd">        4. 理想値の小数部分が大きい元素から順に +1 ずつ配っていく。</span>
+
+<span class="sd">        これにより、</span>
+
+<span class="sd">        - 合計は必ず N_tot になる</span>
+<span class="sd">        - 各元素の原子数は「理想値」に最も近い整数に近づく</span>
+
+<span class="sd">        という性質を持つ。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            symbols (Sequence[str]):</span>
+<span class="sd">                元素記号の列（例: (&quot;Fe&quot;, &quot;Si&quot;, &quot;B&quot;)）。</span>
+
+<span class="sd">            ratios (Sequence[int]):</span>
+<span class="sd">                symbols と同じ順番の化学量論比（例: (80, 9, 11)）。</span>
+
+<span class="sd">            N_tot (int):</span>
+<span class="sd">                セル内の総原子数。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, int]: {元素記号: 原子数} の辞書。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== compute_element_counts()&quot;</span><span class="p">)</span>
+        <span class="c1"># 「リストの長さ」ではなく、「元素種類数と比率の個数」が一致しているかを確認</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ratios</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;元素記号の種類数と、それに対応する化学量論比の個数が一致していません。&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">N_tot</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;N_tot は正の整数で指定してください。&quot;</span><span class="p">)</span>
+
+        <span class="n">ratio_sum</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ratios</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ratio_sum</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;化学量論比の総和が 0 以下です。&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 1. 理想的な原子数（実数）を計算する</span>
+        <span class="n">ideal_counts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ratio</span> <span class="ow">in</span> <span class="n">ratios</span><span class="p">:</span>
+            <span class="n">ideal</span> <span class="o">=</span> <span class="n">N_tot</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">ratio</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">ratio_sum</span><span class="p">)</span>
+            <span class="n">ideal_counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ideal</span><span class="p">)</span>
+
+        <span class="c1"># 2. 整数部分を「最低限確保される個数」とみなす</span>
+        <span class="n">int_counts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ideal_counts</span><span class="p">]</span>
+
+        <span class="c1"># 3. まだ割り当てられていない原子数を数える</span>
+        <span class="n">used</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">int_counts</span><span class="p">)</span>
+        <span class="n">remainder</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">N_tot</span> <span class="o">-</span> <span class="n">used</span>
+
+        <span class="c1"># 4. 小数部分が大きい元素から順に +1 ずつ配る</span>
+        <span class="k">if</span> <span class="n">remainder</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">frac_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ideal</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ideal_counts</span><span class="p">):</span>
+                <span class="n">fractional</span> <span class="o">=</span> <span class="n">ideal</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">int_counts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">frac_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">fractional</span><span class="p">))</span>
+
+            <span class="n">frac_list</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">remainder</span><span class="p">):</span>
+                <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">frac_list</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">int_counts</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">sym</span><span class="p">,</span> <span class="n">cnt</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">int_counts</span><span class="p">):</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">sym</span><span class="p">]</span> <span class="o">=</span> <span class="n">cnt</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+    <span class="c1"># ------------------------------------</span>
+    <span class="c1"># packmol 用</span>
+    <span class="c1"># ------------------------------------</span>
+<div class="viewcode-block" id="Packmol.write_single_atom_xyz">
+<a class="viewcode-back" href="../../../api/rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.write_single_atom_xyz">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_single_atom_xyz</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">element</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;単一原子のみを含む XYZ ファイルを生成する。</span>
+
+<span class="sd">        Packmol では構造ファイル内の原子配置そのものは重要ではなく、</span>
+<span class="sd">        「この構造を number 個だけ複製する」という使い方をする。</span>
+<span class="sd">        よって 1 原子のみを原点に置いた XYZ が最も扱いやすい。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str):</span>
+<span class="sd">                書き出すファイル名。</span>
+
+<span class="sd">            element (str):</span>
+<span class="sd">                化学記号（Fe, Si, B など）。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== write_single_atom_xyz()&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;1</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">element</span><span class="si">}</span><span class="s2"> atom template</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">element</span><span class="si">}</span><span class="s2">  0.0  0.0  0.0</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Packmol.run_packmol">
+<a class="viewcode-back" href="../../../api/rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.run_packmol">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_packmol</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">output_log</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">packmol_bin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Packmol を実行する。</span>
+
+<span class="sd">        コマンドラインでの</span>
+
+<span class="sd">            packmol &lt; packmol.inp</span>
+
+<span class="sd">        と全く同じことを Python から行う。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_file (str):</span>
+<span class="sd">                Packmol の入力ファイル名。</span>
+
+<span class="sd">            output_log (str):</span>
+<span class="sd">                Packmol 実行ログを書き出すファイル名。</span>
+
+<span class="sd">            packmol_bin (str):</span>
+<span class="sd">                Packmol 実行ファイルの絶対パス。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== run_packmol()&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">input_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">input_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span>
+
+        <span class="k">if</span> <span class="n">output_log</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">output_log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_log</span>
+
+        <span class="k">if</span> <span class="n">packmol_bin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">packmol_bin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">packmol_bin</span>
+
+        <span class="c1"># packmol.inp をそのまま stdin にする</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_log</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">flog</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">packmol_bin</span><span class="p">],</span>
+                <span class="n">stdin</span><span class="o">=</span><span class="n">fin</span><span class="p">,</span>  <span class="c1"># ここが「packmol &lt; input」の本体</span>
+                <span class="n">stdout</span><span class="o">=</span><span class="n">flog</span><span class="p">,</span>
+                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># ここでは例外で落とさず、終了コードだけ知らせる</span>
+        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Packmol の終了ステータスが 0 ではありません (code=</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;詳細はログ </span><span class="si">{</span><span class="n">output_log</span><span class="si">}</span><span class="s2"> を確認してください。&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Packmol.xyz_to_poscar">
+<a class="viewcode-back" href="../../../api/rmc_dft.packmol.html#rmc_dft.packmol.packmol.Packmol.xyz_to_poscar">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">xyz_to_poscar</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">xyz_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">poscar_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;POSCAR&quot;</span><span class="p">,</span>
+        <span class="n">packmol_inp</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;packmol.inp&quot;</span><span class="p">,</span>
+        <span class="n">comment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;packmol&quot;</span><span class="p">,</span>
+        <span class="n">elements</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1">#  =[&quot;Fe&quot;, &quot;Si&quot;, &quot;B&quot;],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Packmol が出力した XYZ を VASP POSCAR へ変換する。</span>
+
+<span class="sd">        POSCAR は以下を満たす形式で出力する：</span>
+<span class="sd">            - 種類ごとの原子数を数える</span>
+<span class="sd">            - 直交セル（立方体）を仮定し、make_amorphous の L を使用</span>
+<span class="sd">            - 位置は全て Direct (分数座標) へ変換</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            xyz_file (str):</span>
+<span class="sd">                Packmol 出力の XYZ ファイル名。</span>
+
+<span class="sd">            poscar_file (str):</span>
+<span class="sd">                書き出す POSCAR ファイル名。</span>
+
+<span class="sd">            packmol_inp (str):</span>
+<span class="sd">            comment (str): POSCAR の中のコメント</span>
+<span class="sd">            elements (List[str]): 元素の並び順（POSCAR の行順）, None ならば書かない(VASP4)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;== xyz_to_poscar()&quot;</span><span class="p">)</span>
+        <span class="c1"># --- XYZ 読み込み ---</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">xyz_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+        <span class="c1"># 1行目: 原子数</span>
+        <span class="c1"># 2行目: コメント</span>
+        <span class="n">xyz_atoms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">2</span><span class="p">:]:</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">sym</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+            <span class="n">xyz_atoms</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sym</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+        <span class="c1"># make_amorphous 内で使っている L を再利用するため、</span>
+        <span class="c1"># グローバル or 外部で保持している L を参照する。</span>
+        <span class="c1"># ここでは packmol.inp 内の box サイズを読み直す。</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">packmol_inp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;inside box&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="c1"># &quot;... inside box 0.0 0.0 0.0  L L L&quot;</span>
+                    <span class="n">L</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">L</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">packmol_inp</span><span class="si">}</span><span class="s2"> から L を取得できませんでした。&quot;</span><span class="p">)</span>
+
+        <span class="c1"># --- Direct (fractional) 座標へ変換 ---</span>
+        <span class="c1"># XYZ の座標は Å単位の絶対座標なので L で割れば Direct</span>
+        <span class="n">frac_atoms</span> <span class="o">=</span> <span class="p">[(</span><span class="n">sym</span><span class="p">,</span> <span class="n">x</span> <span class="o">/</span> <span class="n">L</span><span class="p">,</span> <span class="n">y</span> <span class="o">/</span> <span class="n">L</span><span class="p">,</span> <span class="n">z</span> <span class="o">/</span> <span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">sym</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">xyz_atoms</span><span class="p">]</span>
+
+        <span class="c1"># --- 元素ごとに分類 ---</span>
+        <span class="n">species_counts</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">}</span>
+        <span class="n">species_positions</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">sym</span><span class="p">,</span> <span class="n">fx</span><span class="p">,</span> <span class="n">fy</span><span class="p">,</span> <span class="n">fz</span> <span class="ow">in</span> <span class="n">frac_atoms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sym</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+                <span class="n">species_counts</span><span class="p">[</span><span class="n">sym</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">species_positions</span><span class="p">[</span><span class="n">sym</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">fx</span><span class="p">,</span> <span class="n">fy</span><span class="p">,</span> <span class="n">fz</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;未知の元素シンボル: </span><span class="si">{</span><span class="n">sym</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># --- POSCAR 書き出し ---</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">poscar_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">comment</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;1.0</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># スケールファクター</span>
+
+            <span class="c1"># 立方体セル</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">L</span><span class="si">:</span><span class="s2">.10f</span><span class="si">}</span><span class="s2"> 0.0 0.0</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;0.0 </span><span class="si">{</span><span class="n">L</span><span class="si">:</span><span class="s2">.10f</span><span class="si">}</span><span class="s2"> 0.0</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;0.0 0.0 </span><span class="si">{</span><span class="n">L</span><span class="si">:</span><span class="s2">.10f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># 元素名</span>
+            <span class="c1"># f.write(&quot; &quot;.join(elements) + &quot;\n&quot;)</span>
+            <span class="k">if</span> <span class="n">elements</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># 元素行を書く</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">species_order</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">elements</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># 元素行は書かない(VASP4)</span>
+                <span class="c1"># 個数行の並び順だけ別に決める（ここでは dict のキー順をそのまま使う）</span>
+                <span class="n">species_order</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">species_counts</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="c1"># 元素ごとの個数</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">species_counts</span><span class="p">[</span><span class="n">s</span><span class="p">])</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Direct</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># 元素順に Direct 座標を書き込む</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">fx</span><span class="p">,</span> <span class="n">fy</span><span class="p">,</span> <span class="n">fz</span> <span class="ow">in</span> <span class="n">species_positions</span><span class="p">[</span><span class="n">s</span><span class="p">]:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fx</span><span class="si">:</span><span class="s2">.10f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">fy</span><span class="si">:</span><span class="s2">.10f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">fz</span><span class="si">:</span><span class="s2">.10f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
