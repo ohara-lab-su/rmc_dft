@@ -19,10 +19,9 @@ import re
 # from rmc_dft.rmc_pot.qn import QnNetworkBuilder
 # from qn.qn_network_builder import QnNetworkBuilder
 
-# ----------------------
 
-from rmc_dft import (
-    Config,
+# ----- vasp-util
+from vasp_util import (
     Vasp,
     VaspIncar,
     VaspKpoints,
@@ -30,6 +29,9 @@ from rmc_dft import (
     VaspPotcarBuilder,
     VaspLog,
 )
+from vasp_util.runners import run_vasp
+
+# ----- rmc-util
 from rmc_util import (
     RmcPot,
     RmcPotLog,
@@ -38,26 +40,21 @@ from rmc_util import (
     RmcPotHst,
     RmcPotPpcf,
 )
+from rmc_util.runners import run_rmc
 from rmc_util.util import poscar2cfg, contcar2cfg
 
-# from rmc_dft.util import poscar2cfg, contcar2cfg
-
+# ----- rmc-DFT
+from rmc_dft import Config
 from rmc_dft.util import next_log_dir_name as next_log_dir_name
 from rmc_dft.util import check_restart_rmc_vasp as check_restart_rmc_vasp
 
 from x_logger import XLogger
 
-# for local
-from rmc import run_rmc
-from rmc_vasp import run_vasp
 
-if __name__ == "__main__":
-    logger = XLogger(
-        log_level="debug",
-        logger_name="rmc_vasp_script",
-    )
-
-    config = Config("config.yml")
+def rmc_vasp_script_sequence(
+    logger,
+    config,
+):
     max_rmc_dft_loop = config.max_rmc_dft_loop
     logger.info(f"max_rmc_dft_loop: {max_rmc_dft_loop}")
 
@@ -370,3 +367,13 @@ if __name__ == "__main__":
                 break
 
             start_mode = "RMC"
+
+
+if __name__ == "__main__":
+    logger_ = XLogger(
+        log_level="debug",
+        logger_name="rmc_vasp_script",
+    )
+    config_ = Config("config.yml")
+
+    rmc_vasp_script_sequence(logger_, config_)

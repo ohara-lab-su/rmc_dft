@@ -3,6 +3,10 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/README.md)
 [![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/README.ja.md)
 
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/ja/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/)
+
 `rmc_dft` は、Reverse Monte Carlo（RMC）による実験データを再現する3次元構造モデルの生成と、
 DFT によるエネルギー・原子間力に基づく構造緩和を交互に行う RMC-DFT
 ワークフローを Python から構築・実行するためのパッケージです。
@@ -28,6 +32,28 @@ from rmc_util import RmcPot, RmcPotDat, RmcPotHst
 ```
 
 この分離により、RMC_POT 単独の操作は `rmc_util`、RMC と DFT を組み合わせた計算フローは `rmc_dft` という役割分担になっています。
+
+## サンプルスクリプトの配置
+
+`rmc_dft install <カテゴリ>` で、指定カテゴリ以下の**すべてのファイル**をカレントディレクトリへコピーします。カテゴリのディレクトリ自体は作成しません。対象は `analyze`、`check`、`edit`、`job`、`make`、`plot`、`run`、`tools` の8カテゴリです。`all` は8カテゴリすべてをカテゴリ別ディレクトリ構造を保ってコピーします。
+
+```bash
+rmc_dft install analyze
+rmc_dft install check
+rmc_dft install edit
+rmc_dft install job
+rmc_dft install make
+rmc_dft install plot
+rmc_dft install run
+rmc_dft install tools
+rmc_dft install all
+rmc_dft install plot --force
+```
+
+`rmc_dft install all` は `./analyze/`、`./check/`、`./edit/`、`./job/`、`./make/`、`./plot/`、`./run/`、`./tools/` にコピーします。個別ファイル指定は受け付けません。
+
+例えば `rmc_dft install run` は `scripts/run/` 内の7ファイルを `./` にコピーします。既存ファイルがある場合は事前に中止し、`--force` 指定時のみ上書きします。配布には `src/rmc_dft/scripts/` に元の `scripts/` 全44ファイルを同じ構造で収録してください。
+
 
 ## インストール
 
