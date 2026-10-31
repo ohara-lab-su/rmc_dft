@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "rmc-dft"
 version = "0.7.12"
 
-description = "rmc_dft is a Python package for performing Reverse Monte Carlo modeling and ab initio molecular dynamics / relaxation using VASP code."
+description = "Python tools for integrating Reverse Monte Carlo structural modeling with VASP-based first-principles calculations and molecular dynamics of amorphous materials."
 authors = [
     { name = "Kengo NAKADA", email = "kengo.nakada@email.com" },
     { name = "Kentaro Kobayashi", email = "kobayashi@mat.shimane-u.ac.jp" }
@@ -40,6 +40,12 @@ dependencies = [
     "sphinxcontrib-napoleon",
     "linkify-it-py"
 ]
+
+[project.urls]
+Homepage = "https://ohara-lab-su.github.io/rmc_dft/"
+Documentation = "https://ohara-lab-su.github.io/rmc_dft/"
+Repository = "https://github.com/ohara-lab-su/rmc_dft"
+Issues = "https://github.com/ohara-lab-su/rmc_dft/issues"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
