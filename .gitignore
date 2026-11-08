@@ -2,6 +2,7 @@
 !POTCAR
 !POSCAR
 !INCAR
+update_*sh
 
 __pycache__/
 build/
