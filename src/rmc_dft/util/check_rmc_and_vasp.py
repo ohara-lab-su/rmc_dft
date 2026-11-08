@@ -7,8 +7,11 @@ import os
 from typing import Any, Dict, List, Optional, Union, Tuple, Callable, Sequence
 
 from rmc_dft.config import Config
-from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
-from rmc_dft.vasp.vasp_outcar import VaspOutcar
+
+# from rmc_dft.rmc_pot.rmc_pot_log import RmcPotLog
+# from rmc_dft.vasp.vasp_outcar import VaspOutcar
+from rmc_util import RmcPotLog
+from vasp_util import VaspOutcar
 from x_logger import XLogger
 
 
