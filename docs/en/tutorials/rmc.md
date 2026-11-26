@@ -1,5 +1,14 @@
 # RMC Execution Tutorial
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://ohara-lab-su.github.io/rmc_dft/en/tutorials/rmc.html)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://ohara-lab-su.github.io/rmc_dft/ja/tutorials/rmc.html)
+
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/en/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.en.html)
+
+Use `rmc_util install` to copy the standalone `rmc.py`, `rmc_init.py`, and `config.yml`. If sharing a directory with a combined calculation, use a single `config.yml` with settings for both workflows.
+
 > Applies to: **rmc_dft v0.6.13**
 >
 > This tutorial explains the basic procedure for running RMC_POT independently by executing `rmc.py` directly.
@@ -122,7 +131,7 @@ When RMC and DFT are combined, the numbering is a **single shared sequence** acr
 
 ## 7. Ctrl+C
 
-In v0.6.13, `rmc.py` / `run_rmc()` wraps the RMC_POT execution in `try/finally`.
+The `rmc_util` runner `run_rmc()` wraps the RMC_POT execution in `try/finally`.
 
 Consequently, even if RMC_POT is interrupted with `Ctrl+C`, postprocessing is performed on partially generated files such as `*.cfg`, and the files are archived in the log directory.
 

@@ -1,5 +1,14 @@
 # RMC-DFT 手動 sequence 実行チュートリアル
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://ohara-lab-su.github.io/rmc_dft/en/tutorials/rmc_dft_sequence.html)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://ohara-lab-su.github.io/rmc_dft/ja/tutorials/rmc_dft_sequence.html)
+
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/ja/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.ja.html)
+
+`rmc_dft install run` で `config.yml` とシーケンス設定例を配置し、番号付き init と入力を用意してから、作業ディレクトリで `python -m rmc_dft.runners.rmc_vasp_script_sequence` を実行します。
+
 > 対象: **rmc_dft v0.6.13**
 >
 > `rmc_vasp_script_sequence.py` を使用し、RMC/VASPの実行順序を通し番号単位で明示的に指定する方法を説明します。
@@ -45,7 +54,6 @@ rmc_vasp_init_6.py
 sequence実行では主に、
 
 ```text
-rmc_vasp_script_sequence.py
 rmc_vasp_script_sequence_dat.py
 rmc_init_N.py
 rmc_vasp_init_N.py

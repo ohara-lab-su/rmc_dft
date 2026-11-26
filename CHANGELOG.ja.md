@@ -1,16 +1,36 @@
 # CHANGELOG
-- `rmc_dft install` は `run` に限らず、8カテゴリのいずれも指定でき、指定カテゴリ以下の全ファイルをカレントディレクトリへ配置する。
 
-[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
-[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](./CHANGELOG.md)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](./CHANGELOG.ja.md)
 
-- `all` を指定すると8カテゴリすべてをカテゴリ別ディレクトリにコピーする。個別ファイル指定はサポートしない。
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/ja/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.ja.html)
+
+## v0.7.15（作業ツリー）
+
+- `rmc_dft install list` を追加。同梱ファイルのカテゴリ付きパスと用途を、揃えた列で表示する。
+- リポジトリ直下の `scripts/` を配布物の `share/rmc_dft/scripts/` 以下に収録するよう修正。一覧とコピーはインストール済み配布物の同じファイル記録を参照する。
+- `vasp_util` の読み込み時に必要な ASE を実行時依存に明記。
+- 単独 RMC の `plot_fit.py`、`plot_hst.py`、`plot_ppcf.py`、`plot_ppcf2.py` を削除。これらは `rmc_util` v0.1.12 の配布対象。複数 run 比較と統合収束の作図は `rmc_dft` 側に残る。
+- README と Pages を、3パッケージの役割、現行 runner の起動方法、スクリプト配置に合わせて更新。
+
+## v0.7.13 — 2026-11-08
+
+- `check_rmc_and_vasp()` が `RmcPotLog` を `rmc_util`、`VaspOutcar` を `vasp_util` から取得するよう修正。
+- 配布メタデータの説明を更新し、ホームページ、資料、リポジトリ、Issues の URL を登録。
+- `scripts/run/conv_poscar2cfg.py` と `scripts/run/config.yml` のリポジトリ上の実行ビットを変更。ファイル内容は同じ。
 
 ## v0.7.12 — 2026-10-28
 
-### 追加
+- `vasp-util` を依存関係に追加し、VASP の処理本体を `vasp_util` に移行。`rmc_dft` の一部の旧名前空間からクラスや関数を再公開する。
+- 統合 runner を `rmc_dft.runners` に置き、実際の RMC・VASP 実行をそれぞれの依存パッケージの runner に委譲する。
+- 編集用サンプルを `scripts/` の8カテゴリに再配置。`rmc_dft install <カテゴリ>` と、カテゴリ別の構造を保つ `rmc_dft install all` を追加。
+- Sphinx の Pages を英語ルート、`/en/`、`/ja/` の構成に再編し、日英チュートリアルを収録。
 
-- 同梱サンプルをカレントディレクトリへコピーする `rmc_dft install` コマンドを追加。
+## v0.7.11 — 2026-10-28（履歴上で取り消し）
+
+- バージョンを v0.7.11 とした変更は、v0.7.12 に至る履歴で取り消された（`2ce0f5f`、`20e7169`）。
 
 ## v0.7.10 — 2026-10-22
 
@@ -33,7 +53,7 @@
 
 - 正の単一係数、負の体積指定、3成分指定についてDirect/Cartesian座標を数値検査。スケール `1.0` およびセル外Direct座標の保持も検査（計7ケース）。
 
-## v0.7.9
+## v0.7.9 — 2026-10-22
 
 - `check_pair_distances()` を汎用幾何操作として提供。
 
@@ -49,6 +69,10 @@
 - 本ZIPは追加・修正ファイルのみ。既存の `vasp_poscar.py` は変更しない。
 - 最短画像探索は指定された画像探索半径の範囲内で行う。強く歪んだ格子では探索半径を検討すること。
 - aenet_env の教師候補生成は別ZIPで提供する。
+
+## v0.7.7 — 2026-10-19
+
+- 配布名を `rmc-dft`、Packmol の依存名を `packmol-util` に変更。
 
 ## v0.7.6 - 2026-10-13
 
@@ -71,12 +95,11 @@
 
 ## v0.7.2 - 2026-10-07
 
-- rmc_util への機能分離に対する対応のバグを修正 (未完？)
+- RMC 機能分離に合わせて、サンプルとパッケージ内の import を修正。
 
 ## v0.7.1 - 2026-10-07
 
-- ブランチ清掃
-- toml 修正
+- `rmc_util` を依存関係に追加。
 
 ## v0.7.0 - 2026-10-07
 
