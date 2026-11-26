@@ -1,26 +1,35 @@
 # VASP 実行チュートリアル
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://ohara-lab-su.github.io/rmc_dft/en/tutorials/dft_vasp.html)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://ohara-lab-su.github.io/rmc_dft/ja/tutorials/dft_vasp.html)
+
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/ja/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.ja.html)
+
+単独実行では `vasp_util install` で `vasp.py` と `vasp_init.py` を配置し、`config.yml` を用意します。統合 runner に渡す場合は初期化ファイルを `rmc_vasp_init.py`、番号付きなら `rmc_vasp_init_N.py` として置きます。
+
 > 対象: **rmc_dft v0.6.13**
 >
-> `rmc_vasp.py` を直接実行して VASP を単独で動かす場合と、`rmc_vasp_init.py` の使い方を説明します。
+> `vasp.py` を直接実行して VASP を単独で動かす場合と、`vasp_init.py` の使い方を説明します。
 
 ## 1. 概要
 
-`rmc_vasp.py` は、既存の VASP 入力を利用して VASP を実行するスクリプトです。
+`vasp.py` は、既存の VASP 入力を利用して VASP を実行するスクリプトです。
 
-VASP の入力条件は `rmc_vasp_init.py` に記述します。
+VASP の入力条件は `vasp_init.py` に記述します。
 
 ```text
 config.yml
     |
-rmc_vasp_init.py
+vasp_init.py
     |
     +--> KPOINTS
     +--> POTCAR
     +--> VaspIncar.init()
     +--> INCAR のタグ設定
     |
-rmc_vasp.py
+vasp.py
     |
     +--> run_vasp()
             |
@@ -35,8 +44,8 @@ rmc_vasp.py
 
 ```text
 config.yml
-rmc_vasp.py
-rmc_vasp_init.py
+vasp.py
+vasp_init.py
 POSCAR
 ```
 
@@ -44,9 +53,9 @@ POSCAR
 
 `INCAR`、`KPOINTS`、`POTCAR` は既存ファイルを使用することも、init 側から準備することもできます。
 
-## 3. `rmc_vasp_init.py`
+## 3. `vasp_init.py`
 
-`rmc_vasp.py` を直接起動すると、
+`vasp.py` を直接起動すると、
 
 ```python
 run_vasp_init(
@@ -119,16 +128,16 @@ vasp_incar.set_tag("ISIF", 2)
 vasp_incar.set_tag("IBRION", 2)
 ```
 
-のように、`rmc_vasp_init.py` に明示したタグを設定します。
+のように、`vasp_init.py` に明示したタグを設定します。
 
 重要なのは、**既存 `INCAR` がある場合でも init を無視しない**ことです。
 
-既存INCARを初期入力として読み込み、その上で `rmc_vasp_init.py` の setter を実行します。
+既存INCARを初期入力として読み込み、その上で `vasp_init.py` の setter を実行します。
 
 ## 5. 実行
 
 ```bash
-python rmc_vasp.py
+python vasp.py
 ```
 
 で実行します。
@@ -182,7 +191,7 @@ RMC-DFTとして使用するとき、数字部分はRMCとDFTで共有する通�
 
 ## 8. `CONTINUE_NUMBERED_INIT`
 
-`rmc_vasp_init.py` には、
+`vasp_init.py` には、
 
 ```python
 CONTINUE_NUMBERED_INIT = False
@@ -190,7 +199,7 @@ CONTINUE_NUMBERED_INIT = False
 
 があります。
 
-単独で `rmc_vasp.py` を実行する場合には通常使用しません。
+単独で `vasp.py` を実行する場合には通常使用しません。
 
 `rmc_vasp_script.py` / `rmc_vasp_script_sequence.py` から、
 
@@ -202,7 +211,7 @@ rmc_vasp_init_N.py
 
 ## 9. 基本的な編集方針
 
-VASP条件を変更する場合は、原則として `rmc_vasp.py` 本体ではなく `rmc_vasp_init.py` を編集します。
+VASP条件を変更する場合は、原則として `vasp.py` 本体ではなく `vasp_init.py` を編集します。
 
 例えば、
 
@@ -226,4 +235,4 @@ NSIM
 
 などです。
 
-`rmc_vasp.py` は実行処理、`rmc_vasp_init.py` は入力条件、という役割分担にします。
+`vasp.py` は実行処理、`vasp_init.py` は入力条件、という役割分担にします。

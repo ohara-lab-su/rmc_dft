@@ -1,5 +1,14 @@
 # RMC-DFT Manual Sequence Execution Tutorial
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://ohara-lab-su.github.io/rmc_dft/en/tutorials/rmc_dft_sequence.html)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://ohara-lab-su.github.io/rmc_dft/ja/tutorials/rmc_dft_sequence.html)
+
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/en/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.en.html)
+
+Use `rmc_dft install run` to copy `config.yml` and the sequence template. Prepare the numbered init files and inputs, then run `python -m rmc_dft.runners.rmc_vasp_script_sequence` from the working directory.
+
 > Applies to: **rmc_dft v0.6.13**
 >
 > This tutorial explains how to use `rmc_vasp_script_sequence.py` to specify the execution order of RMC and VASP runs explicitly by shared sequence number.
@@ -39,7 +48,6 @@ rmc_vasp_init_6.py
 Sequence execution primarily uses:
 
 ```text
-rmc_vasp_script_sequence.py
 rmc_vasp_script_sequence_dat.py
 rmc_init_N.py
 rmc_vasp_init_N.py

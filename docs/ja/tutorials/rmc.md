@@ -1,5 +1,14 @@
 # RMC 実行チュートリアル
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://ohara-lab-su.github.io/rmc_dft/en/tutorials/rmc.html)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://ohara-lab-su.github.io/rmc_dft/ja/tutorials/rmc.html)
+
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/ja/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.ja.html)
+
+単独実行用の `rmc.py`、`rmc_init.py`、`config.yml` は `rmc_util install` で配置します。統合計算と同じディレクトリを使う場合は、双方が読む `config.yml` を一つにまとめてください。
+
 > 対象: **rmc_dft v0.6.13**
 >
 > `rmc.py` を直接実行して、RMC_POT を単独で動かす場合の基本的な使い方を説明します。
@@ -130,7 +139,7 @@ RMC と DFT を組み合わせた場合も、番号はRMC専用番号・DFT専�
 
 ## 7. Ctrl+C
 
-v0.6.13 の `rmc.py` / `run_rmc()` では、RMC_POT 実行部分を `try/finally` で処理しています。
+`rmc_util` の `run_rmc()` では、RMC_POT 実行部分を `try/finally` で処理しています。
 
 そのため、RMC_POT を `Ctrl+C` で停止した場合でも、途中まで生成された `*.cfg` などに対して postprocess が実行され、ログディレクトリへの退避処理が行われます。
 

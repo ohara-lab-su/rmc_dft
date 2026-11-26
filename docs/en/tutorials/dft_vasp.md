@@ -1,26 +1,35 @@
 # VASP Execution Tutorial
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://ohara-lab-su.github.io/rmc_dft/en/tutorials/dft_vasp.html)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://ohara-lab-su.github.io/rmc_dft/ja/tutorials/dft_vasp.html)
+
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/en/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.en.html)
+
+For standalone execution, use `vasp_util install` to copy `vasp.py` and `vasp_init.py`, and provide `config.yml`. For the combined runner, name the initialization file `rmc_vasp_init.py` or `rmc_vasp_init_N.py` for a numbered run.
+
 > Applies to: **rmc_dft v0.6.13**
 >
-> This tutorial describes running VASP independently by executing `rmc_vasp.py` directly, as well as using `rmc_vasp_init.py`.
+> This tutorial describes running VASP independently by executing `vasp.py` directly, as well as using `vasp_init.py`.
 
 ## 1. Overview
 
-`rmc_vasp.py` runs VASP using existing VASP input files.
+`vasp.py` runs VASP using existing VASP input files.
 
-VASP input conditions are specified in `rmc_vasp_init.py`.
+VASP input conditions are specified in `vasp_init.py`.
 
 ```text
 config.yml
     |
-rmc_vasp_init.py
+vasp_init.py
     |
     +--> KPOINTS
     +--> POTCAR
     +--> VaspIncar.init()
     +--> Set INCAR tags
     |
-rmc_vasp.py
+vasp.py
     |
     +--> run_vasp()
             |
@@ -35,16 +44,16 @@ A typical setup includes:
 
 ```text
 config.yml
-rmc_vasp.py
-rmc_vasp_init.py
+vasp.py
+vasp_init.py
 POSCAR
 ```
 
 `INCAR`, `KPOINTS`, and `POTCAR` can either be provided as existing files or prepared by the initialization script.
 
-## 3. `rmc_vasp_init.py`
+## 3. `vasp_init.py`
 
-When `rmc_vasp.py` is launched directly, the following function is called before VASP execution:
+When `vasp.py` is launched directly, the following function is called before VASP execution:
 
 ```python
 run_vasp_init(
@@ -99,7 +108,7 @@ Already initialized
     -> init() does not initialize again
 ```
 
-After initialization, explicitly configured tags are set in `rmc_vasp_init.py`, for example:
+After initialization, explicitly configured tags are set in `vasp_init.py`, for example:
 
 ```python
 vasp_incar.set_tag("EDIFF", 1e-4)
@@ -113,14 +122,14 @@ vasp_incar.set_tag("IBRION", 2)
 
 Importantly, **the initialization script is not skipped when an existing `INCAR` is present**.
 
-The existing INCAR is loaded as the initial input, and the setters in `rmc_vasp_init.py` are then applied.
+The existing INCAR is loaded as the initial input, and the setters in `vasp_init.py` are then applied.
 
 ## 5. Execution
 
 Run:
 
 ```bash
-python rmc_vasp.py
+python vasp.py
 ```
 
 The execution mode normally comes from `run_mode` in `config.yml`.
@@ -166,13 +175,13 @@ In RMC-DFT operation, the numeric part is a shared sequence number across RMC an
 
 ## 8. `CONTINUE_NUMBERED_INIT`
 
-`rmc_vasp_init.py` contains:
+`vasp_init.py` contains:
 
 ```python
 CONTINUE_NUMBERED_INIT = False
 ```
 
-This is normally unused when `rmc_vasp.py` is run independently.
+This is normally unused when `vasp.py` is run independently.
 
 When invoked through `rmc_vasp_script.py` / `rmc_vasp_script_sequence.py` with a numbered initialization file:
 
@@ -184,7 +193,7 @@ it determines whether the numbered initialization file continues to be used for 
 
 ## 9. General Editing Guidelines
 
-To change VASP conditions, edit `rmc_vasp_init.py` rather than the main `rmc_vasp.py` script.
+To change VASP conditions, edit `vasp_init.py` rather than the main `vasp.py` script.
 
 For example:
 
@@ -206,4 +215,4 @@ NCORE
 NSIM
 ```
 
-The responsibilities are separated: `rmc_vasp.py` handles execution, while `rmc_vasp_init.py` defines input conditions.
+The responsibilities are separated: `vasp.py` handles execution, while `vasp_init.py` defines input conditions.

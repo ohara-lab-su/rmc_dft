@@ -1,5 +1,14 @@
 # RMC-DFT 実行チュートリアル
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://ohara-lab-su.github.io/rmc_dft/en/tutorials/rmc_dft.html)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://ohara-lab-su.github.io/rmc_dft/ja/tutorials/rmc_dft.html)
+
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/ja/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.ja.html)
+
+`rmc_dft install run` で統合設定を配置します。実行処理はパッケージ内の `rmc_dft.runners` にあり、作業ディレクトリに用意するファイルは設定、計算入力、必要な init です。
+
 > 対象: **rmc_dft v0.6.13**
 >
 > `rmc_vasp_script.py` による通常の RMC → VASP → RMC → VASP ... の自動実行と、`rmc_init_N.py` / `rmc_vasp_init_N.py` の使い方を説明します。
@@ -55,7 +64,7 @@ RMC用カウンターとDFT用カウンターを別々に持つ方式ではあ�
 通常開始は、
 
 ```bash
-python rmc_vasp_script.py
+python -m rmc_dft.runners.rmc_vasp_script
 ```
 
 です。
@@ -77,7 +86,7 @@ POSCAR0
 restart は、
 
 ```bash
-python rmc_vasp_script.py restart
+python -m rmc_dft.runners.rmc_vasp_script restart
 ```
 
 です。

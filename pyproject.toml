@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rmc-dft"
-version = "0.7.13"
+version = "0.7.15"
 
 description = "Python tools for integrating Reverse Monte Carlo structural modeling with VASP-based first-principles calculations and molecular dynamics of amorphous materials."
 authors = [
@@ -20,6 +20,7 @@ dependencies = [
     "packmol-util",
     "rmc-util",
     "vasp-util",
+    "ase",
     # fnc
     "pymatgen",
     # basic
@@ -64,5 +65,12 @@ rmc_dft = "rmc_dft.install:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.setuptools.package-data]
-rmc_dft = ["scripts/**/*"]
+[tool.setuptools.data-files]
+"share/rmc_dft/scripts/analyze" = ["scripts/analyze/*.py"]
+"share/rmc_dft/scripts/check" = ["scripts/check/*.py"]
+"share/rmc_dft/scripts/edit" = ["scripts/edit/*.py"]
+"share/rmc_dft/scripts/job" = ["scripts/job/*.sh"]
+"share/rmc_dft/scripts/make" = ["scripts/make/*.py", "scripts/make/*.json"]
+"share/rmc_dft/scripts/plot" = ["scripts/plot/*.py"]
+"share/rmc_dft/scripts/run" = ["scripts/run/*.py", "scripts/run/*.yml"]
+"share/rmc_dft/scripts/tools" = ["scripts/tools/*.py", "scripts/tools/*.sh"]

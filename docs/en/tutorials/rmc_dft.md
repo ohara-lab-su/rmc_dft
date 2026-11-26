@@ -1,5 +1,14 @@
 # RMC-DFT Execution Tutorial
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://ohara-lab-su.github.io/rmc_dft/en/tutorials/rmc_dft.html)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://ohara-lab-su.github.io/rmc_dft/ja/tutorials/rmc_dft.html)
+
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/en/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.en.html)
+
+Use `rmc_dft install run` to copy the combined configuration. Execution is provided by the installed `rmc_dft.runners` package. Keep the configuration, simulation inputs, and any init files in the working directory.
+
 > Applies to: **rmc_dft v0.6.13**
 >
 > This tutorial describes the standard automated RMC → VASP → RMC → VASP ... workflow using `rmc_vasp_script.py`, including the use of `rmc_init_N.py` and `rmc_vasp_init_N.py`.
@@ -51,7 +60,7 @@ The current sequence number is determined by `next_log_dir_name()`.
 Start normally with:
 
 ```bash
-python rmc_vasp_script.py
+python -m rmc_dft.runners.rmc_vasp_script
 ```
 
 A normal start creates the initial CFG from:
@@ -71,7 +80,7 @@ Execution then begins with RMC.
 Restart with:
 
 ```bash
-python rmc_vasp_script.py restart
+python -m rmc_dft.runners.rmc_vasp_script restart
 ```
 
 The script examines existing `logN_rmc` / `logN_dft` directories to determine the next sequence number and whether to resume with RMC or VASP.

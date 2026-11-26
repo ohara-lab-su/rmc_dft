@@ -1,5 +1,14 @@
 # TOP/ITP and FNC in RMC_POT
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://ohara-lab-su.github.io/rmc_dft/en/tutorials/rmc_pot_dat_top_fnc_pages.html)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://ohara-lab-su.github.io/rmc_dft/ja/tutorials/rmc_pot_dat_top_fnc_pages.html)
+
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/en/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.en.html)
+
+Import the TOP and FNC APIs from `rmc_util`. A TOP implementation also remains in `rmc_dft.rmc_pot_dat_top`, so check which import existing scripts use.
+
 This page describes the functionality implemented by the following two classes.
 
 - `RmcPotDatTop`: Creates and edits GROMACS-style `*.top` and `*.itp` files for RMC_POT.
@@ -48,7 +57,7 @@ It also handles preprocessor directives recognized by RMC_POT.
 ## 1.2 Reading and writing files
 
 ```python
-from rmc_pot_dat_top import RmcPotDatTop
+from rmc_util.rmc_pot_dat_top import RmcPotDatTop
 
 
 top = RmcPotDatTop("sample", auto_write=False)
@@ -645,7 +654,7 @@ Atom numbers in FNC are not local molecular numbers. They are 1-based final RMC 
 ## 8.2 Initialization
 
 ```python
-from rmc_pot_dat_fnc import RmcPotDatFnc
+from rmc_util.rmc_pot_dat_fnc import RmcPotDatFnc
 
 
 fnc = RmcPotDatFnc(
@@ -983,7 +992,7 @@ pairs = fnc.as_pairs(unique=False)
 Replace the example distance ranges and atom indices with values appropriate to the target structure.
 
 ```python
-from rmc_pot_dat_fnc import RmcPotDatFnc
+from rmc_util.rmc_pot_dat_fnc import RmcPotDatFnc
 
 
 fnc = RmcPotDatFnc(

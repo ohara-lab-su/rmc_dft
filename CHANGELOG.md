@@ -1,16 +1,36 @@
 # CHANGELOG
-- `rmc_dft install` supports all eight script categories, copying every file in the selected category to the current directory.
 
-[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.md)
-[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://github.com/ohara-lab-su/rmc_dft/blob/main/CHANGELOG.ja.md)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](./CHANGELOG.md)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](./CHANGELOG.ja.md)
 
-- `all` copies all eight categories preserving category directories. Individual file paths are not supported.
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/en/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.en.html)
+
+## v0.7.15 (working tree)
+
+- Added `rmc_dft install list` to show bundled paths and one-line descriptions in aligned columns.
+- Fixed packaging to ship the repository's `scripts/` under `share/rmc_dft/scripts/`. Listing and copying use the same installed distribution records.
+- Declared ASE as a runtime dependency because importing `vasp_util` requires it.
+- Removed the standalone RMC scripts `plot_fit.py`, `plot_hst.py`, `plot_ppcf.py`, and `plot_ppcf2.py`, which are bundled with `rmc_util` v0.1.12. Multi-run comparison and combined convergence plots remain in `rmc_dft`.
+- Updated the READMEs and Pages to describe the three packages, current runner entry points, and script setup.
+
+## v0.7.13 — 2026-11-08
+
+- Fixed `check_rmc_and_vasp()` to use `RmcPotLog` from `rmc_util` and `VaspOutcar` from `vasp_util`.
+- Updated the distribution description and registered URLs for the homepage, documentation, repository, and issue tracker.
+- Changed the repository executable bits of `scripts/run/conv_poscar2cfg.py` and `scripts/run/config.yml`. Their contents were unchanged.
 
 ## v0.7.12 — 2026-10-28
 
-### Added
+- Added the `vasp-util` dependency and moved VASP implementations to `vasp_util`. Selected classes and functions are re-exported through legacy namespaces.
+- Placed the combined runners under `rmc_dft.runners`, delegating RMC and VASP execution to their respective dependency runners.
+- Reorganized editable examples into eight categories in `scripts/`. Added `rmc_dft install <category>` and `rmc_dft install all`, which preserves the category directories.
+- Reorganized the Sphinx Pages into an English root, `/en/`, and `/ja/` with tutorials in both languages.
 
-- Added the `rmc_dft install` command to copy packaged example scripts to the current directory.
+## v0.7.11 — 2026-10-28 (reverted in local history)
+
+- The change that set the version to v0.7.11 was reverted in the history leading to v0.7.12 (`2ce0f5f`, `20e7169`).
 
 ## v0.7.10 — 2026-10-22
 
@@ -40,7 +60,7 @@
 - Numerically tested Direct and Cartesian positions with positive scalar, negative volume, and three-component scale
   specifications, plus scale `1.0` and preservation of out-of-cell Direct coordinates (seven cases).
 
-## v0.7.9
+## v0.7.9 — 2026-10-22
 
 - Added check_pair_distances () as a general-purpose geometry utility.
 
@@ -60,6 +80,14 @@
   search radius may need to be adjusted.
 - Training-candidate generation for `aenet_env` is provided in a separate ZIP.
 
+## v0.7.7 — 2026-10-19
+
+- Set the distribution name to `rmc-dft` and the Packmol dependency name to `packmol-util`.
+
+## v0.7.6 — 2026-10-13
+
+- Included INCAR in VASP result backups.
+
 ## v0.7.5 - 2026-10-12
 
 - Updated the README to match the current `rmc_dft` implementation and package structure.
@@ -68,6 +96,22 @@
   sequence execution.
 - Documented the design direction toward independence from specific RMC/DFT codes and future support for
   structural-relaxation backends such as MLPs in addition to DFT.
+
+## v0.7.4 — 2026-10-08
+
+- Added the Apache 2.0 license file.
+
+## v0.7.3 — 2026-10-08
+
+- Updated documentation URLs and README content.
+
+## v0.7.2 — 2026-10-07
+
+- Updated examples and package imports after the RMC split.
+
+## v0.7.1 — 2026-10-07
+
+- Declared `rmc_util` as a dependency.
 
 ## v0.7.0 - 2026-10-07
 

@@ -1,5 +1,14 @@
 # RMC_POT の TOP／ITP と FNC
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://ohara-lab-su.github.io/rmc_dft/en/tutorials/rmc_pot_dat_top_fnc_pages.html)
+[![ja](https://img.shields.io/badge/lang-ja-yellow.svg)](https://ohara-lab-su.github.io/rmc_dft/ja/tutorials/rmc_pot_dat_top_fnc_pages.html)
+
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Frmc_dft-181717?logo=github)](https://github.com/ohara-lab-su/rmc_dft/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/ja/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.ja.html)
+
+TOP と FNC の API は `rmc_util` から読み込みます。既存の `rmc_dft.rmc_pot_dat_top` にも TOP の実装が残っているため、利用中の import を確認してください。
+
 このページでは、次の2クラスが実装している機能を説明します。
 
 - `RmcPotDatTop`: RMC_POT用のGROMACS型`*.top`／`*.itp`を生成・編集する
@@ -48,7 +57,7 @@ RMC_POTでは、通常FNCの`fnc=1/2/3`と、TOPを用いる柔軟分子の`fnc=
 ## 1.2 ファイルの読み書き
 
 ```python
-from rmc_pot_dat_top import RmcPotDatTop
+from rmc_util.rmc_pot_dat_top import RmcPotDatTop
 
 
 top = RmcPotDatTop("sample", auto_write=False)
@@ -645,7 +654,7 @@ FNC内の原子番号は、分子内ローカル番号ではありません。�
 ## 8.2 初期化
 
 ```python
-from rmc_pot_dat_fnc import RmcPotDatFnc
+from rmc_util.rmc_pot_dat_fnc import RmcPotDatFnc
 
 
 fnc = RmcPotDatFnc(
@@ -983,7 +992,7 @@ pairs = fnc.as_pairs(unique=False)
 具体的な距離範囲と原子indexは、対象構造に合わせて置き換えます。
 
 ```python
-from rmc_pot_dat_fnc import RmcPotDatFnc
+from rmc_util.rmc_pot_dat_fnc import RmcPotDatFnc
 
 
 fnc = RmcPotDatFnc(
