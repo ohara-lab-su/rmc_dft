@@ -7,7 +7,7 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/ja/)
 [![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.ja.html)
 
-## v0.7.15（作業ツリー）
+## v0.7.14（未公開）
 
 - `rmc_dft install list` を追加。同梱ファイルのカテゴリ付きパスと用途を、揃えた列で表示する。
 - リポジトリ直下の `scripts/` を配布物の `share/rmc_dft/scripts/` 以下に収録するよう修正。一覧とコピーはインストール済み配布物の同じファイル記録を参照する。
