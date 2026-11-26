@@ -7,7 +7,7 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/rmc_dft/en/)
 [![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.en.html)
 
-## v0.7.15 (working tree)
+## v0.7.14 (unreleased)
 
 - Added `rmc_dft install list` to show bundled paths and one-line descriptions in aligned columns.
 - Fixed packaging to ship the repository's `scripts/` under `share/rmc_dft/scripts/`. Listing and copying use the same installed distribution records.
